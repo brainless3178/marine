@@ -108,12 +108,12 @@ Copy the output and set it as `JWT_SECRET` in Render.
 
 ## Step 5: Update Admin Password
 
-After deployment, the default admin credentials are:
+After deployment, log in with the admin credentials created during the database seed:
 
 - **Email:** admin@alkatraders.com
-- **Password:** admin123
+- **Password:** *(set during seed — change immediately after first login)*
 
-**⚠️ Change this immediately after first login!**
+**⚠️ Change the admin password immediately after first login via the Admin Panel!**
 
 ---
 
