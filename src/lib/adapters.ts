@@ -63,7 +63,7 @@ export function apiProductToFrontend(api: ApiProduct): Product {
 
   return {
     id: api.id,
-    filename: api.images?.[0]?.url?.split('/').pop()?.split('?')[0] || 'placeholder.png',
+    filename: (api.images?.[0]?.url?.split('/').pop()?.split('?')[0] || 'placeholder.png').replace(/\.(jpe?g|png|webp)$/i, '.avif'),
     name: api.name,
     brand: api.brand?.name || 'Unknown',
     sku: api.sku,
