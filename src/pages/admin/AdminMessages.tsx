@@ -1,0 +1,342 @@
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useToast } from '../../components/admin/Toast'
+import { AdminPagination } from '../../components/admin/AdminPagination'
+import { admin, api } from '../../lib/api'
+import {
+  Search,
+  Mail,
+  Plus,
+  X,
+  Send,
+  Inbox,
+  Trash2,
+  Star,
+  Paperclip,
+  Loader2,
+} from 'lucide-react'
+
+type MessageFolder = 'inbox' | 'sent' | 'starred' | 'trash'
+
+interface Message {
+  id: string
+  from: string
+  fromCompany: string
+  to: string
+  subject: string
+  body: string
+  folder: 'inbox' | 'sent'
+  read: boolean
+  starred: boolean
+  createdAt: string
+  attachments: string[]
+}
+
+function mapApiMessage(m: any): Message {
+  return {
+    id: m.id,
+    from: m.name || m.from || 'Unknown',
+    fromCompany: m.source || m.fromCompany || '',
+    to: m.to || 'Admin',
+    subject: m.subject || 'No Subject',
+    body: m.message || m.body || '',
+    folder: m.status === 'replied' ? 'sent' as const : 'inbox' as const,
+    read: m.status !== 'new',
+    starred: m.isStarred ?? false,
+    createdAt: m.createdAt || new Date().toISOString(),
+    attachments: [],
+  }
+}
+
+const ITEMS_PER_PAGE = 12
+
+function ComposeModal({ onClose, onSent, toast }: { onClose: () => void; onSent: () => void; toast: any }) {
+  const [to, setTo] = useState('')
+  const [subject, setSubject] = useState('')
+  const [body, setBody] = useState('')
+  const [sending, setSending] = useState(false)
+
+  const handleSend = async () => {
+    if (!to.trim() || !subject.trim() || !body.trim()) {
+      toast('To, subject, and message are required', 'error')
+      return
+    }
+    setSending(true)
+    try {
+      await api.post('/admin/messages', { to, subject, message: body }, { auth: 'admin' })
+      toast('Message sent', 'success')
+      onSent()
+    } catch (err: any) {
+      toast(err.message || 'Failed to send message', 'error')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-2xl p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="font-display text-lg font-bold text-[var(--text-primary)]">New Message</h3>
+          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)]"><X size={16} /></button>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">To</label>
+            <input type="text" value={to} onChange={(e) => setTo(e.target.value)} placeholder="Recipient name or email" className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm outline-none focus:border-[var(--accent-gold)]" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">Subject</label>
+            <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Message subject" className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm outline-none focus:border-[var(--accent-gold)]" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">Message</label>
+            <textarea rows={6} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Type your message..." className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm outline-none focus:border-[var(--accent-gold)] resize-y" />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={handleSend} disabled={sending} className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522] disabled:opacity-50">
+            {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />} Send
+          </button>
+          <button onClick={onClose} className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)]">Cancel</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function AdminMessages() {
+  const { toast } = useToast()
+  const [messages, setMessages] = useState<Message[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [folder, setFolder] = useState<MessageFolder>('inbox')
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
+  const [composing, setComposing] = useState(false)
+  const [page, setPage] = useState(1)
+
+  const fetchMessages = useCallback(async () => {
+    setLoading(true)
+    try {
+      const params: Record<string, string> = {}
+      if (search.trim()) params.search = search.trim()
+      params.page = String(page)
+      params.limit = String(ITEMS_PER_PAGE)
+      if (folder === 'inbox' || folder === 'sent') params.folder = folder
+      const res = await admin.messages.list(params)
+      setMessages((res.messages || []).map(mapApiMessage))
+    } catch (err: any) {
+      console.error('Failed to load messages:', err)
+      toast('Failed to load messages', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [search, page, folder, toast])
+
+  useEffect(() => {
+    const timer = setTimeout(() => fetchMessages(), 300)
+    return () => clearTimeout(timer)
+  }, [fetchMessages])
+
+  const filtered = useMemo(() => {
+    let result = [...messages]
+    if (folder === 'starred') result = result.filter((m) => m.starred)
+    else if (folder === 'trash') return []
+    else result = result.filter((m) => m.folder === folder)
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      result = result.filter((m) => m.subject.toLowerCase().includes(q) || m.from.toLowerCase().includes(q) || m.fromCompany.toLowerCase().includes(q))
+    }
+    return result
+  }, [messages, search, folder])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+
+  const unreadCount = messages.filter((m) => m.folder === 'inbox' && !m.read).length
+  const starredCount = messages.filter((m) => m.starred).length
+
+  const formatTime = (d: string) => {
+    const date = new Date(d)
+    const now = new Date()
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+    if (diffDays === 0) return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    if (diffDays === 1) return 'Yesterday'
+    if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'short' })
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
+  const handleOpenMessage = async (msg: Message) => {
+    setSelectedMessage(msg)
+    if (!msg.read && msg.folder === 'inbox') {
+      try {
+        await admin.messages.markRead(msg.id)
+        setMessages((prev) => prev.map((m) => m.id === msg.id ? { ...m, read: true } : m))
+      } catch {
+        // Optimistic update already done
+      }
+    }
+  }
+
+  const handleArchive = async (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    try {
+      await admin.messages.archive(id)
+      toast('Message archived', 'success')
+      setMessages((prev) => prev.filter((m) => m.id !== id))
+      if (selectedMessage?.id === id) setSelectedMessage(null)
+    } catch (err: any) {
+      toast(err.message || 'Archive failed', 'error')
+    }
+  }
+
+  const handleDelete = async (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    try {
+      await admin.messages.delete(id)
+      toast('Message deleted', 'success')
+      setMessages((prev) => prev.filter((m) => m.id !== id))
+      if (selectedMessage?.id === id) setSelectedMessage(null)
+    } catch (err: any) {
+      toast(err.message || 'Delete failed', 'error')
+    }
+  }
+
+  const toggleStar = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setMessages((prev) => prev.map((m) => m.id === id ? { ...m, starred: !m.starred } : m))
+    if (selectedMessage?.id === id) setSelectedMessage((prev) => prev ? { ...prev, starred: !prev.starred } : prev)
+  }
+
+  const folders: { id: MessageFolder; label: string; icon: typeof Inbox; count: number }[] = [
+    { id: 'inbox', label: 'Inbox', icon: Inbox, count: messages.filter((m) => m.folder === 'inbox').length },
+    { id: 'sent', label: 'Sent', icon: Send, count: messages.filter((m) => m.folder === 'sent').length },
+    { id: 'starred', label: 'Starred', icon: Star, count: starredCount },
+    { id: 'trash', label: 'Trash', icon: Trash2, count: 0 },
+  ]
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Messages</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{unreadCount} unread messages</p>
+        </div>
+        <button onClick={() => setComposing(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
+          <Plus size={14} /> Compose
+        </button>
+      </div>
+
+      {/* Folder Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {folders.map((f) => {
+          const Icon = f.icon
+          return (
+            <button key={f.id} onClick={() => { setFolder(f.id); setPage(1) }} className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${folder === f.id ? 'bg-[var(--accent-gold)] text-[#061522] shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
+              <Icon size={14} /> {f.label} ({f.count})
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Search */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
+        <div className="relative">
+          <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          <input type="text" placeholder="Search messages..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]" />
+        </div>
+      </div>
+
+      {/* Message List */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 size={24} className="animate-spin text-[var(--accent-gold)]" />
+            <span className="ml-3 text-sm text-[var(--text-muted)]">Loading messages...</span>
+          </div>
+        ) : (
+          <div className="divide-y divide-[var(--border)]">
+            {paginated.length === 0 ? (
+              <div className="text-center py-12"><Mail size={32} className="mx-auto text-[var(--text-muted)] mb-3" /><p className="text-sm font-semibold text-[var(--text-muted)]">No messages</p></div>
+            ) : (
+              paginated.map((msg) => (
+                <div key={msg.id} onClick={() => handleOpenMessage(msg)} className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[var(--surface-soft)] transition-colors ${!msg.read ? 'bg-[var(--accent-gold)]/[0.03]' : ''}`}>
+                  <button onClick={(e) => toggleStar(msg.id, e)} className="shrink-0">
+                    <Star size={14} className={msg.starred ? 'text-[var(--accent-gold)] fill-[var(--accent-gold)]' : 'text-[var(--text-muted)]/30 hover:text-[var(--accent-gold)]'} />
+                  </button>
+                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-bold ${msg.read ? 'bg-[var(--surface-soft)] text-[var(--text-muted)]' : 'bg-[var(--accent-blue)] text-white'}`}>
+                    {msg.from.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs truncate ${!msg.read ? 'font-bold text-[var(--text-primary)]' : 'font-semibold text-[var(--text-secondary)]'}`}>{msg.from}</span>
+                      <span className="text-[0.625rem] text-[var(--text-muted)] truncate hidden sm:inline">{msg.fromCompany}</span>
+                    </div>
+                    <p className={`text-xs truncate ${!msg.read ? 'font-semibold text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>{msg.subject}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {msg.attachments.length > 0 && <Paperclip size={10} className="text-[var(--text-muted)]" />}
+                    <span className="text-[0.625rem] text-[var(--text-muted)]">{formatTime(msg.createdAt)}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        <AdminPagination page={page} totalPages={totalPages} totalItems={filtered.length} itemLabel="messages" onPageChange={setPage} />
+      </div>
+
+      {/* Message Detail Slide-over */}
+      {selectedMessage && (
+        <div className="fixed inset-0 z-[100] flex justify-end bg-black/50 backdrop-blur-sm" onClick={() => setSelectedMessage(null)}>
+          <div className="relative w-full max-w-xl max-md:max-w-full max-md:rounded-none bg-[var(--surface)] shadow-2xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-6 py-4">
+              <h2 className="font-display text-sm font-bold text-[var(--text-primary)] truncate pr-4">{selectedMessage.subject}</h2>
+              <div className="flex items-center gap-1">
+                <button onClick={(e) => toggleStar(selectedMessage.id, e)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-gold)]"><Star size={14} className={selectedMessage.starred ? 'fill-[var(--accent-gold)] text-[var(--accent-gold)]' : ''} /></button>
+                <button onClick={(e) => handleArchive(selectedMessage.id, e)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-teal)]"><Inbox size={14} /></button>
+                <button onClick={(e) => handleDelete(selectedMessage.id, e)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)]"><Trash2 size={14} /></button>
+                <button onClick={() => setSelectedMessage(null)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)]"><X size={16} /></button>
+              </div>
+            </div>
+            <div className="p-6 space-y-6">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-blue)] text-xs font-bold text-white">
+                  {selectedMessage.from.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">{selectedMessage.from}</p>
+                  <p className="text-[0.625rem] text-[var(--text-muted)]">{selectedMessage.fromCompany} · {formatTime(selectedMessage.createdAt)}</p>
+                </div>
+              </div>
+              <div className="rounded-xl border border-[var(--border)] p-4">
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{selectedMessage.body}</p>
+              </div>
+              {selectedMessage.attachments.length > 0 && (
+                <div className="rounded-xl border border-[var(--border)] p-4">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">Attachments</h3>
+                  {selectedMessage.attachments.map((a) => (
+                    <div key={a} className="flex items-center gap-2 py-1"><Paperclip size={12} className="text-[var(--text-muted)]" /><span className="text-xs text-[var(--accent-blue)]">{a}</span></div>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-2 pt-2">
+                <button onClick={() => { setSelectedMessage(null); setComposing(true); toast('Reply composer opened', 'info') }} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-bold text-[var(--text-secondary)] hover:border-[var(--accent-gold)] transition-colors">
+                  <Send size={12} /> Reply
+                </button>
+                <button onClick={() => { setSelectedMessage(null); setComposing(true); toast('Forward composer opened', 'info') }} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-bold text-[var(--text-secondary)] hover:border-[var(--accent-teal)] transition-colors">
+                  Forward
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Compose Modal */}
+      {composing && (
+        <ComposeModal onClose={() => setComposing(false)} onSent={() => { setComposing(false); fetchMessages() }} toast={toast} />
+      )}
+    </div>
+  )
+}

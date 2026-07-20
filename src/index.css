@@ -1,0 +1,730 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-bg: #f3f7fb;
+  --secondary-bg: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #eaf1f7;
+  --surface-raised: #f8fbfd;
+  --accent-blue: #0a3d62;
+  --accent-gold: #e8aa24;
+  --accent-teal: #008c8c;
+  --text-primary: #071827;
+  --text-secondary: #38546d;
+  --text-muted: #6f8498;
+  --border: #cddbe7;
+  --danger: #dc2626;
+  --success: #159a67;
+  --shadow-soft: 0 24px 70px rgba(7, 24, 39, 0.10);
+  --shadow-card: 0 16px 44px rgba(7, 24, 39, 0.09);
+  --navy-deep: #061522;
+  --navy-mid: #0a2a43;
+  --navy-light: #154b70;
+  --gold-light: #ffd878;
+  --gold-dark: #9f6b00;
+  --gold-muted: rgba(232, 170, 36, 0.14);
+  --teal-soft: rgba(0, 140, 140, 0.10);
+  --brick-ember: #b91c1c;
+  --honeydew: #f0fdf4;
+}
+
+html.light {
+  --primary-bg: #f3f7fb;
+  --secondary-bg: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #eaf1f7;
+  --surface-raised: #f8fbfd;
+  --accent-blue: #0a3d62;
+  --accent-gold: #e8aa24;
+  --accent-teal: #008c8c;
+  --text-primary: #071827;
+  --text-secondary: #38546d;
+  --text-muted: #6f8498;
+  --border: #cddbe7;
+  --danger: #dc2626;
+  --success: #159a67;
+  --shadow-soft: 0 24px 70px rgba(7, 24, 39, 0.10);
+  --shadow-card: 0 16px 44px rgba(7, 24, 39, 0.09);
+  --navy-deep: #061522;
+  --navy-mid: #0a2a43;
+  --navy-light: #154b70;
+  --gold-light: #ffd878;
+  --gold-dark: #9f6b00;
+  --gold-muted: rgba(232, 170, 36, 0.14);
+  --teal-soft: rgba(0, 140, 140, 0.10);
+  --brick-ember: #b91c1c;
+  --honeydew: #f0fdf4;
+}
+
+html:not(.light) {
+  --primary-bg: #04101b;
+  --secondary-bg: #071827;
+  --surface: #0b2033;
+  --surface-soft: #071827;
+  --surface-raised: #102a40;
+  --accent-blue: #77c7f3;
+  --accent-gold: #f0b947;
+  --accent-teal: #31d5c7;
+  --text-primary: #eef6fb;
+  --text-secondary: #abc2d4;
+  --text-muted: #7891a5;
+  --border: rgba(167, 190, 210, 0.20);
+  --danger: #f87171;
+  --success: #34d399;
+  --shadow-soft: 0 18px 48px rgba(0, 0, 0, 0.28);
+  --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.22);
+  --navy-deep: #030b12;
+  --navy-mid: #071827;
+  --navy-light: #123552;
+  --gold-light: #ffe08a;
+  --gold-dark: #bd820e;
+  --gold-muted: rgba(240, 185, 71, 0.13);
+  --teal-soft: rgba(49, 213, 199, 0.08);
+  --brick-ember: #dc2626;
+  --honeydew: #ecfdf5;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    -webkit-font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background:
+      radial-gradient(circle at 8% 0%, rgba(232, 170, 36, 0.08), transparent 24rem),
+      radial-gradient(circle at 92% 12%, rgba(0, 140, 140, 0.08), transparent 28rem),
+      var(--primary-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'tnum' 1;
+    -webkit-font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'tnum' 1;
+  }
+
+  /* ── Heading hierarchy ─────────────────────────────────── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    text-wrap: balance;
+    hanging-punctuation: first last;
+  }
+
+  h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    letter-spacing: 0;
+    font-weight: 600;
+  }
+
+  h4 {
+    font-size: 1rem;
+    line-height: 1.35;
+    letter-spacing: 0;
+    font-weight: 600;
+  }
+
+  /* ── Body text ─────────────────────────────────────────── */
+  p {
+    text-wrap: pretty;
+    hanging-punctuation: first last;
+    overflow-wrap: break-word;
+    max-width: 70ch;
+  }
+
+  strong, b {
+    font-weight: 700;
+  }
+
+  /* ── Links ─────────────────────────────────────────────── */
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  a:hover {
+    color: var(--accent-gold);
+  }
+
+  /* ── Selection ─────────────────────────────────────────── */
+  ::selection {
+    background: rgba(200, 147, 10, 0.22);
+    color: var(--text-primary);
+  }
+
+  /* ── Scrollbar ─────────────────────────────────────────── */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--primary-bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-gold);
+  }
+}
+
+@layer components {
+  /* ── Typographic utilities ─────────────────────────────── */
+  .type-display-hero {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(44px, 7vw, 84px);
+    line-height: 1.0;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .type-display-lg {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .type-display-md {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(32px, 4.5vw, 52px);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .type-display-sm {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 3.5vw, 44px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .type-section {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(34px, 4.5vw, 52px);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .type-body-lead {
+    font-size: 1.125rem;
+    line-height: 1.65;
+    letter-spacing: 0;
+  }
+
+  .type-body {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .type-body-sm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .type-label {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    font-weight: 600;
+  }
+
+  .type-caption {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+
+  .type-overline {
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .type-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .type-price {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* ── Heading size utilities (for use outside h1-h6 elements) ── */
+  .heading-xl {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    line-height: 1.25;
+    letter-spacing: 0;
+    font-weight: 700;
+  }
+
+  .heading-lg {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.3;
+    letter-spacing: 0;
+    font-weight: 600;
+  }
+
+  .heading-md {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    line-height: 1.35;
+    letter-spacing: 0;
+    font-weight: 600;
+  }
+
+  .heading-sm {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    letter-spacing: 0;
+    font-weight: 600;
+  }
+
+  /* ── Tabular numbers for prices & stats ────────────────── */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lining-nums {
+    font-variant-numeric: lining-nums;
+  }
+
+  /* Premium Maritime Hero Background */
+  .hero-maritime-bg {
+    background:
+      linear-gradient(135deg, rgba(6, 21, 34, 0.96), rgba(10, 42, 67, 0.94)),
+      radial-gradient(circle at 75% 20%, rgba(232, 170, 36, 0.26), transparent 26rem),
+      linear-gradient(160deg, #061522 0%, #0a2a43 42%, #0e4d72 100%);
+    position: relative;
+  }
+
+  html:not(.light) .hero-maritime-bg {
+    background: linear-gradient(160deg, #030810 0%, #071422 35%, #0c2438 70%, #0f3050 100%);
+  }
+
+  .hero-maritime-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(200, 147, 10, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 80% at 20% 80%, rgba(15, 118, 110, 0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Gradient text for headings */
+  .maritime-gradient-text {
+    background: linear-gradient(135deg, #f8fafc 0%, #e6b422 50%, #c8930a 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientText 6s ease infinite;
+  }
+
+  /* Shimmer button effect */
+  .maritime-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmerSweep 2.5s ease-in-out infinite;
+  }
+
+  /* Marquee fade edges */
+  .marquee-fade-edges {
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  /* Premium card styling */
+  .maritime-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .commerce-card,
+  .product-card {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, white 4%), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+  }
+
+  .commerce-card:hover,
+  .product-card:hover {
+    transform: translateY(-5px);
+    border-color: color-mix(in srgb, var(--accent-gold) 70%, var(--border));
+    box-shadow: 0 22px 60px rgba(7, 24, 39, 0.16);
+  }
+
+  html:not(.light) .commerce-card,
+  html:not(.light) .product-card {
+    background:
+      linear-gradient(180deg, rgba(16, 42, 64, 0.96), rgba(8, 26, 42, 0.98));
+    box-shadow: 0 18px 54px rgba(0, 0, 0, 0.28);
+  }
+
+  .commerce-button {
+    border-color: var(--accent-gold);
+    background: var(--accent-gold);
+    color: var(--navy-deep);
+    box-shadow: 0 12px 26px rgba(232, 170, 36, 0.24);
+  }
+
+  .commerce-button:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+  }
+
+  .marine-section {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--secondary-bg) 88%, transparent), color-mix(in srgb, var(--primary-bg) 92%, transparent)),
+      radial-gradient(circle at 10% 10%, var(--teal-soft), transparent 28rem);
+  }
+
+  .maritime-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(11, 26, 46, 0.12);
+    border-color: var(--accent-gold);
+  }
+
+  html:not(.light) .maritime-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Premium button */
+  .maritime-btn-primary {
+    background: linear-gradient(135deg, #c8930a 0%, #e6b422 100%);
+    color: #071422;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 14px 28px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .maritime-btn-primary:hover {
+    background: linear-gradient(135deg, #e6b422 0%, #f5d87a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(200, 147, 10, 0.3);
+  }
+
+  .maritime-btn-secondary {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 14px 28px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .maritime-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+  }
+
+  /* Section divider */
+  .maritime-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* Glass card for overlays */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+  }
+
+  /* Product marquee card */
+  .product-marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 1rem;
+  }
+
+  .product-marquee-card {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.625rem 1rem 0.625rem 0.625rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(8px);
+  }
+
+  .product-marquee-card:hover {
+    border-color: var(--accent-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(200, 147, 10, 0.15);
+  }
+
+  /* Gold accent bar */
+  .gold-accent-bar {
+    width: 48px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-gold), var(--gold-light));
+    border-radius: 2px;
+  }
+
+  /* Stats section gradient */
+  .stats-gradient {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Hanging punctuation for refined typography */
+  .hanging-punct {
+    hanging-punctuation: first last;
+  }
+
+  /* Font feature utilities */
+  .feature-kern {
+    font-feature-settings: 'kern' 1;
+  }
+
+  .feature-liga {
+    font-feature-settings: 'liga' 1;
+  }
+
+  .feature-tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .feature-lnum {
+    font-variant-numeric: lining-nums;
+  }
+
+  .feature-onum {
+    font-variant-numeric: oldstyle-nums;
+  }
+
+  .feature-pnum {
+    font-variant-numeric: proportional-nums;
+  }
+
+  /* Optical sizing hint */
+  .optical-size {
+    font-optical-sizing: auto;
+  }
+}
+
+@keyframes gradientText {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes shimmerSweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  [class*="marquee"] {
+    animation-play-state: paused !important;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Mobile-first global fixes ──────────────────────────── */
+@media (max-width: 48em) {
+  /* Ensure no horizontal overflow */
+  html, body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Minimum touch target size for interactive elements */
+  button, a, input[type="checkbox"], input[type="radio"], select {
+    min-height: 44px;
+  }
+
+  /* Prevent iOS auto-zoom on input focus — use !important to override Tailwind text-sm */
+  input, select, textarea {
+    font-size: max(16px, 1em) !important;
+  }
+
+  /* Better tap highlights */
+  button, a {
+    -webkit-tap-highlight-color: rgba(232, 170, 36, 0.15);
+  }
+
+  /* Reduce animations on mobile for performance */
+  .maritime-card:hover,
+  .commerce-card:hover,
+  .product-card:hover {
+    transform: none;
+  }
+
+  /* Disable hover transforms on mobile */
+  .hover\:-translate-y-1,
+  .hover\:-translate-y-0\.5 {
+    --tw-translate-y: 0;
+    transform: translate(var(--tw-translate-x), 0) scale(var(--tw-scale-x), var(--tw-scale-y));
+  }
+
+  /* Admin table horizontal scroll */
+  .admin-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100vw;
+  }
+
+  /* Admin slide-over full-width on mobile */
+  .admin-slide-over {
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    height: 100vh;
+  }
+
+  /* Reduce padding on mobile */
+  .admin-content {
+    padding: 12px !important;
+  }
+}
+
+/* ── Small phone optimizations (320-374px) ──────────────── */
+@media (max-width: 23.375em) {
+  h1 {
+    font-size: 28px;
+  }
+  h2 {
+    font-size: 24px;
+  }
+}
+
+/* ── Touch device optimizations ─────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  .group:hover .group-hover\:scale-105 {
+    transform: none;
+  }
+  .group:hover .group-hover\:opacity-100 {
+    opacity: 0;
+  }
+  /* Ensure tap targets are large enough — min-height only, no min-width to avoid grid breakage */
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+}
+
+/* ── Orientation support ────────────────────────────────── */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Collapse vertical padding in landscape on short screens */
+  .hero-maritime-bg {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+/* ── Focus visible for keyboard accessibility ───────────── */
+:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+/* ── Safe area padding for notched phones ───────────────── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .admin-sidebar {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
