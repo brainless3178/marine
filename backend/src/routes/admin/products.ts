@@ -387,4 +387,171 @@ router.patch('/bulk', requireRole('inventory-manager'), asyncHandler(async (req:
   res.json({ updated: result.count })
 }))
 
+// ─── Duplicate Product ──────────────────────────────────────────
+router.post('/:id/duplicate', requireRole('inventory-manager'), asyncHandler(async (req: AuthRequest, res) => {
+  const source = await prisma.product.findUnique({
+    where: { id: req.params.id as string },
+    include: {
+      specs: true,
+      images: true,
+      industries: { select: { industryId: true } },
+    },
+  })
+  if (!source) return res.status(404).json({ error: 'Product not found' })
+
+  // Generate unique SKU and slug
+  let slug = generateSlug(source.name + ' Copy')
+  const slugExists = await prisma.product.findUnique({ where: { slug } })
+  if (slugExists) slug = `${slug}-${Date.now()}`
+  let sku = `${source.sku}-COPY`
+  const skuExists = await prisma.product.findUnique({ where: { sku } })
+  if (skuExists) sku = `${source.sku}-COPY-${Date.now()}`
+
+  const product = await prisma.product.create({
+    data: {
+      name: `${source.name} (Copy)`,
+      slug,
+      sku,
+      brandId: source.brandId,
+      categoryId: source.categoryId,
+      status: 'draft',
+      availability: source.availability,
+      condition: source.condition,
+      shortDescription: source.shortDescription,
+      description: source.description,
+      regularPrice: source.regularPrice,
+      salePrice: source.salePrice,
+      currency: source.currency,
+      showPrice: source.showPrice,
+      makeOfferEnabled: source.makeOfferEnabled,
+      stockCount: 0,
+      lowStockThreshold: source.lowStockThreshold,
+      warehouseLocation: source.warehouseLocation,
+      leadTime: source.leadTime,
+      isNewArrival: false,
+      isFeatured: false,
+      customLabel: source.customLabel,
+      customLabelColor: source.customLabelColor,
+      seoTitle: source.seoTitle,
+      seoDescription: source.seoDescription,
+      seoKeywords: source.seoKeywords,
+      keyFeatures: source.keyFeatures,
+      compatibilityNotes: source.compatibilityNotes,
+      conditionNotes: source.conditionNotes,
+      warrantyNotes: source.warrantyNotes,
+      includedItems: source.includedItems,
+      excludedItems: source.excludedItems,
+      productType: source.productType,
+      createdBy: req.user!.id,
+      updatedBy: req.user!.id,
+      specs: {
+        create: source.specs.map((s, i) => ({
+          name: s.name,
+          value: s.value,
+          isPublic: s.isPublic,
+          sortOrder: i,
+        })),
+      },
+      images: {
+        create: source.images.map((img, i) => ({
+          url: img.url,
+          altText: img.altText,
+          label: img.label,
+          isMain: img.isMain,
+          sortOrder: i,
+        })),
+      },
+      ...(source.industries.length ? {
+        industries: {
+          create: source.industries.map((ind) => ({ industryId: ind.industryId })),
+        },
+      } : {}),
+    },
+    include: productAdminInclude,
+  })
+
+  await logAudit({
+    actor: req.user!,
+    action: 'product.duplicate',
+    entityType: 'product',
+    entityId: product.id,
+    entityName: product.name,
+    newValue: { sourceId: source.id, sourceName: source.name },
+    ipAddress: req.ip,
+  })
+
+  res.status(201).json({ product })
+}))
+
+// ─── Import Products CSV ────────────────────────────────────────
+router.post('/import/csv', requireRole('inventory-manager'), asyncHandler(async (req: AuthRequest, res) => {
+  const { rows } = req.body as { rows: any[] }
+  if (!Array.isArray(rows) || !rows.length) {
+    return res.status(400).json({ error: 'rows array is required' })
+  }
+
+  let created = 0
+  let skipped = 0
+  const errors: string[] = []
+
+  for (const row of rows.slice(0, 500)) {
+    try {
+      if (!row.name || !row.sku) {
+        skipped++
+        errors.push(`Row ${created + skipped}: missing name or sku`)
+        continue
+      }
+
+      // Check SKU uniqueness
+      const existing = await prisma.product.findUnique({ where: { sku: row.sku } })
+      if (existing) {
+        skipped++
+        continue
+      }
+
+      let slug = generateSlug(row.name)
+      const slugExists = await prisma.product.findUnique({ where: { slug } })
+      if (slugExists) slug = `${slug}-${Date.now()}`
+
+      await prisma.product.create({
+        data: {
+          name: row.name,
+          slug,
+          sku: row.sku,
+          brandId: row.brandId || null,
+          categoryId: row.categoryId || null,
+          status: row.status || 'draft',
+          condition: row.condition || 'used',
+          availability: row.availability || 'in-stock',
+          shortDescription: row.shortDescription || null,
+          description: row.description || null,
+          regularPrice: Number(row.regularPrice) || 0,
+          salePrice: row.salePrice ? Number(row.salePrice) : null,
+          stockCount: Number(row.stockCount) || 0,
+          currency: row.currency || 'USD',
+          makeOfferEnabled: row.makeOfferEnabled === true || row.makeOfferEnabled === 'true',
+          isNewArrival: row.isNewArrival === true || row.isNewArrival === 'true',
+          isFeatured: row.isFeatured === true || row.isFeatured === 'true',
+          createdBy: req.user!.id,
+          updatedBy: req.user!.id,
+        },
+      })
+      created++
+    } catch (err: any) {
+      skipped++
+      errors.push(`Row ${created + skipped}: ${err.message}`)
+    }
+  }
+
+  await logAudit({
+    actor: req.user!,
+    action: 'product.import.csv',
+    entityType: 'product',
+    newValue: { created, skipped, totalRows: rows.length },
+    ipAddress: req.ip,
+  })
+
+  res.json({ created, skipped, errors: errors.slice(0, 20) })
+}))
+
 export default router

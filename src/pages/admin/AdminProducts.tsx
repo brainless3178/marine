@@ -18,7 +18,11 @@ import {
   Square,
   X,
   Loader2,
+  Copy,
+  Upload,
+  CheckCircle,
 } from 'lucide-react'
+import Papa from 'papaparse'
 import { admin } from '../../lib/api'
 import { AdminPagination } from '../../components/admin/AdminPagination'
 import { OptimizedImage } from '../../components/ui/OptimizedImage'
@@ -262,6 +266,71 @@ export default function AdminProducts() {
     }
   }
 
+  const [duplicating, setDuplicating] = useState<string | null>(null)
+  const [showImport, setShowImport] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState<{ created: number; skipped: number; errors: string[] } | null>(null)
+
+  const handleDuplicate = async (productId: string) => {
+    setDuplicating(productId)
+    try {
+      await admin.products.duplicate(productId)
+      toast('Product duplicated as draft', 'success')
+      fetchProducts()
+    } catch (err: any) {
+      toast(err.message || 'Failed to duplicate product', 'error')
+    } finally {
+      setDuplicating(null)
+    }
+  }
+
+  const handleImportCsv = async (file: File) => {
+    setImporting(true)
+    setImportResult(null)
+    try {
+      const result = await new Promise<Papa.ParseResult<any>>((resolve, reject) => {
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          dynamicTyping: false,
+          transformHeader: (h: string) => h.trim().toLowerCase(),
+          complete: (results) => resolve(results),
+          error: (err: Error) => reject(err),
+        })
+      })
+
+      if (result.errors.length > 0) {
+        const errMessages = result.errors.map((e) => `Row ${e.row}: ${e.message}`)
+        toast(`CSV parse errors: ${errMessages[0]}`, 'error')
+        setImportResult({ created: 0, skipped: 0, errors: errMessages })
+        return
+      }
+
+      if (!result.data || result.data.length === 0) {
+        toast('CSV file is empty or has no data rows', 'error')
+        return
+      }
+
+      const rows = result.data.map((row: Record<string, string>) => {
+        const clean: Record<string, any> = {}
+        for (const [key, value] of Object.entries(row)) {
+          const cleanKey = key.trim().toLowerCase()
+          clean[cleanKey] = value
+        }
+        return clean
+      })
+
+      const importResult = await admin.products.importCsv(rows)
+      setImportResult(importResult)
+      toast(`Imported ${importResult.created} products (${importResult.skipped} skipped)`, 'success')
+      fetchProducts()
+    } catch (err: any) {
+      toast(err.message || 'Import failed', 'error')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   const handleExportCsv = () => {
     const headers = ['Name', 'SKU', 'Brand', 'Category', 'Price', 'Sale Price', 'Stock', 'Condition', 'Availability']
     const rows = filteredProducts.map((p) => [p.name, p.sku, getBrandName(p.brand), getCategoryName(p.category), p.price.toString(), p.salePrice?.toString() || '', p.stockCount.toString(), p.condition, p.availability])
@@ -285,9 +354,14 @@ export default function AdminProducts() {
             {selectedIds.size > 0 && ` · ${selectedIds.size} selected`}
           </p>
         </div>
-        <Link to="/admin/products/new" className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[#061522] no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5">
-          <Plus size={14} /> Add Product
-        </Link>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowImport(true)} className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] transition-all hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]">
+            <Upload size={14} /> Import CSV
+          </button>
+          <Link to="/admin/products/new" className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[#061522] no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5">
+            <Plus size={14} /> Add Product
+          </Link>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
@@ -433,6 +507,7 @@ export default function AdminProducts() {
                         <div className="flex items-center gap-1">
                           <Link to={`/admin/products/${product.id}/edit`} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-gold)] hover:bg-[var(--gold-muted)] transition-colors" title="Edit"><Pencil size={12} /></Link>
                           <a href={`/product/${product.id}`} target="_blank" rel="noopener noreferrer" className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 transition-colors" title="View on storefront"><Eye size={12} /></a>
+                          <button onClick={(e) => { e.stopPropagation(); handleDuplicate(product.id) }} disabled={duplicating === product.id} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-teal)] hover:bg-[var(--accent-teal)]/10 transition-colors" title="Duplicate as draft"><Copy size={12} /></button>
                           <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(product.id) }} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors" title="Delete"><Trash2 size={12} /></button>
                         </div>
                       </td>
@@ -447,6 +522,45 @@ export default function AdminProducts() {
         {!loading && <AdminPagination page={page} totalPages={totalPages} totalItems={filteredProducts.length} itemLabel="products" onPageChange={setPage} />}
       </div>
     </div>
+
+      {/* Import CSV Modal */}
+      {showImport && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => { setShowImport(false); setImportResult(null) }}>
+          <div className="relative w-full max-w-lg mx-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-[var(--border)] px-6 py-4">
+              <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">Import Products from CSV</h2>
+              <button onClick={() => { setShowImport(false); setImportResult(null) }} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors"><X size={16} /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              {!importResult ? (
+                <>
+                  <div className="rounded-xl border-2 border-dashed border-[var(--border)] p-8 text-center">
+                    <Upload size={32} className="mx-auto text-[var(--text-muted)] mb-3" />
+                    <p className="text-sm font-semibold text-[var(--text-secondary)]">Upload a CSV file with columns:</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-1 font-mono">name, sku, brand, category, condition, availability, regularPrice, salePrice, stockCount, status</p>
+                    <input type="file" accept=".csv" className="hidden" id="csv-import-input" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImportCsv(f) }} />
+                    <button onClick={() => document.getElementById('csv-import-input')?.click()} disabled={importing} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent-gold)] px-4 py-2 text-xs font-bold text-[#061522] hover:bg-[var(--gold-light)] transition-colors disabled:opacity-50">
+                      {importing ? <><Loader2 size={12} className="animate-spin" /> Importing...</> : <><Upload size={12} /> Choose CSV File</>}
+                    </button>
+                  </div>
+                  <p className="text-[0.625rem] text-[var(--text-muted)] text-center">Max 500 rows. Products with duplicate SKUs are skipped.</p>
+                </>
+              ) : (
+                <div className="text-center py-4">
+                  <CheckCircle size={40} className="mx-auto text-[var(--success)] mb-3" />
+                  <p className="text-sm font-bold text-[var(--text-primary)]">Import Complete</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-1">Created: {importResult.created} · Skipped: {importResult.skipped}</p>
+                  {importResult.errors.length > 0 && (
+                    <div className="mt-3 rounded-lg bg-[var(--surface-soft)] p-3 text-left max-h-40 overflow-y-auto">
+                      {importResult.errors.map((err, i) => <p key={i} className="text-[0.625rem] text-[var(--danger)]">{err}</p>)}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     <ConfirmDialog
       open={!!deleteTarget}
