@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
 import { useStore } from './store/useStore'
 import { PageWrapper } from './components/layout/PageWrapper'
@@ -70,8 +70,6 @@ function AppContent() {
   const loadAdminSession = useStore((s) => s.loadAdminSession)
   const loadCustomerSession = useStore((s) => s.loadCustomerSession)
   const isSessionLoading = useStore((s) => s.isSessionLoading)
-  const location = useLocation()
-
   useEffect(() => {
     if (localStorage.getItem('alka-admin-auth')) loadAdminSession()
     if (localStorage.getItem('alka-auth')) loadCustomerSession()

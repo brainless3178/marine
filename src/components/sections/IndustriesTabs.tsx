@@ -61,7 +61,7 @@ export function IndustriesTabs() {
                 onClick={() => setActive(ind.id)}
                 className={`flex-shrink-0 px-6 py-3 rounded-xl font-body font-semibold text-xs tracking-wide transition-all duration-300 border ${
                   isActive
-                    ? 'bg-[var(--accent-blue)] border-[var(--accent-blue)] text-white shadow-[0_4px_16px_rgba(12,45,72,0.25)]'
+                    ? 'bg-[var(--accent-blue)] border-[var(--accent-blue)] text-[var(--btn-blue-text)] shadow-[0_4px_16px_rgba(12,45,72,0.25)]'
                     : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-blue)] hover:text-[var(--text-primary)]'
                 }`}
               >

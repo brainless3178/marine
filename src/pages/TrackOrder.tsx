@@ -97,7 +97,7 @@ export default function TrackOrder() {
             <button
               onClick={() => handleTrack()}
               disabled={loading}
-              className="px-6 py-3.5 bg-[var(--accent-blue)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--accent-blue)]/90 transition-all disabled:opacity-50 whitespace-nowrap"
+              className="px-6 py-3.5 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-xl hover:bg-[var(--accent-blue)]/90 transition-all disabled:opacity-50 whitespace-nowrap"
             >
               {loading ? <div className="h-5 w-5 border-2 border-white border-t-transparent animate-spin" /> : 'Track'}
             </button>
@@ -160,7 +160,7 @@ export default function TrackOrder() {
                         <div key={step.key} className="relative flex flex-col items-center z-10" style={{ width: `${100 / statusSteps.length}%` }}>
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                             isCompleted
-                              ? 'bg-[var(--accent-blue)] border-[var(--accent-blue)] text-white'
+                              ? 'bg-[var(--accent-blue)] border-[var(--accent-blue)] text-[var(--btn-blue-text)]'
                               : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-muted)]'
                           } ${isCurrent ? 'ring-4 ring-[var(--accent-blue)]/20' : ''}`}>
                             <StepIcon size={16} />

@@ -211,7 +211,7 @@ export default function AdminUsers() {
                 <tr key={user.id} className="hover:bg-[var(--surface-soft)]">
                   <td>
                     <div className="flex items-center gap-3">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-bold ${user.active ? 'bg-[var(--accent-blue)] text-white' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'}`}>
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-bold ${user.active ? 'bg-[var(--accent-blue)] text-[var(--btn-blue-text)]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'}`}>
                         {user.avatar}
                       </div>
                       <div>
@@ -304,7 +304,7 @@ export default function AdminUsers() {
             </div>
             <div className="p-6 space-y-6">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-blue)] text-sm font-bold text-white">{selectedUser.avatar}</div>
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-blue)] text-sm font-bold text-[var(--btn-blue-text)]">{selectedUser.avatar}</div>
                 <div>
                   <h3 className="text-sm font-bold text-[var(--text-primary)]">{selectedUser.name}</h3>
                   <p className="text-xs text-[var(--text-muted)]">{selectedUser.email}</p>

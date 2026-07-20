@@ -191,7 +191,7 @@ export default function RFQ() {
                         step === rfqStep
                           ? 'border-accent-blue bg-accent-blue text-[var(--text-primary)]'
                           : step < rfqStep
-                          ? 'border-success bg-success text-[var(--text-primary)]'
+                          ? 'border-success bg-success text-[var(--btn-success-text)]'
                           : 'border-[var(--border)] bg-surface text-[var(--text-muted)]'
                       }`}>
                         {step}
@@ -260,7 +260,7 @@ export default function RFQ() {
                       </div>
                     </div>
                     <button type="button" onClick={() => goToStep(2)}
-                      className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--text-primary)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all mt-2">
+                      className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--btn-blue-text)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all mt-2">
                       {t('rfq.nextProduct')}
                     </button>
                   </div>
@@ -307,7 +307,7 @@ export default function RFQ() {
                         {t('rfq.back')}
                       </button>
                       <button type="button" onClick={() => goToStep(3)}
-                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--text-primary)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all">
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--btn-blue-text)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all">
                         {t('rfq.nextUrgency')}
                       </button>
                     </div>
@@ -381,7 +381,7 @@ export default function RFQ() {
                         {t('rfq.back')}
                       </button>
                       <button type="submit" disabled={submitting}
-                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--text-primary)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all shimmer-btn relative overflow-hidden disabled:opacity-50">
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--btn-blue-text)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all shimmer-btn relative overflow-hidden disabled:opacity-50">
                         {submitting ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : t('rfq.submit')}
                       </button>
                     </div>
@@ -429,5 +429,4 @@ export default function RFQ() {
     </div>
   )
 }
-
 

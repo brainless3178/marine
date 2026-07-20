@@ -51,9 +51,9 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
   }, [onDismiss])
 
   const config = {
-    success: { icon: CheckCircle, bg: 'bg-[var(--success)]', text: 'text-white' },
-    error: { icon: XCircle, bg: 'bg-[var(--danger)]', text: 'text-white' },
-    info: { icon: Info, bg: 'bg-[var(--accent-blue)]', text: 'text-white' },
+    success: { icon: CheckCircle, bg: 'bg-[var(--success)]', text: 'text-[var(--btn-success-text)]' },
+    error: { icon: XCircle, bg: 'bg-[var(--danger)]', text: 'text-[var(--btn-danger-text)]' },
+    info: { icon: Info, bg: 'bg-[var(--accent-blue)]', text: 'text-[var(--btn-blue-text)]' },
   }[toast.type]
 
   const Icon = config.icon

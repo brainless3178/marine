@@ -51,7 +51,7 @@ export default function Home() {
       <Hero />
 
       {/* ── SHIPPING BADGES ── */}
-      <section className="py-8 bg-[var(--navy-deep)] border-b border-white/10">
+      <section className="py-8 bg-[var(--navy-deep)] border-b border-white/10" aria-label="Shipping and service guarantees">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -78,12 +78,12 @@ export default function Home() {
       </section>
 
       {/* ── NEW ARRIVALS ── */}
-      <section className="py-20 marine-section">
+      <section className="py-20 marine-section" aria-labelledby="new-arrivals-heading">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-12">
             <div>
               <SectionLabel>{t('shop.newArrivals')}</SectionLabel>
-              <h2 className="font-display font-bold text-section tracking-tight text-[var(--text-primary)]">
+              <h2 id="new-arrivals-heading" className="font-display font-bold text-section tracking-tight text-[var(--text-primary)]">
                 {t('shop.freshInventory')}
               </h2>
               <p className="mt-3 max-w-[620px] text-sm leading-relaxed text-[var(--text-secondary)]">
@@ -93,7 +93,7 @@ export default function Home() {
             </div>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-6 py-3 rounded-xl hover:bg-[var(--accent-blue)] hover:text-white transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-6 py-3 rounded-xl hover:bg-[var(--accent-blue)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
             >
               {t('shop.cta')} <ArrowRight size={16} />
             </Link>

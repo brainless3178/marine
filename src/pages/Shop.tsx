@@ -106,7 +106,7 @@ export default function Shop() {
                       </div>
                       <div>
                         <span className="block text-xs font-bold text-white">{item.label}</span>
-                        <span className="text-xs text-white/55">{item.sub}</span>
+                        <span className="text-xs text-white/72">{item.sub}</span>
                       </div>
                     </div>
                   )
@@ -116,7 +116,7 @@ export default function Shop() {
             <div className="hidden lg:block">
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-6 py-3 rounded-xl hover:bg-[var(--accent-blue)] hover:text-white transition-all duration-300 no-underline"
+                className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-6 py-3 rounded-xl hover:bg-[var(--accent-blue)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
               >
                 {t('shop.viewFullCatalog')} <ArrowRight size={16} />
               </Link>
@@ -192,7 +192,7 @@ export default function Shop() {
             </div>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-blue)] hover:text-white transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-blue)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
             >
               {t('shop.fullCatalog')} <ArrowRight size={16} />
             </Link>

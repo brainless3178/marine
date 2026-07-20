@@ -195,7 +195,7 @@ export function Hero() {
                   {t('hero.searchLabel', { defaultValue: 'Search products' })}
                 </label>
                 <div ref={searchContainerRef} className="relative flex-1">
-                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/45" />
+                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/65" />
                   <input
                     id="hero-product-search"
                     type="search"
@@ -335,7 +335,7 @@ export function Hero() {
               <div className="absolute -inset-4 bg-gradient-to-br from-[var(--accent-gold)]/10 via-transparent to-[var(--accent-teal)]/5 rounded-3xl blur-xl pointer-events-none" />
               <div className="relative glass-card p-4 shadow-[0_32px_80px_var(--shadow-heavy)]">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="type-mono text-xs uppercase tracking-widest text-white/50">{t('hero.liveInventory')}</span>
+                  <span className="type-mono text-xs uppercase tracking-widest text-white/68">{t('hero.liveInventory')}</span>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
                     <span className="rounded-full bg-success/15 px-3 py-1 text-overline text-success border border-success/20">{t('hero.inStock')}</span>
@@ -356,7 +356,7 @@ export function Hero() {
                   </div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="inline-block font-mono text-xs px-2.5 py-1 rounded-full border border-white/15 text-white/60 bg-white/[0.04]">{heroProducts[activeIndex]?.brand}</span>
-                    <span className="font-mono text-xs text-white/35">{t('product.skuPrefix', { sku: heroProducts[activeIndex]?.sku || '' })}</span>
+                    <span className="font-mono text-xs text-white/60">{t('product.skuPrefix', { sku: heroProducts[activeIndex]?.sku || '' })}</span>
                   </div>
                   <h3 className="heading-lg text-white mt-1">{rotatingNames[activeIndex]}</h3>
                 </div>
@@ -373,7 +373,7 @@ export function Hero() {
       {/* Bottom product marquees */}
       <div className="relative z-10 w-full pb-4 pt-3 border-t border-white/10 bg-white/[0.03] backdrop-blur-sm">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 mb-3 flex items-center justify-between">
-          <span className="type-mono text-xs uppercase tracking-widest text-white/50">{t('hero.newArrivals')}</span>
+          <span className="type-mono text-xs uppercase tracking-widest text-white/68">{t('hero.newArrivals')}</span>
           <a href="/products" className="type-mono text-xs uppercase tracking-wider text-white/60 hover:text-[var(--accent-gold)] transition-colors no-underline flex items-center gap-1">
             {t('hero.viewAll')} <ArrowRight size={12} />
           </a>

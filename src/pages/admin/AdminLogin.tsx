@@ -49,7 +49,7 @@ export default function AdminLogin() {
           <h1 className="font-display text-2xl font-extrabold text-white">
             Alka Traders
           </h1>
-          <p className="mt-1 text-sm text-white/50 font-medium">
+          <p className="mt-1 text-sm text-white/72 font-medium">
             Admin Panel Access
           </p>
         </div>
@@ -59,45 +59,45 @@ export default function AdminLogin() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/50">
+              <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/72">
                 Email Address
               </label>
               <div className="relative">
                 <Mail
                   size={16}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/60"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@alkatraders.com"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/25 outline-none transition-all focus:border-[var(--accent-gold)] focus:bg-white/8 focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]"
+                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/55 outline-none transition-all focus:border-[var(--accent-gold)] focus:bg-white/10 focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/50">
+              <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/72">
                 Password
               </label>
               <div className="relative">
                 <Lock
                   size={16}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/60"
                 />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-11 text-sm text-white placeholder:text-white/25 outline-none transition-all focus:border-[var(--accent-gold)] focus:bg-white/8 focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]"
+                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-11 text-sm text-white placeholder:text-white/55 outline-none transition-all focus:border-[var(--accent-gold)] focus:bg-white/10 focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/85 transition-colors"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -133,10 +133,10 @@ export default function AdminLogin() {
         </div>
 
         {/* Back to store */}
-        <p className="mt-6 text-center text-xs text-white/30">
+        <p className="mt-6 text-center text-xs text-white/60">
           <a
             href="/"
-            className="text-white/50 hover:text-[var(--accent-gold)] transition-colors font-semibold"
+            className="text-white/72 hover:text-[var(--accent-gold)] transition-colors font-semibold"
           >
             ← Back to Storefront
           </a>

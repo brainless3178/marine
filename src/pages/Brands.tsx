@@ -113,7 +113,7 @@ export default function Brands() {
                   >
                     <OptimizedImage
                       src={`/brand/${img}`}
-                      alt="Brand"
+                      alt={`${img.replace(/\.(avif|png|jpg|jpeg|webp)$/i, '').replace(/-/g, ' ')} brand logo`}
                       width={112}
                       height={112}
                       loading="lazy"
@@ -140,6 +140,8 @@ export default function Brands() {
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
+                aria-label={`Filter brands by ${f === 'All' ? 'all categories' : f}`}
+                aria-pressed={activeFilter === f}
                 className={`px-5 py-2.5 font-body font-medium text-xs border transition-all duration-300 ${
                   activeFilter === f
                     ? 'bg-accent-blue border-accent-blue text-[var(--text-primary)]'

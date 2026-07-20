@@ -102,7 +102,7 @@ export default function Emergency() {
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <a href={`https://wa.me/${whatsappNumber}`}
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-danger text-[var(--text-primary)] font-semibold text-sm border border-danger hover:bg-danger hover:border-danger hover:-translate-y-0.5 transition-all shadow-[0_0_20px_var(--danger-border)]">
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-danger text-[var(--btn-danger-text)] font-semibold text-sm border border-danger hover:bg-danger hover:border-danger hover:-translate-y-0.5 transition-all shadow-[0_0_20px_var(--danger-border)]">
               <MessageCircle size={16} /> {t('emergency.ctaWhatsapp')}
             </a>
             <a href={`tel:${phoneNumber}`}
@@ -198,7 +198,7 @@ export default function Emergency() {
               <label htmlFor="emergency-vessel" className="sr-only">{t('emergency.formVessel')}</label>
               <input id="emergency-vessel" type="text" placeholder={t('emergency.formVessel')} value={form.vesselName} onChange={(e) => setForm({ ...form, vesselName: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-danger focus:shadow-[0_0_0_3px_rgba(239,68,68,0.25)] transition-all outline-none" />
             </div>
-            <button type="submit" disabled={submitted || loading} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm border transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-white' : 'bg-danger text-[var(--text-primary)] border-danger hover:bg-danger shadow-[0_0_20px_var(--danger-border)]'}`}>
+            <button type="submit" disabled={submitted || loading} aria-label={t('emergency.formSubmit')} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm border transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-[var(--btn-success-text)]' : 'bg-danger text-[var(--btn-danger-text)] border-danger hover:bg-danger shadow-[0_0_20px_var(--danger-border)]'}`}>
               {loading ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : submitted ? <><Check size={16} /> Request Submitted!</> : <><TriangleAlert size={16} /> {t('emergency.formSubmit')}</>}
             </button>
           </form>

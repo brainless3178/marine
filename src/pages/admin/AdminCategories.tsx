@@ -302,7 +302,7 @@ export default function AdminCategories() {
             </p>
             <button
               onClick={() => handleDelete(node.id)}
-              className="rounded-md bg-[var(--danger)] px-2 py-0.5 text-[0.625rem] font-bold text-white hover:bg-[var(--danger)]/80"
+              className="rounded-md bg-[var(--danger)] px-2 py-0.5 text-[0.625rem] font-bold text-[var(--btn-danger-text)] hover:bg-[var(--danger)]/80"
             >
               Confirm
             </button>

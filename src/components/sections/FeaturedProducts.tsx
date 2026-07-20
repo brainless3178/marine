@@ -35,7 +35,7 @@ export function FeaturedProducts() {
             <h2 className="font-display font-bold text-section tracking-tight">{t('featured.title')}</h2>
             <div className="gold-accent-bar mt-4" />
           </div>
-          <a href="/products" className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-6 py-3 rounded-xl hover:bg-[var(--accent-blue)] hover:text-white transition-all duration-300 no-underline">
+          <a href="/products" className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-6 py-3 rounded-xl hover:bg-[var(--accent-blue)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline">
             {t('featured.viewAll')} <ArrowRight size={16} />
           </a>
         </div>
@@ -58,7 +58,7 @@ export function FeaturedProducts() {
                   </span>
                   <span className="text-xs font-bold text-[var(--success)]">{t('featured.ready')}</span>
                 </div>
-                <button onClick={() => handleAddToCart(product)} className={`inline-flex items-center justify-center w-full gap-2 text-xs font-bold px-[18px] py-[11px] mt-3 transition-all duration-300 border cursor-pointer rounded-xl ${addedIds.has(product.id) ? 'border-[var(--success)] bg-[var(--success)] text-white' : 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-[var(--navy-deep)] hover:bg-[var(--gold-light)] hover:shadow-[0_4px_16px_rgba(200,147,10,0.25)]'}`}>
+                <button onClick={() => handleAddToCart(product)} className={`inline-flex items-center justify-center w-full gap-2 text-xs font-bold px-[18px] py-[11px] mt-3 transition-all duration-300 border cursor-pointer rounded-xl ${addedIds.has(product.id) ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]' : 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-[var(--navy-deep)] hover:bg-[var(--gold-light)] hover:shadow-[0_4px_16px_rgba(200,147,10,0.25)]'}`}>
                   {addedIds.has(product.id) ? <><Check size={14} /> {t('product.added')}</> : <><ShoppingCart size={14} /> {t('product.addToCart')}</>}
                 </button>
               </div>

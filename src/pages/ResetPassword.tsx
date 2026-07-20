@@ -71,7 +71,7 @@ export default function ResetPassword() {
               <p className="text-sm text-[var(--text-secondary)] mb-6">Your password has been updated. You can now sign in with your new password.</p>
               <button
                 onClick={() => useStore.getState().setShowAuthModal(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-blue)] text-white font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all"
               >
                 Sign In
               </button>
@@ -113,7 +113,7 @@ export default function ResetPassword() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 bg-[var(--accent-blue)] text-white font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <div className="h-5 w-5 mx-auto rounded-full border-2 border-white border-t-transparent animate-spin" />

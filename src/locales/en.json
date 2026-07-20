@@ -185,7 +185,18 @@
     "productCategories": "Product Categories",
     "contactUs": "Contact Us",
     "copyright": "Alka Traders. All Rights Reserved.",
-    "tagline": "Marine · Industrial · Equipment · Export"
+    "tagline": "Marine · Industrial · Equipment · Export",
+    "linkHome": "Alka Traders Home",
+    "linkProducts": "Marine & Industrial Products",
+    "linkBrands": "Equipment Brands We Carry",
+    "linkIndustries": "Industries We Serve",
+    "linkRfq": "Request a Quote",
+    "catMarine": "Marine Equipment & Ship Spares",
+    "catElectrical": "Electrical Automation Components",
+    "catHydraulic": "Hydraulic Systems & Pumps",
+    "catPneumatic": "Pneumatic Cylinders & Valves",
+    "catSpares": "Industrial Spare Parts",
+    "catSurplus": "Surplus & Refurbished Equipment"
   },
   "products": {
     "title": "Full Product Catalog",

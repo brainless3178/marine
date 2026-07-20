@@ -392,7 +392,7 @@ export default function Products() {
                           <button
                             onClick={() => { if (!product.inStock) return; handleAddToCart(product) }}
                             disabled={!product.inStock}
-                            className={`inline-flex items-center justify-center w-full gap-2 text-xs font-bold px-[18px] py-[11px] mt-3 transition-all duration-300 border cursor-pointer rounded-lg ${!product.inStock ? 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed' : addedIds.has(product.id) ? 'border-[var(--success)] bg-[var(--success)] text-white' : 'commerce-button'}`}
+                            className={`inline-flex items-center justify-center w-full gap-2 text-xs font-bold px-[18px] py-[11px] mt-3 transition-all duration-300 border cursor-pointer rounded-lg ${!product.inStock ? 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed' : addedIds.has(product.id) ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]' : 'commerce-button'}`}
                           >
                             {!product.inStock ? t('product.outOfStock') : addedIds.has(product.id) ? <><Check size={14} /> {t('product.added')}</> : <><ShoppingCart size={14} /> {t('product.addToCart')}</>}
                           </button>
@@ -406,7 +406,7 @@ export default function Products() {
                     <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-2 text-xs font-bold border border-[var(--border)] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--accent-blue)] transition-colors bg-[var(--surface)] text-[var(--text-primary)]">← Prev</button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2).reduce<(number | string)[]>((acc, p, i, arr) => { if (i > 0 && (arr[i - 1] as number) < p - 1) acc.push('...'); acc.push(p); return acc }, []).map((p, i) =>
                       typeof p === 'string' ? <span key={`dots-${i}`} className="px-1 text-xs text-[var(--text-muted)]">…</span> : (
-                        <button key={p} onClick={() => setCurrentPage(p)} className={`w-8 h-8 text-xs font-bold rounded-lg transition-colors ${p === currentPage ? 'bg-[var(--accent-blue)] text-white border border-[var(--accent-blue)]' : 'border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[var(--accent-blue)]'}`}>{p}</button>
+                        <button key={p} onClick={() => setCurrentPage(p)} className={`w-8 h-8 text-xs font-bold rounded-lg transition-colors ${p === currentPage ? 'bg-[var(--accent-blue)] text-[var(--btn-blue-text)] border border-[var(--accent-blue)]' : 'border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[var(--accent-blue)]'}`}>{p}</button>
                       )
                     )}
                     <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-2 text-xs font-bold border border-[var(--border)] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--accent-blue)] transition-colors bg-[var(--surface)] text-[var(--text-primary)]">Next →</button>
