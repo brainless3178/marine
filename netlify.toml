@@ -5,10 +5,10 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# Proxy /api requests to the Render backend
+# Proxy /api requests to the Render backend — UPDATE this URL after deploying to Render
 [[redirects]]
   from = "/api/*"
-  to = "https://alka-traders-api.onrender.com/api/:splat"
+  to = "https://alka-traders-api.onrender.com/api/:splat"  # ← Replace with your Render backend URL
   status = 200
   force = true
 
@@ -35,5 +35,5 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-XSS-Protection = "1; mode=block"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://alka-traders-api.onrender.com https://api-m.paypal.com https://www.paypal.com https://*.sentry.io; frame-src https://www.paypal.com https://sandbox.paypal.com; frame-ancestors 'self'; font-src 'self' data:; object-src 'none'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://alka-traders-api.onrender.com https://api-m.paypal.com https://www.paypal.com https://*.sentry.io;  # ← Replace Render URL frame-src https://www.paypal.com https://sandbox.paypal.com; frame-ancestors 'self'; font-src 'self' data:; object-src 'none'"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
