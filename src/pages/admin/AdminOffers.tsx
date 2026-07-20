@@ -13,6 +13,8 @@ import {
   Calendar,
   Tag,
   Download,
+  ShoppingCart,
+  Loader2,
 } from 'lucide-react'
 import { admin } from '../../lib/api'
 import { useToast } from '../../components/admin/Toast'
@@ -92,6 +94,7 @@ export default function AdminOffers() {
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null)
   const [page, setPage] = useState(1)
   const [rejectTarget, setRejectTarget] = useState<string | null>(null)
+  const [convertingOffer, setConvertingOffer] = useState<string | null>(null)
 
   const fetchOffers = useCallback(async () => {
     setLoading(true)
@@ -151,6 +154,20 @@ export default function AdminOffers() {
       fetchOffers()
     } catch (err: any) {
       toast(err.message || 'Failed to reject offer', 'error')
+    }
+  }
+
+  const handleConvertToOrder = async (offerId: string) => {
+    setConvertingOffer(offerId)
+    try {
+      const result = await admin.offers.convertToOrder(offerId)
+      toast(`Order ${result.order?.orderNumber || ''} created from offer`, 'success')
+      fetchOffers()
+      setSelectedOffer(null)
+    } catch (err: any) {
+      toast(err.message || 'Failed to convert offer to order', 'error')
+    } finally {
+      setConvertingOffer(null)
     }
   }
 
@@ -286,9 +303,14 @@ export default function AdminOffers() {
               )}
 
               {selectedOffer.status === 'accepted' && (
-                <div className="rounded-xl border border-[var(--success)]/20 bg-[var(--success)]/5 p-4 text-center">
-                  <CheckCircle size={20} className="mx-auto text-[var(--success)] mb-1" />
-                  <p className="text-xs font-bold text-[var(--success)]">Offer Accepted — ready to process</p>
+                <div className="rounded-xl border border-[var(--success)]/20 bg-[var(--success)]/5 p-4 space-y-3">
+                  <div className="text-center">
+                    <CheckCircle size={20} className="mx-auto text-[var(--success)] mb-1" />
+                    <p className="text-xs font-bold text-[var(--success)]">Offer Accepted — ready to process</p>
+                  </div>
+                  <button onClick={() => handleConvertToOrder(selectedOffer.id)} disabled={convertingOffer === selectedOffer.id} className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--success)] px-4 py-2.5 text-xs font-bold text-white hover:bg-[var(--success)]/90 transition-colors disabled:opacity-50">
+                    {convertingOffer === selectedOffer.id ? <><Loader2 size={12} className="animate-spin" /> Converting...</> : <><ShoppingCart size={12} /> Convert to Order</>}
+                  </button>
                 </div>
               )}
 

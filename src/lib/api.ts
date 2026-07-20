@@ -457,6 +457,18 @@ export const admin = {
       api.del<{ message: string }>(`/admin/products/${id}`, { auth: 'admin' }),
     bulk: (ids: string[], action: string, value?: string) =>
       api.patch<{ updated: number }>('/admin/products/bulk', { ids, action, value }, { auth: 'admin' }),
+    duplicate: (id: string) =>
+      api.post<{ product: ApiProduct }>(`/admin/products/${id}/duplicate`, undefined, { auth: 'admin' }),
+    importCsv: (rows: any[]) =>
+      api.post<{ created: number; skipped: number; errors: string[] }>('/admin/products/import/csv', { rows }, { auth: 'admin' }),
+    exportCsv: async () => {
+      const res = await fetch(`${API_BASE}/admin/products/export/csv`, {
+        headers: adminAccessToken ? { Authorization: `Bearer ${adminAccessToken}` } : undefined,
+        credentials: 'include',
+      })
+      if (!res.ok) throw new ApiError(res.status, 'Export failed')
+      return res.text()
+    },
   },
 
   // Categories
@@ -536,6 +548,8 @@ export const admin = {
     reject: (id: string) => api.patch<{ offer: ApiOffer }>(`/admin/offers/${id}/reject`, undefined, { auth: 'admin' }),
     counter: (id: string, counterPrice: number) =>
       api.patch<{ offer: ApiOffer }>(`/admin/offers/${id}/counter`, { counterPrice }, { auth: 'admin' }),
+    convertToOrder: (id: string) =>
+      api.post<{ order: ApiOrder }>(`/admin/offers/${id}/convert-to-order`, undefined, { auth: 'admin' }),
   },
 
   // Customers
