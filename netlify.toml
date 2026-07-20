@@ -5,6 +5,19 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Proxy /api requests to the Render backend
+[[redirects]]
+  from = "/api/*"
+  to = "https://alka-traders-api.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# SPA catch-all for React Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 [[headers]]
   for = "/images/*"
   [headers.values]
