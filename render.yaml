@@ -1,5 +1,6 @@
 # Render Blueprint — Alka Traders Backend API
 # Docs: https://render.com/docs/blueprint-spec
+# Auto-deploys on push to master branch
 
 services:
   - type: web
@@ -9,22 +10,26 @@ services:
     rootDir: backend
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: node dist/server.js
+    postDeployCommand: npx prisma db push --accept-data-loss
     healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false  # Set manually in Render dashboard
+        sync: false
       - key: DIRECT_URL
-        sync: false  # Set manually in Render dashboard
+        sync: false
       - key: JWT_SECRET
         generateValue: true
+      - key: CSRF_SECRET
+        generateValue: true
       - key: CORS_ORIGIN
-        sync: false  # Set to your Netlify URL after frontend is deployed
+        sync: false
       - key: FRONTEND_URL
-        sync: false  # Set to your Netlify URL
+        sync: false
       - key: ADMIN_URL
-        sync: false  # Set to your Netlify URL + /admin
+        sync: false
       - key: PORT
         value: 3001
       - key: PAYPAL_CLIENT_ID
@@ -33,6 +38,8 @@ services:
         sync: false
       - key: PAYPAL_MODE
         value: sandbox
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
       - key: RESEND_API_KEY
         sync: false
       - key: EMAIL_FROM
@@ -53,3 +60,5 @@ services:
         value: info@alkatraders.com
       - key: WHATSAPP_NUMBER
         value: "919726900547"
+      - key: LOG_LEVEL
+        value: info
