@@ -80,7 +80,7 @@ export default function Shop() {
       />
       {/* ── SHOP HERO ── */}
       <section className="relative overflow-hidden bg-[var(--navy-deep)] py-16 text-white border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(232,170,36,0.18),transparent_28rem),radial-gradient(circle_at_85%_20%,rgba(49,213,199,0.12),transparent_30rem)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,var(--gold-muted),transparent_28rem),radial-gradient(circle_at_85%_20%,var(--teal-soft),transparent_30rem)]" />
         <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="max-w-[640px]">
@@ -223,7 +223,7 @@ export default function Shop() {
             </p>
             <Link
               to="/rfq"
-              className="inline-flex items-center gap-2 bg-[var(--accent-gold)] text-[#111827] font-bold px-8 py-3.5 rounded-xl hover:bg-[var(--gold-light)] transition-all no-underline"
+              className="inline-flex items-center gap-2 bg-[var(--accent-gold)] text-navy-deep font-bold px-8 py-3.5 rounded-xl hover:bg-[var(--gold-light)] transition-all no-underline"
             >
               {t('shop.submitRfq')} <ArrowRight size={16} />
             </Link>

@@ -79,7 +79,7 @@ export function ProductTrendRadar({ products, orders }: Props) {
           {(['7d', '30d', '90d'] as const).map(p => (
             <button key={p} onClick={() => setPeriod(p)}
               className={`rounded-lg px-2 py-0.5 text-[0.5rem] font-bold transition-all ${
-                period === p ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
+                period === p ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
               }`}>{p}</button>
           ))}
         </div>

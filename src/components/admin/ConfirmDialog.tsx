@@ -33,7 +33,7 @@ export function ConfirmDialog({ open, title, message, confirmLabel = 'Confirm', 
           <button onClick={onCancel} className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2 text-xs font-bold text-[var(--text-secondary)] hover:border-[var(--text-muted)] transition-colors">
             {cancelLabel}
           </button>
-          <button onClick={onConfirm} className={`rounded-xl px-4 py-2 text-xs font-bold text-white transition-all ${danger ? 'bg-[var(--danger)] hover:bg-[var(--danger)]/80' : 'bg-[var(--accent-gold)] text-[#061522] hover:bg-[var(--gold-light)]'}`}>
+          <button onClick={onConfirm} className={`rounded-xl px-4 py-2 text-xs font-bold text-white transition-all ${danger ? 'bg-[var(--danger)] hover:bg-[var(--danger)]/80' : 'bg-[var(--accent-gold)] text-navy-deep hover:bg-[var(--gold-light)]'}`}>
             {confirmLabel}
           </button>
         </div>

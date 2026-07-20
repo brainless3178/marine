@@ -44,7 +44,7 @@ function MarqueeCard({ product }: { product: Product }) {
           {product.sku}
         </span>
       </div>
-      {product.availability === 'emergency' && (          <span className="px-2 py-0.5 text-xs font-mono uppercase tracking-wide bg-[rgba(186,45,11,0.12)] text-[var(--brick-ember)] border border-[rgba(186,45,11,0.3)] rounded-full flex-shrink-0">
+      {product.availability === 'emergency' && (          <span className="px-2 py-0.5 text-xs font-mono uppercase tracking-wide bg-[rgba(186,45,11,0.12)] text-[var(--brick-ember)] border border-[var(--brick-border)] rounded-full flex-shrink-0">
           Urgent
         </span>
       )}

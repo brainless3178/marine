@@ -149,7 +149,7 @@ export function GoalTracker({ orders, products }: Props) {
               onKeyDown={e => e.key === 'Enter' && handleAdd()}
             />
             <button onClick={handleAdd}
-              className="rounded-lg bg-[var(--accent-gold)] px-3 py-1.5 text-xs font-bold text-[#061522] hover:bg-[var(--gold-light)] transition-colors">
+              className="rounded-lg bg-[var(--accent-gold)] px-3 py-1.5 text-xs font-bold text-navy-deep hover:bg-[var(--gold-light)] transition-colors">
               Save
             </button>
             <button onClick={() => setShowAdd(false)}

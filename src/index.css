@@ -30,6 +30,61 @@
   --teal-soft: rgba(0, 140, 140, 0.10);
   --brick-ember: #b91c1c;
   --honeydew: #f0fdf4;
+  --btn-hover-dark: #9a2509;
+  --btn-hover-gold: #d97706;
+  --focus-ring-gold: rgba(232, 170, 36, 0.25);
+  --focus-ring-blue: rgba(10, 61, 98, 0.25);
+  --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.18);
+  --overlay-dark: rgba(3, 13, 23, 0.62);
+  --overlay-medium: rgba(3, 13, 23, 0.54);
+  --danger-border: rgba(239, 68, 68, 0.3);
+  --danger-subtle: rgba(239, 68, 68, 0.15);
+  --danger-glow: rgba(239, 68, 68, 0.08);
+  --warning-border: rgba(245, 158, 11, 0.3);
+  --warning-subtle: rgba(245, 158, 11, 0.08);
+  --success-border: rgba(16, 185, 129, 0.3);
+  --info-border: rgba(14, 165, 233, 0.3);
+  --info-subtle: rgba(14, 165, 233, 0.08);
+  --gold-glow: rgba(200, 147, 10, 0.06);
+  --teal-glow: rgba(115, 186, 155, 0.45);
+  --brick-border: rgba(186, 45, 11, 0.3);
+  --selection-bg: rgba(200, 147, 10, 0.22);
+  --tap-highlight: rgba(232, 170, 36, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --sidebar-text: rgba(255, 255, 255, 0.55);
+  --sidebar-text-hover: rgba(255, 255, 255, 0.92);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+  --sidebar-section-label: rgba(255, 255, 255, 0.25);
+  --sidebar-section-label-hover: rgba(255, 255, 255, 0.4);
+  --header-glass: rgba(255, 255, 255, 0.88);
+  --header-glass-dark: rgba(11, 32, 51, 0.88);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
+  --gold-glow-strong: rgba(232, 170, 36, 0.35);
+  --gold-glow-medium: rgba(232, 170, 36, 0.25);
+  --gold-subtle: rgba(232, 170, 36, 0.12);
+  --gold-muted-light: rgba(232, 170, 36, 0.06);
+  --badge-published-bg: rgba(21, 154, 103, 0.12);
+  --badge-hidden-bg: rgba(111, 132, 152, 0.12);
+  --badge-danger-bg: rgba(220, 38, 38, 0.12);
+  --badge-info-bg: rgba(10, 61, 98, 0.12);
+  --overlay-sidebar: rgba(0, 0, 0, 0.5);
+  --shadow-card-hover-dark: rgba(0, 0, 0, 0.2);
+  --shadow-nav-hover: rgba(0, 0, 0, 0.12);
+  --hero-gradient-start: rgba(6, 21, 34, 0.96);
+  --hero-gradient-mid: rgba(10, 42, 67, 0.94);
+  --hero-gold-glow: rgba(232, 170, 36, 0.26);
+  --hero-pseudo-teal: rgba(15, 118, 110, 0.05);
+  --shimmer-white: rgba(255, 255, 255, 0.2);
+  --card-hover-shadow: rgba(7, 24, 39, 0.16);
+  --card-maritime-shadow: rgba(11, 26, 46, 0.12);
+  --btn-gold-shadow: rgba(232, 170, 36, 0.24);
+  --btn-secondary-border: rgba(255, 255, 255, 0.25);
+  --btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
+  --btn-secondary-hover-border: rgba(255, 255, 255, 0.4);
+  --shadow-heavy-color: rgba(0, 0, 0, 0.3);
 }
 
 html.light {
@@ -58,6 +113,62 @@ html.light {
   --teal-soft: rgba(0, 140, 140, 0.10);
   --brick-ember: #b91c1c;
   --honeydew: #f0fdf4;
+  --btn-hover-dark: #9a2509;
+  --btn-hover-gold: #d97706;
+  --focus-ring-gold: rgba(232, 170, 36, 0.25);
+  --focus-ring-blue: rgba(10, 61, 98, 0.25);
+  --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.28);
+  --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.22);
+  --overlay-dark: rgba(3, 13, 23, 0.72);
+  --overlay-medium: rgba(3, 13, 23, 0.62);
+  --danger-border: rgba(248, 113, 113, 0.3);
+  --danger-subtle: rgba(248, 113, 113, 0.15);
+  --danger-glow: rgba(248, 113, 113, 0.08);
+  --warning-border: rgba(251, 191, 36, 0.3);
+  --warning-subtle: rgba(251, 191, 36, 0.08);
+  --success-border: rgba(52, 211, 153, 0.3);
+  --info-border: rgba(119, 199, 243, 0.3);
+  --info-subtle: rgba(119, 199, 243, 0.08);
+  --gold-glow: rgba(240, 185, 71, 0.06);
+  --teal-glow: rgba(49, 213, 199, 0.45);
+  --brick-border: rgba(248, 113, 113, 0.3);
+  --selection-bg: rgba(240, 185, 71, 0.22);
+  --tap-highlight: rgba(240, 185, 71, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --sidebar-text: rgba(255, 255, 255, 0.55);
+  --sidebar-text-hover: rgba(255, 255, 255, 0.92);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+  --sidebar-section-label: rgba(255, 255, 255, 0.25);
+  --sidebar-section-label-hover: rgba(255, 255, 255, 0.4);
+  --header-glass: rgba(255, 255, 255, 0.88);
+  --header-glass-dark: rgba(11, 32, 51, 0.88);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
+  --gold-glow-strong: rgba(232, 170, 36, 0.35);
+  --gold-glow-medium: rgba(232, 170, 36, 0.25);
+  --gold-subtle: rgba(232, 170, 36, 0.12);
+  --gold-muted-light: rgba(232, 170, 36, 0.06);
+  --badge-published-bg: rgba(21, 154, 103, 0.12);
+  --badge-hidden-bg: rgba(111, 132, 152, 0.12);
+  --badge-danger-bg: rgba(220, 38, 38, 0.12);
+  --badge-info-bg: rgba(10, 61, 98, 0.12);
+  --overlay-sidebar: rgba(0, 0, 0, 0.5);
+  --shadow-card-hover-dark: rgba(0, 0, 0, 0.2);
+  --shadow-nav-hover: rgba(0, 0, 0, 0.12);
+  --login-teal: rgba(0, 140, 140, 0.04);
+  --hero-gradient-start: rgba(6, 21, 34, 0.96);
+  --hero-gradient-mid: rgba(10, 42, 67, 0.94);
+  --hero-gold-glow: rgba(232, 170, 36, 0.26);
+  --hero-pseudo-teal: rgba(15, 118, 110, 0.05);
+  --shimmer-white: rgba(255, 255, 255, 0.2);
+  --card-hover-shadow: rgba(7, 24, 39, 0.16);
+  --card-maritime-shadow: rgba(11, 26, 46, 0.12);
+  --btn-gold-shadow: rgba(232, 170, 36, 0.24);
+  --btn-secondary-border: rgba(255, 255, 255, 0.25);
+  --btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
+  --btn-secondary-hover-border: rgba(255, 255, 255, 0.4);
+  --shadow-heavy-color: rgba(0, 0, 0, 0.28);
 }
 
 html:not(.light) {
@@ -86,6 +197,62 @@ html:not(.light) {
   --teal-soft: rgba(49, 213, 199, 0.08);
   --brick-ember: #dc2626;
   --honeydew: #ecfdf5;
+  --btn-hover-dark: #b91c1c;
+  --btn-hover-gold: #bd820e;
+  --focus-ring-gold: rgba(240, 185, 71, 0.25);
+  --focus-ring-blue: rgba(119, 199, 243, 0.25);
+  --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.4);
+  --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.3);
+  --overlay-dark: rgba(0, 0, 0, 0.72);
+  --overlay-medium: rgba(0, 0, 0, 0.62);
+  --danger-border: rgba(248, 113, 113, 0.3);
+  --danger-subtle: rgba(248, 113, 113, 0.15);
+  --danger-glow: rgba(248, 113, 113, 0.08);
+  --warning-border: rgba(251, 191, 36, 0.3);
+  --warning-subtle: rgba(251, 191, 36, 0.08);
+  --success-border: rgba(52, 211, 153, 0.3);
+  --info-border: rgba(119, 199, 243, 0.3);
+  --info-subtle: rgba(119, 199, 243, 0.08);
+  --gold-glow: rgba(240, 185, 71, 0.06);
+  --teal-glow: rgba(49, 213, 199, 0.45);
+  --brick-border: rgba(248, 113, 113, 0.3);
+  --selection-bg: rgba(240, 185, 71, 0.22);
+  --tap-highlight: rgba(240, 185, 71, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --sidebar-text: rgba(255, 255, 255, 0.55);
+  --sidebar-text-hover: rgba(255, 255, 255, 0.92);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+  --sidebar-section-label: rgba(255, 255, 255, 0.25);
+  --sidebar-section-label-hover: rgba(255, 255, 255, 0.4);
+  --header-glass: rgba(255, 255, 255, 0.88);
+  --header-glass-dark: rgba(11, 32, 51, 0.88);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
+  --gold-glow-strong: rgba(240, 185, 71, 0.35);
+  --gold-glow-medium: rgba(240, 185, 71, 0.25);
+  --gold-subtle: rgba(240, 185, 71, 0.12);
+  --gold-muted-light: rgba(240, 185, 71, 0.06);
+  --badge-published-bg: rgba(52, 211, 153, 0.12);
+  --badge-hidden-bg: rgba(120, 145, 165, 0.12);
+  --badge-danger-bg: rgba(248, 113, 113, 0.12);
+  --badge-info-bg: rgba(119, 199, 243, 0.12);
+  --overlay-sidebar: rgba(0, 0, 0, 0.5);
+  --shadow-card-hover-dark: rgba(0, 0, 0, 0.2);
+  --shadow-nav-hover: rgba(0, 0, 0, 0.12);
+  --login-teal: rgba(0, 140, 140, 0.04);
+  --hero-gradient-start: rgba(3, 8, 16, 0.96);
+  --hero-gradient-mid: rgba(7, 20, 34, 0.94);
+  --hero-gold-glow: rgba(240, 185, 71, 0.26);
+  --hero-pseudo-teal: rgba(15, 118, 110, 0.05);
+  --shimmer-white: rgba(255, 255, 255, 0.2);
+  --card-hover-shadow: rgba(0, 0, 0, 0.28);
+  --card-maritime-shadow: rgba(0, 0, 0, 0.12);
+  --btn-gold-shadow: rgba(240, 185, 71, 0.24);
+  --btn-secondary-border: rgba(255, 255, 255, 0.25);
+  --btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
+  --btn-secondary-hover-border: rgba(255, 255, 255, 0.4);
+  --shadow-heavy-color: rgba(0, 0, 0, 0.4);
 }
 
 @layer base {
@@ -111,8 +278,8 @@ html:not(.light) {
     line-height: 1.6;
     color: var(--text-primary);
     background:
-      radial-gradient(circle at 8% 0%, rgba(232, 170, 36, 0.08), transparent 24rem),
-      radial-gradient(circle at 92% 12%, rgba(0, 140, 140, 0.08), transparent 28rem),
+      radial-gradient(circle at 8% 0%, var(--gold-muted), transparent 24rem),
+      radial-gradient(circle at 92% 12%, var(--teal-soft), transparent 28rem),
       var(--primary-bg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -188,7 +355,7 @@ html:not(.light) {
 
   /* ── Selection ─────────────────────────────────────────── */
   ::selection {
-    background: rgba(200, 147, 10, 0.22);
+    background: var(--selection-bg);
     color: var(--text-primary);
   }
 
@@ -350,14 +517,14 @@ html:not(.light) {
   /* Premium Maritime Hero Background */
   .hero-maritime-bg {
     background:
-      linear-gradient(135deg, rgba(6, 21, 34, 0.96), rgba(10, 42, 67, 0.94)),
-      radial-gradient(circle at 75% 20%, rgba(232, 170, 36, 0.26), transparent 26rem),
-      linear-gradient(160deg, #061522 0%, #0a2a43 42%, #0e4d72 100%);
+      linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-mid)),
+      radial-gradient(circle at 75% 20%, var(--hero-gold-glow), transparent 26rem),
+      linear-gradient(160deg, var(--navy-deep) 0%, var(--navy-mid) 42%, var(--navy-light) 100%);
     position: relative;
   }
 
   html:not(.light) .hero-maritime-bg {
-    background: linear-gradient(160deg, #030810 0%, #071422 35%, #0c2438 70%, #0f3050 100%);
+    background: linear-gradient(160deg, var(--navy-deep) 0%, var(--navy-mid) 35%, var(--navy-light) 70%, #0f3050 100%);
   }
 
   .hero-maritime-bg::before {
@@ -365,14 +532,14 @@ html:not(.light) {
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(200, 147, 10, 0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 80% at 20% 80%, rgba(15, 118, 110, 0.05) 0%, transparent 60%);
+      radial-gradient(ellipse 80% 60% at 70% 40%, var(--gold-glow) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 80% at 20% 80%, var(--hero-pseudo-teal) 0%, transparent 60%);
     pointer-events: none;
   }
 
   /* Gradient text for headings */
   .maritime-gradient-text {
-    background: linear-gradient(135deg, #f8fafc 0%, #e6b422 50%, #c8930a 100%);
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-gold) 50%, var(--gold-dark) 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -388,7 +555,7 @@ html:not(.light) {
     left: -100%;
     width: 50%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, var(--shimmer-white), transparent);
     animation: shimmerSweep 2.5s ease-in-out infinite;
   }
 
@@ -421,21 +588,21 @@ html:not(.light) {
   .product-card:hover {
     transform: translateY(-5px);
     border-color: color-mix(in srgb, var(--accent-gold) 70%, var(--border));
-    box-shadow: 0 22px 60px rgba(7, 24, 39, 0.16);
+    box-shadow: 0 22px 60px var(--card-hover-shadow);
   }
 
   html:not(.light) .commerce-card,
   html:not(.light) .product-card {
     background:
-      linear-gradient(180deg, rgba(16, 42, 64, 0.96), rgba(8, 26, 42, 0.98));
-    box-shadow: 0 18px 54px rgba(0, 0, 0, 0.28);
+      linear-gradient(180deg, var(--navy-mid), var(--navy-deep));
+    box-shadow: 0 18px 54px var(--shadow-heavy-color);
   }
 
   .commerce-button {
     border-color: var(--accent-gold);
     background: var(--accent-gold);
     color: var(--navy-deep);
-    box-shadow: 0 12px 26px rgba(232, 170, 36, 0.24);
+    box-shadow: 0 12px 26px var(--btn-gold-shadow);
   }
 
   .commerce-button:hover {
@@ -451,18 +618,18 @@ html:not(.light) {
 
   .maritime-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(11, 26, 46, 0.12);
+    box-shadow: 0 12px 40px var(--card-maritime-shadow);
     border-color: var(--accent-gold);
   }
 
   html:not(.light) .maritime-card:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 40px var(--shadow-heavy-color);
   }
 
   /* Premium button */
   .maritime-btn-primary {
-    background: linear-gradient(135deg, #c8930a 0%, #e6b422 100%);
-    color: #071422;
+    background: linear-gradient(135deg, var(--gold-dark) 0%, var(--accent-gold) 100%);
+    color: var(--navy-deep);
     border: none;
     border-radius: 10px;
     font-weight: 700;
@@ -475,15 +642,15 @@ html:not(.light) {
   }
 
   .maritime-btn-primary:hover {
-    background: linear-gradient(135deg, #e6b422 0%, #f5d87a 100%);
+    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--gold-light) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(200, 147, 10, 0.3);
+    box-shadow: 0 8px 24px var(--gold-muted);
   }
 
   .maritime-btn-secondary {
     background: transparent;
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: var(--text-primary);
+    border: 1px solid var(--btn-secondary-border);
     border-radius: 10px;
     font-weight: 600;
     font-size: 14px;
@@ -493,9 +660,9 @@ html:not(.light) {
   }
 
   .maritime-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
-    color: #ffffff;
+    background: var(--btn-secondary-hover-bg);
+    border-color: var(--btn-secondary-hover-border);
+    color: var(--text-primary);
   }
 
   /* Section divider */
@@ -508,9 +675,9 @@ html:not(.light) {
 
   /* Glass card for overlays */
   .glass-card {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--glass-bg);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
     border-radius: 12px;
   }
 
@@ -527,8 +694,8 @@ html:not(.light) {
     align-items: center;
     gap: 0.875rem;
     padding: 0.625rem 1rem 0.625rem 0.625rem;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
     border-radius: 10px;
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     backdrop-filter: blur(8px);
@@ -537,7 +704,7 @@ html:not(.light) {
   .product-marquee-card:hover {
     border-color: var(--accent-gold);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(200, 147, 10, 0.15);
+    box-shadow: 0 8px 24px var(--gold-muted);
   }
 
   /* Gold accent bar */
@@ -642,7 +809,7 @@ html:not(.light) {
 
   /* Better tap highlights */
   button, a {
-    -webkit-tap-highlight-color: rgba(232, 170, 36, 0.15);
+    -webkit-tap-highlight-color: var(--tap-highlight);
   }
 
   /* Reduce animations on mobile for performance */

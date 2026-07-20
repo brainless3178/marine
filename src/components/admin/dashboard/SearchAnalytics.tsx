@@ -89,7 +89,7 @@ export function SearchAnalytics({ products, orders }: Props) {
         ].map(tab => (
           <button key={tab.key} onClick={() => setView(tab.key)}
             className={`rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${
-              view === tab.key ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              view === tab.key ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
             }`}>{tab.label}</button>
         ))}
       </div>

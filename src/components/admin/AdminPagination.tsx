@@ -50,7 +50,7 @@ export function AdminPagination({
             onClick={() => onPageChange(num)}
             className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
               page === num
-                ? 'bg-[var(--accent-gold)] text-[#061522]'
+                ? 'bg-[var(--accent-gold)] text-navy-deep'
                 : 'border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'
             }`}
           >

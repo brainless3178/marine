@@ -489,7 +489,7 @@ export default function AdminProductForm() {
                 ? 'bg-[var(--success)] text-white'
                 : !isValid && attempted
                 ? 'bg-[var(--text-muted)] text-white cursor-not-allowed opacity-60'
-                : 'bg-[var(--accent-gold)] text-[#061522] hover:bg-[var(--gold-light)] hover:-translate-y-0.5'
+                : 'bg-[var(--accent-gold)] text-navy-deep hover:bg-[var(--gold-light)] hover:-translate-y-0.5'
             }`}
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : saved ? <CheckCircle size={14} /> : <Save size={14} />}
@@ -508,7 +508,7 @@ export default function AdminProductForm() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`whitespace-nowrap rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${
                   activeTab === tab.id
-                    ? 'bg-[var(--accent-gold)] text-[#061522] shadow-[0_4px_12px_rgba(232,170,36,0.2)]'
+                    ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]'
                     : 'text-[var(--text-secondary)] hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -802,7 +802,7 @@ export default function AdminProductForm() {
                     {form.images.length > 1 && (
                       <button
                         onClick={() => removeImage(i)}
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors mt-5"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors mt-5"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -982,7 +982,7 @@ export default function AdminProductForm() {
                       <span className="text-xs font-bold text-[var(--text-muted)] w-6 shrink-0">{i + 1}.</span>
                       <input type="text" value={feat} onChange={(e) => updateArrayItem('keyFeatures', i, e.target.value)} placeholder="e.g. Heavy-duty construction" className={`${getFieldClass('')} flex-1`} />
                       {form.keyFeatures.length > 1 && (
-                        <button onClick={() => removeArrayItem('keyFeatures', i)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors">
+                        <button onClick={() => removeArrayItem('keyFeatures', i)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors">
                           <Trash2 size={14} />
                         </button>
                       )}
@@ -1021,7 +1021,7 @@ export default function AdminProductForm() {
                       <CheckCircle size={14} className="text-[var(--success)] shrink-0" />
                       <input type="text" value={item} onChange={(e) => updateArrayItem('includedItems', i, e.target.value)} placeholder="e.g. Mounting brackets, User manual" className={`${getFieldClass('')} flex-1`} />
                       {form.includedItems.length > 1 && (
-                        <button onClick={() => removeArrayItem('includedItems', i)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors">
+                        <button onClick={() => removeArrayItem('includedItems', i)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors">
                           <Trash2 size={14} />
                         </button>
                       )}
@@ -1042,7 +1042,7 @@ export default function AdminProductForm() {
                       <AlertCircle size={14} className="text-[var(--danger)] shrink-0" />
                       <input type="text" value={item} onChange={(e) => updateArrayItem('excludedItems', i, e.target.value)} placeholder="e.g. Power cable, Installation tools" className={`${getFieldClass('')} flex-1`} />
                       {form.excludedItems.length > 1 && (
-                        <button onClick={() => removeArrayItem('excludedItems', i)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors">
+                        <button onClick={() => removeArrayItem('excludedItems', i)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors">
                           <Trash2 size={14} />
                         </button>
                       )}
@@ -1092,7 +1092,7 @@ export default function AdminProductForm() {
                     {form.specs.length > 1 && (
                       <button
                         onClick={() => removeSpec(i)}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors"
                       >
                         <Trash2 size={14} />
                       </button>

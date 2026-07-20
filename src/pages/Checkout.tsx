@@ -290,7 +290,7 @@ export default function Checkout() {
                   setCancelRequested(true)
                 }}
                 disabled={!cancelReason.trim()}
-                className="w-full py-3 bg-[var(--accent-gold)] text-[#111827] font-bold text-xs rounded-xl hover:bg-[var(--gold-light)] transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-[var(--accent-gold)] text-navy-deep font-bold text-xs rounded-xl hover:bg-[var(--gold-light)] transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t('checkout.cancelSubmitBtn')}
               </button>
@@ -300,7 +300,7 @@ export default function Checkout() {
           <div className="flex gap-4 flex-wrap justify-center mt-4">
             <button
               onClick={handleContinueShopping}
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-sm border border-[var(--brick-ember)] hover:bg-[#9a2509] transition-all rounded-full cursor-pointer"
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-sm border border-[var(--brick-ember)] hover:bg-btn-hover-dark transition-all rounded-full cursor-pointer"
             >
               {t('checkout.continueShopping')}
             </button>
@@ -468,7 +468,7 @@ export default function Checkout() {
               <button
                 type="button"
                 onClick={() => goToStep(2)}
-                className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-sm border border-[var(--brick-ember)] hover:bg-[#9a2509] transition-all mt-6 rounded-full cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-sm border border-[var(--brick-ember)] hover:bg-btn-hover-dark transition-all mt-6 rounded-full cursor-pointer"
               >
                 {t('checkout.continuePayment')}
               </button>
@@ -554,7 +554,7 @@ export default function Checkout() {
                 <button
                   type="button"
                   onClick={() => goToStep(3)}
-                  className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-sm border border-[var(--brick-ember)] hover:bg-[#9a2509] transition-all rounded-full cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-sm border border-[var(--brick-ember)] hover:bg-btn-hover-dark transition-all rounded-full cursor-pointer"
                 >
                   {t('checkout.reviewOrder')}
                 </button>
@@ -671,11 +671,11 @@ export default function Checkout() {
                 {paymentMethod === 'paypal' ? (
                   <div className="w-full">
                     {creatingOrder ? (
-                      <div className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[#ffc439] text-[#111111] font-semibold text-sm rounded-full">
+                      <div className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-gold text-navy-deep font-semibold text-sm rounded-full">
                         <Loader2 size={16} className="animate-spin" /> Creating order...
                       </div>
                     ) : paypalScriptLoading ? (
-                      <div className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[#ffc439] text-[#111111] font-semibold text-sm rounded-full">
+                      <div className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-gold text-navy-deep font-semibold text-sm rounded-full">
                         <Loader2 size={16} className="animate-spin" /> Loading PayPal...
                       </div>
                     ) : (
@@ -693,7 +693,7 @@ export default function Checkout() {
                     type="button"
                     onClick={handlePlaceOrder}
                     disabled={orderLoading}
-                    className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-sm border border-[var(--brick-ember)] hover:bg-[#9a2509] transition-all rounded-full cursor-pointer relative overflow-hidden shimmer-btn disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-sm border border-[var(--brick-ember)] hover:bg-btn-hover-dark transition-all rounded-full cursor-pointer relative overflow-hidden shimmer-btn disabled:opacity-50"
                   >
                     {orderLoading ? <><Loader2 size={16} className="animate-spin" /> Processing...</> : <><ClipboardCheck size={16} /> {t('checkout.placeOrder')}</>}
                   </button>

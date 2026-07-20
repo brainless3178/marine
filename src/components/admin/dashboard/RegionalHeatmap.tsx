@@ -66,7 +66,7 @@ export function RegionalHeatmap({ orders }: Props) {
         {(['revenue', 'count'] as const).map(s => (
           <button key={s} onClick={() => setSortBy(s)}
             className={`rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${
-              sortBy === s ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              sortBy === s ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
             }`}>
             {s === 'revenue' ? 'By Revenue' : 'By Orders'}
           </button>

@@ -95,9 +95,9 @@ export function WarehouseHeatMap({ products }: Props) {
         </div>
         <div className="flex gap-1">
           <button onClick={() => setView('heatmap')}
-            className={`rounded-lg px-2 py-0.5 text-[0.5rem] font-bold transition-all ${view === 'heatmap' ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'}`}>Heat Map</button>
+            className={`rounded-lg px-2 py-0.5 text-[0.5rem] font-bold transition-all ${view === 'heatmap' ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'}`}>Heat Map</button>
           <button onClick={() => setView('list')}
-            className={`rounded-lg px-2 py-0.5 text-[0.5rem] font-bold transition-all ${view === 'list' ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'}`}>List</button>
+            className={`rounded-lg px-2 py-0.5 text-[0.5rem] font-bold transition-all ${view === 'list' ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'}`}>List</button>
         </div>
       </div>
 

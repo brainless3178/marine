@@ -336,7 +336,7 @@ export default function AdminCategories() {
             <div className="flex gap-2">
               <button
                 onClick={() => handleSave({ id: node.id, name: node.name, slug: node.slug, description: node.description })}
-                className="inline-flex items-center gap-1 rounded-lg bg-[var(--accent-gold)] px-3 py-1.5 text-[0.625rem] font-bold text-[#061522]"
+                className="inline-flex items-center gap-1 rounded-lg bg-[var(--accent-gold)] px-3 py-1.5 text-[0.625rem] font-bold text-navy-deep"
               >
                 <CheckCircle size={10} /> Save
               </button>
@@ -365,7 +365,7 @@ export default function AdminCategories() {
         </div>
         <button
           onClick={() => { setNewCategoryOpen(true); setNewParentId(null); setEditingCategory(null) }}
-          className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all"
+          className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all"
         >
           <Plus size={14} /> Add Category
         </button>
@@ -449,7 +449,7 @@ function NewCategoryForm({ parentId, categories, onAdd, onCancel }: { parentId: 
         <button
           onClick={() => onAdd({ name: name || 'New Category', slug, description })}
           disabled={!name.trim()}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all disabled:opacity-40"
         >
           <Plus size={14} /> Create Category
         </button>

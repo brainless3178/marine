@@ -144,7 +144,7 @@ export default function AdminBrands() {
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Brands</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">{filteredBrands.length} brands</p>
         </div>
-        <button onClick={openAddModal} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[#061522] transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5">
+        <button onClick={openAddModal} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5">
           <Plus size={14} /> Add Brand
         </button>
       </div>
@@ -176,7 +176,7 @@ export default function AdminBrands() {
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => openEditModal(brand.id)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-gold)] hover:bg-[var(--gold-muted)] transition-colors" title="Edit"><Pencil size={12} /></button>
                   <a href={`/brands/${brand.slug}`} target="_blank" rel="noopener noreferrer" className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 transition-colors" title="View on storefront"><Eye size={12} /></a>
-                  <button onClick={() => setDeleteTarget(brand.id)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors" title="Delete"><Trash2 size={12} /></button>
+                  <button onClick={() => setDeleteTarget(brand.id)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors" title="Delete"><Trash2 size={12} /></button>
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 mb-3">
@@ -246,7 +246,7 @@ export default function AdminBrands() {
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-[var(--border)] px-6 py-4">
               <button onClick={() => setShowModal(false)} className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] hover:border-[var(--text-muted)] transition-colors">Cancel</button>
-              <button onClick={handleSave} disabled={!form.name.trim()} className="rounded-xl bg-[var(--accent-gold)] px-5 py-2.5 text-xs font-extrabold text-[#061522] transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">{editingBrand ? 'Save Changes' : 'Add Brand'}</button>
+              <button onClick={handleSave} disabled={!form.name.trim()} className="rounded-xl bg-[var(--accent-gold)] px-5 py-2.5 text-xs font-extrabold text-navy-deep transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">{editingBrand ? 'Save Changes' : 'Add Brand'}</button>
             </div>
           </div>
         </div>

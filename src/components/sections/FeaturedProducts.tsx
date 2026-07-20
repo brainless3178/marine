@@ -44,7 +44,7 @@ export function FeaturedProducts() {
             <div key={product.id} className="maritime-card overflow-hidden group" style={{ animationDelay: `${i * 50}ms` }}>
               <Link to={`/product/${product.id}`} className="block relative overflow-hidden bg-[var(--surface-soft)]">
                 <OptimizedImage src={`/images/${product.filename}`} alt={product.name} className="w-full aspect-[4/3] object-cover border-b border-[var(--border)] transition-transform duration-500 group-hover:scale-105" width={400} height={300} loading="lazy" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                {product.availability === 'emergency' && <span className="absolute top-3 left-3 z-10 px-2.5 py-1 text-xs font-mono font-bold border border-red-300/30 text-white bg-red-600/90 rounded-lg shadow-[0_2px_10px_rgba(239,68,68,0.3)]">Emergency</span>}
+                {product.availability === 'emergency' && <span className="absolute top-3 left-3 z-10 px-2.5 py-1 text-xs font-mono font-bold border border-danger/30/30 text-white bg-danger/90 rounded-lg shadow-[0_2px_10px_var(--danger-border)]">Emergency</span>}
               </Link>
               <div className="p-4">
                 <span className="inline-block font-mono text-xs px-2.5 py-1 border border-[var(--accent-blue)]/15 text-[var(--accent-blue)] bg-[var(--accent-blue)]/[0.04] rounded-lg">{product.brand}</span>

@@ -167,7 +167,7 @@ export default function AdminUsers() {
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Users & Roles</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">{users.filter((u) => u.active).length} active users</p>
         </div>
-        <button onClick={() => setInviteOpen(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
+        <button onClick={() => setInviteOpen(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
           <Plus size={14} /> Invite User
         </button>
       </div>
@@ -251,7 +251,7 @@ export default function AdminUsers() {
                     <div className="flex items-center gap-0.5">
                       <button onClick={() => setSelectedUser(user)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-gold)] hover:bg-[var(--gold-muted)] transition-colors"><Eye size={12} /></button>
                       <button onClick={() => setEditRoleUser(editRoleUser === user.id ? null : user.id)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 transition-colors"><Pencil size={12} /></button>
-                      <button onClick={() => setDeleteTarget(user.id)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors"><Trash2 size={12} /></button>
+                      <button onClick={() => setDeleteTarget(user.id)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors"><Trash2 size={12} /></button>
                     </div>
                   </td>
                 </tr>
@@ -351,7 +351,7 @@ export default function AdminUsers() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={handleInvite} className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522]"><Mail size={14} /> Send Invite</button>
+              <button onClick={handleInvite} className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep"><Mail size={14} /> Send Invite</button>
               <button onClick={() => setInviteOpen(false)} className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)]">Cancel</button>
             </div>
           </div>

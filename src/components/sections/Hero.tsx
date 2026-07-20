@@ -190,7 +190,7 @@ export function Hero() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
               }`}
             >
-              <div className="flex flex-col gap-2 rounded-2xl border border-white/15 bg-white/[0.08] p-2 shadow-[0_22px_60px_rgba(0,0,0,0.18)] backdrop-blur sm:flex-row">
+              <div className="flex flex-col gap-2 rounded-2xl border border-white/15 bg-white/[0.08] p-2 shadow-[0_22px_60px_var(--shadow-medium)] backdrop-blur sm:flex-row">
                 <label htmlFor="hero-product-search" className="sr-only">
                   {t('hero.searchLabel', { defaultValue: 'Search products' })}
                 </label>
@@ -211,7 +211,7 @@ export function Hero() {
                     aria-controls="hero-suggestions"
                     role="combobox"
                     autoComplete="off"
-                    className="h-12 w-full rounded-xl border border-white/10 bg-white pl-11 pr-4 text-sm font-semibold text-[var(--navy-deep)] outline-none placeholder:text-slate-500 focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.25)]"
+                    className="h-12 w-full rounded-xl border border-white/10 bg-white pl-11 pr-4 text-sm font-semibold text-[var(--navy-deep)] outline-none placeholder:text-[var(--text-muted)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.25)]"
                   />
                 </div>
                 <button
@@ -241,10 +241,10 @@ export function Hero() {
                 id="hero-suggestions"
                 style={dropdownStyle}
                 role="listbox"
-                className="fixed z-[100] overflow-hidden rounded-2xl border border-slate-200 bg-white text-[var(--navy-deep)] shadow-[0_24px_70px_rgba(0,0,0,0.28)]"
+                className="fixed z-[100] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-[0_24px_70px_var(--shadow-heavy)]"
                 onMouseDown={(e) => e.preventDefault()}
               >
-                <div className="border-b border-slate-100 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">
+                <div className="border-b border-[var(--border)] px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                   Product suggestions
                 </div>
                 <div className="max-h-[360px] overflow-y-auto">
@@ -258,22 +258,22 @@ export function Hero() {
                         role="option"
                         aria-selected={searchSuggestions.indexOf(product) === suggestionIndex}
                         onMouseDown={(event) => { event.preventDefault(); clearBlurTimeout(); navigate(`/product/${product.id}`) }}
-                        className={`grid w-full grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-slate-100 px-3 py-3 text-left transition last:border-b-0 ${searchSuggestions.indexOf(product) === suggestionIndex ? 'bg-slate-100' : 'hover:bg-slate-50'}`}
+                        className={`grid w-full grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-[var(--border)] px-3 py-3 text-left transition last:border-b-0 ${searchSuggestions.indexOf(product) === suggestionIndex ? 'bg-[var(--surface-soft)]' : 'hover:bg-[var(--primary-bg)]'}`}
                       >
-                        <span className="h-14 w-14 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                        <span className="h-14 w-14 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-soft)]">
                           <OptimizedImage src={`/images/${product.filename}`} alt={product.name} width={56} height={56} sizes="56px" className="h-full w-full object-cover" onError={(event) => { (event.target as HTMLImageElement).style.opacity = '0.25' }} />
                         </span>
                         <span className="min-w-0">
-                          <span className="block truncate text-sm font-black text-slate-950">{product.name}</span>
-                          <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                            <span className="font-bold text-slate-700">{product.brand}</span>
+                          <span className="block truncate text-sm font-black text-[var(--text-primary)]">{product.name}</span>
+                          <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
+                            <span className="font-bold text-[var(--text-secondary)]">{product.brand}</span>
                             <span>{product.sku}</span>
                             <span className="capitalize">{product.category.replace(/-/g, ' ')}</span>
                           </span>
                         </span>
                         <span className="hidden text-right sm:block">
                           <span className="block font-display text-lg font-black text-[var(--brick-ember)]">${effectivePrice.toFixed(2)}</span>
-                          <span className={`text-[11px] font-bold ${product.inStock ? 'text-emerald-700' : 'text-red-600'}`}>
+                          <span className={`text-[11px] font-bold ${product.inStock ? 'text-success' : 'text-danger'}`}>
                             {product.inStock ? `${product.stockCount} in stock` : 'Out of stock'}
                           </span>
                         </span>
@@ -284,7 +284,7 @@ export function Hero() {
                 <button
                   type="button"
                   onMouseDown={(event) => { event.preventDefault(); clearBlurTimeout(); const query = searchQuery.trim(); navigate(query ? `/products?search=${encodeURIComponent(query)}` : '/products') }}
-                  className="flex w-full items-center justify-between bg-slate-950 px-4 py-3 text-left text-xs font-black uppercase tracking-[0.12em] text-white transition hover:bg-slate-800"
+                  className="flex w-full items-center justify-between bg-[var(--navy-deep)] px-4 py-3 text-left text-xs font-black uppercase tracking-[0.12em] text-white transition hover:bg-[var(--navy-mid)]"
                 >
                   View all results for &quot;{searchQuery.trim()}&quot;
                   <ArrowRight size={14} />
@@ -333,12 +333,12 @@ export function Hero() {
           <div className={`transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-br from-[var(--accent-gold)]/10 via-transparent to-[var(--accent-teal)]/5 rounded-3xl blur-xl pointer-events-none" />
-              <div className="relative glass-card p-4 shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
+              <div className="relative glass-card p-4 shadow-[0_32px_80px_var(--shadow-heavy)]">
                 <div className="flex items-center justify-between mb-4">
                   <span className="type-mono text-xs uppercase tracking-widest text-white/50">{t('hero.liveInventory')}</span>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-overline text-emerald-300 border border-emerald-400/20">{t('hero.inStock')}</span>
+                    <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                    <span className="rounded-full bg-success/15 px-3 py-1 text-overline text-success border border-success/20">{t('hero.inStock')}</span>
                   </div>
                 </div>
                 <div key={`spot-${animKey}`} className="animate-word-cycle">

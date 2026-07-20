@@ -71,9 +71,9 @@ export function RFQSection() {
         className="max-w-[1280px] mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-[42%_58%] gap-12 items-center"
         style={{
           background: isTouchDevice
-            ? 'radial-gradient(600px at 50% 50%, rgba(200, 147, 10, 0.06) 0%, transparent 80%)'
+            ? 'radial-gradient(600px at 50% 50%, var(--gold-glow) 0%, transparent 80%)'
             : isHovering
-            ? `radial-gradient(600px at ${spotlight.x}px ${spotlight.y}px, rgba(200, 147, 10, 0.06) 0%, transparent 80%)`
+            ? `radial-gradient(600px at ${spotlight.x}px ${spotlight.y}px, var(--gold-glow) 0%, transparent 80%)`
             : undefined,
         }}
       >

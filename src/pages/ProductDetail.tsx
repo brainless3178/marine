@@ -121,7 +121,7 @@ export default function ProductDetail() {
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-24 text-center">
         <h2 className="text-2xl font-bold mb-2">{t('product.productNotFound')}</h2>
         <p className="text-body-sm text-[var(--text-secondary)] mb-6">{t('product.productNotFoundDesc')}</p>
-        <Link to="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold rounded-full hover:bg-[#9a2509] transition-all">
+        <Link to="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold rounded-full hover:bg-btn-hover-dark transition-all">
           <ArrowLeft size={16} /> {t('product.backToProducts')}
         </Link>
       </div>
@@ -218,7 +218,7 @@ export default function ProductDetail() {
               </div>
               <h1 className="font-display font-bold text-display-lg tracking-tight text-[var(--text-primary)] leading-tight">{product.name}</h1>
               <div className="flex items-center gap-3 mt-3 flex-wrap">
-                <span className="text-xs font-semibold px-2.5 py-0.5 border text-[var(--accent-blue)] border-[rgba(14,165,233,0.3)] bg-[var(--surface)] rounded">{t('product.brandPrefix', { brand: product.brand })}</span>
+                <span className="text-xs font-semibold px-2.5 py-0.5 border text-[var(--accent-blue)] border-[var(--info-border)] bg-[var(--surface)] rounded">{t('product.brandPrefix', { brand: product.brand })}</span>
                 <span className="text-xs font-mono text-[var(--text-muted)]">{t('product.skuPrefix', { sku: product.sku })}</span>
                 <span className="text-xs font-semibold px-2.5 py-0.5 border text-[var(--text-secondary)] border-[var(--border)] rounded">{t('product.conditionLabel', { condition: product.condition.charAt(0).toUpperCase() + product.condition.slice(1) })}</span>
               </div>
@@ -274,7 +274,7 @@ export default function ProductDetail() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button onClick={handleAddToCart} className={`w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full transition-all duration-300 border cursor-pointer ${added ? 'border-[var(--success)] bg-[var(--success)] text-white' : 'border-[var(--brick-ember)] bg-[var(--brick-ember)] text-[var(--honeydew)] hover:bg-[#9a2509]'}`}>
+                  <button onClick={handleAddToCart} className={`w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full transition-all duration-300 border cursor-pointer ${added ? 'border-[var(--success)] bg-[var(--success)] text-white' : 'border-[var(--brick-ember)] bg-[var(--brick-ember)] text-[var(--honeydew)] hover:bg-btn-hover-dark'}`}>
                     {added ? <><Check size={14} /> {t('product.added')}</> : <><ShoppingCart size={14} /> {t('product.addToCartUpper')}</>}
                   </button>
                   <button onClick={handleBuyNow} className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full bg-[var(--accent-blue)] border border-[var(--accent-blue)] text-white hover:bg-[var(--muted-teal)] transition-all cursor-pointer">
@@ -294,7 +294,7 @@ export default function ProductDetail() {
               <div className="p-4 bg-[var(--surface-soft)] border border-[var(--border)] rounded-xl text-center">
                 <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">{t('product.outOfStockMsg')}</p>
                 <p className="text-xs text-[var(--text-muted)] mb-3">{t('product.checkAvailability')}</p>
-                <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[var(--accent-gold)] text-[#111827] font-bold px-6 py-2.5 rounded-xl text-xs transition-all hover:bg-[var(--gold-light)] no-underline">
+                <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[var(--accent-gold)] text-navy-deep font-bold px-6 py-2.5 rounded-xl text-xs transition-all hover:bg-[var(--gold-light)] no-underline">
                   <MessageCircle size={14} /> {t('product.inquireWhatsApp')}
                 </a>
               </div>
@@ -435,7 +435,7 @@ export default function ProductDetail() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-6">
                   <button type="button" onClick={() => setShowOfferModal(false)} className="w-full py-3 border border-[var(--border)] bg-transparent font-semibold text-xs rounded-full transition-colors cursor-pointer hover:border-[var(--danger)] hover:text-[var(--danger)]">{t('product.cancel')}</button>
-                  <button type="submit" disabled={offerSubmitting} className="w-full py-3 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-xs border border-[var(--brick-ember)] hover:bg-[#9a2509] transition-all rounded-full cursor-pointer disabled:opacity-50">
+                  <button type="submit" disabled={offerSubmitting} className="w-full py-3 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-xs border border-[var(--brick-ember)] hover:bg-btn-hover-dark transition-all rounded-full cursor-pointer disabled:opacity-50">
                     {offerSubmitting ? 'Submitting...' : t('product.submitOffer')}
                   </button>
                 </div>

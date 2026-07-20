@@ -133,7 +133,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-2">
           <Link
             to="/admin/products/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[#061522] no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5"
           >
             <Plus size={14} />
             Add Product
@@ -150,7 +150,7 @@ export default function AdminDashboard() {
               to={alert.link}
               className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold no-underline transition-all hover:-translate-y-0.5 ${
                 alert.type === 'danger'
-                  ? 'border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10'
+                  ? 'border-danger/20 bg-danger/50/5 text-danger hover:bg-danger/50/10'
                   : alert.type === 'warning'
                   ? 'border-[var(--accent-gold)]/20 bg-[var(--accent-gold)]/5 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/10'
                   : 'border-[var(--accent-blue)]/20 bg-[var(--accent-blue)]/5 text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10'
