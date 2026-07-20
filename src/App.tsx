@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
 import { useStore } from './store/useStore'
 import { PageWrapper } from './components/layout/PageWrapper'
@@ -27,6 +27,7 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const TrackOrder = lazy(() => import('./pages/TrackOrder'))
+const AuthCallback = lazy(() => import('./pages/AuthCallback').then(m => ({ default: m.AuthCallback })))
 const OrderHistory = lazy(() => import('./pages/account/OrderHistory'))
 const ProfileEdit = lazy(() => import('./pages/account/ProfileEdit'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
@@ -66,20 +67,21 @@ function LoadingFallback() {
   )
 }
 
-export default function App() {
-  // Restore admin/customer sessions on mount via refresh tokens
+function AppContent() {
   const loadAdminSession = useStore((s) => s.loadAdminSession)
   const loadCustomerSession = useStore((s) => s.loadCustomerSession)
   const isSessionLoading = useStore((s) => s.isSessionLoading)
+  const location = useLocation()
 
   useEffect(() => {
-    // Only attempt session restore if user had a previous session
     if (localStorage.getItem('alka-admin-auth')) loadAdminSession()
     if (localStorage.getItem('alka-auth')) loadCustomerSession()
   }, [loadAdminSession, loadCustomerSession])
 
-  // Show loading spinner while validating session on page refresh
-  if (isSessionLoading) {
+  // Skip loading gate for auth callback — it needs to render immediately
+  const skipLoadingGate = location.pathname === '/auth/callback'
+
+  if (isSessionLoading && !skipLoadingGate) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--primary-bg)]">
         <div className="flex flex-col items-center gap-4">
@@ -91,9 +93,6 @@ export default function App() {
   }
 
   return (
-    <ToastProvider>
-    <PayPalProvider>
-    <BrowserRouter>
       <Routes>
         {/* Admin routes — listed FIRST so they take priority over storefront catch-all */}
         <Route path="/admin/login" element={<Suspense fallback={<LoadingFallback />}><AdminLogin /></Suspense>} />
@@ -127,6 +126,9 @@ export default function App() {
           <Route path="products/:id/edit" element={<AdminProductForm />} />
           <Route path="*" element={<NotFound />} />
         </Route>
+
+        {/* Auth callback — outside layout so it renders full-screen during OAuth processing */}
+        <Route path="/auth/callback" element={<Suspense fallback={<LoadingFallback />}><AuthCallback /></Suspense>} />
 
         {/* Storefront routes — AFTER admin so /admin/* is not caught here */}
         <Route
@@ -171,6 +173,15 @@ export default function App() {
           }
         />
       </Routes>
+  )
+}
+
+export default function App() {
+  return (
+    <ToastProvider>
+    <PayPalProvider>
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
     </PayPalProvider>
     <CookieConsent />

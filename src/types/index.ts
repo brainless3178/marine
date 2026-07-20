@@ -148,8 +148,12 @@ export interface CartItem {
 }
 
 export interface User {
+  id: string
   name: string
   email: string
+  phone?: string
+  company?: string
+  country?: string
 }
 
 export interface ShippingAddress {
