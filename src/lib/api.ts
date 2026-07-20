@@ -23,11 +23,6 @@ const API_BASE = '/api'
 let adminAccessToken: string | null = null
 let customerAccessToken: string | null = null
 
-// ─── Neon Auth Integration ─────────────────────────────────────
-// Customer auth tokens can come from Neon Auth (Google OAuth) or our legacy JWT system.
-// Import getAccessToken from neon-auth to check for Neon Auth tokens first.
-import { getAccessToken as getNeonAccessToken, signOut as neonSignOut, getCurrentUser as getNeonUser } from './neon-auth'
-
 // ─── CSRF Token Cache ───────────────────────────────────────────
 const CSRF_TOKEN_TTL_MS = 50 * 60 * 1000 // Refresh at 50 min (token expires at 60 min)
 let csrfToken: string | null = null
@@ -117,16 +112,11 @@ async function apiFetch<T = unknown>(
     ...((customHeaders as Record<string, string>) || {}),
   }
 
-  // Inject auth token — prefer Neon Auth token, fallback to legacy JWT
+  // Inject auth token
   if (auth === 'admin' && adminAccessToken) {
     headers['Authorization'] = `Bearer ${adminAccessToken}`
-  } else if (auth === 'customer') {
-    const neonToken = getNeonAccessToken()
-    if (neonToken) {
-      headers['Authorization'] = `Bearer ${neonToken}`
-    } else if (customerAccessToken) {
-      headers['Authorization'] = `Bearer ${customerAccessToken}`
-    }
+  } else if (auth === 'customer' && customerAccessToken) {
+    headers['Authorization'] = `Bearer ${customerAccessToken}`
   }
 
   // Inject CSRF token on state-changing requests
@@ -408,33 +398,11 @@ export const customerAuth = {
   login: (data: { email: string; password: string }) =>
     api.post<{ accessToken: string; user: { id: string; name: string; email: string } }>('/auth/login', data),
 
-  logout: async () => {
-    // Clear Neon Auth session if it exists
-    if (getNeonAccessToken()) {
-      await neonSignOut()
-    }
-    // Also clear legacy JWT
-    return api.post<{ message: string }>('/auth/logout', undefined, { auth: 'customer' })
-  },
+  logout: () =>
+    api.post<{ message: string }>('/auth/logout', undefined, { auth: 'customer' }),
 
-  me: async () => {
-    // If Neon Auth token is available, get user from Neon Auth
-    const neonUser = getNeonUser()
-    if (neonUser && getNeonAccessToken()) {
-      return {
-        user: {
-          id: neonUser.id,
-          name: neonUser.name,
-          email: neonUser.email,
-          phone: undefined,
-          company: undefined,
-          country: undefined,
-        }
-      }
-    }
-    // Fallback to legacy JWT
-    return api.get<{ user: { id: string; name: string; email: string; phone?: string; company?: string; country?: string } }>('/auth/me', { auth: 'customer' })
-  },
+  me: () =>
+    api.get<{ user: { id: string; name: string; email: string; phone?: string; company?: string; country?: string } }>('/auth/me', { auth: 'customer' }),
 
   updateProfile: (data: { name?: string; phone?: string; company?: string; country?: string }) =>
     api.put<{ user: { id: string; name: string; email: string; phone?: string; company?: string; country?: string } }>('/auth/me', data, { auth: 'customer' }),

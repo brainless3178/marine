@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import i18n from 'i18next'
 import type { Language, CartItem, Product, User, PriceRange } from '../types'
 import { adminAuth, customerAuth, setAdminToken, setCustomerToken } from '../lib/api'
-import { signInWithGoogle, getSession as getNeonSession, signOut as neonSignOut } from '../lib/neon-auth'
+
 
 interface AdminUser {
   name: string
@@ -71,7 +71,6 @@ interface AppState {
   showAuthModal: boolean
   authError: string | null
   login: (email: string, password: string) => Promise<boolean>
-  loginWithGoogle: () => Promise<void>
   register: (name: string, email: string, password: string, phone?: string, company?: string, country?: string) => Promise<boolean>
   logout: () => Promise<void>
   loadCustomerSession: () => Promise<void>
@@ -289,17 +288,7 @@ export const useStore = create<AppState>((set, get) => ({
       return false
     }
   },
-  loginWithGoogle: async () => {
-    set({ authError: null })
-    try {
-      await signInWithGoogle()
-      // signInWithGoogle redirects the browser — this line won't execute
-    } catch (err: any) {
-      set({ authError: err.message || 'Google sign-in failed' })
-    }
-  },
   logout: async () => {
-    try { await neonSignOut() } catch { /* ignore */ }
     try { await customerAuth.logout() } catch { /* ignore */ }
     setCustomerToken(null)
     set({ isLoggedIn: false, user: null, cart: [], showCartDrawer: false, cartTotal: 0, cartCount: 0 })
@@ -310,25 +299,6 @@ export const useStore = create<AppState>((set, get) => ({
   loadCustomerSession: async () => {
     set({ isSessionLoading: true })
 
-    // 1. Check for Neon Auth session first
-    try {
-      const neonSession = await getNeonSession()
-      if (neonSession?.user) {
-        const user: User = {
-          id: neonSession.user.id,
-          name: neonSession.user.name,
-          email: neonSession.user.email,
-          phone: undefined,
-          company: undefined,
-          country: undefined,
-        }
-        set({ isLoggedIn: true, user, isSessionLoading: false })
-        saveState('auth', true)
-        return
-      }
-    } catch { /* fall through to legacy auth */ }
-
-    // 2. Fallback to legacy JWT auth
     if (!localStorage.getItem('alka-auth')) {
       set({ isLoggedIn: false, user: null, isSessionLoading: false })
       return

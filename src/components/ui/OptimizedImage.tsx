@@ -40,22 +40,35 @@ function buildSrcSet(basePath: string, ext: string): string {
 
 /**
  * Derive responsive source info from a base image URL.
+ * Supports jpg, jpeg, png, avif, and webp source files.
+ * For non-jpg/png sources (avif, webp), we still generate avif/webp srcSets
+ * using the base path, plus a fallback to the original file.
  */
 function getResponsiveSources(src: string): {
   avifSrcSet: string
   webpSrcSet: string
-  jpgSrcSet: string
+  fallbackSrcSet: string
 } | null {
-  const match = src.match(/^(\/images\/.+)\.(jpe?g|png)$/i)
+  const match = src.match(/^(\/images\/.+)\.(jpe?g|png|avif|webp)$/i)
   if (!match) return null
   const base = match[1]
   const ext = match[2].toLowerCase().startsWith('jpeg') ? 'jpg' : match[2].toLowerCase()
 
-  return {
-    avifSrcSet: buildSrcSet(base, 'avif'),
-    webpSrcSet: buildSrcSet(base, 'webp'),
-    jpgSrcSet: buildSrcSet(base, ext),
+  // Always generate avif and webp srcSets (browsers will skip unsupported formats)
+  const avifSrcSet = buildSrcSet(base, 'avif')
+  const webpSrcSet = buildSrcSet(base, 'webp')
+
+  // For the fallback source, use the original file's format
+  let fallbackSrcSet: string
+  if (ext === 'avif' || ext === 'webp') {
+    // Source is already avif/webp — generate a jpg fallback too
+    fallbackSrcSet = buildSrcSet(base, 'jpg')
+  } else {
+    // Source is jpg/png — generate fallback in the original format
+    fallbackSrcSet = buildSrcSet(base, ext)
   }
+
+  return { avifSrcSet, webpSrcSet, fallbackSrcSet }
 }
 
 /**
@@ -102,6 +115,7 @@ export function OptimizedImage({
     <picture>
       <source srcSet={sources.avifSrcSet} sizes={sizes} type="image/avif" />
       <source srcSet={sources.webpSrcSet} sizes={sizes} type="image/webp" />
+      <source srcSet={sources.fallbackSrcSet} sizes={sizes} />
       <img
         src={src}
         alt={alt}

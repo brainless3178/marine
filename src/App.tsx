@@ -27,7 +27,6 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const TrackOrder = lazy(() => import('./pages/TrackOrder'))
-const AuthCallback = lazy(() => import('./pages/AuthCallback').then(m => ({ default: m.AuthCallback })))
 const OrderHistory = lazy(() => import('./pages/account/OrderHistory'))
 const ProfileEdit = lazy(() => import('./pages/account/ProfileEdit'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
@@ -78,10 +77,7 @@ function AppContent() {
     if (localStorage.getItem('alka-auth')) loadCustomerSession()
   }, [loadAdminSession, loadCustomerSession])
 
-  // Skip loading gate for auth callback — it needs to render immediately
-  const skipLoadingGate = location.pathname === '/auth/callback'
-
-  if (isSessionLoading && !skipLoadingGate) {
+  if (isSessionLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--primary-bg)]">
         <div className="flex flex-col items-center gap-4">
@@ -126,9 +122,6 @@ function AppContent() {
           <Route path="products/:id/edit" element={<AdminProductForm />} />
           <Route path="*" element={<NotFound />} />
         </Route>
-
-        {/* Auth callback — outside layout so it renders full-screen during OAuth processing */}
-        <Route path="/auth/callback" element={<Suspense fallback={<LoadingFallback />}><AuthCallback /></Suspense>} />
 
         {/* Storefront routes — AFTER admin so /admin/* is not caught here */}
         <Route
