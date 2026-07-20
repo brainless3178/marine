@@ -228,8 +228,10 @@ app.use('/api/storefront/testimonials', publicLimiter, storefrontTestimonialRout
 app.use('/api/storefront/offices', publicLimiter, storefrontOfficeRoutes)
 app.use('/api/storefront/payments', publicLimiter, storefrontPaymentRoutes)
 
-// ─── Customer Auth ─────────────────────────────────────────────
+// ─── Customer Auth (Legacy + Neon Auth) ────────────────────────
+import neonAuthRoutes from './routes/storefront/neon-auth.js'
 app.use('/api/auth', publicLimiter, customerAuthRoutes)
+app.use('/api/auth/neon', publicLimiter, neonAuthRoutes)
 
 // ─── 404 Handler ───────────────────────────────────────────────
 app.use((_req, res) => {

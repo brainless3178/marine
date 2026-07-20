@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import i18n from 'i18next'
 import type { Language, CartItem, Product, User, PriceRange } from '../types'
 import { adminAuth, customerAuth, setAdminToken, setCustomerToken } from '../lib/api'
+import { signInWithGoogle, getSession as getNeonSession, signOut as neonSignOut } from '../lib/neon-auth'
 
 interface AdminUser {
   name: string
@@ -70,6 +71,7 @@ interface AppState {
   showAuthModal: boolean
   authError: string | null
   login: (email: string, password: string) => Promise<boolean>
+  loginWithGoogle: () => Promise<void>
   register: (name: string, email: string, password: string, phone?: string, company?: string, country?: string) => Promise<boolean>
   logout: () => Promise<void>
   loadCustomerSession: () => Promise<void>
@@ -268,7 +270,6 @@ export const useStore = create<AppState>((set, get) => ({
       setCustomerToken(accessToken)
       set({ isLoggedIn: true, user, showAuthModal: false, authError: null })
       saveState('auth', true)
-      // Don't persist user PII — loadCustomerSession will fetch from API
       return true
     } catch (err: any) {
       set({ authError: err.message || 'Login failed' })
@@ -282,14 +283,23 @@ export const useStore = create<AppState>((set, get) => ({
       setCustomerToken(accessToken)
       set({ isLoggedIn: true, user, showAuthModal: false, authError: null })
       saveState('auth', true)
-      // Don't persist user PII — loadCustomerSession will fetch from API
       return true
     } catch (err: any) {
       set({ authError: err.message || 'Registration failed' })
       return false
     }
   },
+  loginWithGoogle: async () => {
+    set({ authError: null })
+    try {
+      await signInWithGoogle()
+      // signInWithGoogle redirects the browser — this line won't execute
+    } catch (err: any) {
+      set({ authError: err.message || 'Google sign-in failed' })
+    }
+  },
   logout: async () => {
+    try { await neonSignOut() } catch { /* ignore */ }
     try { await customerAuth.logout() } catch { /* ignore */ }
     setCustomerToken(null)
     set({ isLoggedIn: false, user: null, cart: [], showCartDrawer: false, cartTotal: 0, cartCount: 0 })
@@ -298,12 +308,31 @@ export const useStore = create<AppState>((set, get) => ({
     saveState('cart', [])
   },
   loadCustomerSession: async () => {
-    // Always fetch fresh user data from API — don't trust localStorage
+    set({ isSessionLoading: true })
+
+    // 1. Check for Neon Auth session first
+    try {
+      const neonSession = await getNeonSession()
+      if (neonSession?.user) {
+        const user: User = {
+          id: neonSession.user.id,
+          name: neonSession.user.name,
+          email: neonSession.user.email,
+          phone: undefined,
+          company: undefined,
+          country: undefined,
+        }
+        set({ isLoggedIn: true, user, isSessionLoading: false })
+        saveState('auth', true)
+        return
+      }
+    } catch { /* fall through to legacy auth */ }
+
+    // 2. Fallback to legacy JWT auth
     if (!localStorage.getItem('alka-auth')) {
       set({ isLoggedIn: false, user: null, isSessionLoading: false })
       return
     }
-    set({ isSessionLoading: true })
     try {
       const { user } = await customerAuth.me()
       set({ isLoggedIn: true, user, isSessionLoading: false })
