@@ -59,6 +59,8 @@
 7. Wait for the deploy to finish — your backend URL will be something like `https://alka-traders-api.onrender.com`
 8. Test: Visit `https://alka-traders-api.onrender.com/api/health`
 
+**⚠️ Render Free Tier:** The backend will spin down after ~15 minutes of inactivity and cold-start in ~30 seconds. To keep it alive, set up a free cron ping at [cron-job.org](https://cron-job.org) hitting `/api/health` every 10 minutes.
+
 ---
 
 ## Step 2: Deploy Frontend to Netlify
