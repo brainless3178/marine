@@ -34,8 +34,8 @@
 | Key | Value |
 |-----|-------|
 | `NODE_ENV` | `production` |
-| `DATABASE_URL` | `postgresql://neondb_owner:npg_o6xkj7AGwJDK@ep-orange-voice-aur4fzzm-pooler.c-10.us-east-1.aws.neon.tech/neondb?sslmode=require` |
-| `DIRECT_URL` | `postgresql://neondb_owner:npg_o6xkj7AGwJDK@ep-orange-voice-aur4fzzm.us-east-1.aws.neon.tech/neondb?sslmode=require` |
+| `DATABASE_URL` | *(your NeonDB connection string with `?sslmode=require`)* |
+| `DIRECT_URL` | *(your NeonDB direct connection string — same as above but without `-pooler`)* |
 | `JWT_SECRET` | *(generate a random 64-char hex string)* |
 | `CORS_ORIGIN` | `https://YOUR-NETLIFY-SITE.netlify.app` |
 | `FRONTEND_URL` | `https://YOUR-NETLIFY-SITE.netlify.app` |

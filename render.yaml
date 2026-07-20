@@ -6,8 +6,9 @@ services:
     name: alka-traders-api
     runtime: node
     plan: free
-    buildCommand: cd backend && npm install && npx prisma generate && npm run build
-    startCommand: cd backend && node dist/server.js
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: node dist/server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
