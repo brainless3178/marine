@@ -1,0 +1,54 @@
+# Render Blueprint — Alka Traders Backend API
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: alka-traders-api
+    runtime: node
+    plan: free
+    buildCommand: cd backend && npm install && npx prisma generate && npm run build
+    startCommand: cd backend && node dist/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render dashboard
+      - key: DIRECT_URL
+        sync: false  # Set manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false  # Set to your Netlify URL after frontend is deployed
+      - key: FRONTEND_URL
+        sync: false  # Set to your Netlify URL
+      - key: ADMIN_URL
+        sync: false  # Set to your Netlify URL + /admin
+      - key: PORT
+        value: 3001
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_MODE
+        value: sandbox
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: noreply@alkatraders.com
+      - key: RFQ_EMAIL
+        value: rfq@alkatraders.com
+      - key: EMERGENCY_EMAIL
+        value: emergency@alkatraders.com
+      - key: ADMIN_EMAIL
+        value: admin@alkatraders.com
+      - key: DEFAULT_SHIPPING_COST
+        value: "25"
+      - key: DEFAULT_TAX_RATE
+        value: "0.08"
+      - key: COMPANY_NAME
+        value: Alka Traders
+      - key: COMPANY_EMAIL
+        value: info@alkatraders.com
+      - key: WHATSAPP_NUMBER
+        value: "919726900547"
