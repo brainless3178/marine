@@ -9,10 +9,10 @@ interface BadgeProps {
 
 export function Badge({ variant = 'default', size = 'md', icon, children }: BadgeProps) {
   const variants = {
-    blue: 'text-[var(--deep-forest)] border-[var(--teal-glow)]',
-    gold: 'text-[var(--brick-ember)] border-[var(--brick-border)]',
-    success: 'text-success border-[var(--teal-glow)]',
-    danger: 'text-danger border-[var(--brick-border)]',
+    blue: 'text-[var(--accent-blue)] border-[var(--info-border)] bg-[var(--info-subtle)]',
+    gold: 'text-[var(--accent-gold)] border-[var(--warning-border)] bg-[var(--warning-subtle)]',
+    success: 'text-[var(--success)] border-[var(--success-border)] bg-[var(--badge-published-bg)]',
+    danger: 'text-[var(--danger)] border-[var(--danger-border)] bg-[var(--danger-subtle)]',
     default: 'text-[var(--text-secondary)] border-[var(--border)]',
   }
 
@@ -23,7 +23,7 @@ export function Badge({ variant = 'default', size = 'md', icon, children }: Badg
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-mono tracking-[0.5px] border ${variants[variant]} ${sizes[size]} bg-surface`}
+      className={`inline-flex items-center gap-1.5 font-mono tracking-[0.5px] border ${variants[variant]} ${sizes[size]} ${variant === 'default' ? 'bg-surface' : ''}`}
     >
       {icon && <span>{icon}</span>}
       {children}

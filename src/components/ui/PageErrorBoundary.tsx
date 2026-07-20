@@ -46,7 +46,7 @@ export class PageErrorBoundary extends Component<Props, State> {
                 this.setState({ hasError: false, error: null })
                 window.location.reload()
               }}
-              className="px-5 py-2.5 text-xs font-bold border border-[var(--accent-blue)] text-[var(--accent-blue)] rounded-lg hover:bg-[var(--accent-blue)] hover:text-white transition-all cursor-pointer"
+              className="px-5 py-2.5 text-xs font-bold border border-[var(--accent-blue)] text-[var(--accent-blue)] rounded-lg hover:bg-[var(--accent-blue)] hover:text-[var(--btn-blue-text)] transition-all cursor-pointer"
             >
               Retry
             </button>

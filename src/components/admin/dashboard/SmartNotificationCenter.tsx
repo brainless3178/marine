@@ -91,7 +91,7 @@ export function SmartNotificationCenter({ alerts, rfqs, orders }: Props) {
           <div className="relative">
             <Bell size={16} className="text-[var(--accent-gold)]" />
             {urgentCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--danger)] text-[0.375rem] font-bold text-white">
+              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--danger)] text-[0.375rem] font-bold text-[var(--btn-danger-text)]">
                 {urgentCount}
               </span>
             )}

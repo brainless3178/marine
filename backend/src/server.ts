@@ -94,6 +94,7 @@ import storefrontSettingsRoutes from './routes/storefront/settings.js'
 import storefrontTestimonialRoutes from './routes/storefront/testimonials.js'
 import storefrontOfficeRoutes from './routes/storefront/offices.js'
 import storefrontPaymentRoutes from './routes/storefront/payments.js'
+import storefrontSitemapRoutes from './routes/storefront/sitemap.js'
 
 import customerAuthRoutes from './routes/storefront/auth.js'
 import paypalWebhookRoutes from './routes/webhooks/paypal.js'
@@ -227,6 +228,7 @@ app.use('/api/storefront/settings', publicLimiter, storefrontSettingsRoutes)
 app.use('/api/storefront/testimonials', publicLimiter, storefrontTestimonialRoutes)
 app.use('/api/storefront/offices', publicLimiter, storefrontOfficeRoutes)
 app.use('/api/storefront/payments', publicLimiter, storefrontPaymentRoutes)
+app.use('/api/sitemap.xml', publicLimiter, storefrontSitemapRoutes)
 
 // ─── Customer Auth ──────────────────────────────────────────────
 app.use('/api/auth', publicLimiter, customerAuthRoutes)

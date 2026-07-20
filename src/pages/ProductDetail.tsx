@@ -19,6 +19,7 @@ import {
 import { useStore } from '../store/useStore'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 import { SEO } from '../components/seo/SEO'
+import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import { OptimizedImage } from '../components/ui/OptimizedImage'
 import { storefront } from '../lib/api'
 import { apiProductToFrontend, apiProductsToFrontend } from '../lib/adapters'
@@ -173,7 +174,15 @@ export default function ProductDetail() {
         description={product ? product.description?.slice(0, 160) || `${product.name} — ${product.brand}, ${product.condition}. SKU: ${product.sku}.` : 'View product details'}
         canonical={`/product/${id}`}
         ogImage={product ? `/images/${product.filename}` : undefined}
+        ogType={product ? 'product' : 'website'}
+        productPrice={product ? effectivePrice : undefined}
+        productCurrency="USD"
+        productAvailability={product?.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}
+        ogImageAlt={product?.name}
       />
+      {product && (
+        <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'Products', url: '/products' }, { name: product.category.replace(/-/g, ' '), url: `/products?category=${product.category}` }, { name: product.name, url: `/product/${id}` }]} />
+      )}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
         <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-xs font-semibold text-accent-blue hover:text-accent-teal transition-colors mb-6 bg-transparent border-none cursor-pointer">
           <ArrowLeft size={14} /> {t('product.backToCatalog')}
@@ -204,7 +213,7 @@ export default function ProductDetail() {
               </button>
             </div>
             {showShare && (
-              <div className="mt-2 bg-[var(--success)] text-white text-xs font-bold px-4 py-2 rounded-lg inline-block">{t('product.linkCopied')}</div>
+              <div className="mt-2 bg-[var(--success)] text-[var(--btn-success-text)] text-xs font-bold px-4 py-2 rounded-lg inline-block">{t('product.linkCopied')}</div>
             )}
           </div>
 
@@ -230,7 +239,7 @@ export default function ProductDetail() {
                   <div className="flex items-center gap-3">
                     <span className="font-display font-bold text-4xl text-[var(--danger)] tabular-nums">${product.salePrice.toFixed(2)}</span>
                     <span className="font-display font-bold text-xl text-[var(--text-muted)] line-through tabular-nums">${product.price.toFixed(2)}</span>
-                    <span className="text-xs font-bold bg-[var(--danger)] text-white px-2 py-0.5 rounded">{t('product.percentageOff', { percent: Math.round((1 - product.salePrice / product.price) * 100) })}</span>
+                    <span className="text-xs font-bold bg-[var(--danger)] text-[var(--btn-danger-text)] px-2 py-0.5 rounded">{t('product.percentageOff', { percent: Math.round((1 - product.salePrice / product.price) * 100) })}</span>
                   </div>
                 ) : (
                   <span className="font-display font-bold text-4xl text-[var(--accent-blue)] tabular-nums">${effectivePrice.toFixed(2)}</span>
@@ -274,10 +283,10 @@ export default function ProductDetail() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button onClick={handleAddToCart} className={`w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full transition-all duration-300 border cursor-pointer ${added ? 'border-[var(--success)] bg-[var(--success)] text-white' : 'border-[var(--brick-ember)] bg-[var(--brick-ember)] text-[var(--honeydew)] hover:bg-btn-hover-dark'}`}>
+                  <button onClick={handleAddToCart} className={`w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full transition-all duration-300 border cursor-pointer ${added ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]' : 'border-[var(--brick-ember)] bg-[var(--brick-ember)] text-[var(--honeydew)] hover:bg-btn-hover-dark'}`}>
                     {added ? <><Check size={14} /> {t('product.added')}</> : <><ShoppingCart size={14} /> {t('product.addToCartUpper')}</>}
                   </button>
-                  <button onClick={handleBuyNow} className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full bg-[var(--accent-blue)] border border-[var(--accent-blue)] text-white hover:bg-[var(--muted-teal)] transition-all cursor-pointer">
+                  <button onClick={handleBuyNow} className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full bg-[var(--accent-blue)] border border-[var(--accent-blue)] text-[var(--btn-blue-text)] hover:bg-[var(--muted-teal)] transition-all cursor-pointer">
                     {t('product.buyNow')}
                   </button>
                 </div>

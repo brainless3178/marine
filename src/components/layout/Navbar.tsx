@@ -88,26 +88,26 @@ export function Navbar() {
   }, [])
 
   return (
-    <>
+    <header>
       {/* ── TOP BAR: Email, Phone, Free Shipping ── */}
-      <div className="bg-[var(--navy-deep)] border-b border-white/10 text-white/80 text-xs">
+      <div className="bg-[var(--navy-deep)] border-b border-white/10 text-white/85 text-xs">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex items-center justify-between h-9">
           <div className="flex items-center gap-4">
-            <a href={`mailto:${settings.rfqEmail}`} className="flex items-center gap-1.5 text-white/70 hover:text-[var(--accent-gold)] transition-colors no-underline">
+            <a href={`mailto:${settings.rfqEmail}`} className="flex items-center gap-1.5 text-white/80 hover:text-[var(--accent-gold)] transition-colors no-underline">
               <Mail size={12} />
               <span className="hidden sm:inline">{settings.rfqEmail}</span>
             </a>
-            <a href={`tel:${settings.phoneNumber}`} className="flex items-center gap-1.5 text-white/70 hover:text-[var(--accent-gold)] transition-colors no-underline">
+            <a href={`tel:${settings.phoneNumber}`} className="flex items-center gap-1.5 text-white/80 hover:text-[var(--accent-gold)] transition-colors no-underline">
               <Phone size={12} />
               <span className="hidden sm:inline">{settings.phoneNumber}</span>
             </a>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden md:inline text-white/50">{t('topbar.freeShipping')}</span>
-            <span className="hidden md:inline text-white/30">|</span>
-            <span className="hidden md:inline text-white/50">{t('topbar.timelyDelivery')}</span>
-            <span className="hidden md:inline text-white/30">|</span>
-            <span className="hidden md:inline text-white/50">{t('topbar.securePayment')}</span>
+            <span className="hidden md:inline text-white/70">{t('topbar.freeShipping')}</span>
+            <span className="hidden md:inline text-white/45">|</span>
+            <span className="hidden md:inline text-white/70">{t('topbar.timelyDelivery')}</span>
+            <span className="hidden md:inline text-white/45">|</span>
+            <span className="hidden md:inline text-white/70">{t('topbar.securePayment')}</span>
           </div>
         </div>
       </div>
@@ -271,6 +271,6 @@ export function Navbar() {
             </div>
           </div>
       </nav>
-    </>
+    </header>
   )
 }

@@ -25,9 +25,9 @@ export function Button({
     primary:
       'bg-[var(--brick-ember)] text-[var(--honeydew)] border-[var(--brick-ember)] hover:bg-btn-hover-dark hover:border-btn-hover-dark hover:-translate-y-0.5 rounded-full focus-visible:ring-2 focus-visible:ring-[var(--accent-gold)] focus-visible:ring-offset-2',
     outline:
-      'bg-transparent text-[var(--deep-forest)] border-[var(--border)] hover:bg-[var(--honeydew)] hover:text-[var(--deep-forest)] hover:border-[var(--muted-teal)] hover:-translate-y-0.5 rounded-full',
+      'bg-transparent text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--surface-soft)] hover:text-[var(--accent-blue)] hover:border-[var(--accent-teal)] hover:-translate-y-0.5 rounded-full',
     danger:
-      'bg-danger text-[var(--text-primary)] border-danger hover:bg-danger hover:border-danger hover:-translate-y-0.5',
+      'bg-danger text-[var(--btn-danger-text)] border-danger hover:bg-danger hover:border-danger hover:-translate-y-0.5',
     ghost:
       'bg-transparent text-[var(--text-secondary)] border-transparent hover:text-[var(--text-primary)]',
   }

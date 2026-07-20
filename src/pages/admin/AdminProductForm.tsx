@@ -486,7 +486,7 @@ export default function AdminProductForm() {
             disabled={saving || (!isValid && attempted)}
             className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-extrabold transition-all ${
               saved
-                ? 'bg-[var(--success)] text-white'
+                ? 'bg-[var(--success)] text-[var(--btn-success-text)]'
                 : !isValid && attempted
                 ? 'bg-[var(--text-muted)] text-white cursor-not-allowed opacity-60'
                 : 'bg-[var(--accent-gold)] text-navy-deep hover:bg-[var(--gold-light)] hover:-translate-y-0.5'

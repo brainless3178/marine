@@ -82,6 +82,8 @@ export default function Industries() {
               <button
                 key={ind.id}
                 onClick={() => setActive(ind.id)}
+                aria-label={`View ${ind.name} industry details`}
+                aria-pressed={active === ind.id}
                 className={`px-5 py-2.5 font-body font-medium text-xs border transition-all duration-300 ${
                   active === ind.id
                     ? 'bg-accent-blue border-accent-blue text-[var(--text-primary)]'

@@ -25,7 +25,7 @@ export function EmergencyPanel({ alerts, rfqs }: Props) {
         <h2 className="font-display text-sm font-bold text-[var(--danger)]">
           Emergency Alerts
         </h2>
-        <span className="ml-auto rounded-full bg-[var(--danger)] px-2 py-0.5 text-[0.5rem] font-bold text-white">
+        <span className="ml-auto rounded-full bg-[var(--danger)] px-2 py-0.5 text-[0.5rem] font-bold text-[var(--btn-danger-text)]">
           {emergencyRfqs.length + dangerAlerts.length} urgent
         </span>
       </div>

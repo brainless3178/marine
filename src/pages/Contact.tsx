@@ -93,7 +93,7 @@ export default function Contact() {
                 <label htmlFor="contact-message" className="sr-only">{t('contact.formMessage')}</label>
                 <textarea id="contact-message" rows={4} placeholder={t('contact.formMessage')} required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none resize-vertical min-h-[100px]" />
               </div>
-              <button type="submit" disabled={submitted || loading} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm border transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-white' : 'bg-accent-blue text-[var(--text-primary)] border-accent-blue hover:bg-accent-teal'}`} onClick={() => submitted && setSubmitted(false)}>
+              <button type="submit" disabled={submitted || loading} aria-label={t('contact.formSubmit')} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm border transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-white' : 'bg-accent-blue text-[var(--btn-blue-text)] border-accent-blue hover:bg-accent-teal'}`} onClick={() => submitted && setSubmitted(false)}>
                 {loading ? <><Loader2 size={16} className="animate-spin" /> Sending...</> : submitted ? <><Check size={16} /> Message Sent!</> : <><Send size={16} /> {t('contact.formSubmit')}</>}
               </button>
             </form>

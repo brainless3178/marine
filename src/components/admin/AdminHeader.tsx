@@ -144,7 +144,7 @@ export function AdminHeader() {
           aria-label="Notifications"
         >
           <Bell size={16} />
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[var(--danger)] px-1 text-[0.625rem] font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[var(--danger)] px-1 text-[0.625rem] font-bold text-[var(--btn-danger-text)]">
             0
           </span>
         </button>
@@ -164,7 +164,7 @@ export function AdminHeader() {
             onClick={() => setUserMenuOpen((v) => !v)}
             className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-2.5 py-1.5 transition-colors hover:border-[var(--accent-gold)]"
           >
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--accent-blue)] text-[0.625rem] font-bold text-white">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--accent-blue)] text-[0.625rem] font-bold text-[var(--btn-blue-text)]">
               {initials}
             </div>
             <span className="hidden sm:block text-xs font-bold text-[var(--text-primary)] max-w-[100px] truncate">

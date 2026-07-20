@@ -445,7 +445,7 @@ export default function AdminOrders() {
                     .catch((err: any) => toast(err.message || 'Failed to update tracking', 'error'))
                 }}
                 disabled={!trackingNumber.trim()}
-                className="flex-1 py-2.5 bg-[var(--accent-teal)] text-white font-semibold text-xs rounded-xl hover:bg-[var(--accent-teal)]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2.5 bg-[var(--accent-teal)] text-[var(--btn-blue-text)] font-semibold text-xs rounded-xl hover:bg-[var(--accent-teal)]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save Tracking
               </button>

@@ -80,7 +80,7 @@ export default function OrderHistory() {
               <p className="text-sm text-[var(--text-secondary)] mb-6">Start shopping to see your orders here.</p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-blue)] text-white font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all"
               >
                 Browse Products
               </Link>

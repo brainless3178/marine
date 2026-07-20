@@ -137,7 +137,7 @@ export function AdminSidebar() {
             <span className="font-display text-sm font-bold text-white leading-tight">
               Alka Traders
             </span>
-            <span className="text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-white/35">
+            <span className="text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-white/60">
               Admin Panel
             </span>
           </div>
@@ -213,7 +213,7 @@ export function AdminSidebar() {
       {/* Collapse toggle */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[var(--accent-blue)] text-white shadow-lg transition-colors hover:bg-[var(--accent-gold)] hover:text-navy-deep"
+        className="absolute -right-3 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] shadow-lg transition-colors hover:bg-[var(--accent-gold)] hover:text-navy-deep"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}

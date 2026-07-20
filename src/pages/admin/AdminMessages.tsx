@@ -263,7 +263,7 @@ export default function AdminMessages() {
                   <button onClick={(e) => toggleStar(msg.id, e)} className="shrink-0">
                     <Star size={14} className={msg.starred ? 'text-[var(--accent-gold)] fill-[var(--accent-gold)]' : 'text-[var(--text-muted)]/30 hover:text-[var(--accent-gold)]'} />
                   </button>
-                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-bold ${msg.read ? 'bg-[var(--surface-soft)] text-[var(--text-muted)]' : 'bg-[var(--accent-blue)] text-white'}`}>
+                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-bold ${msg.read ? 'bg-[var(--surface-soft)] text-[var(--text-muted)]' : 'bg-[var(--accent-blue)] text-[var(--btn-blue-text)]'}`}>
                     {msg.from.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -301,7 +301,7 @@ export default function AdminMessages() {
             </div>
             <div className="p-6 space-y-6">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-blue)] text-xs font-bold text-white">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-blue)] text-xs font-bold text-[var(--btn-blue-text)]">
                   {selectedMessage.from.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                 </div>
                 <div>
