@@ -1,0 +1,82 @@
+// ─── Slug Generation ───────────────────────────────────────────
+export function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+// ─── Order Number Generation (DB-backed) ──────────────────────
+export async function generateOrderNumber(): Promise<string> {
+  // Use a random unique number to avoid race conditions in multi-instance
+  const timestamp = Date.now().toString(36).toUpperCase()
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase()
+  return `MS7-ORD-${timestamp}${random}`
+}
+
+// ─── RFQ Number Generation (DB-backed) ─────────────────────────
+export async function generateRfqNumber(): Promise<string> {
+  const timestamp = Date.now().toString(36).toUpperCase()
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase()
+  return `AT-${timestamp}${random}`
+}
+
+// ─── Offer Number Generation (DB-backed) ──────────────────────
+export async function generateOfferNumber(): Promise<string> {
+  const timestamp = Date.now().toString(36).toUpperCase()
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase()
+  return `OFF-${timestamp}${random}`
+}
+
+// ─── Pagination Helper ─────────────────────────────────────────
+export function paginationParams(page?: number, limit?: number) {
+  const p = Math.max(1, Number(page) || 1)
+  const l = Math.min(100, Math.max(1, Number(limit) || 24))
+  const skip = (p - 1) * l
+  return { page: p, limit: l, skip }
+}
+
+// ─── Pagination Response ───────────────────────────────────────
+export function paginationResponse(total: number, page: number, limit: number) {
+  return {
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+    hasNext: page * limit < total,
+    hasPrev: page > 1,
+  }
+}
+
+// ─── Price Helpers ─────────────────────────────────────────────
+export function getEffectivePrice(product: {
+  regularPrice: any
+  salePrice?: any | null
+  saleStartsAt?: Date | null
+  saleEndsAt?: Date | null
+}): number {
+  const regular = Number(product.regularPrice)
+  if (!product.salePrice) return regular
+
+  const sale = Number(product.salePrice)
+  const now = new Date()
+
+  if (product.saleStartsAt && now < product.saleStartsAt) return regular
+  if (product.saleEndsAt && now > product.saleEndsAt) return regular
+
+  return sale < regular ? sale : regular
+}
+
+export function isOnSale(product: {
+  regularPrice: any
+  salePrice?: any | null
+  saleStartsAt?: Date | null
+  saleEndsAt?: Date | null
+}): boolean {
+  const effective = getEffectivePrice(product)
+  const regular = Number(product.regularPrice)
+  return effective < regular
+}

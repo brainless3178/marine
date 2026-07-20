@@ -1,0 +1,433 @@
+﻿import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Shield, Clock, Globe, MessageCircle, Mail, ChevronDown, Phone, Calendar, Zap, TriangleAlert, Loader2 } from 'lucide-react'
+import { useStore } from '../store/useStore'
+import { useStoreSettings } from '../hooks/useStoreSettings'
+import { faqItems } from '../data/testimonials'
+import { countries } from '../data/countries'
+import { storefront } from '../lib/api'
+import { SEO } from '../components/seo/SEO'
+import type { RFQFormData } from '../types'
+
+const roles = [
+  { value: 'chief-engineer', label: 'Chief Engineer' },
+  { value: 'procurement-manager', label: 'Procurement Manager' },
+  { value: 'plant-manager', label: 'Plant Manager' },
+  { value: 'fleet-manager', label: 'Fleet Manager' },
+  { value: 'sourcing-head', label: 'Head of Sourcing' },
+  { value: 'owner', label: 'Owner / Director' },
+  { value: 'other', label: 'Other' },
+]
+
+export default function RFQ() {
+  const { t } = useTranslation()
+  const { rfqStep, setRfqStep, rfqSubmitted, rfqId, setRfqSubmitted, generateRfqId } = useStore()
+  const { whatsappNumber, phoneNumber, rfqEmail } = useStoreSettings()
+  const [formData, setFormData] = useState<RFQFormData>({
+    fullName: '',
+    company: '',
+    email: '',
+    phone: '',
+    country: 'IN',
+    role: '',
+    productDesc: '',
+    partNumber: '',
+    brand: '',
+    quantity: 1,
+    deliveryLocation: '',
+    urgency: 'standard',
+    notes: '',
+    source: '',
+    consent: false,
+  })
+  const [errors, setErrors] = useState<Record<string, boolean>>({})
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+
+  const update = (field: keyof RFQFormData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    setErrors((prev) => ({ ...prev, [field]: false }))
+  }
+
+  const validateStep = (step: number): boolean => {
+    const newErrors: Record<string, boolean> = {}
+    if (step === 1) {
+      if (!formData.fullName.trim()) newErrors.fullName = true
+      if (!formData.company.trim()) newErrors.company = true
+      if (!formData.email.trim()) newErrors.email = true
+      if (!formData.country) newErrors.country = true
+    } else if (step === 2) {
+      if (!formData.productDesc.trim()) newErrors.productDesc = true
+      if (!formData.quantity || formData.quantity < 1) newErrors.quantity = true
+      if (!formData.deliveryLocation.trim()) newErrors.deliveryLocation = true
+    } else if (step === 3) {
+      if (!formData.consent) newErrors.consent = true
+    }
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const goToStep = (step: number) => {
+    if (step > rfqStep && !validateStep(rfqStep)) return
+    setRfqStep(step)
+    const el = document.getElementById('rfq-form')
+    if (el) {
+      window.scrollTo({ top: el.offsetTop - 100, behavior: 'smooth' })
+    }
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!validateStep(3)) return
+    setSubmitting(true)
+    setSubmitError('')
+    try {
+      const result = await storefront.rfq.submit({
+        fullName: formData.fullName,
+        company: formData.company,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        country: formData.country,
+        role: formData.role || undefined,
+        productDescription: formData.productDesc,
+        partNumber: formData.partNumber || undefined,
+        brand: formData.brand || undefined,
+        quantity: formData.quantity,
+        deliveryLocation: formData.deliveryLocation,
+        urgency: formData.urgency,
+        notes: formData.notes || undefined,
+        source: formData.source || undefined,
+        consent: formData.consent,
+      })
+      // Use the server-assigned RFQ number if available
+      if (result.rfqNumber) {
+        useStore.setState({ rfqId: result.rfqNumber })
+      } else {
+        generateRfqId()
+      }
+      setRfqSubmitted(true)
+      setRfqStep(1) // Reset step for next submission
+    } catch (err: any) {
+      setSubmitError(err.message || 'Failed to submit RFQ. Please try again or contact us via WhatsApp.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (rfqSubmitted) {
+    return (
+      <div className="py-24">
+        <div className="max-w-[640px] mx-auto px-4 sm:px-6 text-center">
+          <div className="w-20 h-20 mx-auto relative mb-6">
+            <div className="w-20 h-20 rounded-full border-[3px] border-success" />
+            <div className="absolute top-6 left-[30px] w-4 h-9 border-r-[3px] border-b-[3px] border-success"
+              style={{ transform: 'rotate(45deg)' }} />
+          </div>
+          <h2 className="heading-xl mb-2">{t('rfq.success')}</h2>
+          <p className="font-mono text-lg text-accent-gold mb-2">{t('rfq.rfqId')}{rfqId}</p>
+          <p className="text-body-sm text-[var(--text-secondary)] max-w-[480px] mx-auto">
+            {t('rfq.successSub')}
+          </p>
+          <div className="flex gap-4 flex-wrap justify-center mt-8">
+            <a href="/rfq" className="inline-flex items-center gap-2 text-xs font-semibold border border-accent-blue text-accent-blue px-[18px] py-[10px] hover:bg-accent-blue/10 transition-all no-underline">
+              {t('rfq.submitAnother')}
+            </a>
+            <a href="/products" className="inline-flex items-center gap-2 text-xs font-semibold border border-accent-blue text-accent-blue px-[18px] py-[10px] hover:bg-accent-blue/10 transition-all no-underline">
+              {t('rfq.browseProducts')}
+            </a>
+            <a href={`https://wa.me/${whatsappNumber}`} className="inline-flex items-center gap-2 text-xs font-semibold border border-success text-success px-[18px] py-[10px] hover:bg-success/10 transition-all no-underline">
+              <MessageCircle size={14} /> {t('rfq.whatsappUsNow')}
+            </a>
+          </div>
+        </div>
+      </div>
+    )
+  }  return (
+    <div>
+      <SEO
+        title="Request a Quote — RFQ for Marine & Industrial Parts"
+        description="Submit a request for quotation for marine spares, industrial equipment, surplus machinery, and hard-to-find parts. Fast response within hours."
+        canonical="/rfq"
+      />
+      <section className="py-20 text-center" style={{
+        background: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.06) 0%, transparent 70%), var(--primary-bg)'
+      }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
+            {t('rfq.label')}
+          </span>
+          <h1 className="font-display font-bold text-display-xl tracking-tight">
+            {t('rfq.title')}
+          </h1>
+          <p className="text-body text-[var(--text-secondary)] max-w-[640px] mx-auto mt-4">
+            {t('rfq.sub')}
+          </p>
+          <div className="flex justify-center gap-6 mt-7 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[rgba(14,165,233,0.3)] text-accent-blue bg-surface">
+              <Shield size={12} /> {t('rfq.verifiedSuppliers')}
+            </span>
+            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[rgba(245,158,11,0.3)] text-accent-gold bg-surface">
+              <Clock size={12} /> {t('rfq.hourResponse')}
+            </span>
+            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[rgba(16,185,129,0.3)] text-success bg-surface">
+              <Globe size={12} /> {t('rfq.countries')}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12" id="rfq-form">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 items-start">
+            {/* Form */}
+            <div>
+              {/* Progress */}
+              <div className="flex items-center justify-center gap-0 mb-10">
+                {[1, 2, 3].map((step) => (
+                  <div key={step} className="flex items-center">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-sm border-2 transition-all ${
+                        step === rfqStep
+                          ? 'border-accent-blue bg-accent-blue text-[var(--text-primary)]'
+                          : step < rfqStep
+                          ? 'border-success bg-success text-[var(--text-primary)]'
+                          : 'border-[var(--border)] bg-surface text-[var(--text-muted)]'
+                      }`}>
+                        {step}
+                      </div>
+                      <span className={`text-xs font-medium hidden sm:block ${
+                        step === rfqStep ? 'text-accent-blue' : step < rfqStep ? 'text-success' : 'text-[var(--text-muted)]'
+                      }`}>
+                        {step === 1 ? t('rfq.contactStep') : step === 2 ? t('rfq.productStep') : t('rfq.urgencyStep')}
+                      </span>
+                    </div>
+                    {step < 3 && (
+                      <div className={`w-20 h-0.5 mx-2 transition-colors ${
+                        step < rfqStep ? 'bg-success' : 'bg-[var(--border)]'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <form onSubmit={handleSubmit} className="bg-surface border border-[var(--border)] p-6 sm:p-10">
+                {/* Step 1 */}
+                {rfqStep === 1 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-6">{t('rfq.formContact')}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="mb-5">
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.name')} *</label>
+                        <input type="text" value={formData.fullName} onChange={(e) => update('fullName', e.target.value)}
+                          className={`w-full px-4 py-3 bg-[var(--primary-bg)] border text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none ${errors.fullName ? 'border-danger' : 'border-[var(--border)]'}`}
+                          placeholder={t('rfq.placeholders.fullName')} />
+                      </div>
+                      <div className="mb-5">
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.company')} *</label>
+                        <input type="text" value={formData.company} onChange={(e) => update('company', e.target.value)}
+                          className={`w-full px-4 py-3 bg-[var(--primary-bg)] border text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none ${errors.company ? 'border-danger' : 'border-[var(--border)]'}`}
+                          placeholder={t('rfq.placeholders.company')} />
+                      </div>
+                      <div className="mb-5">
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.email')} *</label>
+                        <input type="email" value={formData.email} onChange={(e) => update('email', e.target.value)}
+                          className={`w-full px-4 py-3 bg-[var(--primary-bg)] border text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none ${errors.email ? 'border-danger' : 'border-[var(--border)]'}`}
+                          placeholder={t('rfq.placeholders.email')} />
+                      </div>
+                      <div className="mb-5">
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.phone')}</label>
+                        <input type="tel" value={formData.phone} onChange={(e) => update('phone', e.target.value)}
+                          className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none"
+                          placeholder={t('rfq.placeholders.phone')} />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="rfq-country" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.country')} *</label>
+                        <select id="rfq-country" value={formData.country} onChange={(e) => update('country', e.target.value)}
+                          className={`w-full px-4 py-3 bg-[var(--primary-bg)] border text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none appearance-none ${errors.country ? 'border-danger' : 'border-[var(--border)]'}`}
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
+                          {countries.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                        </select>
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="rfq-role" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.role')}</label>
+                        <select id="rfq-role" value={formData.role} onChange={(e) => update('role', e.target.value)}
+                          className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none appearance-none"
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
+                          <option value="">{t('rfq.placeholders.selectRole')}</option>
+                          {roles.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <button type="button" onClick={() => goToStep(2)}
+                      className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--text-primary)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all mt-2">
+                      {t('rfq.nextProduct')}
+                    </button>
+                  </div>
+                )}
+
+                {/* Step 2 */}
+                {rfqStep === 2 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-6">{t('rfq.formProduct')}</h3>
+                    <div className="mb-5">
+                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.productDesc')} *</label>
+                      <textarea value={formData.productDesc} onChange={(e) => update('productDesc', e.target.value)} rows={4}
+                        className={`w-full px-4 py-3 bg-[var(--primary-bg)] border text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none resize-vertical min-h-[80px] ${errors.productDesc ? 'border-danger' : 'border-[var(--border)]'}`}
+                        placeholder={t('rfq.placeholders.productDesc')} />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="mb-5">
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.partNumber')}</label>
+                        <input type="text" value={formData.partNumber} onChange={(e) => update('partNumber', e.target.value)}
+                          className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm font-mono text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none"
+                          placeholder={t('rfq.placeholders.partNumber')} />
+                      </div>
+                      <div className="mb-5">
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.brand')}</label>
+                        <input type="text" value={formData.brand} onChange={(e) => update('brand', e.target.value)}
+                          className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none"
+                          placeholder={t('rfq.placeholders.brand')} />
+                      </div>
+                      <div className="mb-5">
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.quantity')} *</label>
+                        <input type="number" value={formData.quantity} onChange={(e) => update('quantity', parseInt(e.target.value) || 1)} min={1}
+                          className={`w-full px-4 py-3 bg-[var(--primary-bg)] border text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none ${errors.quantity ? 'border-danger' : 'border-[var(--border)]'}`} />
+                      </div>
+                      <div className="mb-5">
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.deliveryLocation')} *</label>
+                        <input type="text" value={formData.deliveryLocation} onChange={(e) => update('deliveryLocation', e.target.value)}
+                          className={`w-full px-4 py-3 bg-[var(--primary-bg)] border text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none ${errors.deliveryLocation ? 'border-danger' : 'border-[var(--border)]'}`}
+                          placeholder={t('rfq.placeholders.deliveryLocation')} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-5 mt-2">
+                      <button type="button" onClick={() => goToStep(1)}
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-accent-blue font-semibold text-sm border border-accent-blue hover:bg-accent-blue/10 transition-all">
+                        {t('rfq.back')}
+                      </button>
+                      <button type="button" onClick={() => goToStep(3)}
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--text-primary)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all">
+                        {t('rfq.nextUrgency')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3 */}
+                {rfqStep === 3 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-6">{t('rfq.formUrgency')}</h3>
+                    <div className="mb-5">
+                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-3">{t('rfq.urgencyLabel')}</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {(['standard', 'urgent', 'emergency'] as const).map((u) => (
+                          <label key={u} className="cursor-pointer">
+                            <input type="radio" name="urgency" checked={formData.urgency === u}
+                              onChange={() => update('urgency', u)} className="hidden" />
+                            <div className={`flex flex-col items-center gap-1.5 p-5 bg-[var(--primary-bg)] border-2 text-center transition-all ${
+                              formData.urgency === u
+                                ? u === 'urgent' ? 'border-accent-gold bg-[rgba(245,158,11,0.08)]'
+                                  : u === 'emergency' ? 'border-danger bg-[rgba(239,68,68,0.08)]'
+                                  : 'border-accent-blue bg-[rgba(14,165,233,0.08)]'
+                                : u === 'urgent' ? 'border-[rgba(245,158,11,0.3)]'
+                                  : u === 'emergency' ? 'border-[rgba(239,68,68,0.3)]'
+                                  : 'border-[var(--border)]'
+                            }`}>
+                              <span className={`flex items-center justify-center ${
+                                u === 'urgent' ? 'text-accent-gold' : u === 'emergency' ? 'text-danger' : 'text-accent-blue'
+                              }`}>
+                                {u === 'standard' ? <Calendar size={24} /> : u === 'urgent' ? <Zap size={24} /> : <TriangleAlert size={24} />}
+                              </span>
+                              <strong className="text-sm capitalize">{u === 'standard' ? t('rfq.urgencyStandard') : u === 'urgent' ? t('rfq.urgencyUrgent') : t('rfq.urgencyEmergency')}</strong>
+                              <span className="font-mono text-xs text-[var(--text-muted)]">
+                                {u === 'standard' ? t('rfq.urgencyStandardDesc') : u === 'urgent' ? t('rfq.urgencyUrgentDesc') : t('rfq.urgencyEmergencyDesc')}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mb-5">
+                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.notes')}</label>
+                      <textarea value={formData.notes} onChange={(e) => update('notes', e.target.value)} rows={3}
+                        className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none resize-vertical min-h-[80px]"
+                        placeholder={t('rfq.placeholders.notes')} />
+                    </div>
+                    <div className="mb-5">
+                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('rfq.source')}</label>
+                      <select value={formData.source} onChange={(e) => update('source', e.target.value)}
+                        className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none appearance-none"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
+                        <option value="">{t('rfq.sourceOptionSelect')}</option>
+                        <option value="google">{t('rfq.sourceOptionGoogle')}</option>
+                        <option value="linkedin">{t('rfq.sourceOptionLinkedin')}</option>
+                        <option value="referral">{t('rfq.sourceOptionReferral')}</option>
+                        <option value="other">{t('rfq.sourceOptionOther')}</option>
+                      </select>
+                    </div>
+                    <label className="flex items-center gap-2 mb-5 cursor-pointer">
+                      <input type="checkbox" checked={formData.consent}
+                        onChange={(e) => update('consent', e.target.checked)}
+                        className="accent-accent-blue w-4 h-4 cursor-pointer" />
+                      <span className={`text-xs ${errors.consent ? 'text-danger' : 'text-[var(--text-secondary)]'}`}>
+                        {t('rfq.consent')}
+                      </span>
+                    </label>
+                    {submitError && <p className="text-xs text-[var(--danger)] mb-4">{submitError}</p>}
+                    <div className="grid grid-cols-2 gap-5">
+                      <button type="button" onClick={() => goToStep(2)}
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-accent-blue font-semibold text-sm border border-accent-blue hover:bg-accent-blue/10 transition-all">
+                        {t('rfq.back')}
+                      </button>
+                      <button type="submit" disabled={submitting}
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--text-primary)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all shimmer-btn relative overflow-hidden disabled:opacity-50">
+                        {submitting ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : t('rfq.submit')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </form>
+            </div>
+
+            {/* Sidebar */}
+            <aside className="lg:sticky lg:top-20">
+              <div className="bg-surface border border-[var(--border)] p-6">
+                <h4 className="text-sm font-semibold mb-4">{t('rfq.whyChoose')}</h4>
+                <div className="flex flex-col">
+                  {faqItems.map((faq, i) => (
+                    <div key={i} className="border-b border-[var(--border)] last:border-b-0">
+                      <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                        className="flex justify-between items-center w-full py-4 text-sm font-semibold text-left text-[var(--text-primary)] hover:text-accent-blue transition-colors bg-transparent border-none cursor-pointer">
+                        <span>{faq.question}</span>
+                        <ChevronDown size={14} className={`text-[var(--text-muted)] transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
+                      </button>
+                      {openFaq === i && (
+                        <p className="text-xs text-[var(--text-secondary)] pb-4 leading-relaxed">{faq.answer}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 p-5 bg-surface border border-[var(--border)]">
+                  <p className="text-sm font-semibold mb-3">{t('rfq.questionsContact')}</p>
+                  <a href={`mailto:${rfqEmail}`} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] no-underline hover:text-accent-blue mb-2">
+                    <Mail size={14} className="text-accent-blue" /> {rfqEmail}
+                  </a>
+                  <a href={`tel:${phoneNumber}`} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] no-underline hover:text-accent-blue mb-2">
+                    <Phone size={14} className="text-accent-blue" /> {phoneNumber}
+                  </a>
+                  <a href={`https://wa.me/${whatsappNumber}`}
+                    className="flex items-center justify-center gap-2 text-xs font-semibold border border-accent-blue text-accent-blue px-[18px] py-[10px] mt-3 hover:bg-accent-blue/10 transition-all no-underline">
+                    <MessageCircle size={14} className="text-success" /> {t('contact.whatsapp')}
+                  </a>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+

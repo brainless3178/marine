@@ -1,0 +1,34 @@
+node_modules
+dist
+*.local
+.env
+.env.*
+!.env.example
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage
+coverage
+
+# Junk files
+*.zip
+*.jpeg
+*.jpg
+*.png
+!public/images/*.avif
+brand/
+.nul
+*.rar
+.nul

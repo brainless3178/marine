@@ -1,0 +1,609 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Admin Users ───────────────────────────────────────────────
+model AdminUser {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique @db.VarChar(255)
+  passwordHash String    @map("password_hash") @db.VarChar(255)
+  name         String    @db.VarChar(255)
+  role         String    @default("viewer") @db.VarChar(50)
+  avatarUrl    String?   @map("avatar_url") @db.Text
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  assignedRfqs    Rfq[]
+  rfqNotes        RfqNote[]
+  orderTimelines  OrderTimeline[]
+  mediaAssets     MediaAsset[]
+  contactMessages ContactMessage[]
+  auditLogs       AuditLog[]
+  createdProducts Product[]        @relation("CreatedProducts")
+  updatedProducts Product[]        @relation("UpdatedProducts")
+  storeSettings   StoreSetting[]
+
+  @@map("admin_users")
+}
+
+// ─── Customer Users ────────────────────────────────────────────
+model Customer {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String    @unique @db.VarChar(255)
+  passwordHash  String    @map("password_hash") @db.VarChar(255)
+  name          String    @db.VarChar(255)
+  phone         String?   @db.VarChar(50)
+  company       String?   @db.VarChar(255)
+  country       String?   @db.VarChar(100)
+  city          String?   @db.VarChar(100)
+  address       String?   @db.Text
+  website       String?   @db.VarChar(255)
+  status        String    @default("active") @db.VarChar(20)
+  tags          String[]  @default([])
+  internalNotes String?   @map("internal_notes") @db.Text
+  lastLoginAt   DateTime? @map("last_login_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  orders Order[]
+  rfqs   Rfq[]
+  offers Offer[]
+
+  @@map("customers")
+}
+
+// ─── Products ──────────────────────────────────────────────────
+model Product {
+  id                 String    @id @default(uuid()) @db.Uuid
+  slug               String    @unique @db.VarChar(255)
+  name               String    @db.VarChar(500)
+  sku                String    @unique @db.VarChar(100)
+  brandId            String?   @map("brand_id") @db.Uuid
+  categoryId         String?   @map("category_id") @db.Uuid
+  status             String    @default("draft") @db.VarChar(20)
+  availability       String    @default("in-stock") @db.VarChar(20)
+  condition          String    @default("used") @db.VarChar(30)
+  shortDescription   String?   @map("short_description") @db.Text
+  description        String?   @db.Text
+  regularPrice       Decimal   @default(0) @map("regular_price") @db.Decimal(12, 2)
+  salePrice          Decimal?  @map("sale_price") @db.Decimal(12, 2)
+  saleStartsAt       DateTime? @map("sale_starts_at")
+  saleEndsAt         DateTime? @map("sale_ends_at")
+  currency           String    @default("USD") @db.VarChar(3)
+  showPrice          Boolean   @default(true) @map("show_price")
+  makeOfferEnabled   Boolean   @default(false) @map("make_offer_enabled")
+  minimumOfferPrice  Decimal?  @map("minimum_offer_price") @db.Decimal(12, 2)
+  stockCount         Int       @default(0) @map("stock_count")
+  lowStockThreshold  Int       @default(10) @map("low_stock_threshold")
+  warehouseLocation  String?   @map("warehouse_location") @db.VarChar(255)
+  publicItemLocation String?   @map("public_item_location") @db.VarChar(255)
+  leadTime           String?   @db.VarChar(100)
+  isNewArrival       Boolean   @default(false) @map("is_new_arrival")
+  isFeatured         Boolean   @default(false) @map("is_featured")
+  customLabel        String?   @map("custom_label") @db.VarChar(100)
+  customLabelColor   String?   @map("custom_label_color") @db.VarChar(20)
+  sortPriority       Int       @default(0) @map("sort_priority")
+  seoTitle           String?   @map("seo_title") @db.VarChar(255)
+  seoDescription     String?   @map("seo_description") @db.Text
+  seoKeywords        String?   @map("seo_keywords") @db.Text
+  ogImageUrl         String?   @map("og_image_url") @db.Text
+  canonicalUrl       String?   @map("canonical_url") @db.Text
+  internalNotes      String?   @map("internal_notes") @db.Text
+  purchaseCost       Decimal?  @map("purchase_cost") @db.Decimal(12, 2)
+  supplierReference  String?   @map("supplier_reference") @db.VarChar(255)
+  productType        String    @default("physical") @map("product_type") @db.VarChar(30)
+  keyFeatures        String[]  @default([])
+  compatibilityNotes String?   @map("compatibility_notes") @db.Text
+  conditionNotes     String?   @map("condition_notes") @db.Text
+  warrantyNotes      String?   @map("warranty_notes") @db.Text
+  includedItems      String[]  @default([])
+  excludedItems      String[]  @default([])
+  legacyId           String?   @map("legacy_id") @db.VarChar(50)
+  createdBy          String?   @map("created_by") @db.Uuid
+  updatedBy          String?   @map("updated_by") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  brand         Brand?            @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  category      Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  images        ProductImage[]
+  specs         ProductSpec[]
+  industries    ProductIndustry[]
+  orderItems    OrderItem[]
+  offers        Offer[]
+  createdByUser AdminUser?        @relation("CreatedProducts", fields: [createdBy], references: [id])
+  updatedByUser AdminUser?        @relation("UpdatedProducts", fields: [updatedBy], references: [id])
+
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([availability])
+  @@index([sku])
+  @@map("products")
+}
+
+// ─── Product Images ────────────────────────────────────────────
+model ProductImage {
+  id           String   @id @default(uuid()) @db.Uuid
+  productId    String   @map("product_id") @db.Uuid
+  mediaAssetId String?  @map("media_asset_id") @db.Uuid
+  url          String   @db.Text
+  altText      String?  @map("alt_text") @db.VarChar(500)
+  label        String?  @db.VarChar(100)
+  sortOrder    Int      @default(0) @map("sort_order")
+  isMain       Boolean  @default(false) @map("is_main")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  product Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  media   MediaAsset? @relation(fields: [mediaAssetId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+// ─── Product Specifications ────────────────────────────────────
+model ProductSpec {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  name      String   @db.VarChar(255)
+  value     String   @db.Text
+  sortOrder Int      @default(0) @map("sort_order")
+  isPublic  Boolean  @default(true) @map("is_public")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_specs")
+}
+
+// ─── Product Industries (Join Table) ───────────────────────────
+model ProductIndustry {
+  productId  String @map("product_id") @db.Uuid
+  industryId String @map("industry_id") @db.Uuid
+
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  industry Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, industryId])
+  @@map("product_industries")
+}
+
+// ─── Categories ────────────────────────────────────────────────
+model Category {
+  id             String   @id @default(uuid()) @db.Uuid
+  name           String   @db.VarChar(255)
+  slug           String   @unique @db.VarChar(255)
+  description    String?  @db.Text
+  parentId       String?  @map("parent_id") @db.Uuid
+  icon           String?  @db.VarChar(100)
+  seoTitle       String?  @map("seo_title") @db.VarChar(255)
+  seoDescription String?  @map("seo_description") @db.Text
+  sortOrder      Int      @default(0) @map("sort_order")
+  isVisible      Boolean  @default(true) @map("is_visible")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([parentId])
+  @@index([slug])
+  @@map("categories")
+}
+
+// ─── Brands ────────────────────────────────────────────────────
+model Brand {
+  id             String   @id @default(uuid()) @db.Uuid
+  name           String   @db.VarChar(255)
+  slug           String   @unique @db.VarChar(255)
+  logoUrl        String?  @map("logo_url") @db.Text
+  sectors        String[] @default([])
+  description    String?  @db.Text
+  website        String?  @db.VarChar(255)
+  country        String?  @db.VarChar(100)
+  seoTitle       String?  @map("seo_title") @db.VarChar(255)
+  seoDescription String?  @map("seo_description") @db.Text
+  isVisible      Boolean  @default(true) @map("is_visible")
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+
+  @@index([slug])
+  @@map("brands")
+}
+
+// ─── Industries ────────────────────────────────────────────────
+model Industry {
+  id             String   @id @default(uuid()) @db.Uuid
+  name           String   @db.VarChar(255)
+  slug           String   @unique @db.VarChar(255)
+  icon           String?  @db.VarChar(100)
+  description    String?  @db.Text
+  painPoints     String[] @default([])
+  seoTitle       String?  @map("seo_title") @db.VarChar(255)
+  seoDescription String?  @map("seo_description") @db.Text
+  sortOrder      Int      @default(0) @map("sort_order")
+  isVisible      Boolean  @default(true) @map("is_visible")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  products ProductIndustry[]
+
+  @@map("industries")
+}
+
+// ─── Orders ────────────────────────────────────────────────────
+model Order {
+  id                   String    @id @default(uuid()) @db.Uuid
+  orderNumber          String    @unique @map("order_number") @db.VarChar(50)
+  customerId           String?   @map("customer_id") @db.Uuid
+  status               String    @default("pending") @db.VarChar(20)
+  paymentMethod        String?   @map("payment_method") @db.VarChar(50)
+  paymentStatus        String    @default("pending") @map("payment_status") @db.VarChar(20)
+  paymentIntentId      String?   @map("payment_intent_id") @db.VarChar(255)
+  subtotal             Decimal   @default(0) @db.Decimal(12, 2)
+  shippingCost         Decimal   @default(0) @map("shipping_cost") @db.Decimal(12, 2)
+  tax                  Decimal   @default(0) @db.Decimal(12, 2)
+  total                Decimal   @default(0) @db.Decimal(12, 2)
+  currency             String    @default("USD") @db.VarChar(3)
+  shippingFullName     String?   @map("shipping_full_name") @db.VarChar(255)
+  shippingAddressLine1 String?   @map("shipping_address_line1") @db.VarChar(255)
+  shippingAddressLine2 String?   @map("shipping_address_line2") @db.VarChar(255)
+  shippingCity         String?   @map("shipping_city") @db.VarChar(100)
+  shippingState        String?   @map("shipping_state") @db.VarChar(100)
+  shippingPostalCode   String?   @map("shipping_postal_code") @db.VarChar(20)
+  shippingCountry      String?   @map("shipping_country") @db.VarChar(100)
+  trackingNumber       String?   @map("tracking_number") @db.VarChar(100)
+  courier              String?   @db.VarChar(100)
+  customerNotes        String?   @map("customer_notes") @db.Text
+  adminNotes           String?   @map("admin_notes") @db.Text
+  cancelRequested      Boolean   @default(false) @map("cancel_requested")
+  cancelReason         String?   @map("cancel_reason") @db.Text
+  cancelRequestedAt    DateTime? @map("cancel_requested_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  customer Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items    OrderItem[]
+  timeline OrderTimeline[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([orderNumber])
+  @@index([createdAt(sort: Desc)])
+  @@map("orders")
+}
+
+// ─── Order Items ───────────────────────────────────────────────
+model OrderItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  orderId     String   @map("order_id") @db.Uuid
+  productId   String?  @map("product_id") @db.Uuid
+  productName String   @map("product_name") @db.VarChar(500)
+  productSku  String?  @map("product_sku") @db.VarChar(100)
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(12, 2)
+  totalPrice  Decimal  @map("total_price") @db.Decimal(12, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+// ─── Order Timeline ────────────────────────────────────────────
+model OrderTimeline {
+  id        String   @id @default(uuid()) @db.Uuid
+  orderId   String   @map("order_id") @db.Uuid
+  status    String   @db.VarChar(20)
+  note      String?  @db.Text
+  createdBy String?  @map("created_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  order Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor AdminUser? @relation(fields: [createdBy], references: [id])
+
+  @@index([orderId])
+  @@map("order_timeline")
+}
+
+// ─── RFQ (Request for Quote) ──────────────────────────────────
+model Rfq {
+  id                 String    @id @default(uuid()) @db.Uuid
+  rfqNumber          String    @unique @map("rfq_number") @db.VarChar(50)
+  customerId         String?   @map("customer_id") @db.Uuid
+  fullName           String    @map("full_name") @db.VarChar(255)
+  company            String?   @db.VarChar(255)
+  email              String    @db.VarChar(255)
+  phone              String?   @db.VarChar(50)
+  country            String?   @db.VarChar(100)
+  role               String?   @db.VarChar(100)
+  productDescription String    @map("product_description") @db.Text
+  partNumber         String?   @map("part_number") @db.VarChar(255)
+  brand              String?   @db.VarChar(255)
+  quantity           Int       @default(1)
+  deliveryLocation   String?   @map("delivery_location") @db.VarChar(255)
+  urgency            String    @default("standard") @db.VarChar(20)
+  status             String    @default("new") @db.VarChar(30)
+  assignedTo         String?   @map("assigned_to") @db.Uuid
+  source             String?   @db.VarChar(50)
+  consent            Boolean   @default(false)
+  responseDeadline   DateTime? @map("response_deadline")
+  firstResponseAt    DateTime? @map("first_response_at")
+  internalNotes      String?   @map("internal_notes") @db.Text
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  customer  Customer?          @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  assignee  AdminUser?         @relation(fields: [assignedTo], references: [id])
+  items     RfqItem[]
+  notes     RfqNote[]
+  offers    Offer[]
+  emergency EmergencyRequest[]
+
+  @@index([urgency])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("rfqs")
+}
+
+// ─── RFQ Items ─────────────────────────────────────────────────
+model RfqItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  rfqId       String   @map("rfq_id") @db.Uuid
+  productName String   @map("product_name") @db.VarChar(500)
+  quantity    Int      @default(1)
+  unit        String?  @db.VarChar(50)
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  rfq Rfq @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+
+  @@index([rfqId])
+  @@map("rfq_items")
+}
+
+// ─── RFQ Notes ─────────────────────────────────────────────────
+model RfqNote {
+  id         String   @id @default(uuid()) @db.Uuid
+  rfqId      String   @map("rfq_id") @db.Uuid
+  authorId   String?  @map("author_id") @db.Uuid
+  note       String   @db.Text
+  isInternal Boolean  @default(true) @map("is_internal")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  rfq    Rfq        @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  author AdminUser? @relation(fields: [authorId], references: [id])
+
+  @@map("rfq_notes")
+}
+
+// ─── Offers (Make an Offer) ───────────────────────────────────
+model Offer {
+  id            String    @id @default(uuid()) @db.Uuid
+  offerNumber   String    @unique @map("offer_number") @db.VarChar(50)
+  productId     String?   @map("product_id") @db.Uuid
+  rfqId         String?   @map("rfq_id") @db.Uuid
+  customerId    String?   @map("customer_id") @db.Uuid
+  customerEmail String    @map("customer_email") @db.VarChar(255)
+  offeredPrice  Decimal   @map("offered_price") @db.Decimal(12, 2)
+  quantity      Int       @default(1)
+  message       String?   @db.Text
+  status        String    @default("pending") @db.VarChar(20)
+  counterPrice  Decimal?  @map("counter_price") @db.Decimal(12, 2)
+  adminNotes    String?   @map("admin_notes") @db.Text
+  expiresAt     DateTime? @map("expires_at")
+  respondedAt   DateTime? @map("responded_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  product  Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  rfq      Rfq?      @relation(fields: [rfqId], references: [id], onDelete: SetNull)
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([productId])
+  @@index([customerEmail])
+  @@map("offers")
+}
+
+// ─── Contact Messages ──────────────────────────────────────────
+model ContactMessage {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String   @db.VarChar(255)
+  email         String   @db.VarChar(255)
+  subject       String?  @db.VarChar(500)
+  message       String   @db.Text
+  status        String   @default("new") @db.VarChar(20)
+  assignedTo    String?  @map("assigned_to") @db.Uuid
+  internalNotes String?  @map("internal_notes") @db.Text
+  source        String   @default("contact-form") @db.VarChar(50)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  assignee AdminUser? @relation(fields: [assignedTo], references: [id])
+
+  @@index([status])
+  @@map("contact_messages")
+}
+
+// ─── Emergency Requests ────────────────────────────────────────
+model EmergencyRequest {
+  id              String    @id @default(uuid()) @db.Uuid
+  name            String    @db.VarChar(255)
+  phone           String    @db.VarChar(50)
+  partDescription String    @map("part_description") @db.Text
+  vesselName      String?   @map("vessel_name") @db.VarChar(255)
+  rfqId           String?   @map("rfq_id") @db.Uuid
+  status          String    @default("new") @db.VarChar(20)
+  contactedAt     DateTime? @map("contacted_at")
+  resolvedAt      DateTime? @map("resolved_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  rfq Rfq? @relation(fields: [rfqId], references: [id], onDelete: SetNull)
+
+  @@map("emergency_requests")
+}
+
+// ─── Media Assets ──────────────────────────────────────────────
+model MediaAsset {
+  id           String   @id @default(uuid()) @db.Uuid
+  filename     String   @db.VarChar(500)
+  originalName String?  @map("original_name") @db.VarChar(500)
+  url          String   @db.Text
+  thumbnailUrl String?  @map("thumbnail_url") @db.Text
+  mimeType     String?  @map("mime_type") @db.VarChar(100)
+  fileSize     Int?     @map("file_size")
+  width        Int?
+  height       Int?
+  altText      String?  @map("alt_text") @db.VarChar(500)
+  label        String?  @db.VarChar(100)
+  hash         String?  @db.VarChar(64)
+  uploadedBy   String?  @map("uploaded_by") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  uploader AdminUser?     @relation(fields: [uploadedBy], references: [id])
+  images   ProductImage[]
+
+  @@index([hash])
+  @@map("media_assets")
+}
+
+// ─── Testimonials ──────────────────────────────────────────────
+model Testimonial {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(255)
+  role      String?  @db.VarChar(255)
+  company   String?  @db.VarChar(255)
+  avatarUrl String?  @map("avatar_url") @db.Text
+  text      String   @db.Text
+  rating    Int      @default(5)
+  sortOrder Int      @default(0) @map("sort_order")
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("testimonials")
+}
+
+// ─── Offices ───────────────────────────────────────────────────
+model Office {
+  id             String   @id @default(uuid()) @db.Uuid
+  city           String   @db.VarChar(255)
+  country        String   @db.VarChar(255)
+  address        String?  @db.Text
+  timezone       String?  @db.VarChar(100)
+  phone          String?  @db.VarChar(50)
+  email          String?  @db.VarChar(255)
+  coordinatesLat Decimal? @map("coordinates_lat") @db.Decimal(10, 7)
+  coordinatesLng Decimal? @map("coordinates_lng") @db.Decimal(10, 7)
+  sortOrder      Int      @default(0) @map("sort_order")
+  isVisible      Boolean  @default(true) @map("is_visible")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("offices")
+}
+
+// ─── Store Settings ────────────────────────────────────────────
+model StoreSetting {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique @db.VarChar(255)
+  value     Json     @db.JsonB
+  category  String?  @db.VarChar(100)
+  updatedBy String?  @map("updated_by") @db.Uuid
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  updater AdminUser? @relation(fields: [updatedBy], references: [id])
+
+  @@map("store_settings")
+}
+
+// ─── Homepage Sections ─────────────────────────────────────────
+model HomepageSection {
+  id          String   @id @default(uuid()) @db.Uuid
+  sectionType String   @map("section_type") @db.VarChar(50)
+  label       String   @db.VarChar(255)
+  isEnabled   Boolean  @default(true) @map("is_enabled")
+  sortOrder   Int      @default(0) @map("sort_order")
+  config      Json     @default("{}") @db.JsonB
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("homepage_sections")
+}
+
+// ─── Audit Log ─────────────────────────────────────────────────
+model AuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  actorId       String?  @map("actor_id") @db.Uuid
+  actorEmail    String?  @map("actor_email") @db.VarChar(255)
+  action        String   @db.VarChar(100)
+  entityType    String   @map("entity_type") @db.VarChar(100)
+  entityId      String?  @map("entity_id") @db.Uuid
+  entityName    String?  @map("entity_name") @db.VarChar(255)
+  previousValue Json?    @map("previous_value") @db.JsonB
+  newValue      Json?    @map("new_value") @db.JsonB
+  ipAddress     String?  @map("ip_address") @db.Inet
+  userAgent     String?  @map("user_agent") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  actor AdminUser? @relation(fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+// ─── Email Queue ───────────────────────────────────────────────
+model EmailQueue {
+  id           String    @id @default(uuid()) @db.Uuid
+  toEmail      String    @map("to_email") @db.VarChar(255)
+  toName       String?   @map("to_name") @db.VarChar(255)
+  subject      String    @db.VarChar(500)
+  htmlBody     String    @map("html_body") @db.Text
+  textBody     String?   @map("text_body") @db.Text
+  template     String?   @db.VarChar(100)
+  templateData Json?     @map("template_data") @db.JsonB
+  status       String    @default("pending") @db.VarChar(20)
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(3) @map("max_attempts")
+  lastError    String?   @map("last_error") @db.Text
+  sentAt       DateTime? @map("sent_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([status])
+  @@map("email_queue")
+}
+
+// ─── Webhook Logs ──────────────────────────────────────────────
+model WebhookLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  source    String   @db.VarChar(50)
+  eventType String   @map("event_type") @db.VarChar(100)
+  payload   Json?    @db.JsonB
+  status    String   @default("received") @db.VarChar(20)
+  error     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("webhook_logs")
+}

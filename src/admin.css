@@ -1,0 +1,372 @@
+/* ── Admin Panel Styles ──────────────────────────────────── */
+/* Extends the existing maritime theme for admin UI            */
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.admin-sidebar {
+  background: linear-gradient(180deg, #061522 0%, #0a2a43 100%);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.light .admin-sidebar {
+  background: linear-gradient(180deg, #0a2a43 0%, #0d3352 100%);
+}
+
+.admin-sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+  position: relative;
+  transform: translateX(0);
+}
+
+.admin-sidebar .nav-item:hover {
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateX(3px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.admin-sidebar .nav-item:hover svg {
+  filter: drop-shadow(0 0 4px rgba(232, 170, 36, 0.25));
+}
+
+.admin-sidebar .nav-item:active {
+  transform: translateX(1px) scale(0.98);
+  transition-duration: 0.1s;
+}
+
+.admin-sidebar .nav-item.active {
+  color: #e8aa24;
+  background: rgba(232, 170, 36, 0.12);
+  box-shadow: inset 3px 0 0 #e8aa24, 0 2px 12px rgba(232, 170, 36, 0.08);
+  transform: translateX(2px);
+}
+
+.admin-sidebar .nav-item.active svg {
+  filter: drop-shadow(0 0 6px rgba(232, 170, 36, 0.35));
+}
+
+/* Notification badge on nav items */
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 0.625rem;
+  font-weight: 800;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1;
+  margin-left: auto;
+  flex-shrink: 0;
+  animation: navBadgePulse 2.5s ease-in-out infinite;
+}
+
+.nav-badge.badge-gold {
+  background: #e8aa24;
+  color: #061522;
+}
+
+.nav-badge.badge-danger {
+  background: #dc2626;
+  color: #fff;
+}
+
+.nav-badge.badge-teal {
+  background: #008c8c;
+  color: #fff;
+}
+
+@keyframes navBadgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* Collapsed sidebar badge positioning */
+.admin-sidebar.collapsed .nav-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  font-size: 0;
+}
+
+/* Nav icon transition */
+.admin-sidebar .nav-item svg {
+  transition: filter 0.28s ease, transform 0.28s ease;
+}
+
+.admin-sidebar .nav-item:hover svg {
+  transform: scale(1.12);
+}
+
+.admin-sidebar .nav-item.active svg {
+  transform: scale(1.05);
+}
+
+/* Section label animation */
+.admin-sidebar .nav-section-label {
+  transition: color 0.2s ease;
+}
+
+.admin-sidebar:hover .nav-section-label {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.admin-sidebar .nav-section-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 1.25rem 1rem 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ── Admin Header ────────────────────────────────────────── */
+.admin-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+html.light .admin-header {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+html:not(.light) .admin-header {
+  background: rgba(11, 32, 51, 0.88);
+}
+
+/* ── Admin Content ───────────────────────────────────────── */
+.admin-content {
+  background: var(--primary-bg);
+  min-height: calc(100vh - 64px);
+}
+
+/* ── Admin Cards ─────────────────────────────────────────── */
+.admin-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  transition: all 0.25s ease;
+}
+
+.admin-stat-card:hover {
+  border-color: color-mix(in srgb, var(--accent-gold) 50%, var(--border));
+  box-shadow: 0 8px 28px rgba(7, 24, 39, 0.08);
+  transform: translateY(-2px);
+}
+
+html:not(.light) .admin-stat-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Admin Table ─────────────────────────────────────────── */
+.admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-table thead th {
+  background: var(--surface-soft);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.admin-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: var(--surface-soft);
+}
+
+.admin-table tbody td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+/* ── Status Badges ───────────────────────────────────────── */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.admin-badge-published {
+  background: rgba(21, 154, 103, 0.12);
+  color: var(--success);
+}
+
+.admin-badge-draft {
+  background: rgba(232, 170, 36, 0.12);
+  color: var(--accent-gold);
+}
+
+.admin-badge-hidden {
+  background: rgba(111, 132, 152, 0.12);
+  color: var(--text-muted);
+}
+
+.admin-badge-danger {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--danger);
+}
+
+.admin-badge-info {
+  background: rgba(10, 61, 98, 0.12);
+  color: var(--accent-blue);
+}
+
+html:not(.light) .admin-badge-published {
+  background: rgba(52, 211, 153, 0.12);
+}
+
+html:not(.light) .admin-badge-draft {
+  background: rgba(240, 185, 71, 0.12);
+}
+
+html:not(.light) .admin-badge-hidden {
+  background: rgba(120, 145, 165, 0.12);
+}
+
+html:not(.light) .admin-badge-danger {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+html:not(.light) .admin-badge-info {
+  background: rgba(119, 199, 243, 0.12);
+}
+
+/* ── Pulse dot for emergency/urgent ──────────────────────── */
+.admin-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: adminPulse 2s ease-in-out infinite;
+}
+
+.admin-pulse-dot.emergency {
+  background: var(--danger);
+}
+
+.admin-pulse-dot.urgent {
+  background: var(--accent-gold);
+}
+
+@keyframes adminPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.5); }
+}
+
+/* ── Admin Login ─────────────────────────────────────────── */
+.admin-login-bg {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(232, 170, 36, 0.08), transparent 30rem),
+    radial-gradient(circle at 80% 70%, rgba(0, 140, 140, 0.06), transparent 30rem),
+    linear-gradient(135deg, #061522 0%, #0a2a43 50%, #0e4d72 100%);
+  min-height: 100vh;
+}
+
+html.light .admin-login-bg {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(232, 170, 36, 0.06), transparent 30rem),
+    radial-gradient(circle at 80% 70%, rgba(0, 140, 140, 0.04), transparent 30rem),
+    linear-gradient(135deg, #f3f7fb 0%, #eaf1f7 50%, #dde8f0 100%);
+}
+
+/* ── Quick action button ─────────────────────────────────── */
+.admin-quick-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.admin-quick-action:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+  background: var(--gold-muted);
+}
+
+/* ── Overlay for mobile sidebar ──────────────────────────── */
+.admin-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ── Scrollbar for admin ─────────────────────────────────── */
+.admin-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.admin-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+html.light .admin-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+html.light .admin-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
