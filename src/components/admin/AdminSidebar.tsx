@@ -130,7 +130,7 @@ export function AdminSidebar() {
       {/* Logo */}
       <div className="flex items-center gap-3 border-b border-white/8 px-4 py-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-gold)]">
-          <span className="font-display text-sm font-extrabold text-[#061522]">AT</span>
+          <span className="font-display text-sm font-extrabold text-navy-deep">AT</span>
         </div>
         {!collapsed && (
           <div className="flex flex-col overflow-hidden">
@@ -200,7 +200,7 @@ export function AdminSidebar() {
 
         <button
           onClick={adminLogout}
-          className="nav-item mb-0.5 w-full text-left text-red-400/70 hover:text-red-400"
+          className="nav-item mb-0.5 w-full text-left text-danger/70 hover:text-danger"
           title="Sign Out"
         >
           <span className="shrink-0">
@@ -213,7 +213,7 @@ export function AdminSidebar() {
       {/* Collapse toggle */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[var(--accent-blue)] text-white shadow-lg transition-colors hover:bg-[var(--accent-gold)] hover:text-[#061522]"
+        className="absolute -right-3 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[var(--accent-blue)] text-white shadow-lg transition-colors hover:bg-[var(--accent-gold)] hover:text-navy-deep"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}

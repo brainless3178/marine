@@ -84,7 +84,7 @@ export function ChurnPredictor({ orders, customers }: Props) {
       <div className="flex gap-1.5 mb-3">
         {(['all', 'churned', 'at-risk'] as const).map(f => (
           <button key={f} onClick={() => setFilter(f)}
-            className={`rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${filter === f ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}>
+            className={`rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${filter === f ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}>
             {f === 'all' ? 'All' : f === 'at-risk' ? 'At Risk' : 'Churned'}
           </button>
         ))}

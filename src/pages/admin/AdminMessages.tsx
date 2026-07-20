@@ -94,7 +94,7 @@ function ComposeModal({ onClose, onSent, toast }: { onClose: () => void; onSent:
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={handleSend} disabled={sending} className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522] disabled:opacity-50">
+          <button onClick={handleSend} disabled={sending} className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep disabled:opacity-50">
             {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />} Send
           </button>
           <button onClick={onClose} className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)]">Cancel</button>
@@ -221,7 +221,7 @@ export default function AdminMessages() {
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Messages</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">{unreadCount} unread messages</p>
         </div>
-        <button onClick={() => setComposing(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
+        <button onClick={() => setComposing(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
           <Plus size={14} /> Compose
         </button>
       </div>
@@ -231,7 +231,7 @@ export default function AdminMessages() {
         {folders.map((f) => {
           const Icon = f.icon
           return (
-            <button key={f.id} onClick={() => { setFolder(f.id); setPage(1) }} className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${folder === f.id ? 'bg-[var(--accent-gold)] text-[#061522] shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
+            <button key={f.id} onClick={() => { setFolder(f.id); setPage(1) }} className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${folder === f.id ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
               <Icon size={14} /> {f.label} ({f.count})
             </button>
           )

@@ -73,7 +73,7 @@ export function OrderTimeline({ orders }: Props) {
         {['all', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'].map(f => (
           <button key={f} onClick={() => setSelectedStatus(f)}
             className={`shrink-0 rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${
-              selectedStatus === f ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              selectedStatus === f ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
             }`}>
             {f === 'all' ? `All (${statusCounts.all || 0})` : `${f.charAt(0).toUpperCase() + f.slice(1)} (${statusCounts[f] || 0})`}
           </button>

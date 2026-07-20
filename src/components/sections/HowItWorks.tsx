@@ -91,7 +91,7 @@ export function HowItWorks() {
           {/* Timeline line */}
           <div
             ref={lineRef}
-            className="hidden lg:block absolute top-6 left-[60px] right-[60px] h-[2px] bg-gradient-to-r from-[rgba(200,147,10,0.5)] via-[#c8930a] to-[rgba(200,147,10,0.5)]"
+            className="hidden lg:block absolute top-6 left-[60px] right-[60px] h-[2px] bg-gradient-to-r from-[rgba(200,147,10,0.5)] via-[var(--gold-dark)] to-[rgba(200,147,10,0.5)]"
             style={{ width: '0%' }}
           />
 

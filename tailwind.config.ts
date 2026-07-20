@@ -32,6 +32,8 @@ const config: Config = {
         'gold-dark': 'var(--gold-dark)',
         'gold-muted': 'var(--gold-muted)',
         'teal-soft': 'var(--teal-soft)',
+        'btn-hover-dark': 'var(--btn-hover-dark)',
+        'btn-hover-gold': 'var(--btn-hover-gold)',
       },
       fontFamily: {
         display: ['Space Grotesk', 'sans-serif'],
@@ -90,6 +92,8 @@ const config: Config = {
         'card': 'var(--shadow-card)',
         'gold': '0 12px 26px rgba(232, 170, 36, 0.24)',
         'danger': '0 0 20px rgba(239, 68, 68, 0.3)',
+        'focus-gold': '0 0 0 3px var(--focus-ring-gold)',
+        'focus-blue': '0 0 0 3px var(--focus-ring-blue)',
       },
       borderRadius: {
         '2xl': '16px',

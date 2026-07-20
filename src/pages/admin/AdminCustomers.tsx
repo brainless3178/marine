@@ -198,7 +198,7 @@ export default function AdminCustomers() {
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Customers</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">{filteredCustomers.length} of {customers.length} customers</p>
         </div>
-        <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[#061522] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
+        <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
           <Plus size={14} /> Add Customer
         </button>
       </div>
@@ -230,7 +230,7 @@ export default function AdminCustomers() {
           onClick={() => { setStatusFilter(''); setPage(1) }}
           className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${
             statusFilter === ''
-              ? 'bg-[var(--accent-gold)] text-[#061522] shadow-[0_4px_12px_rgba(232,170,36,0.2)]'
+              ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]'
               : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'
           }`}
         >
@@ -540,7 +540,7 @@ export default function AdminCustomers() {
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-[var(--border)] px-6 py-4">
               <button onClick={() => setShowCreateModal(false)} className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2 text-xs font-bold text-[var(--text-secondary)] hover:border-[var(--text-muted)] transition-colors">Cancel</button>
-              <button onClick={handleCreateCustomer} className="rounded-xl bg-[var(--accent-gold)] px-4 py-2 text-xs font-extrabold text-[#061522] hover:bg-[var(--gold-light)] transition-colors">Create Customer</button>
+              <button onClick={handleCreateCustomer} className="rounded-xl bg-[var(--accent-gold)] px-4 py-2 text-xs font-extrabold text-navy-deep hover:bg-[var(--gold-light)] transition-colors">Create Customer</button>
             </div>
           </div>
         </div>

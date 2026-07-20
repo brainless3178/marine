@@ -104,7 +104,7 @@ export function RevenueForecast({ orders }: Props) {
           {(['30d', '60d', '90d'] as const).map(h => (
             <button key={h} onClick={() => setHorizon(h)}
               className={`rounded-lg px-2 py-0.5 text-[0.5rem] font-bold transition-all ${
-                horizon === h ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
+                horizon === h ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
               }`}>{h}</button>
           ))}
         </div>

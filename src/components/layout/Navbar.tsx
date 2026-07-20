@@ -179,7 +179,7 @@ export function Navbar() {
             >
               <ShoppingCart size={18} />
               {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--accent-gold)] px-1 text-xs font-bold leading-none text-[#111827]">
+                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--accent-gold)] px-1 text-xs font-bold leading-none text-navy-deep">
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               )}
@@ -197,7 +197,7 @@ export function Navbar() {
 
             <Link
               to="/rfq"
-              className="hidden items-center rounded-lg bg-[var(--accent-gold)] px-5 py-3 text-xs font-extrabold text-[#111827] no-underline transition-colors hover:bg-[#d97706] hover:text-white lg:inline-flex"
+              className="hidden items-center rounded-lg bg-[var(--accent-gold)] px-5 py-3 text-xs font-extrabold text-navy-deep no-underline transition-colors hover:bg-btn-hover-gold hover:text-white lg:inline-flex"
             >
               {t('nav.requestQuote')}
             </Link>
@@ -264,7 +264,7 @@ export function Navbar() {
               </div>
               <Link
                 to="/rfq"
-                className="inline-flex items-center justify-center rounded-lg bg-[var(--accent-gold)] px-5 py-3 text-xs font-extrabold text-[#111827] no-underline"
+                className="inline-flex items-center justify-center rounded-lg bg-[var(--accent-gold)] px-5 py-3 text-xs font-extrabold text-navy-deep no-underline"
               >
                 {t('nav.requestQuote')}
               </Link>

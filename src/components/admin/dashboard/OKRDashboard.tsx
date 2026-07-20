@@ -146,7 +146,7 @@ export function OKRDashboard({ orders, products, customers }: Props) {
           <h2 className="font-display text-sm font-bold text-[var(--text-primary)]">OKR Dashboard</h2>
         </div>
         <button onClick={() => setShowAdd(!showAdd)}
-          className="flex items-center gap-1 rounded-lg bg-[var(--accent-gold)] px-2.5 py-1 text-[0.625rem] font-bold text-[#061522] hover:bg-[var(--gold-light)] transition-colors">
+          className="flex items-center gap-1 rounded-lg bg-[var(--accent-gold)] px-2.5 py-1 text-[0.625rem] font-bold text-navy-deep hover:bg-[var(--gold-light)] transition-colors">
           <Plus size={10} /> Add Objective
         </button>
       </div>
@@ -159,7 +159,7 @@ export function OKRDashboard({ orders, products, customers }: Props) {
             className="flex-1 rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-gold)]"
             onKeyDown={e => e.key === 'Enter' && handleAdd()} />
           <button onClick={handleAdd}
-            className="rounded-lg bg-[var(--accent-gold)] px-3 py-1.5 text-[0.625rem] font-bold text-[#061522]">Save</button>
+            className="rounded-lg bg-[var(--accent-gold)] px-3 py-1.5 text-[0.625rem] font-bold text-navy-deep">Save</button>
         </div>
       )}
 

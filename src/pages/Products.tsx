@@ -201,9 +201,9 @@ export default function Products() {
                     {t('products.priceRange')}
                   </span>
                   <div className="flex items-center gap-2">
-                    <input type="number" min={0} max={1000} value={localMinPrice} onChange={(e) => setLocalMinPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMin')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)]" />
+                    <input type="number" min={0} max={1000} value={localMinPrice} onChange={(e) => setLocalMinPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMin')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-accent-gold focus:shadow-focus-gold" />
                     <span className="text-[var(--text-muted)] text-xs">—</span>
-                    <input type="number" min={0} max={1000} value={localMaxPrice} onChange={(e) => setLocalMaxPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMax')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)]" />
+                    <input type="number" min={0} max={1000} value={localMaxPrice} onChange={(e) => setLocalMaxPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMax')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-accent-gold focus:shadow-focus-gold" />
                   </div>
                   <button onClick={applyPriceFilter} className="w-full mt-2 py-2 text-xs font-bold text-[var(--accent-blue)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border border-[var(--border)] rounded-lg">
                     {t('products.applyPrice')}
@@ -275,7 +275,7 @@ export default function Products() {
                   {selectedBrands.map((slug) => {
                     const brand = derivedBrands.find((b) => b.slug === slug)
                     return (
-                      <span key={slug} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-purple-300 bg-purple-50 text-purple-700">
+                      <span key={slug} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-teal)]/30 bg-[var(--accent-teal)]/5 text-[var(--accent-teal)]">
                         {brand?.name ?? slug}
                         <button onClick={() => toggleBrand(slug)} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
                       </span>
@@ -288,7 +288,7 @@ export default function Products() {
                     </span>
                   )}
                   {urgencyFilter !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-orange-300 bg-orange-50 text-orange-700">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-gold)]/30 bg-[var(--accent-gold)]/5 text-[var(--accent-gold)]">
                       Emergency Available
                       <button onClick={() => setUrgencyFilter('all')} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
                     </span>
@@ -360,7 +360,7 @@ export default function Products() {
                             </span>
                           )}
                           {product.availability === 'emergency' && (
-                            <span className="absolute top-2 right-2 z-10 px-2 py-1 rounded-full text-xs font-mono border border-red-200 text-danger bg-white">{t('product.emergency')}</span>
+                            <span className="absolute top-2 right-2 z-10 px-2 py-1 rounded-full text-xs font-mono border border-danger/20 text-danger bg-white">{t('product.emergency')}</span>
                           )}
                           {!product.inStock && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -369,7 +369,7 @@ export default function Products() {
                           )}
                         </Link>
                         <div className="p-4">
-                          <span className="inline-block font-mono text-xs px-2 py-1 rounded-full border text-[var(--accent-blue)] border-blue-100 bg-blue-50 mb-2">{product.brand}</span>
+                          <span className="inline-block font-mono text-xs px-2 py-1 rounded-full border text-[var(--accent-blue)] border-[var(--accent-blue)]/15 bg-[var(--accent-blue)]/5 mb-2">{product.brand}</span>
                           <h4 className="text-label leading-tight hover:text-[var(--accent-blue)] transition-colors min-h-[40px]">
                             <Link to={`/product/${product.id}`}>{product.name}</Link>
                           </h4>

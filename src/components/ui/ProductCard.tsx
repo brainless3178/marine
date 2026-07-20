@@ -28,7 +28,7 @@ export function ProductCard({ product, added = false, onAddToCart, t, compact = 
   const { whatsappNumber } = useStoreSettings()
   const whatsappText = encodeURIComponent('Hi, I need a quote for ' + product.name + ' (SKU: ' + product.sku + ').')
   const imageClassName = 'w-full ' + (compact ? 'aspect-[4/3]' : 'aspect-square') + ' object-cover transition duration-700 group-hover:scale-[1.06]'
-  const stockClassName = 'rounded-full px-2.5 py-1 text-[11px] font-black ' + (product.inStock ? 'bg-emerald-400 text-[#042014]' : 'bg-slate-900 text-white')
+  const stockClassName = 'rounded-full px-2.5 py-1 text-[11px] font-black ' + (product.inStock ? 'bg-success text-[var(--navy-deep)]' : 'bg-[var(--navy-deep)] text-white')
   const buttonClassName = 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-xs font-black uppercase tracking-[0.08em] transition ' + (
     !product.inStock
       ? 'cursor-not-allowed border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)]'
@@ -52,7 +52,7 @@ export function ProductCard({ product, added = false, onAddToCart, t, compact = 
             ;(e.target as HTMLImageElement).style.opacity = '0.25'
           }}
         />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[rgba(3,13,23,0.62)] to-transparent opacity-80" />
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[var(--overlay-dark)] to-transparent opacity-80" />
 
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           {product.customLabel && (
@@ -64,7 +64,7 @@ export function ProductCard({ product, added = false, onAddToCart, t, compact = 
             </span>
           )}
           {product.availability === 'emergency' && (
-            <span className="rounded-full border border-red-300/30 bg-red-600/95 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-lg">
+            <span className="rounded-full border border-danger/30/30 bg-danger/95 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-lg">
               {t('product.emergency')}
             </span>
           )}
@@ -80,7 +80,7 @@ export function ProductCard({ product, added = false, onAddToCart, t, compact = 
         </div>
 
         {!product.inStock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[rgba(3,13,23,0.62)]">
+          <div className="absolute inset-0 flex items-center justify-center bg-[var(--overlay-dark)]">
             <span className="rounded-xl bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--navy-deep)]">
               {t('product.outOfStock')}
             </span>
@@ -163,7 +163,7 @@ export function ProductCard({ product, added = false, onAddToCart, t, compact = 
       </div>
 
       {product.makeOffer && (
-        <span className="pointer-events-none absolute right-3 top-3 hidden rounded-full border border-white/15 bg-[rgba(3,13,23,0.54)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white backdrop-blur sm:inline-flex">
+        <span className="pointer-events-none absolute right-3 top-3 hidden rounded-full border border-white/15 bg-[var(--overlay-medium)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white backdrop-blur sm:inline-flex">
           <Sparkles size={11} className="mr-1 text-[var(--gold-light)]" /> Offer
         </span>
       )}

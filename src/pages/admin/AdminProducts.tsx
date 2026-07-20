@@ -358,7 +358,7 @@ export default function AdminProducts() {
           <button onClick={() => setShowImport(true)} className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] transition-all hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]">
             <Upload size={14} /> Import CSV
           </button>
-          <Link to="/admin/products/new" className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[#061522] no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5">
+          <Link to="/admin/products/new" className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5">
             <Plus size={14} /> Add Product
           </Link>
         </div>
@@ -372,7 +372,7 @@ export default function AdminProducts() {
           </div>
           <button onClick={() => setShowFilters((v) => !v)} className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold transition-all ${showFilters || activeFilterCount > 0 ? 'border-[var(--accent-gold)] bg-[var(--gold-muted)] text-[var(--accent-gold)]' : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
             <Filter size={14} /> Filters
-            {activeFilterCount > 0 && <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--accent-gold)] px-1.5 text-[0.625rem] font-bold text-[#061522]">{activeFilterCount}</span>}
+            {activeFilterCount > 0 && <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--accent-gold)] px-1.5 text-[0.625rem] font-bold text-navy-deep">{activeFilterCount}</span>}
           </button>
           <button onClick={handleExportCsv} className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] transition-all hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]">
             <Download size={14} /> Export CSV
@@ -409,7 +409,7 @@ export default function AdminProducts() {
               </select>
             </div>
             <div className="flex items-end">
-              <button onClick={() => { setFilterOnSale((v) => !v); setPage(1) }} className={`w-full rounded-lg border px-3 py-2 text-xs font-bold transition-all ${filterOnSale ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-[#061522]' : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)]'}`}>
+              <button onClick={() => { setFilterOnSale((v) => !v); setPage(1) }} className={`w-full rounded-lg border px-3 py-2 text-xs font-bold transition-all ${filterOnSale ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-navy-deep' : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)]'}`}>
                 <Tag size={12} className="inline mr-1" /> On Sale
               </button>
             </div>
@@ -508,7 +508,7 @@ export default function AdminProducts() {
                           <Link to={`/admin/products/${product.id}/edit`} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-gold)] hover:bg-[var(--gold-muted)] transition-colors" title="Edit"><Pencil size={12} /></Link>
                           <a href={`/product/${product.id}`} target="_blank" rel="noopener noreferrer" className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 transition-colors" title="View on storefront"><Eye size={12} /></a>
                           <button onClick={(e) => { e.stopPropagation(); handleDuplicate(product.id) }} disabled={duplicating === product.id} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-teal)] hover:bg-[var(--accent-teal)]/10 transition-colors" title="Duplicate as draft"><Copy size={12} /></button>
-                          <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(product.id) }} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors" title="Delete"><Trash2 size={12} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(product.id) }} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors" title="Delete"><Trash2 size={12} /></button>
                         </div>
                       </td>
                     </tr>
@@ -539,7 +539,7 @@ export default function AdminProducts() {
                     <p className="text-sm font-semibold text-[var(--text-secondary)]">Upload a CSV file with columns:</p>
                     <p className="text-xs text-[var(--text-muted)] mt-1 font-mono">name, sku, brand, category, condition, availability, regularPrice, salePrice, stockCount, status</p>
                     <input type="file" accept=".csv" className="hidden" id="csv-import-input" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImportCsv(f) }} />
-                    <button onClick={() => document.getElementById('csv-import-input')?.click()} disabled={importing} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent-gold)] px-4 py-2 text-xs font-bold text-[#061522] hover:bg-[var(--gold-light)] transition-colors disabled:opacity-50">
+                    <button onClick={() => document.getElementById('csv-import-input')?.click()} disabled={importing} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent-gold)] px-4 py-2 text-xs font-bold text-navy-deep hover:bg-[var(--gold-light)] transition-colors disabled:opacity-50">
                       {importing ? <><Loader2 size={12} className="animate-spin" /> Importing...</> : <><Upload size={12} /> Choose CSV File</>}
                     </button>
                   </div>

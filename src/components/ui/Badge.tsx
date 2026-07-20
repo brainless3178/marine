@@ -9,10 +9,10 @@ interface BadgeProps {
 
 export function Badge({ variant = 'default', size = 'md', icon, children }: BadgeProps) {
   const variants = {
-    blue: 'text-[var(--deep-forest)] border-[rgba(115,186,155,0.45)]',
-    gold: 'text-[var(--brick-ember)] border-[rgba(186,45,11,0.3)]',
-    success: 'text-success border-[rgba(115,186,155,0.45)]',
-    danger: 'text-danger border-[rgba(186,45,11,0.3)]',
+    blue: 'text-[var(--deep-forest)] border-[var(--teal-glow)]',
+    gold: 'text-[var(--brick-ember)] border-[var(--brick-border)]',
+    success: 'text-success border-[var(--teal-glow)]',
+    danger: 'text-danger border-[var(--brick-border)]',
     default: 'text-[var(--text-secondary)] border-[var(--border)]',
   }
 

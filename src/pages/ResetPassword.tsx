@@ -89,7 +89,7 @@ export default function ResetPassword() {
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); setError('') }}
                     placeholder="New password (min. 8 characters)"
-                    className="w-full pl-10 pr-10 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-blue)] transition-all placeholder:text-[var(--text-muted)]"
+                    className="w-full pl-10 pr-10 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-xl outline-none focus:border-accent-gold focus:shadow-focus-gold transition-all placeholder:text-[var(--text-muted)]"
                     autoFocus
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)]">
@@ -104,7 +104,7 @@ export default function ResetPassword() {
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); setError('') }}
                     placeholder="Confirm new password"
-                    className="w-full pl-10 pr-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-blue)] transition-all placeholder:text-[var(--text-muted)]"
+                    className="w-full pl-10 pr-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-xl outline-none focus:border-accent-gold focus:shadow-focus-gold transition-all placeholder:text-[var(--text-muted)]"
                   />
                 </div>
 

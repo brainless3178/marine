@@ -25,7 +25,7 @@ export default function Emergency() {
     const ctx = gsap.context(() => {
       // Pulsing glow on the clock card
       gsap.to(pulseRef.current, {
-        boxShadow: '0 0 40px 15px rgba(239, 68, 68, 0.15)',
+        boxShadow: '0 0 40px 15px var(--danger-subtle)',
         scale: 1.02,
         duration: 1.5,
         repeat: -1,
@@ -86,7 +86,7 @@ export default function Emergency() {
       />
       {/* Dark red gradient overlay */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at 50% 0%, rgba(239,68,68,0.08) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse at 50% 0%, var(--danger-glow) 0%, transparent 70%)',
       }} />
 
       <section className="py-24 text-center relative">
@@ -102,7 +102,7 @@ export default function Emergency() {
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <a href={`https://wa.me/${whatsappNumber}`}
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-danger text-[var(--text-primary)] font-semibold text-sm border border-danger hover:bg-red-600 hover:border-red-600 hover:-translate-y-0.5 transition-all shadow-[0_0_20px_rgba(239,68,68,0.3)]">
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-danger text-[var(--text-primary)] font-semibold text-sm border border-danger hover:bg-danger hover:border-danger hover:-translate-y-0.5 transition-all shadow-[0_0_20px_var(--danger-border)]">
               <MessageCircle size={16} /> {t('emergency.ctaWhatsapp')}
             </a>
             <a href={`tel:${phoneNumber}`}
@@ -198,7 +198,7 @@ export default function Emergency() {
               <label htmlFor="emergency-vessel" className="sr-only">{t('emergency.formVessel')}</label>
               <input id="emergency-vessel" type="text" placeholder={t('emergency.formVessel')} value={form.vesselName} onChange={(e) => setForm({ ...form, vesselName: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-danger focus:shadow-[0_0_0_3px_rgba(239,68,68,0.25)] transition-all outline-none" />
             </div>
-            <button type="submit" disabled={submitted || loading} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm border transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-white' : 'bg-danger text-[var(--text-primary)] border-danger hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.3)]'}`}>
+            <button type="submit" disabled={submitted || loading} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm border transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-white' : 'bg-danger text-[var(--text-primary)] border-danger hover:bg-danger shadow-[0_0_20px_var(--danger-border)]'}`}>
               {loading ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : submitted ? <><Check size={16} /> Request Submitted!</> : <><TriangleAlert size={16} /> {t('emergency.formSubmit')}</>}
             </button>
           </form>

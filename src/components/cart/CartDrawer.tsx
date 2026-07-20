@@ -213,12 +213,12 @@ export function CartDrawer() {
                               </div>
                               <button
                                 onClick={() => removeFromCart(product.id)}
-                                className="group flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md transition-colors hover:bg-red-500/10"
+                                className="group flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md transition-colors hover:bg-danger/50/10"
                                 aria-label={`Remove ${product.name}`}
                               >
                                 <Trash2
                                   size={14}
-                                  className="text-[var(--text-muted)] transition-colors group-hover:text-red-500"
+                                  className="text-[var(--text-muted)] transition-colors group-hover:text-danger"
                                 />
                               </button>
                             </div>
@@ -296,7 +296,7 @@ export function CartDrawer() {
 
                   <button
                     onClick={clearCart}
-                    className="mt-3 w-full text-center text-xs font-medium text-[var(--text-muted)] transition-colors hover:text-red-500"
+                    className="mt-3 w-full text-center text-xs font-medium text-[var(--text-muted)] transition-colors hover:text-danger"
                   >
                     {t('cart.clearCart')}
                   </button>

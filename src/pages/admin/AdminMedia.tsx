@@ -242,7 +242,7 @@ export default function AdminMedia() {
             </p>
           </div>
           <input type="file" ref={(el) => setFileInputEl(el)} accept="image/jpeg,image/png,image/webp,image/avif" multiple className="hidden" onChange={(e) => handleUpload(e.target.files)} disabled={uploading} />
-          <button onClick={() => fileInputEl?.click()} disabled={uploading} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[#061522] transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5 disabled:opacity-50">
+          <button onClick={() => fileInputEl?.click()} disabled={uploading} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5 disabled:opacity-50">
             <Upload size={14} /> {uploading ? 'Uploading...' : 'Upload Images'}
           </button>
         </div>
@@ -287,8 +287,8 @@ export default function AdminMedia() {
               </select>
             </div>
             <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] p-1">
-              <button onClick={() => setViewMode('grid')} className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[var(--accent-gold)] text-[#061522]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}><Grid3X3 size={14} /></button>
-              <button onClick={() => setViewMode('list')} className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[var(--accent-gold)] text-[#061522]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}><List size={14} /></button>
+              <button onClick={() => setViewMode('grid')} className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[var(--accent-gold)] text-navy-deep' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}><Grid3X3 size={14} /></button>
+              <button onClick={() => setViewMode('list')} className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[var(--accent-gold)] text-navy-deep' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}><List size={14} /></button>
             </div>
           </div>
           {(filterLabel || search) && (
@@ -305,7 +305,7 @@ export default function AdminMedia() {
           <div className="flex items-center gap-3 rounded-xl border border-[var(--accent-gold)]/30 bg-[var(--gold-muted)] px-4 py-3">
             <span className="text-xs font-bold text-[var(--accent-gold)]">{selectedIds.size} selected</span>
             <div className="flex flex-wrap gap-2 ml-auto">
-              <button onClick={handleBulkDelete} className="rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-[0.625rem] font-bold text-[var(--danger)] hover:bg-red-100"><Trash2 size={10} className="inline mr-1" />Delete</button>
+              <button onClick={handleBulkDelete} className="rounded-lg bg-danger/5 border border-danger/20 px-3 py-1.5 text-[0.625rem] font-bold text-[var(--danger)] hover:bg-danger/10"><Trash2 size={10} className="inline mr-1" />Delete</button>
             </div>
             <button onClick={() => setSelectedIds(new Set())} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"><X size={14} /></button>
           </div>
@@ -381,7 +381,7 @@ export default function AdminMedia() {
                         <td>
                           <div className="flex items-center gap-1">
                             <button onClick={() => { setPreviewImage(media); fetchUsage(media.id) }} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-gold)] hover:bg-[var(--gold-muted)] transition-colors"><Eye size={12} /></button>
-                            <button onClick={() => setDeleteTarget(media.id)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-red-50 transition-colors"><Trash2 size={12} /></button>
+                            <button onClick={() => setDeleteTarget(media.id)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors"><Trash2 size={12} /></button>
                           </div>
                         </td>
                       </tr>
@@ -429,7 +429,7 @@ export default function AdminMedia() {
                 <div className="flex items-center gap-2 pt-2 border-t border-[var(--border)]">
                   <button onClick={() => { const a = document.createElement('a'); a.href = previewImage.url; a.download = previewImage.originalName || 'image'; a.click(); toast('Download started', 'success') }} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-bold text-[var(--text-secondary)] hover:border-[var(--accent-gold)] transition-colors"><Download size={12} /> Download</button>
                   <button onClick={() => { window.open(previewImage.url, '_blank'); toast('Opened in new tab', 'info') }} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-bold text-[var(--text-secondary)] hover:border-[var(--accent-blue)] transition-colors"><Eye size={12} /> Open Original</button>
-                  <button onClick={() => setDeleteTarget(previewImage.id)} className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-[var(--danger)] hover:bg-red-100 transition-colors"><Trash2 size={12} /> Delete</button>
+                  <button onClick={() => setDeleteTarget(previewImage.id)} className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-danger/20 bg-danger/5 px-3 py-2 text-xs font-bold text-[var(--danger)] hover:bg-danger/10 transition-colors"><Trash2 size={12} /> Delete</button>
                 </div>
               </div>
             </div>

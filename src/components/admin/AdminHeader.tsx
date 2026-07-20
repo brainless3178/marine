@@ -199,7 +199,7 @@ export function AdminHeader() {
                     adminLogout()
                     setUserMenuOpen(false)
                   }}
-                  className="w-full px-4 py-2 text-left text-xs font-semibold text-[var(--danger)] hover:bg-red-50 transition-colors"
+                  className="w-full px-4 py-2 text-left text-xs font-semibold text-[var(--danger)] hover:bg-danger/5 transition-colors"
                 >
                   Sign Out
                 </button>

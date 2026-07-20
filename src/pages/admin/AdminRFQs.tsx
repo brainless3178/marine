@@ -195,7 +195,7 @@ export default function AdminRFQs() {
 
       {/* Urgency Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1">
-        <button onClick={() => { setUrgencyFilter(''); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${urgencyFilter === '' ? 'bg-[var(--accent-gold)] text-[#061522] shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
+        <button onClick={() => { setUrgencyFilter(''); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${urgencyFilter === '' ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
           All ({rfqs.length})
         </button>
         {(Object.keys(urgencyConfig) as RFQUrgency[]).map((u) => (
@@ -325,7 +325,7 @@ export default function AdminRFQs() {
                     <label className="text-[0.625rem] font-bold text-[var(--text-muted)] mb-1 block">Assign to</label>
                     <div className="flex flex-wrap gap-1.5">
                       {assignees.map((a) => (
-                        <button key={a} onClick={() => handleAssign(selectedRFQ.id, a)} className={`rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${selectedRFQ.assignedTo === a ? 'bg-[var(--accent-gold)] text-[#061522]' : 'bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
+                        <button key={a} onClick={() => handleAssign(selectedRFQ.id, a)} className={`rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${selectedRFQ.assignedTo === a ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
                           {a}
                         </button>
                       ))}

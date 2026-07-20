@@ -91,7 +91,7 @@ export default function TrackOrder() {
                 onChange={(e) => setOrderNumber(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleTrack()}
                 placeholder="Enter order number (e.g. AT-12345)"
-                className="w-full pl-10 pr-4 py-3.5 bg-[var(--surface)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-xl outline-none focus:border-[var(--accent-blue)] transition-all placeholder:text-[var(--text-muted)]"
+                className="w-full pl-10 pr-4 py-3.5 bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-xl outline-none focus:border-accent-gold focus:shadow-focus-gold transition-all placeholder:text-[var(--text-muted)]"
               />
             </div>
             <button

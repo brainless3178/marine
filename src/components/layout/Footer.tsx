@@ -15,7 +15,7 @@ export function Footer() {
   const { t } = useTranslation()
   const settings = useStoreSettings()
   return (
-    <footer className="bg-[#07111f] text-white border-t border-white/10 pt-16 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+    <footer className="bg-navy-deep text-white border-t border-white/10 pt-16 pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr] gap-10">
           {/* Brand */}
