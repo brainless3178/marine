@@ -5,31 +5,6 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# Serve SEO and AI discovery files directly (before SPA catch-all)
-[[redirects]]
-  from = "/sitemap.xml"
-  to = "/sitemap.xml"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/robots.txt"
-  to = "/robots.txt"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/llms.txt"
-  to = "/llms.txt"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/llms-full.txt"
-  to = "/llms-full.txt"
-  status = 200
-  force = true
-
 # Proxy /api requests to the Render backend
 [[redirects]]
   from = "/api/*"
