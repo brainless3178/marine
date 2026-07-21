@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { Product } from '../../types'
-import { OptimizedImage } from '../ui/OptimizedImage'
 
 interface HeroProductMarqueeProps {
   products: Product[]
@@ -22,12 +21,13 @@ function MarqueeCard({ product }: { product: Product }) {
             {product.brand.slice(0, 2)}
           </span>
         ) : (
-        <OptimizedImage
+        <img
           src={`/images/${product.filename}`}
           alt={product.name}
           width={56}
           height={56}
-          sizes="56px"
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           onError={() => setImgFailed(true)}
         />

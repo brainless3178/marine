@@ -261,7 +261,7 @@ export function Hero() {
                         className={`grid w-full grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-[var(--border)] px-3 py-3 text-left transition last:border-b-0 ${searchSuggestions.indexOf(product) === suggestionIndex ? 'bg-[var(--surface-soft)]' : 'hover:bg-[var(--primary-bg)]'}`}
                       >
                         <span className="h-14 w-14 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-soft)]">
-                          <OptimizedImage src={`/images/${product.filename}`} alt={product.name} width={56} height={56} sizes="56px" className="h-full w-full object-cover" onError={(event) => { const img = event.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
+                          <img src={`/images/${product.filename}`} alt={product.name} width={56} height={56} loading="lazy" decoding="async" className="h-full w-full object-cover" onError={(event) => { const img = event.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
                         </span>
                         <span className="min-w-0">
                           <span className="block truncate text-sm font-black text-[var(--text-primary)]">{product.name}</span>
@@ -344,7 +344,7 @@ export function Hero() {
                 <div key={`spot-${animKey}`} className="animate-word-cycle">
                   <div className="w-full aspect-[5/4] rounded-xl overflow-hidden bg-white/5 border border-white/10 mb-4">
                     <OptimizedImage
-                      src={`/images/${heroProducts[activeIndex]?.filename || 'placeholder.png'}`}
+                      src={`/images/${heroProducts[activeIndex]?.filename || 'product-001.jpg'}`}
                       alt={rotatingNames[activeIndex] || ''}
                       loading="eager"
                       width={600}
