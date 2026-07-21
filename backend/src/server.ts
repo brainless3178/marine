@@ -193,6 +193,32 @@ app.get('/api/health', async (_req, res) => {
   }
 })
 
+// ─── Diagnostic: Check Database Schema ─────────────────────────
+// TEMPORARY: Remove after debugging
+app.get('/api/debug/schema', async (_req, res) => {
+  try {
+    const tables = await prisma.$queryRaw<{ tablename: string }[]>`
+      SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename
+    `
+    const productColumns = await prisma.$queryRaw<{ column_name: string }[]>`
+      SELECT column_name FROM information_schema.columns WHERE table_name = 'products' ORDER BY ordinal_position
+    `
+    const productImagesExists = tables.some(t => t.tablename === 'product_images')
+    const productSpecsExists = tables.some(t => t.tablename === 'product_specs')
+    const productIndustriesExists = tables.some(t => t.tablename === 'product_industries')
+
+    res.json({
+      tables: tables.map(t => t.tablename),
+      productColumns: productColumns.map(c => c.column_name),
+      productImagesExists,
+      productSpecsExists,
+      productIndustriesExists,
+    })
+  } catch (err: any) {
+    res.status(500).json({ error: err.message, code: err.code })
+  }
+})
+
 // ─── Admin Routes ──────────────────────────────────────────────
 app.use('/api/admin/auth', loginLimiter, adminAuthRoutes)
 app.use('/api/admin/products', adminLimiter, adminProductRoutes)
