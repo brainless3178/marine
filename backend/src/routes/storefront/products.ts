@@ -8,7 +8,6 @@ const router = Router()
 
 // ─── List Products (Storefront) ────────────────────────────────
 router.get('/', asyncHandler(async (req, res) => {
-  try {
   const { page, limit, skip } = paginationParams(Number(req.query.page), Number(req.query.limit))
 
   const where: any = { status: 'published' }
@@ -76,10 +75,6 @@ router.get('/', asyncHandler(async (req, res) => {
       priceRange: { min: Number(priceAgg._min.regularPrice) || 0, max: Number(priceAgg._max.regularPrice) || 1000 },
     },
   })
-  } catch (err: any) {
-    console.error('Products list error:', err.message, err.code, err.stack)
-    res.status(500).json({ error: 'Internal server error', detail: err.message, code: err.code })
-  }
 }))
 
 // ─── Get Featured Products ─────────────────────────────────────
