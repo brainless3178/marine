@@ -90,7 +90,7 @@ model Product {
   lowStockThreshold  Int       @default(10) @map("low_stock_threshold")
   warehouseLocation  String?   @map("warehouse_location") @db.VarChar(255)
   publicItemLocation String?   @map("public_item_location") @db.VarChar(255)
-  leadTime           String?   @db.VarChar(100)
+  leadTime           String?   @map("lead_time") @db.VarChar(100)
   isNewArrival       Boolean   @default(false) @map("is_new_arrival")
   isFeatured         Boolean   @default(false) @map("is_featured")
   customLabel        String?   @map("custom_label") @db.VarChar(100)
