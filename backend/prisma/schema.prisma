@@ -237,7 +237,7 @@ model Industry {
   slug           String   @unique @db.VarChar(255)
   icon           String?  @db.VarChar(100)
   description    String?  @db.Text
-  painPoints     String[] @default([])
+  painPoints     String[] @default([]) @map("pain_points")
   seoTitle       String?  @map("seo_title") @db.VarChar(255)
   seoDescription String?  @map("seo_description") @db.Text
   sortOrder      Int      @default(0) @map("sort_order")
