@@ -134,8 +134,6 @@ export function SEO({
       <title>{fullTitle}</title>
       <meta name="description" content={description || DEFAULT_DESCRIPTION} />
       <link rel="canonical" href={canonicalUrl} />
-
-      {/* Open Graph */}
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description || DEFAULT_DESCRIPTION} />
       <meta property="og:url" content={canonicalUrl} />
@@ -146,14 +144,11 @@ export function SEO({
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content={ogImageAlt || `${SITE_NAME} — Marine & Industrial Equipment`} />
       <meta property="og:locale" content="en_US" />
-
-      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description || DEFAULT_DESCRIPTION} />
       <meta name="twitter:image" content={ogImageUrl} />
 
-      {/* Product-specific OG tags */}
       {ogType === 'product' && productPrice && (
         <>
           <meta property="product:price:amount" content={String(productPrice)} />
@@ -161,7 +156,6 @@ export function SEO({
         </>
       )}
 
-      {/* JSON-LD Structured Data */}
       <script type="application/ld+json">
         {JSON.stringify(allJsonLd.length === 1 ? allJsonLd[0] : allJsonLd)}
       </script>

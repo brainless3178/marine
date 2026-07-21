@@ -3,6 +3,7 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
+import noCommentsInHelmet from './eslint-rules/no-comments-in-helmet.js'
 
 export default tseslint.config(
   { ignores: ['dist', 'backend', 'test-results', 'node_modules', 'e2e/**', 'playwright.config.ts', 'tailwind.config.ts', 'vitest.config.ts', 'vite.config.ts', 'postcss.config.js'] },
@@ -20,6 +21,11 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'custom': {
+        rules: {
+          'no-comments-in-helmet': noCommentsInHelmet,
+        },
+      },
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -30,6 +36,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-require-imports': 'off',
+      'custom/no-comments-in-helmet': 'warn',
     },
   },
 )

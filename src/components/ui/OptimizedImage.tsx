@@ -15,6 +15,8 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   decoding?: 'async' | 'sync' | 'auto'
   /** CSS sizes attribute hint for responsive images (default: "100vw") */
   sizes?: string
+  /** Skip responsive srcSet/picture — renders a plain <img> (default: false) */
+  optimized?: boolean
 }
 
 /** Responsive breakpoints where we generate resized variants */
@@ -91,12 +93,16 @@ export function OptimizedImage({
   loading = 'lazy',
   decoding = 'async',
   sizes = '100vw',
+  optimized = true,
   className,
   ...rest
 }: OptimizedImageProps) {
   const sources = useMemo(() => getResponsiveSources(src), [src])
 
-  if (!sources) {
+  // When optimized=false or no srcSet available, render a plain <img>
+  // This is useful for tiny thumbnails (e.g. marquee cards) where
+  // responsive srcSet would generate hundreds of redundant requests.
+  if (!optimized || !sources) {
     return (
       <img
         src={src}
