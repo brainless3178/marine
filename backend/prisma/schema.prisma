@@ -105,12 +105,12 @@ model Product {
   purchaseCost       Decimal?  @map("purchase_cost") @db.Decimal(12, 2)
   supplierReference  String?   @map("supplier_reference") @db.VarChar(255)
   productType        String    @default("physical") @map("product_type") @db.VarChar(30)
-  keyFeatures        String[]  @default([])
+  keyFeatures        String[]  @default([]) @map("key_features")
   compatibilityNotes String?   @map("compatibility_notes") @db.Text
   conditionNotes     String?   @map("condition_notes") @db.Text
   warrantyNotes      String?   @map("warranty_notes") @db.Text
-  includedItems      String[]  @default([])
-  excludedItems      String[]  @default([])
+  includedItems      String[]  @default([]) @map("included_items")
+  excludedItems      String[]  @default([]) @map("excluded_items")
   legacyId           String?   @map("legacy_id") @db.VarChar(50)
   createdBy          String?   @map("created_by") @db.Uuid
   updatedBy          String?   @map("updated_by") @db.Uuid
