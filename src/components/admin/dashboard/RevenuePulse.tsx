@@ -64,7 +64,7 @@ export function RevenuePulse({ orders }: Props) {
             />
             {/* Tooltip */}
             <div className="absolute bottom-full mb-2 hidden group-hover:block z-10">
-              <div className="rounded-lg bg-[var(--text-primary)] text-white px-2 py-1 text-[0.5rem] font-bold whitespace-nowrap shadow-lg">
+              <div className="rounded-lg bg-[var(--navy-deep)] text-white px-2 py-1 text-[0.5rem] font-bold whitespace-nowrap shadow-lg">
                 ${d.revenue.toLocaleString()}
               </div>
             </div>

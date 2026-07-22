@@ -124,7 +124,7 @@ export function ReturnAnalytics({ orders }: Props) {
             {analysis.monthlyTrend.map(m => (
               <div key={m.month} className="flex-1 flex flex-col items-center gap-0.5 group relative">
                 <div className="absolute bottom-full mb-1 hidden group-hover:block z-10">
-                  <div className="rounded-lg bg-[var(--text-primary)] text-white px-2 py-1 text-[0.5rem] font-bold whitespace-nowrap shadow-lg">
+                  <div className="rounded-lg bg-[var(--navy-deep)] text-white px-2 py-1 text-[0.5rem] font-bold whitespace-nowrap shadow-lg">
                     {m.rate}% ({m.count}/{m.total})
                   </div>
                 </div>
