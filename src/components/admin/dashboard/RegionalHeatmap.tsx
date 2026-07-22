@@ -97,7 +97,7 @@ export function RegionalHeatmap({ orders }: Props) {
                   </span>
                   {/* Tooltip */}
                   <div className="absolute right-0 bottom-full mb-1 hidden group-hover:block z-10">
-                    <div className="rounded-lg bg-[var(--text-primary)] text-white px-2 py-1 text-[0.5rem] font-bold whitespace-nowrap shadow-lg">
+                    <div className="rounded-lg bg-[var(--navy-deep)] text-white px-2 py-1 text-[0.5rem] font-bold whitespace-nowrap shadow-lg">
                       {r.flag} {r.country}: ${r.revenue.toLocaleString()} ({r.count} orders, {percentage}%)
                     </div>
                   </div>
