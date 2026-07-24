@@ -168,4 +168,4 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
       )}
     </article>
   )
-}
+})
