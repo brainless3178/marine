@@ -24,9 +24,17 @@ coverage
 
 # Junk files
 *.zip
+# Ignore images outside of public/images (e.g. random downloads)
+# but ALLOW all formats inside public/images/ so they deploy to Netlify
 *.jpeg
 *.jpg
 *.png
+!public/images/**/*.jpeg
+!public/images/**/*.jpg
+!public/images/**/*.png
+!public/images/*.jpeg
+!public/images/*.jpg
+!public/images/*.png
 !public/images/*.avif
 brand/
 .nul
