@@ -1,4 +1,4 @@
-import React from 'react'
+import { memo } from 'react'
 import { Check, MessageCircle, PackageCheck, ShoppingCart, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { TFunction } from 'i18next'
@@ -23,7 +23,7 @@ const conditionLabel: Record<Product['condition'], string> = {
   used: 'Used',
 }
 
-export function ProductCard({ product, added = false, onAddToCart, t, compact = false }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product, added = false, onAddToCart, t, compact = false }: ProductCardProps) {
   const effectivePrice = product.onSale && product.salePrice ? product.salePrice : product.price
   const canBuy = product.inStock && Boolean(onAddToCart)
   const { whatsappNumber } = useStoreSettings()
