@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { ArrowRight, Truck, ShieldCheck, Clock, Package, MessageCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAddToCart } from '../hooks/useAddToCart'
@@ -9,13 +10,13 @@ import { storefront } from '../lib/api'
 import { apiProductsToFrontend } from '../lib/adapters'
 import { products as staticProducts } from '../data/products'
 import { Hero } from '../components/sections/Hero'
-import { StatsBar } from '../components/sections/StatsBar'
-import { CategoriesGrid } from '../components/sections/CategoriesGrid'
-import { HowItWorks } from '../components/sections/HowItWorks'
-import { IndustriesTabs } from '../components/sections/IndustriesTabs'
-import { BrandsMarquee } from '../components/sections/BrandsMarquee'
-import { RFQSection } from '../components/sections/RFQSection'
-import { Testimonials } from '../components/sections/Testimonials'
+const StatsBar = lazy(() => import('../components/sections/StatsBar').then(m => ({ default: m.StatsBar })))
+const CategoriesGrid = lazy(() => import('../components/sections/CategoriesGrid').then(m => ({ default: m.CategoriesGrid })))
+const HowItWorks = lazy(() => import('../components/sections/HowItWorks').then(m => ({ default: m.HowItWorks })))
+const IndustriesTabs = lazy(() => import('../components/sections/IndustriesTabs').then(m => ({ default: m.IndustriesTabs })))
+const BrandsMarquee = lazy(() => import('../components/sections/BrandsMarquee').then(m => ({ default: m.BrandsMarquee })))
+const RFQSection = lazy(() => import('../components/sections/RFQSection').then(m => ({ default: m.RFQSection })))
+const Testimonials = lazy(() => import('../components/sections/Testimonials').then(m => ({ default: m.Testimonials })))
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { ProductCard } from '../components/ui/ProductCard'
 
@@ -138,13 +139,15 @@ export default function Home() {
         </div>
       </section>
 
-      <StatsBar />
-      <CategoriesGrid />
-      <HowItWorks />
-      <IndustriesTabs />
-      <BrandsMarquee />
-      <RFQSection />
-      <Testimonials />
+      <Suspense fallback={<div className="h-40 flex items-center justify-center text-sm text-[var(--text-muted)]">Loading sections...</div>}>
+        <StatsBar />
+        <CategoriesGrid />
+        <HowItWorks />
+        <IndustriesTabs />
+        <BrandsMarquee />
+        <RFQSection />
+        <Testimonials />
+      </Suspense>
     </>
   )
 }
