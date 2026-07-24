@@ -61,7 +61,18 @@ export function apiProductToFrontend(api: ApiProduct): Product {
 
   const effectivePrice = isOnSale && salePriceNum ? salePriceNum : regularPrice
 
-  const rawFilename = (api.images?.[0]?.url?.split('/').pop()?.split('?')[0] || 'placeholder.png')
+  let rawFilename = api.images?.[0]?.url?.split('/').pop()?.split('?')[0]
+  if (!rawFilename || rawFilename.includes('placeholder')) {
+    // If backend returns UUID or no image, attempt matching by numeric part of ID or SKU, or fallback to product-001.jpg
+    const match = api.id.match(/\d+/) || api.sku.match(/\d+/)
+    if (match) {
+      const num = String((parseInt(match[0], 10) % 255) + 1).padStart(3, '0')
+      rawFilename = `product-${num}.jpg`
+    } else {
+      rawFilename = 'placeholder.avif'
+    }
+  }
+
   const filename = rawFilename.startsWith('products/') ? rawFilename : `products/${rawFilename}`
 
   return {
@@ -83,11 +94,13 @@ export function apiProductToFrontend(api: ApiProduct): Product {
     stockCount: api.stockCount,
     customLabel: api.customLabel || undefined,
     customLabelColor: api.customLabelColor || undefined,
-    images: api.images?.map((img) => ({
-      url: img.url,
-      alt: img.altText || `${api.name} - ${img.label || 'View'}`,
-      label: img.label || undefined,
-    })) || [{ url: `/images/${api.images?.[0]?.url?.replace(/^\/images\//, '') || 'placeholder.png'}`, alt: api.name }],
+    images: api.images?.length
+      ? api.images.map((img) => ({
+          url: img.url.startsWith('http') || img.url.startsWith('/images/') ? img.url : `/images/products/${img.url.split('/').pop()}`,
+          alt: img.altText || `${api.name} - ${img.label || 'View'}`,
+          label: img.label || undefined,
+        }))
+      : [{ url: `/images/${filename}`, alt: api.name }],
     isNewArrival: api.isNewArrival,
     makeOffer: api.makeOfferEnabled,
   }

@@ -406,7 +406,7 @@ export default function ProductDetail() {
                 return (
                   <div key={item.id} className="bg-[var(--secondary-bg)] border border-[var(--border)] overflow-hidden transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1 rounded-xl group flex flex-col justify-between">
                     <Link to={`/product/${item.id}`} className="overflow-hidden bg-[var(--primary-bg)] flex items-center justify-center relative block">
-                      <OptimizedImage src={`/images/${item.filename}`} alt={item.name} width={400} height={400} loading="lazy" sizes="(max-width: 1024px) 50vw, 25vw" className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110" onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
+                      <OptimizedImage src={getProductImageUrl(item.filename)} alt={item.name} width={400} height={400} loading="lazy" sizes="(max-width: 1024px) 50vw, 25vw" className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110" onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
                       {item.customLabel && (
                         <span className="absolute top-2 left-2 z-10 px-2 py-0.5 text-xs font-extrabold uppercase rounded" style={{ backgroundColor: item.customLabelColor || '#159a67', color: isLightColor(item.customLabelColor || '#159a67') ? '#1a1a1a' : '#ffffff' }}>{item.customLabel}</span>
                       )}
