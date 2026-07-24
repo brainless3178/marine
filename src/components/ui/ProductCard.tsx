@@ -1,3 +1,4 @@
+import React from 'react'
 import { Check, MessageCircle, PackageCheck, ShoppingCart, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { TFunction } from 'i18next'
