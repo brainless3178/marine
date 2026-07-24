@@ -20,7 +20,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
 }
 
 /** Responsive breakpoints where we generate resized variants */
-const RESPONSIVE_WIDTHS = [400, 1200] as const
+const RESPONSIVE_WIDTHS = [400, 600, 800, 1200] as const
 
 /**
  * Build srcSet string for a given format.
