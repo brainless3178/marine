@@ -8,7 +8,6 @@ import { type ReactNode, useState, useEffect } from 'react'
  */
 export function PayPalProvider({ children }: { children: ReactNode }) {
   const [clientId, setClientId] = useState<string | null>(null)
-  const [error, setError] = useState(false)
 
   useEffect(() => {
     fetch('/api/storefront/payments/client-id')
@@ -32,7 +31,7 @@ export function PayPalProvider({ children }: { children: ReactNode }) {
 
   // If PayPal isn't configured or errored, render children without the provider
   // so the rest of the app still works.
-  if (error || !clientId) {
+  if (!clientId) {
     return <>{children}</>
   }
 
