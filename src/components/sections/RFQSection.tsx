@@ -49,7 +49,7 @@ export function RFQSection() {
               />
             </div>
             <h3 className="text-xl font-bold mb-3 text-[var(--text-primary)]">{t('rfq.success')}</h3>
-            <p className="font-mono text-lg text-[var(--accent-gold)] mb-2">{t('rfq.rfqId')}{rfqId}</p>
+            <p className="font-mono text-lg text-[var(--accent-primary)] mb-2">{t('rfq.rfqId')}{rfqId}</p>
             <p className="text-sm text-[var(--text-secondary)]">{t('rfq.successSub')}</p>
           </div>
         </div>
@@ -115,7 +115,7 @@ export function RFQSection() {
               value={formData.name}
               onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
               placeholder="Your full name"
-              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(200,147,10,0.1)] transition-all outline-none"
+              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none"
             />
           </div>
           <div className="mb-5">
@@ -125,7 +125,7 @@ export function RFQSection() {
               value={formData.company}
               onChange={(e) => setFormData((p) => ({ ...p, company: e.target.value }))}
               placeholder="Company name"
-              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(200,147,10,0.1)] transition-all outline-none"
+              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none"
             />
           </div>
           <div className="mb-5">
@@ -136,7 +136,7 @@ export function RFQSection() {
               value={formData.email}
               onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
               placeholder="you@company.com"
-              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(200,147,10,0.1)] transition-all outline-none"
+              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none"
             />
           </div>
           <div className="mb-5">
@@ -146,7 +146,7 @@ export function RFQSection() {
               value={formData.phone}
               onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
               placeholder={t('rfq.placeholders.phone') || '+1 555 000 0000'}
-              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(200,147,10,0.1)] transition-all outline-none"
+              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none"
             />
           </div>
           <div className="mb-5">
@@ -157,7 +157,7 @@ export function RFQSection() {
               onChange={(e) => setFormData((p) => ({ ...p, productDesc: e.target.value }))}
               rows={3}
               placeholder="Describe the part, include SKU or brand if known"
-              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(200,147,10,0.1)] transition-all outline-none resize-vertical min-h-[80px]"
+              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none resize-vertical min-h-[80px]"
             />
           </div>
           <div className="mb-5">
@@ -167,7 +167,7 @@ export function RFQSection() {
               value={formData.quantity}
               onChange={(e) => setFormData((p) => ({ ...p, quantity: e.target.value }))}
               min={1}
-              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(200,147,10,0.1)] transition-all outline-none"
+              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none"
             />
           </div>
           <div className="mb-7">
@@ -175,7 +175,7 @@ export function RFQSection() {
             <select
               value={formData.urgency}
               onChange={(e) => setFormData((p) => ({ ...p, urgency: e.target.value }))}
-              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(200,147,10,0.1)] transition-all outline-none appearance-none"
+              className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none appearance-none"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat',

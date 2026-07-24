@@ -9,6 +9,10 @@ import { HeroProductMarquee } from './HeroProductMarquee'
 import { OptimizedImage } from '../ui/OptimizedImage'
 import type { Product } from '../../types'
 
+import { getProductImageUrl } from '../../lib/utils'
+
+import { products as staticProducts } from '../../data/products'
+
 export function Hero() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -31,9 +35,13 @@ export function Hero() {
         const res = await storefront.products.list({ limit: '16' })
         if (!cancelled && res.products?.length) {
           setHeroProducts(apiProductsToFrontend(res.products).slice(0, 16))
+          return
         }
       } catch {
-        // API unavailable — leave empty
+        // API unavailable — fallback to static catalog
+      }
+      if (!cancelled) {
+        setHeroProducts(staticProducts.slice(0, 16))
       }
     }
     load()
@@ -142,7 +150,7 @@ export function Hero() {
 
   return (
     <section className="relative flex flex-col overflow-hidden hero-maritime-bg text-white">
-      <div className="absolute top-0 right-0 w-[min(520px,80vw)] h-[min(520px,80vw)] rounded-full bg-[var(--accent-gold)]/[0.03] blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[min(520px,80vw)] h-[min(520px,80vw)] rounded-full bg-[var(--accent-primary)]/[0.04] blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[min(420px,70vw)] h-[min(420px,70vw)] rounded-full bg-[var(--accent-teal)]/[0.04] blur-[100px] pointer-events-none" />
 
       <div
@@ -157,12 +165,12 @@ export function Hero() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-[var(--accent-gold)] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[var(--accent-primary)] animate-pulse" />
               {t('hero.label')}
             </span>
 
             <h1
-              className={`font-display text-[clamp(40px,5.5vw,68px)] font-bold leading-[1.0] tracking-[-0.025em] transition-all duration-700 delay-100 ${
+              className={`font-display text-[clamp(36px,5vw,62px)] font-bold leading-[1.12] tracking-tight transition-all duration-700 delay-100 ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
               }`}
             >
@@ -211,12 +219,12 @@ export function Hero() {
                     aria-controls="hero-suggestions"
                     role="combobox"
                     autoComplete="off"
-                    className="h-12 w-full rounded-xl border border-white/10 bg-white pl-11 pr-4 text-sm font-semibold text-[var(--navy-deep)] outline-none placeholder:text-[var(--text-muted)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.25)]"
+                    className="h-12 w-full rounded-xl border border-white/10 bg-white pl-11 pr-4 text-sm font-semibold text-[#111827] outline-none placeholder:text-gray-500 focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)]"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[var(--accent-gold)] px-5 text-sm font-black text-[var(--navy-deep)] transition hover:bg-[var(--gold-light)]"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] px-5 text-sm font-black text-white transition hover:bg-[var(--accent-primary-hover)]"
                 >
                   <Search size={16} />
                   {t('hero.searchButton', { defaultValue: 'Search' })}
@@ -228,7 +236,7 @@ export function Hero() {
                     key={term}
                     type="button"
                     onClick={() => { setSearchQuery(term); navigate(`/products?search=${encodeURIComponent(term)}`) }}
-                    className="rounded-full border border-white/12 bg-white/[0.05] px-3 py-1.5 text-xs font-bold text-white/65 transition hover:border-[var(--accent-gold)]/40 hover:text-[var(--accent-gold)]"
+                    className="rounded-full border border-white/12 bg-white/[0.05] px-3 py-1.5 text-xs font-bold text-white/65 transition hover:border-[var(--accent-primary)]/40 hover:text-[var(--accent-primary)]"
                   >
                     {term}
                   </button>
@@ -261,7 +269,7 @@ export function Hero() {
                         className={`grid w-full grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-[var(--border)] px-3 py-3 text-left transition last:border-b-0 ${searchSuggestions.indexOf(product) === suggestionIndex ? 'bg-[var(--surface-soft)]' : 'hover:bg-[var(--primary-bg)]'}`}
                       >
                         <span className="h-14 w-14 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-soft)]">
-                          <img src={`/images/${product.filename}`} alt={product.name} width={56} height={56} loading="lazy" decoding="async" className="h-full w-full object-cover" onError={(event) => { const img = event.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
+                          <img src={getProductImageUrl(product.filename)} alt={product.name} width={56} height={56} loading="lazy" decoding="async" className="h-full w-full object-cover" onError={(event) => { const img = event.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
                         </span>
                         <span className="min-w-0">
                           <span className="block truncate text-sm font-black text-[var(--text-primary)]">{product.name}</span>
@@ -272,7 +280,7 @@ export function Hero() {
                           </span>
                         </span>
                         <span className="hidden text-right sm:block">
-                          <span className="block font-display text-lg font-black text-[var(--brick-ember)]">${effectivePrice.toFixed(2)}</span>
+                          <span className="block font-display text-lg font-black text-[var(--accent-primary)]">${effectivePrice.toFixed(2)}</span>
                           <span className={`text-[11px] font-bold ${product.inStock ? 'text-success' : 'text-danger'}`}>
                             {product.inStock ? `${product.stockCount} in stock` : 'Out of stock'}
                           </span>
@@ -320,8 +328,8 @@ export function Hero() {
               ].map((item) => {
                 const Icon = item.icon
                 return (
-                  <span key={item.label} className="flex items-center gap-2.5 rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-white/70 backdrop-blur-sm hover:border-[var(--accent-gold)]/30 transition-all duration-300">
-                    <Icon size={17} className="text-[var(--accent-gold)] flex-shrink-0" />
+                  <span key={item.label} className="flex items-center gap-2.5 rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-white/70 backdrop-blur-sm hover:border-[var(--accent-primary)]/30 transition-all duration-300">
+                    <Icon size={17} className="text-[var(--accent-primary)] flex-shrink-0" />
                     {item.label}
                   </span>
                 )
@@ -332,7 +340,7 @@ export function Hero() {
           {/* Right Column */}
           <div className={`transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-br from-[var(--accent-gold)]/10 via-transparent to-[var(--accent-teal)]/5 rounded-3xl blur-xl pointer-events-none" />
+              <div className="absolute -inset-4 bg-gradient-to-br from-[var(--accent-primary)]/10 via-transparent to-[var(--accent-teal)]/5 rounded-3xl blur-xl pointer-events-none" />
               <div className="relative glass-card p-4 shadow-[0_32px_80px_var(--shadow-heavy)]">
                 <div className="flex items-center justify-between mb-4">
                   <span className="type-mono text-xs uppercase tracking-widest text-white/68">{t('hero.liveInventory')}</span>
@@ -344,7 +352,7 @@ export function Hero() {
                 <div key={`spot-${animKey}`} className="animate-word-cycle">
                   <div className="w-full aspect-[5/4] rounded-xl overflow-hidden bg-white/5 border border-white/10 mb-4">
                     <OptimizedImage
-                      src={`/images/${heroProducts[activeIndex]?.filename || 'product-001.jpg'}`}
+                      src={getProductImageUrl(heroProducts[activeIndex]?.filename || 'product-001.jpg')}
                       alt={rotatingNames[activeIndex] || ''}
                       loading="eager"
                       width={600}
@@ -374,7 +382,7 @@ export function Hero() {
       <div className="relative z-10 w-full pb-4 pt-3 border-t border-white/10 bg-white/[0.03] backdrop-blur-sm">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 mb-3 flex items-center justify-between">
           <span className="type-mono text-xs uppercase tracking-widest text-white/68">{t('hero.newArrivals')}</span>
-          <a href="/products" className="type-mono text-xs uppercase tracking-wider text-white/60 hover:text-[var(--accent-gold)] transition-colors no-underline flex items-center gap-1">
+          <a href="/products" className="type-mono text-xs uppercase tracking-wider text-white/60 hover:text-[var(--accent-primary)] transition-colors no-underline flex items-center gap-1">
             {t('hero.viewAll')} <ArrowRight size={12} />
           </a>
         </div>

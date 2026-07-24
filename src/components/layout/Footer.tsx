@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react'
 
 function LinkedInIcon({ size = 16 }: { size?: number }) {
@@ -37,13 +37,13 @@ export function Footer() {
               {t('footer.desc')}
             </p>
             <div className="flex gap-3">
-              <a href="https://www.linkedin.com/company/alka-traders" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-white/80 hover:border-[var(--accent-gold)] hover:text-[var(--accent-gold)] transition-all">
+              <a href="https://www.linkedin.com/company/alka-traders" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-white/80 hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all">
                 <LinkedInIcon size={16} />
               </a>
-              <a href={`https://wa.me/${settings.whatsappNumber}`} aria-label="WhatsApp" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-[var(--success)] hover:border-[var(--accent-gold)] transition-all">
+              <a href={`https://wa.me/${settings.whatsappNumber}`} aria-label="WhatsApp" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-[var(--success)] hover:border-[var(--accent-primary)] transition-all">
                 <MessageCircle size={16} />
               </a>
-              <a href={`mailto:${settings.rfqEmail}`} aria-label="Email" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-white/80 hover:border-[var(--accent-gold)] hover:text-[var(--accent-gold)] transition-all">
+              <a href={`mailto:${settings.rfqEmail}`} aria-label="Email" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-white/80 hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all">
                 <Mail size={16} />
               </a>
             </div>
@@ -52,37 +52,37 @@ export function Footer() {
           {/* Quick Links */}
           <div className="flex flex-col gap-2.5">
             <span className="font-body font-bold text-xs tracking-[3px] uppercase text-white/65 mb-2">{t('footer.quickLinks')}</span>
-            <Link to="/" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.linkHome')}</Link>
-            <Link to="/products" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.linkProducts')}</Link>
-            <Link to="/brands" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.linkBrands')}</Link>
-            <Link to="/industries" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.linkIndustries')}</Link>
-            <Link to="/rfq" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.linkRfq')}</Link>
+            <Link to="/" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkHome')}</Link>
+            <Link to="/products" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkProducts')}</Link>
+            <Link to="/brands" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkBrands')}</Link>
+            <Link to="/industries" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkIndustries')}</Link>
+            <Link to="/rfq" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkRfq')}</Link>
           </div>
 
           {/* Categories */}
           <div className="flex flex-col gap-2.5">
             <span className="font-body font-bold text-xs tracking-[3px] uppercase text-white/65 mb-2">{t('footer.productCategories')}</span>
-            <Link to="/products?category=marine" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.catMarine')}</Link>
-            <Link to="/products?category=electrical" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.catElectrical')}</Link>
-            <Link to="/products?category=hydraulic" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.catHydraulic')}</Link>
-            <Link to="/products?category=pneumatic" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.catPneumatic')}</Link>
-            <Link to="/products?category=spares" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.catSpares')}</Link>
-            <Link to="/products?category=surplus" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors">{t('footer.catSurplus')}</Link>
+            <Link to="/products?category=marine" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catMarine')}</Link>
+            <Link to="/products?category=electrical" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catElectrical')}</Link>
+            <Link to="/products?category=hydraulic" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catHydraulic')}</Link>
+            <Link to="/products?category=pneumatic" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catPneumatic')}</Link>
+            <Link to="/products?category=spares" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catSpares')}</Link>
+            <Link to="/products?category=surplus" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catSurplus')}</Link>
           </div>
 
           {/* Contact */}
           <div className="flex flex-col gap-2.5">
             <span className="font-body font-bold text-xs tracking-[3px] uppercase text-white/65 mb-2">{t('footer.contactUs')}</span>
-            <a href={`mailto:${settings.rfqEmail}`} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors gap-2">
+            <a href={`mailto:${settings.rfqEmail}`} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors gap-2">
               <Mail size={14} /> {settings.rfqEmail}
             </a>
-            <a href={`tel:${settings.phoneNumber}`} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-gold)] transition-colors gap-2">
+            <a href={`tel:${settings.phoneNumber}`} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors gap-2">
               <Phone size={14} /> {settings.phoneNumber}
             </a>
             <p className="text-sm text-white/78 flex items-start gap-2">
               <MapPin size={14} className="mt-0.5 flex-shrink-0" />              Global Operations: Singapore · Dubai · Rotterdam · Mumbai
             </p>
-            <a href={`https://wa.me/${settings.whatsappNumber}`} className="inline-flex items-center gap-2 rounded-lg text-xs font-bold border border-white/12 bg-white/8 text-white px-[18px] py-[10px] mt-3 hover:border-[var(--accent-gold)] transition-all no-underline">
+            <a href={`https://wa.me/${settings.whatsappNumber}`} className="inline-flex items-center gap-2 rounded-lg text-xs font-bold border border-white/12 bg-white/8 text-white px-[18px] py-[10px] mt-3 hover:border-[var(--accent-primary)] transition-all no-underline">
               <MessageCircle size={14} className="text-success" /> {t('contact.whatsapp')}
             </a>
           </div>

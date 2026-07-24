@@ -81,7 +81,7 @@ export default function About() {
         canonical="/about"
       />
       {/* Hero */}
-      <section className="py-24 bg-secondary-bg text-center relative overflow-hidden">
+      <section className="py-24 bg-[var(--secondary-bg)] text-center relative overflow-hidden">
         <div className="absolute inset-0 dot-grid-bg opacity-40" />
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
           <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
@@ -112,16 +112,16 @@ export default function About() {
             {/* Animated accent line — drawn by GSAP */}
             <div
               ref={timelineLineRef}
-              className="absolute left-[3px] top-0 w-[2px] bg-accent-blue/50"
+              className="absolute left-[3px] top-0 w-[2px] bg-[var(--accent-primary)]/50"
               style={{ height: '0%' }}
             />
             {timelineEvents.map((event) => (
               <div key={event.year} className="about-timeline-event relative pb-10 last:pb-0">
-                <div className="about-timeline-dot absolute -left-[41px] w-8 h-8 rounded-full bg-surface border-2 border-accent-blue flex items-center justify-center font-display font-bold text-xs text-accent-blue z-10">
+                <div className="about-timeline-dot absolute -left-[41px] w-8 h-8 rounded-full bg-[var(--surface)] border-2 border-[var(--accent-primary)] flex items-center justify-center font-display font-bold text-xs text-[var(--accent-primary)] z-10">
                   {event.year.slice(2)}
                 </div>
                 <div className="ml-4">
-                  <span className="font-mono text-xs text-accent-blue">{event.year}</span>
+                  <span className="font-mono text-xs text-[var(--accent-primary)]">{event.year}</span>
                   <h3 className="text-base font-semibold mt-1">{event.title}</h3>
                   <p className="text-sm text-[var(--text-secondary)] mt-1">{event.description}</p>
                 </div>
@@ -132,7 +132,7 @@ export default function About() {
       </section>
 
       {/* Offices */}
-      <section className="py-24 bg-secondary-bg">
+      <section className="py-24 bg-[var(--secondary-bg)]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
             {t('about.hubLabel')}
@@ -144,16 +144,16 @@ export default function About() {
             {offices.map((office) => (
               <div
                 key={office.city}
-                className="bg-surface border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 hover:border-l-accent-blue hover:-translate-y-1"
+                className="bg-[var(--surface)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1"
               >
                 <h3 className="font-display font-bold text-lg mb-1">{office.city}</h3>
                 <p className="text-xs text-[var(--text-muted)] mb-3">{office.country}</p>
                 <p className="text-xs text-[var(--text-secondary)] mb-3 flex items-start gap-1.5">
-                  <MapPin size={12} className="mt-0.5 flex-shrink-0 text-accent-blue" />
+                  <MapPin size={12} className="mt-0.5 flex-shrink-0 text-[var(--accent-primary)]" />
                   {office.address}
                 </p>
                 <p className="text-xs text-[var(--text-secondary)] mb-1 flex items-center gap-1.5">
-                  <Clock size={12} className="text-accent-blue flex-shrink-0" />
+                  <Clock size={12} className="text-[var(--accent-primary)] flex-shrink-0" />
                   {office.timezone.split('/')[1]}
                 </p>
                 <p className="text-xs text-[var(--text-secondary)]">{office.phone}</p>
@@ -175,7 +175,7 @@ export default function About() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
             {teamMembers.map((member) => (
               <div key={member.name} className="text-center">
-                <div className="w-20 h-20 rounded-full bg-surface border border-accent-blue flex items-center justify-center mx-auto mb-3 font-display font-bold text-lg text-accent-blue">
+                <div className="w-20 h-20 rounded-full bg-[var(--surface)] border border-[var(--accent-primary)] flex items-center justify-center mx-auto mb-3 font-display font-bold text-lg text-[var(--accent-primary)]">
                   {member.initials}
                 </div>
                 <h4 className="text-sm font-semibold">{member.name}</h4>

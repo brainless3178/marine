@@ -61,7 +61,7 @@ export default function Brands() {
         canonical="/brands"
       />
       {/* Hero Section */}
-      <section className="py-20 bg-secondary-bg text-center">
+      <section className="py-20 bg-[var(--secondary-bg)] text-center">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
             {t('brands.label')}
@@ -109,7 +109,7 @@ export default function Brands() {
                 {[...row, ...row].map((img, i) => (
                   <div
                     key={`${rowIndex}-${i}`}
-                    className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-[var(--border)] bg-surface/50 hover:border-[var(--accent-gold)]/40 hover:shadow-lg transition-all duration-300 group"
+                    className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface)]/50 hover:border-[var(--accent-gold)]/40 hover:shadow-lg transition-all duration-300 group"
                   >
                     <OptimizedImage
                       src={`/brand/${img}`}
@@ -144,8 +144,8 @@ export default function Brands() {
                 aria-pressed={activeFilter === f}
                 className={`px-5 py-2.5 font-body font-medium text-xs border transition-all duration-300 ${
                   activeFilter === f
-                    ? 'bg-accent-blue border-accent-blue text-[var(--text-primary)]'
-                    : 'bg-surface border-[var(--border)] text-[var(--text-secondary)] hover:border-accent-blue hover:text-[var(--text-primary)]'
+                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white rounded-xl'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)] rounded-xl'
                 }`}
               >
                 {f === 'All' ? t('brands.all') : t(`brands.${f.toLowerCase()}`)}
@@ -158,17 +158,17 @@ export default function Brands() {
               <div
                 key={brand.id}
                 onClick={() => navigate(`/products?brand=${brand.slug}`)}
-                className="bg-secondary-bg border border-[var(--border)] border-l-[3px] border-l-transparent p-6 cursor-pointer transition-all duration-300 hover:border-l-accent-blue hover:-translate-y-1"
+                className="bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 cursor-pointer transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1"
               >
                 <h3 className="heading-xl mb-2">{brand.name}</h3>
                 <div className="flex gap-1.5 flex-wrap mb-3">
                   {brand.sectors.map((s) => (
-                    <span key={s} className="px-2 py-0.5 text-xs font-mono border border-[var(--border)] text-[var(--text-muted)] bg-surface">
+                    <span key={s} className="px-2 py-0.5 text-xs font-mono border border-[var(--border)] text-[var(--text-muted)] bg-[var(--surface)]">
                       {s}
                     </span>
                   ))}
                 </div>
-                <span className="font-mono text-xs text-accent-gold">{t('brands.productCount', { count: brand.productCount })}</span>
+                <span className="font-mono text-xs text-[var(--accent-gold)]">{t('brands.productCount', { count: brand.productCount })}</span>
               </div>
             ))}
           </div>

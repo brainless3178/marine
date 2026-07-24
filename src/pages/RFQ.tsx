@@ -1,4 +1,4 @@
-﻿import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Shield, Clock, Globe, MessageCircle, Mail, ChevronDown, Phone, Calendar, Zap, TriangleAlert, Loader2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
@@ -130,13 +130,13 @@ export default function RFQ() {
             {t('rfq.successSub')}
           </p>
           <div className="flex gap-4 flex-wrap justify-center mt-8">
-            <a href="/rfq" className="inline-flex items-center gap-2 text-xs font-semibold border border-accent-blue text-accent-blue px-[18px] py-[10px] hover:bg-accent-blue/10 transition-all no-underline">
+            <a href="/rfq" className="inline-flex items-center gap-2 text-xs font-semibold border border-[var(--accent-primary)] text-[var(--accent-primary)] px-[18px] py-[10px] hover:bg-[var(--accent-primary)]/10 transition-all no-underline rounded-xl">
               {t('rfq.submitAnother')}
             </a>
-            <a href="/products" className="inline-flex items-center gap-2 text-xs font-semibold border border-accent-blue text-accent-blue px-[18px] py-[10px] hover:bg-accent-blue/10 transition-all no-underline">
+            <a href="/products" className="inline-flex items-center gap-2 text-xs font-semibold border border-[var(--accent-primary)] text-[var(--accent-primary)] px-[18px] py-[10px] hover:bg-[var(--accent-primary)]/10 transition-all no-underline rounded-xl">
               {t('rfq.browseProducts')}
             </a>
-            <a href={`https://wa.me/${whatsappNumber}`} className="inline-flex items-center gap-2 text-xs font-semibold border border-success text-success px-[18px] py-[10px] hover:bg-success/10 transition-all no-underline">
+            <a href={`https://wa.me/${whatsappNumber}`} className="inline-flex items-center gap-2 text-xs font-semibold border border-[var(--success)] text-[var(--success)] px-[18px] py-[10px] hover:bg-[var(--success)]/10 transition-all no-underline rounded-xl">
               <MessageCircle size={14} /> {t('rfq.whatsappUsNow')}
             </a>
           </div>
@@ -164,13 +164,13 @@ export default function RFQ() {
             {t('rfq.sub')}
           </p>
           <div className="flex justify-center gap-6 mt-7 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[var(--info-border)] text-accent-blue bg-surface">
+            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[var(--info-border)] text-[var(--accent-primary)] bg-[var(--surface)]">
               <Shield size={12} /> {t('rfq.verifiedSuppliers')}
             </span>
-            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[var(--warning-border)] text-accent-gold bg-surface">
+            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[var(--warning-border)] text-[var(--accent-gold)] bg-[var(--surface)]">
               <Clock size={12} /> {t('rfq.hourResponse')}
             </span>
-            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[var(--success-border)] text-success bg-surface">
+            <span className="inline-flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 border border-[var(--success-border)] text-[var(--success)] bg-[var(--surface)]">
               <Globe size={12} /> {t('rfq.countries')}
             </span>
           </div>
@@ -189,15 +189,15 @@ export default function RFQ() {
                     <div className="flex items-center gap-2.5">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-sm border-2 transition-all ${
                         step === rfqStep
-                          ? 'border-accent-blue bg-accent-blue text-[var(--text-primary)]'
+                          ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-white'
                           : step < rfqStep
-                          ? 'border-success bg-success text-[var(--btn-success-text)]'
-                          : 'border-[var(--border)] bg-surface text-[var(--text-muted)]'
+                          ? 'border-[var(--success)] bg-[var(--success)] text-white'
+                          : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]'
                       }`}>
                         {step}
                       </div>
                       <span className={`text-xs font-medium hidden sm:block ${
-                        step === rfqStep ? 'text-accent-blue' : step < rfqStep ? 'text-success' : 'text-[var(--text-muted)]'
+                        step === rfqStep ? 'text-[var(--accent-primary)]' : step < rfqStep ? 'text-[var(--success)]' : 'text-[var(--text-muted)]'
                       }`}>
                         {step === 1 ? t('rfq.contactStep') : step === 2 ? t('rfq.productStep') : t('rfq.urgencyStep')}
                       </span>
@@ -260,7 +260,7 @@ export default function RFQ() {
                       </div>
                     </div>
                     <button type="button" onClick={() => goToStep(2)}
-                      className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--btn-blue-text)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all mt-2">
+                      className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all mt-2 rounded-xl">
                       {t('rfq.nextProduct')}
                     </button>
                   </div>
@@ -303,11 +303,11 @@ export default function RFQ() {
                     </div>
                     <div className="grid grid-cols-2 gap-5 mt-2">
                       <button type="button" onClick={() => goToStep(1)}
-                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-accent-blue font-semibold text-sm border border-accent-blue hover:bg-accent-blue/10 transition-all">
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-[var(--accent-primary)] font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/10 transition-all rounded-xl">
                         {t('rfq.back')}
                       </button>
                       <button type="button" onClick={() => goToStep(3)}
-                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--btn-blue-text)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all">
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all rounded-xl">
                         {t('rfq.nextUrgency')}
                       </button>
                     </div>
@@ -327,15 +327,15 @@ export default function RFQ() {
                               onChange={() => update('urgency', u)} className="hidden" />
                             <div className={`flex flex-col items-center gap-1.5 p-5 bg-[var(--primary-bg)] border-2 text-center transition-all ${
                               formData.urgency === u
-                                ? u === 'urgent' ? 'border-accent-gold bg-[var(--warning-subtle)]'
-                                  : u === 'emergency' ? 'border-danger bg-[var(--danger-glow)]'
-                                  : 'border-accent-blue bg-[var(--info-subtle)]'
+                                ? u === 'urgent' ? 'border-[var(--accent-gold)] bg-[var(--warning-subtle)]'
+                                  : u === 'emergency' ? 'border-[var(--danger)] bg-[var(--danger-glow)]'
+                                  : 'border-[var(--accent-primary)] bg-[var(--info-subtle)]'
                                 : u === 'urgent' ? 'border-[var(--warning-border)]'
                                   : u === 'emergency' ? 'border-[var(--danger-border)]'
                                   : 'border-[var(--border)]'
                             }`}>
                               <span className={`flex items-center justify-center ${
-                                u === 'urgent' ? 'text-accent-gold' : u === 'emergency' ? 'text-danger' : 'text-accent-blue'
+                                u === 'urgent' ? 'text-[var(--accent-gold)]' : u === 'emergency' ? 'text-[var(--danger)]' : 'text-[var(--accent-primary)]'
                               }`}>
                                 {u === 'standard' ? <Calendar size={24} /> : u === 'urgent' ? <Zap size={24} /> : <TriangleAlert size={24} />}
                               </span>
@@ -369,7 +369,7 @@ export default function RFQ() {
                     <label className="flex items-center gap-2 mb-5 cursor-pointer">
                       <input type="checkbox" checked={formData.consent}
                         onChange={(e) => update('consent', e.target.checked)}
-                        className="accent-accent-blue w-4 h-4 cursor-pointer" />
+                        className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer" />
                       <span className={`text-xs ${errors.consent ? 'text-danger' : 'text-[var(--text-secondary)]'}`}>
                         {t('rfq.consent')}
                       </span>
@@ -377,11 +377,11 @@ export default function RFQ() {
                     {submitError && <p className="text-xs text-[var(--danger)] mb-4">{submitError}</p>}
                     <div className="grid grid-cols-2 gap-5">
                       <button type="button" onClick={() => goToStep(2)}
-                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-accent-blue font-semibold text-sm border border-accent-blue hover:bg-accent-blue/10 transition-all">
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-[var(--accent-primary)] font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/10 transition-all rounded-xl">
                         {t('rfq.back')}
                       </button>
                       <button type="submit" disabled={submitting}
-                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--btn-blue-text)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal transition-all shimmer-btn relative overflow-hidden disabled:opacity-50">
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all shimmer-btn relative overflow-hidden disabled:opacity-50 rounded-xl">
                         {submitting ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : t('rfq.submit')}
                       </button>
                     </div>
@@ -392,13 +392,13 @@ export default function RFQ() {
 
             {/* Sidebar */}
             <aside className="lg:sticky lg:top-20">
-              <div className="bg-surface border border-[var(--border)] p-6">
+              <div className="bg-[var(--surface)] border border-[var(--border)] p-6">
                 <h4 className="text-sm font-semibold mb-4">{t('rfq.whyChoose')}</h4>
                 <div className="flex flex-col">
                   {faqItems.map((faq, i) => (
                     <div key={i} className="border-b border-[var(--border)] last:border-b-0">
                       <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                        className="flex justify-between items-center w-full py-4 text-sm font-semibold text-left text-[var(--text-primary)] hover:text-accent-blue transition-colors bg-transparent border-none cursor-pointer">
+                        className="flex justify-between items-center w-full py-4 text-sm font-semibold text-left text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors bg-transparent border-none cursor-pointer">
                         <span>{faq.question}</span>
                         <ChevronDown size={14} className={`text-[var(--text-muted)] transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
                       </button>
@@ -408,17 +408,17 @@ export default function RFQ() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-6 p-5 bg-surface border border-[var(--border)]">
+                <div className="mt-6 p-5 bg-[var(--surface)] border border-[var(--border)]">
                   <p className="text-sm font-semibold mb-3">{t('rfq.questionsContact')}</p>
-                  <a href={`mailto:${rfqEmail}`} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] no-underline hover:text-accent-blue mb-2">
-                    <Mail size={14} className="text-accent-blue" /> {rfqEmail}
+                  <a href={`mailto:${rfqEmail}`} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] no-underline hover:text-[var(--accent-primary)] mb-2">
+                    <Mail size={14} className="text-[var(--accent-primary)]" /> {rfqEmail}
                   </a>
-                  <a href={`tel:${phoneNumber}`} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] no-underline hover:text-accent-blue mb-2">
-                    <Phone size={14} className="text-accent-blue" /> {phoneNumber}
+                  <a href={`tel:${phoneNumber}`} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] no-underline hover:text-[var(--accent-primary)] mb-2">
+                    <Phone size={14} className="text-[var(--accent-primary)]" /> {phoneNumber}
                   </a>
                   <a href={`https://wa.me/${whatsappNumber}`}
-                    className="flex items-center justify-center gap-2 text-xs font-semibold border border-accent-blue text-accent-blue px-[18px] py-[10px] mt-3 hover:bg-accent-blue/10 transition-all no-underline">
-                    <MessageCircle size={14} className="text-success" /> {t('contact.whatsapp')}
+                    className="flex items-center justify-center gap-2 text-xs font-semibold border border-[var(--accent-primary)] text-[var(--accent-primary)] px-[18px] py-[10px] mt-3 hover:bg-[var(--accent-primary)]/10 transition-all no-underline rounded-xl">
+                    <MessageCircle size={14} className="text-[var(--success)]" /> {t('contact.whatsapp')}
                   </a>
                 </div>
               </div>

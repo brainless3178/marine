@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { Anchor, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 
 export default function AdminLogin() {
@@ -43,9 +43,11 @@ export default function AdminLogin() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--accent-gold)] shadow-[0_12px_40px_rgba(232,170,36,0.3)]">
-            <Anchor size={28} className="text-navy-deep" />
-          </div>
+          <img
+            src="/images/alka-traders-logo.jpeg"
+            alt="Alka Traders Logo"
+            className="mx-auto mb-4 h-16 w-16 rounded-2xl object-cover shadow-[0_12px_40px_var(--focus-ring)]"
+          />
           <h1 className="font-display text-2xl font-extrabold text-white">
             Alka Traders
           </h1>
@@ -72,7 +74,7 @@ export default function AdminLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@alkatraders.com"
-                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/55 outline-none transition-all focus:border-[var(--accent-gold)] focus:bg-white/10 focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]"
+                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/55 outline-none transition-all focus:border-[var(--accent-primary)] focus:bg-white/10 focus:shadow-[0_0_0_3px_var(--focus-ring)]"
                 />
               </div>
             </div>
@@ -92,7 +94,7 @@ export default function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-11 text-sm text-white placeholder:text-white/55 outline-none transition-all focus:border-[var(--accent-gold)] focus:bg-white/10 focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]"
+                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-11 text-sm text-white placeholder:text-white/55 outline-none transition-all focus:border-[var(--accent-primary)] focus:bg-white/10 focus:shadow-[0_0_0_3px_var(--focus-ring)]"
                 />
                 <button
                   type="button"
@@ -116,10 +118,10 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[var(--accent-gold)] to-[var(--gold-light)] py-3.5 text-sm font-extrabold text-navy-deep transition-all hover:shadow-[0_8px_30px_rgba(232,170,36,0.3)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] py-3.5 text-sm font-extrabold text-white transition-all hover:bg-[var(--accent-primary-hover)] hover:shadow-[0_8px_30px_var(--focus-ring)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {loading ? (
-                <div className="h-5 w-5 rounded-full border-2 border-navy-deep border-t-transparent animate-spin" />
+                <div className="h-5 w-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
               ) : (
                 <>
                   Sign In
@@ -136,7 +138,7 @@ export default function AdminLogin() {
         <p className="mt-6 text-center text-xs text-white/60">
           <a
             href="/"
-            className="text-white/72 hover:text-[var(--accent-gold)] transition-colors font-semibold"
+            className="text-white/72 hover:text-[var(--accent-primary)] transition-colors font-semibold"
           >
             ← Back to Storefront
           </a>

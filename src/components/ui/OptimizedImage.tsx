@@ -99,6 +99,16 @@ export function OptimizedImage({
 }: OptimizedImageProps) {
   const sources = useMemo(() => getResponsiveSources(src), [src])
 
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = e.currentTarget
+    if (!img.src.includes('placeholder.avif')) {
+      img.src = '/images/placeholder.avif'
+    }
+    if (rest.onError) {
+      rest.onError(e)
+    }
+  }
+
   // When optimized=false or no srcSet available, render a plain <img>
   // This is useful for tiny thumbnails (e.g. marquee cards) where
   // responsive srcSet would generate hundreds of redundant requests.
@@ -112,6 +122,7 @@ export function OptimizedImage({
         loading={loading}
         decoding={decoding}
         className={className}
+        onError={handleError}
         {...rest}
       />
     )
@@ -131,6 +142,7 @@ export function OptimizedImage({
         decoding={decoding}
         sizes={sizes}
         className={className}
+        onError={handleError}
         {...rest}
       />
     </picture>

@@ -61,8 +61,8 @@ export function IndustriesTabs() {
                 onClick={() => setActive(ind.id)}
                 className={`flex-shrink-0 px-6 py-3 rounded-xl font-body font-semibold text-xs tracking-wide transition-all duration-300 border ${
                   isActive
-                    ? 'bg-[var(--accent-blue)] border-[var(--accent-blue)] text-[var(--btn-blue-text)] shadow-[0_4px_16px_rgba(12,45,72,0.25)]'
-                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-blue)] hover:text-[var(--text-primary)]'
+                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white shadow-[0_4px_16px_var(--focus-ring)]'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {ind.name}
@@ -72,9 +72,9 @@ export function IndustriesTabs() {
         </div>
 
         {/* Active panel */}
-        <div className="flex gap-10 p-9 bg-[var(--surface)] border border-[var(--border)] rounded-2xl border-l-[4px] border-l-[var(--accent-gold)] shadow-[var(--shadow-card)]">
-          <div className="hidden md:flex items-start text-[var(--accent-gold)] flex-shrink-0 mt-1">
-            <div className="w-16 h-16 rounded-2xl bg-[var(--accent-gold)]/[0.1] flex items-center justify-center">
+        <div className="flex gap-10 p-9 bg-[var(--surface)] border border-[var(--border)] rounded-2xl border-l-[4px] border-l-[var(--accent-primary)] shadow-[var(--shadow-card)]">
+          <div className="hidden md:flex items-start text-[var(--accent-primary)] flex-shrink-0 mt-1">
+            <div className="w-16 h-16 rounded-2xl bg-[var(--accent-primary)]/[0.1] flex items-center justify-center">
               <Icon size={32} />
             </div>
           </div>
@@ -90,7 +90,7 @@ export function IndustriesTabs() {
             </div>
             <a
               href={`/products?industry=${current.id}`}
-              className="inline-flex items-center gap-2 text-xs font-bold border-2 border-[var(--accent-gold)] text-[var(--accent-gold)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-gold)] hover:text-[var(--navy-deep)] transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-xs font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-300 no-underline"
             >
               {t('industries.viewProducts')} <ArrowRight size={14} />
             </a>

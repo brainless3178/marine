@@ -1,4 +1,5 @@
 import type { Product } from '../types'
+import { getProductImageUrl } from '../lib/utils'
 
 /**
  * Compute a deterministic price from a product ID.
@@ -21,6 +22,7 @@ function enrichProduct(base: Omit<Product, 'description' | 'condition' | 'price'
 
   return {
     ...base,
+    filename: base.filename.includes('/') ? base.filename : `products/${base.filename}`,
     description: `${base.name} — ${condition === 'new' ? 'Brand new, factory-sealed' : condition === 'unused' ? 'New old stock, never used' : condition === 'reconditioned' ? 'Fully serviced, tested & working' : condition === 'refurbished' ? 'Professionally refurbished to working order' : 'Previously used, fully inspected and tested'} marine & industrial equipment. SKU: ${base.sku}.`,
     condition,
     price,
@@ -29,7 +31,7 @@ function enrichProduct(base: Omit<Product, 'description' | 'condition' | 'price'
     inStock: base.availability !== 'out-of-stock',
     stockCount: base.availability === 'emergency' ? 1 : (code % 12) + 1,
     images: [
-      { url: `/images/${base.filename}`, alt: `${base.name} - Main View`, label: 'Main' },
+      { url: getProductImageUrl(base.filename), alt: `${base.name} - Main View`, label: 'Main' },
     ],
     isNewArrival: isNew,
     makeOffer: true,

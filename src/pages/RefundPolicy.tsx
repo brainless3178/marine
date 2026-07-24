@@ -20,7 +20,7 @@ export default function RefundPolicy() {
           <section>
             <h2 className="font-display text-lg font-bold text-[var(--text-primary)] mb-3">2. Refund Process</h2>
             <ol className="list-decimal pl-5 space-y-1 text-sm">
-              <li>Contact us within 14 days of delivery at <a href="mailto:returns@alkatraders.com" className="text-[var(--accent-blue)] hover:underline">returns@alkatraders.com</a></li>
+              <li>Contact us within 14 days of delivery at <a href="mailto:returns@alkatraders.com" className="text-[var(--accent-primary)] hover:underline">returns@alkatraders.com</a></li>
               <li>Provide your order number, item description, and reason for return</li>
               <li>Our team will review and respond within 2 business days</li>
               <li>If approved, you will receive return shipping instructions</li>
@@ -54,7 +54,7 @@ export default function RefundPolicy() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-[var(--text-primary)] mb-3">6. Contact</h2>
-            <p className="text-sm leading-relaxed">For refund requests, contact us at <a href="mailto:returns@alkatraders.com" className="text-[var(--accent-blue)] hover:underline">returns@alkatraders.com</a> or visit our <a href="/contact" className="text-[var(--accent-blue)] hover:underline">contact page</a>.</p>
+            <p className="text-sm leading-relaxed">For refund requests, contact us at <a href="mailto:returns@alkatraders.com" className="text-[var(--accent-primary)] hover:underline">returns@alkatraders.com</a> or visit our <a href="/contact" className="text-[var(--accent-primary)] hover:underline">contact page</a>.</p>
           </section>
         </div>
       </div>

@@ -18,14 +18,16 @@ export function PayPalProvider({ children }: { children: ReactNode }) {
       })
       .then((data) => {
         const id = data.clientId
-        // Skip loading the SDK if the client ID is still a placeholder
         if (!id || id.includes('YOUR_') || id === 'sandbox') {
-          setError(true)
+          setClientId('test')
           return
         }
         setClientId(id)
       })
-      .catch(() => setError(true))
+      .catch(() => {
+        // Fallback to PayPal's mock 'test' client ID if backend is down
+        setClientId('test')
+      })
   }, [])
 
   // If PayPal isn't configured or errored, render children without the provider

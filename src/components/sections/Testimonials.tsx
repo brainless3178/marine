@@ -35,7 +35,7 @@ export function Testimonials() {
         <div className="gold-accent-bar mt-0 mb-12" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
           {testimonials.map((review, i) => (
-            <div key={review.id} className="maritime-card p-8 border-l-[4px] border-l-transparent hover:border-l-[var(--accent-gold)]" style={{ animationDelay: `${i * 100}ms` }}>
+            <div key={review.id} className="maritime-card p-8 border-l-[4px] border-l-transparent hover:border-l-[var(--accent-primary)]" style={{ animationDelay: `${i * 100}ms` }}>
               <div className="flex gap-1 mb-5">
                 {Array.from({ length: review.rating }).map((_, j) => (
                   <Star key={j} size={16} className="fill-[var(--accent-gold)] text-[var(--accent-gold)]" />
@@ -43,11 +43,11 @@ export function Testimonials() {
               </div>
               <p className="text-body-sm text-[var(--text-secondary)] leading-relaxed italic mb-6">&ldquo;{review.text}&rdquo;</p>
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-[var(--accent-blue)]/[0.08] border border-[var(--accent-blue)]/15 flex items-center justify-center font-display font-bold text-sm text-[var(--accent-blue)] flex-shrink-0">{review.avatar}</div>
+                <div className="w-12 h-12 rounded-xl bg-[var(--accent-primary)]/[0.08] border border-[var(--accent-primary)]/15 flex items-center justify-center font-display font-bold text-sm text-[var(--accent-primary)] flex-shrink-0">{review.avatar}</div>
                 <div>
                   <strong className="text-label block text-[var(--text-primary)]">{review.name}</strong>
-                  <span className="font-mono text-xs text-[var(--text-muted)] block">{review.role}</span>
-                  <span className="text-xs text-[var(--text-muted)]">{review.company}</span>
+                  <span className="font-mono text-xs text-[var(--text-secondary)] block">{review.role}</span>
+                  <span className="text-xs text-[var(--text-secondary)]">{review.company}</span>
                 </div>
               </div>
             </div>

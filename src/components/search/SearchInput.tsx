@@ -32,7 +32,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={onKeyDown}
           placeholder={placeholder}
-          className="w-full pl-11 pr-10 py-4 bg-surface border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(14,165,233,0.25)] transition-all outline-none"
+          className="w-full pl-11 pr-10 py-4 bg-[var(--surface)] border border-[var(--border)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none rounded-xl"
         />
         {loading && (
           <div className="absolute right-10 top-1/2 -translate-y-1/2">

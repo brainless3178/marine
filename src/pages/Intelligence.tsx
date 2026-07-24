@@ -38,7 +38,7 @@ export default function Intelligence() {
         description="Sourcing trends, regional availability data, emergency procurement benchmarks, and obsolescence management insights for marine and industrial buyers."
         canonical="/intelligence"
       />
-      <section className="py-20 bg-secondary-bg text-center">
+      <section className="py-20 bg-[var(--secondary-bg)] text-center">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
             {t('intelligence.title')}
@@ -63,7 +63,7 @@ export default function Intelligence() {
               { label: t('intelligence.productsSourced'), value: '10,000+' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="font-display font-bold text-3xl text-accent-gold tabular-nums">{stat.value}</div>
+                <div className="font-display font-bold text-3xl text-[var(--accent-gold)] tabular-nums">{stat.value}</div>
                 <div className="text-xs text-[var(--text-muted)] mt-1">{stat.label}</div>
               </div>
             ))}
@@ -81,13 +81,13 @@ export default function Intelligence() {
             {insights.map((insight) => {
               const Icon = insight.icon
               return (
-                <div key={insight.title} className="bg-secondary-bg border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 hover:border-l-accent-blue hover:-translate-y-1">
-                  <Icon size={24} className="text-accent-blue mb-3" />
+                <div key={insight.title} className="bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1">
+                  <Icon size={24} className="text-[var(--accent-primary)] mb-3" />
                   <h3 className="text-sm font-semibold mb-2">{insight.title}</h3>
                   <p className="text-body-sm text-[var(--text-secondary)] leading-relaxed mb-4">{insight.summary}</p>
                   <div className="flex gap-1.5 flex-wrap">
                     {insight.tags.map((tag) => (
-                      <span key={tag} className="px-2 py-0.5 text-xs font-mono border border-[var(--border)] text-[var(--text-muted)] bg-surface">
+                      <span key={tag} className="px-2 py-0.5 text-xs font-mono border border-[var(--border)] text-[var(--text-muted)] bg-[var(--surface)]">
                         {tag}
                       </span>
                     ))}
