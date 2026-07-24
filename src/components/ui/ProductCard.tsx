@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next'
 import type { Product } from '../../types'
 import { OptimizedImage } from './OptimizedImage'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
-import { isLightColor } from '../../lib/utils'
+import { isLightColor, getProductImageUrl } from '../../lib/utils'
 
 interface ProductCardProps {
   product: Product
@@ -28,20 +28,20 @@ export function ProductCard({ product, added = false, onAddToCart, t, compact = 
   const { whatsappNumber } = useStoreSettings()
   const whatsappText = encodeURIComponent('Hi, I need a quote for ' + product.name + ' (SKU: ' + product.sku + ').')
   const imageClassName = 'w-full ' + (compact ? 'aspect-[4/3]' : 'aspect-square') + ' object-cover transition duration-700 group-hover:scale-[1.06]'
-  const stockClassName = 'rounded-full px-2.5 py-1 text-[11px] font-black ' + (product.inStock ? 'bg-success text-[var(--btn-success-text)]' : 'bg-[var(--navy-deep)] text-white')
+  const stockClassName = 'rounded-full px-2.5 py-1 text-[11px] font-black ' + (product.inStock ? 'bg-success text-white' : 'bg-[var(--navy-deep)] text-white')
   const buttonClassName = 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-xs font-black uppercase tracking-[0.08em] transition ' + (
     !product.inStock
       ? 'cursor-not-allowed border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)]'
       : added
       ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
-      : 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-[var(--navy-deep)] shadow-[0_12px_26px_rgba(232,170,36,0.25)] hover:-translate-y-0.5 hover:bg-[var(--gold-light)]'
+      : 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-white shadow-[0_4px_16px_var(--focus-ring)] hover:-translate-y-0.5 hover:bg-[var(--accent-primary-hover)]'
   )
 
   return (
     <article className="group product-card relative flex h-full flex-col overflow-hidden">
       <Link to={'/product/' + product.id} className="relative block overflow-hidden bg-[var(--surface-raised)] no-underline">
         <OptimizedImage
-          src={'/images/' + product.filename}
+          src={getProductImageUrl(product.filename)}
           alt={product.name}
           className={imageClassName}
           width={420}
@@ -94,8 +94,8 @@ export function ProductCard({ product, added = false, onAddToCart, t, compact = 
           <span className="truncate">{product.sku}</span>
         </div>
 
-        <h3 className="min-h-[44px] font-display text-[1.18rem] font-bold leading-[1.08] tracking-[-0.01em] text-[var(--text-primary)]">
-          <Link to={'/product/' + product.id} className="no-underline hover:text-[var(--accent-blue)]">
+        <h3 className="line-clamp-2 min-h-[48px] font-display text-[1.05rem] font-bold leading-[1.3] tracking-tight text-[var(--text-primary)]">
+          <Link to={'/product/' + product.id} className="no-underline transition-colors hover:text-[var(--accent-primary)]">
             {product.name}
           </Link>
         </h3>
@@ -127,7 +127,7 @@ export function ProductCard({ product, added = false, onAddToCart, t, compact = 
             </div>
             <Link
               to={'/product/' + product.id}
-              className="rounded-full border border-[var(--border)] px-3 py-2 text-[11px] font-extrabold text-[var(--text-secondary)] no-underline transition hover:border-[var(--accent-gold)] hover:text-[var(--accent-gold)]"
+              className="rounded-full border border-[var(--border)] px-3 py-2 text-[11px] font-extrabold text-[var(--text-secondary)] no-underline transition hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
             >
               Details
             </Link>

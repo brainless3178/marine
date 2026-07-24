@@ -7,9 +7,10 @@ import { useProducts } from '../hooks/useProducts'
 import { useAddToCart } from '../hooks/useAddToCart'
 import { OptimizedImage } from '../components/ui/OptimizedImage'
 import { storefront } from '../lib/api'
-import { isLightColor } from '../lib/utils'
+import { isLightColor, getProductImageUrl } from '../lib/utils'
 import { SEO } from '../components/seo/SEO'
 import { apiProductsToFrontend } from '../lib/adapters'
+import { products as staticProducts } from '../data/products'
 import type { Product } from '../types'
 
 export default function Products() {
@@ -29,7 +30,7 @@ export default function Products() {
 
   const { handleAddToCart, addedIds } = useAddToCart()
 
-  // Fetch products from API
+  // Fetch products from API with fallback to static catalog
   const [apiProducts, setApiProducts] = useState<Product[]>([])
   const [apiLoaded, setApiLoaded] = useState(false)
 
@@ -40,11 +41,15 @@ export default function Products() {
         const res = await storefront.products.list()
         if (!cancelled && res.products?.length > 0) {
           setApiProducts(apiProductsToFrontend(res.products))
+          setApiLoaded(true)
+          return
         }
       } catch {
-        // API unavailable
-      } finally {
-        if (!cancelled) setApiLoaded(true)
+        // API unavailable — fallback to static catalog
+      }
+      if (!cancelled) {
+        setApiProducts(staticProducts)
+        setApiLoaded(true)
       }
     }
     load()
@@ -133,7 +138,7 @@ export default function Products() {
       {/* Header */}
       <section className="bg-[var(--secondary-bg)] py-16 border-b border-[var(--border)]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 text-center">
-          <span className="inline-block font-body font-bold text-xs tracking-[3px] uppercase text-[var(--accent-blue)] mb-4">
+          <span className="inline-block font-body font-bold text-xs tracking-[3px] uppercase text-[var(--accent-primary)] mb-4">
             {t('products.catalog')}
           </span>
           <h1 className="font-display font-bold text-display-xl tracking-tight">
@@ -149,7 +154,7 @@ export default function Products() {
               value={localSearch}
               onChange={(e) => debouncedSetSearch(e.target.value)}
               placeholder={t('products.searchPlaceholder')}
-              className="w-full pl-11 pr-4 py-4 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-blue)] focus:shadow-[0_0_0_3px_rgba(15,76,129,0.14)] transition-all outline-none"
+              className="w-full pl-11 pr-4 py-4 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none"
             />
           </div>
         </div>
@@ -166,7 +171,7 @@ export default function Products() {
               </span>
               <button
                 onClick={() => setShowFiltersMobile((v) => !v)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] transition-colors hover:border-[var(--accent-blue)]"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] transition-colors hover:border-[var(--accent-primary)]"
               >
                 {showFiltersMobile ? <XIcon size={14} /> : <SlidersHorizontal size={14} />}
                 {showFiltersMobile ? t('products.hideFilters') : t('products.showFilters')}
@@ -187,7 +192,7 @@ export default function Products() {
                         type="checkbox"
                         checked={selectedCategories.includes(cat.id)}
                         onChange={() => toggleCategory(cat.id)}
-                        className="accent-[var(--accent-blue)] w-4 h-4 cursor-pointer"
+                        className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
                       />
                       <span className="flex-1">{cat.name}</span>
                       <span className="text-xs text-[var(--text-muted)]">{cat.count}</span>
@@ -201,11 +206,11 @@ export default function Products() {
                     {t('products.priceRange')}
                   </span>
                   <div className="flex items-center gap-2">
-                    <input type="number" min={0} max={1000} value={localMinPrice} onChange={(e) => setLocalMinPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMin')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-accent-gold focus:shadow-focus-gold" />
+                    <input type="number" min={0} max={1000} value={localMinPrice} onChange={(e) => setLocalMinPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMin')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)]" />
                     <span className="text-[var(--text-muted)] text-xs">—</span>
-                    <input type="number" min={0} max={1000} value={localMaxPrice} onChange={(e) => setLocalMaxPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMax')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-accent-gold focus:shadow-focus-gold" />
+                    <input type="number" min={0} max={1000} value={localMaxPrice} onChange={(e) => setLocalMaxPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMax')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)]" />
                   </div>
-                  <button onClick={applyPriceFilter} className="w-full mt-2 py-2 text-xs font-bold text-[var(--accent-blue)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border border-[var(--border)] rounded-lg">
+                  <button onClick={applyPriceFilter} className="w-full mt-2 py-2 text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border border-[var(--border)] rounded-lg">
                     {t('products.applyPrice')}
                   </button>
                 </div>
@@ -225,7 +230,7 @@ export default function Products() {
                   </span>
                   {derivedBrands.map((brand) => (
                       <label key={brand.slug} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-                        <input type="checkbox" checked={selectedBrands.includes(brand.slug)} onChange={() => toggleBrand(brand.slug)} className="accent-[var(--accent-blue)] w-4 h-4 cursor-pointer" />
+                        <input type="checkbox" checked={selectedBrands.includes(brand.slug)} onChange={() => toggleBrand(brand.slug)} className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer" />
                         {brand.name}
                       </label>
                   ))}
@@ -237,16 +242,16 @@ export default function Products() {
                     {t('products.availability')}
                   </span>
                   <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-                    <input type="radio" name="urgency" checked={urgencyFilter === 'all'} onChange={() => setUrgencyFilter('all')} className="accent-[var(--accent-blue)] w-4 h-4 cursor-pointer" />
+                    <input type="radio" name="urgency" checked={urgencyFilter === 'all'} onChange={() => setUrgencyFilter('all')} className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer" />
                     {t('products.allItems')}
                   </label>
                   <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-                    <input type="radio" name="urgency" checked={urgencyFilter === 'emergency'} onChange={() => setUrgencyFilter('emergency')} className="accent-[var(--accent-blue)] w-4 h-4 cursor-pointer" />
+                    <input type="radio" name="urgency" checked={urgencyFilter === 'emergency'} onChange={() => setUrgencyFilter('emergency')} className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer" />
                     {t('products.emergencyAvailable')}
                   </label>
                 </div>
 
-                <button onClick={clearFilters} className="w-full text-right text-xs font-bold text-[var(--accent-blue)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border-none cursor-pointer py-2">
+                <button onClick={clearFilters} className="w-full text-right text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border-none cursor-pointer py-2">
                   {t('products.clearFilters')}
                 </button>
               </div>
@@ -258,7 +263,7 @@ export default function Products() {
               {(searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0 || showOnSale || urgencyFilter === 'emergency') && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {searchQuery && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-blue)] bg-[var(--accent-blue)]/5 text-[var(--accent-blue)]">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-primary)] bg-[var(--accent-primary)]/5 text-[var(--accent-primary)]">
                       Search: "{searchQuery}"
                       <button onClick={() => { setSearchQuery(''); setLocalSearch('') }} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
                     </span>
@@ -275,7 +280,7 @@ export default function Products() {
                   {selectedBrands.map((slug) => {
                     const brand = derivedBrands.find((b) => b.slug === slug)
                     return (
-                      <span key={slug} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-teal)]/30 bg-[var(--accent-teal)]/5 text-[var(--accent-teal)]">
+                      <span key={slug} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/5 text-[var(--accent-primary)]">
                         {brand?.name ?? slug}
                         <button onClick={() => toggleBrand(slug)} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
                       </span>
@@ -293,7 +298,7 @@ export default function Products() {
                       <button onClick={() => setUrgencyFilter('all')} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
                     </span>
                   )}
-                  <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:border-[var(--accent-blue)] transition-colors cursor-pointer">
+                  <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] transition-colors cursor-pointer">
                     Clear all
                   </button>
                 </div>
@@ -306,7 +311,7 @@ export default function Products() {
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as 'relevance' | 'name-asc' | 'name-desc' | 'category' | 'price-asc' | 'price-desc')}
                   aria-label={t('products.sort')}
-                  className="px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)] appearance-none cursor-pointer"
+                  className="px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] appearance-none cursor-pointer"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E")`,
                     backgroundRepeat: 'no-repeat',
@@ -325,14 +330,14 @@ export default function Products() {
 
               {!apiLoaded ? (
                 <div className="text-center py-20">
-                  <div className="w-8 h-8 border-2 border-accent-blue border-t-transparent animate-spin mx-auto mb-4" />
+                  <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin mx-auto mb-4" />
                   <p className="text-sm text-[var(--text-muted)]">Loading products...</p>
                 </div>
               ) : finalCount === 0 ? (
                 <div className="text-center py-20">
                   <p className="text-sm text-[var(--text-muted)]">{t('products.noResults')}</p>
                   <p className="text-xs text-[var(--text-muted)] mt-2">Try removing some filters or search with different keywords.</p>
-                  <button onClick={clearFilters} className="mt-4 text-xs font-bold text-[var(--accent-blue)] hover:text-[var(--accent-gold)] bg-transparent border border-[var(--border)] px-4 py-2 rounded-lg cursor-pointer">
+                  <button onClick={clearFilters} className="mt-4 text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] bg-transparent border border-[var(--border)] px-4 py-2 rounded-lg cursor-pointer">
                     {t('products.clearFilters')}
                   </button>
                 </div>
@@ -342,10 +347,10 @@ export default function Products() {
                   {paginatedProducts.map((product) => {
                     const effPrice = product.onSale && product.salePrice ? product.salePrice : product.price
                     return (
-                      <div key={product.id} className="commerce-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-blue)] group">
+                      <div key={product.id} className="commerce-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-primary)] group">
                         <Link to={`/product/${product.id}`} className="block relative overflow-hidden bg-[var(--surface-soft)]">
                             <OptimizedImage
-                            src={`/images/${product.filename}`}
+                            src={getProductImageUrl(product.filename)}
                             alt={product.name}
                             width={400}
                             height={400}
@@ -360,7 +365,7 @@ export default function Products() {
                             </span>
                           )}
                           {product.availability === 'emergency' && (
-                            <span className="absolute top-2 right-2 z-10 px-2 py-1 rounded-full text-xs font-mono border border-danger/20 text-danger bg-white">{t('product.emergency')}</span>
+                            <span className="absolute top-2 right-2 z-10 px-2 py-1 rounded-full text-xs font-mono border border-[var(--danger)]/20 text-[var(--danger)] bg-white">{t('product.emergency')}</span>
                           )}
                           {!product.inStock && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -369,8 +374,8 @@ export default function Products() {
                           )}
                         </Link>
                         <div className="p-4">
-                          <span className="inline-block font-mono text-xs px-2 py-1 rounded-full border text-[var(--accent-blue)] border-[var(--accent-blue)]/15 bg-[var(--accent-blue)]/5 mb-2">{product.brand}</span>
-                          <h4 className="text-label leading-tight hover:text-[var(--accent-blue)] transition-colors min-h-[40px]">
+                          <span className="inline-block font-mono text-xs px-2 py-1 rounded-full border text-[var(--accent-primary)] border-[var(--accent-primary)]/15 bg-[var(--accent-primary)]/5 mb-2">{product.brand}</span>
+                          <h4 className="text-label leading-tight hover:text-[var(--accent-primary)] transition-colors min-h-[40px]">
                             <Link to={`/product/${product.id}`}>{product.name}</Link>
                           </h4>
                           <span className="font-mono text-xs text-[var(--text-muted)] block mt-1">{t('product.skuPrefix', { sku: product.sku })}</span>
@@ -403,13 +408,13 @@ export default function Products() {
                 </div>
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center gap-2 mt-8">
-                    <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-2 text-xs font-bold border border-[var(--border)] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--accent-blue)] transition-colors bg-[var(--surface)] text-[var(--text-primary)]">← Prev</button>
+                    <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-2 text-xs font-bold border border-[var(--border)] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--accent-primary)] transition-colors bg-[var(--surface)] text-[var(--text-primary)]">← Prev</button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2).reduce<(number | string)[]>((acc, p, i, arr) => { if (i > 0 && (arr[i - 1] as number) < p - 1) acc.push('...'); acc.push(p); return acc }, []).map((p, i) =>
                       typeof p === 'string' ? <span key={`dots-${i}`} className="px-1 text-xs text-[var(--text-muted)]">…</span> : (
-                        <button key={p} onClick={() => setCurrentPage(p)} className={`w-8 h-8 text-xs font-bold rounded-lg transition-colors ${p === currentPage ? 'bg-[var(--accent-blue)] text-[var(--btn-blue-text)] border border-[var(--accent-blue)]' : 'border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[var(--accent-blue)]'}`}>{p}</button>
+                        <button key={p} onClick={() => setCurrentPage(p)} className={`w-8 h-8 text-xs font-bold rounded-lg transition-colors ${p === currentPage ? 'bg-[var(--accent-primary)] text-white border border-[var(--accent-primary)]' : 'border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[var(--accent-primary)]'}`}>{p}</button>
                       )
                     )}
-                    <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-2 text-xs font-bold border border-[var(--border)] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--accent-blue)] transition-colors bg-[var(--surface)] text-[var(--text-primary)]">Next →</button>
+                    <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-2 text-xs font-bold border border-[var(--border)] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--accent-primary)] transition-colors bg-[var(--surface)] text-[var(--text-primary)]">Next →</button>
                   </div>
                 )}
                 </>

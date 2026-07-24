@@ -47,7 +47,7 @@ export default function PrivacyPolicy() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-[var(--text-primary)] mb-3">5. Your Rights</h2>
-            <p className="text-sm leading-relaxed">You have the right to access, correct, or delete your personal data. To exercise these rights, contact us at <a href="mailto:privacy@alkatraders.com" className="text-[var(--accent-blue)] hover:underline">privacy@alkatraders.com</a>.</p>
+            <p className="text-sm leading-relaxed">You have the right to access, correct, or delete your personal data. To exercise these rights, contact us at <a href="mailto:privacy@alkatraders.com" className="text-[var(--accent-primary)] hover:underline">privacy@alkatraders.com</a>.</p>
           </section>
 
           <section>
@@ -57,7 +57,7 @@ export default function PrivacyPolicy() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-[var(--text-primary)] mb-3">7. Contact</h2>
-            <p className="text-sm leading-relaxed">For privacy-related inquiries, contact us at <a href="mailto:privacy@alkatraders.com" className="text-[var(--accent-blue)] hover:underline">privacy@alkatraders.com</a> or visit our <a href="/contact" className="text-[var(--accent-blue)] hover:underline">contact page</a>.</p>
+            <p className="text-sm leading-relaxed">For privacy-related inquiries, contact us at <a href="mailto:privacy@alkatraders.com" className="text-[var(--accent-primary)] hover:underline">privacy@alkatraders.com</a> or visit our <a href="/contact" className="text-[var(--accent-primary)] hover:underline">contact page</a>.</p>
           </section>
         </div>
       </div>

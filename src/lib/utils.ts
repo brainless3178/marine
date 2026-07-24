@@ -21,3 +21,16 @@ export function isLightColor(hex: string): boolean {
   const luminance = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b)
   return luminance > 0.179 // threshold per WCAG
 }
+
+/**
+ * Safely format a product image URL to ensure it points to /images/products/...
+ */
+export function getProductImageUrl(pathOrFilename?: string): string {
+  if (!pathOrFilename) return '/images/placeholder.avif'
+  if (pathOrFilename.startsWith('http://') || pathOrFilename.startsWith('https://')) return pathOrFilename
+  const clean = pathOrFilename.startsWith('/') ? pathOrFilename.slice(1) : pathOrFilename
+  if (clean.startsWith('images/products/')) return `/${clean}`
+  if (clean.startsWith('products/')) return `/images/${clean}`
+  if (clean.startsWith('images/')) return `/images/products/${clean.slice(7)}`
+  return `/images/products/${clean}`
+}

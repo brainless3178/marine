@@ -11,8 +11,8 @@ export function Card({ children, className = '', hover = true, onClick }: CardPr
   return (
     <div
       onClick={onClick}
-      className={`bg-secondary-bg border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 relative ${
-        hover ? 'hover:border-l-accent-blue hover:-translate-y-1' : ''
+      className={`bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 relative ${
+        hover ? 'hover:border-l-[var(--accent-primary)] hover:-translate-y-1' : ''
       } ${className}`}
     >
       {children}

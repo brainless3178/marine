@@ -111,13 +111,13 @@ export function CategoriesGrid() {
             const isGold = ['surplus', 'safety', 'rigging'].includes(cat.id)
             return (
               <TiltCard key={cat.id} className={`group maritime-card p-7 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[30px]'}`} style={{ transitionDelay: `${i * 80}ms`, transitionProperty: 'opacity, transform', transitionDuration: '0.5s' }}>
-                <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl ${isGold ? 'bg-[var(--accent-gold)]/[0.1] text-[var(--accent-gold)]' : 'bg-[var(--accent-blue)]/[0.08] text-[var(--accent-blue)]'}`}><Icon size={28} /></div>
+                <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl ${isGold ? 'bg-[var(--accent-gold)]/[0.1] text-[var(--accent-gold)]' : 'bg-[var(--accent-primary)]/[0.08] text-[var(--accent-primary)]'}`}><Icon size={28} /></div>
                 <h3 className="heading-xl mb-3">{cat.name}</h3>
                 <p className="text-body-sm text-[var(--text-secondary)] leading-relaxed mb-4">{info.desc}</p>
-                <span className={`inline-block font-mono text-xs px-3 py-1.5 border ${isGold ? 'text-[var(--accent-gold)] border-[var(--accent-gold)]/20 bg-[var(--accent-gold)]/[0.06]' : 'text-[var(--accent-blue)] border-[var(--accent-blue)]/15 bg-[var(--accent-blue)]/[0.04]'} rounded-full`}>
+                <span className={`inline-block font-mono text-xs px-3 py-1.5 border ${isGold ? 'text-[var(--accent-gold)] border-[var(--accent-gold)]/20 bg-[var(--accent-gold)]/[0.06]' : 'text-[var(--accent-primary)] border-[var(--accent-primary)]/15 bg-[var(--accent-primary)]/[0.04]'} rounded-full`}>
                   {cat.count} {t('categories.items', { defaultValue: 'Products' })}
                 </span>
-                <a href={`/products?category=${cat.id}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--accent-blue)] no-underline mt-6 group-hover:text-[var(--accent-gold)] transition-colors">
+                <a href={`/products?category=${cat.id}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--accent-primary)] no-underline mt-6 group-hover:text-[var(--accent-primary-hover)] transition-colors">
                   {t('categories.browse')} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </a>
               </TiltCard>

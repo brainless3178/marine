@@ -55,7 +55,7 @@ export default function Industries() {
         description="Alka Traders serves marine shipping, oil and gas, power generation, manufacturing, chemical processing, shipbuilding, and mining industries with specialized equipment."
         canonical="/industries"
       />
-      <section className="py-20 bg-secondary-bg text-center">
+      <section className="py-20 bg-[var(--secondary-bg)] text-center">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
             {t('industries.label')}
@@ -86,8 +86,8 @@ export default function Industries() {
                 aria-pressed={active === ind.id}
                 className={`px-5 py-2.5 font-body font-medium text-xs border transition-all duration-300 ${
                   active === ind.id
-                    ? 'bg-accent-blue border-accent-blue text-[var(--text-primary)]'
-                    : 'bg-surface border-[var(--border)] text-[var(--text-secondary)] hover:border-accent-blue hover:text-[var(--text-primary)]'
+                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white rounded-xl'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)] rounded-xl'
                 }`}
               >
                 {ind.name}
@@ -95,9 +95,9 @@ export default function Industries() {
             ))}
           </div>
 
-          <div className="bg-secondary-bg border border-[var(--border)] border-l-[3px] border-l-accent-blue p-8 md:p-12">
+          <div className="bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-[var(--accent-primary)] p-8 md:p-12">
             <div className="flex flex-col md:flex-row gap-8">
-              <div className="text-5xl text-accent-blue flex-shrink-0">
+              <div className="text-5xl text-[var(--accent-primary)] flex-shrink-0">
                 <Icon size={48} />
               </div>
               <div>
@@ -107,14 +107,14 @@ export default function Industries() {
                 <ul className="flex flex-col gap-2 mb-6">
                   {current.painPoints.map((pp, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                      <span className="text-accent-blue mt-0.5">→</span>
+                      <span className="text-[var(--accent-primary)] mt-0.5">→</span>
                       {pp}
                     </li>
                   ))}
                 </ul>
                 <a
                   href={`/products?industry=${current.id}`}
-                  className="inline-flex items-center gap-2 text-xs font-semibold border border-accent-blue text-accent-blue px-[18px] py-[10px] hover:bg-accent-blue/10 transition-all no-underline"
+                  className="inline-flex items-center gap-2 text-xs font-semibold border border-[var(--accent-primary)] text-[var(--accent-primary)] px-[18px] py-[10px] hover:bg-[var(--accent-primary)]/10 transition-all no-underline rounded-xl"
                 >
                   {t('industries.viewProducts')} <ArrowRight size={14} />
                 </a>

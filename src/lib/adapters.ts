@@ -61,9 +61,12 @@ export function apiProductToFrontend(api: ApiProduct): Product {
 
   const effectivePrice = isOnSale && salePriceNum ? salePriceNum : regularPrice
 
+  const rawFilename = (api.images?.[0]?.url?.split('/').pop()?.split('?')[0] || 'placeholder.png')
+  const filename = rawFilename.startsWith('products/') ? rawFilename : `products/${rawFilename}`
+
   return {
     id: api.id,
-    filename: (api.images?.[0]?.url?.split('/').pop()?.split('?')[0] || 'placeholder.png').replace(/\.(jpe?g|png|webp)$/i, '.avif'),
+    filename,
     name: api.name,
     brand: api.brand?.name || 'Unknown',
     sku: api.sku,

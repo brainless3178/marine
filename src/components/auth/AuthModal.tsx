@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Mail, Lock, User, Eye, EyeOff, Anchor } from 'lucide-react'
+import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 
 type AuthTab = 'signin' | 'signup'
@@ -148,7 +148,7 @@ export function AuthModal() {
   }
 
   const inputClass =
-    'w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-blue)] outline-none transition-all duration-200 rounded-lg placeholder:text-[var(--text-muted)]'
+    'w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] outline-none transition-all duration-200 rounded-xl'
 
   const backdropVariants = {
     hidden: { opacity: 0 },
@@ -206,10 +206,14 @@ export function AuthModal() {
 
             {/* Brand header */}
             <div className="text-center mb-6">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <Anchor size={22} className="text-[var(--brick-ember)]" />
+              <div className="flex items-center justify-center gap-2.5 mb-1">
+                <img
+                  src="/images/alka-traders-logo.jpeg"
+                  alt="Alka Traders Logo"
+                  className="w-9 h-9 rounded-xl object-cover shadow-sm"
+                />
                 <h2 className="text-xl font-bold tracking-wide">
-                  <span className="text-[var(--brick-ember)]">ALKA</span>{' '}
+                  <span className="text-[var(--accent-primary)]">ALKA</span>{' '}
                   <span className="text-[var(--text-primary)]">TRADERS</span>
                 </h2>
               </div>
@@ -233,7 +237,7 @@ export function AuthModal() {
                   onClick={() => setActiveTab(tab)}
                   className={`relative z-10 flex-1 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-200 ${
                     activeTab === tab
-                      ? 'text-[var(--accent-blue)]'
+                      ? 'text-[var(--accent-primary)]'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                   }`}
                 >
@@ -323,10 +327,10 @@ export function AuthModal() {
                       )}
                       <div className="flex items-center justify-between mt-2">
                         <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] cursor-pointer">
-                          <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="accent-[var(--accent-blue)] w-3.5 h-3.5 rounded" />
+                          <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="accent-[var(--accent-primary)] w-3.5 h-3.5 rounded" />
                           Remember me
                         </label>
-                        <a href="/forgot-password" className="text-xs text-[var(--accent-blue)] hover:underline" onClick={(e) => { e.stopPropagation(); setShowAuthModal(false) }}>
+                        <a href="/forgot-password" className="text-xs text-[var(--accent-primary)] hover:underline" onClick={(e) => { e.stopPropagation(); setShowAuthModal(false) }}>
                           Forgot password?
                         </a>
                       </div>
@@ -499,7 +503,7 @@ export function AuthModal() {
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.975 }}
                 disabled={submitting}
-                className="w-full py-3.5 mt-7 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold rounded-full hover:bg-btn-hover-dark transition-all duration-200 text-sm tracking-wide shadow-lg shadow-[var(--brick-ember)]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 mt-7 bg-[var(--accent-primary)] text-white font-semibold rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all duration-200 text-sm tracking-wide shadow-md shadow-[var(--focus-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <div className="h-5 w-5 mx-auto rounded-full border-2 border-white border-t-transparent animate-spin" />
@@ -514,7 +518,7 @@ export function AuthModal() {
                   Don&apos;t have an account?{' '}
                   <button
                     onClick={() => setActiveTab('signup')}
-                    className="text-[var(--accent-blue)] font-semibold hover:underline transition-all"
+                    className="text-[var(--accent-primary)] font-semibold hover:underline transition-all"
                   >
                     Sign Up
                   </button>
@@ -524,7 +528,7 @@ export function AuthModal() {
                   Already have an account?{' '}
                   <button
                     onClick={() => setActiveTab('signin')}
-                    className="text-[var(--accent-blue)] font-semibold hover:underline transition-all"
+                    className="text-[var(--accent-primary)] font-semibold hover:underline transition-all"
                   >
                     Sign In
                   </button>

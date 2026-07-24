@@ -18,11 +18,11 @@ interface Order {
 
 const statusConfig: Record<string, { color: string; icon: typeof Package }> = {
   pending: { color: 'text-[var(--text-muted)]', icon: Clock },
-  confirmed: { color: 'text-[var(--accent-blue)]', icon: CheckCircle },
+  confirmed: { color: 'text-[var(--accent-primary)]', icon: CheckCircle },
   'payment-pending': { color: 'text-[var(--accent-gold)]', icon: Clock },
-  paid: { color: 'text-[var(--accent-blue)]', icon: CheckCircle },
-  processing: { color: 'text-[var(--accent-blue)]', icon: Package },
-  packed: { color: 'text-[var(--accent-blue)]', icon: Package },
+  paid: { color: 'text-[var(--accent-primary)]', icon: CheckCircle },
+  processing: { color: 'text-[var(--accent-primary)]', icon: Package },
+  packed: { color: 'text-[var(--accent-primary)]', icon: Package },
   shipped: { color: 'text-[var(--accent-teal)]', icon: Truck },
   delivered: { color: 'text-[var(--success)]', icon: CheckCircle },
   cancelled: { color: 'text-[var(--danger)]', icon: XCircle },
@@ -67,7 +67,7 @@ export default function OrderHistory() {
         <div className="max-w-[1024px] mx-auto px-4 sm:px-6">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-8 h-8 border-2 border-[var(--accent-blue)] border-t-transparent animate-spin" />
+              <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin" />
             </div>
           ) : error ? (
             <div className="text-center py-20">
@@ -80,7 +80,7 @@ export default function OrderHistory() {
               <p className="text-sm text-[var(--text-secondary)] mb-6">Start shopping to see your orders here.</p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-primary)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all"
               >
                 Browse Products
               </Link>
@@ -93,7 +93,7 @@ export default function OrderHistory() {
                 return (
                   <div
                     key={order.id}
-                    className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 hover:border-[var(--accent-blue)]/30 transition-all"
+                    className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 hover:border-[var(--accent-primary)]/30 transition-all"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex-1 min-w-0">
@@ -123,7 +123,7 @@ export default function OrderHistory() {
                         </span>
                         <Link
                           to={`/track-order?id=${order.orderNumber}`}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold border border-[var(--border)] text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/5 rounded-lg transition-all"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold border border-[var(--border)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 rounded-xl transition-all"
                         >
                           <Eye size={12} /> Track
                         </Link>

@@ -91,7 +91,7 @@ export function HowItWorks() {
           {/* Timeline line */}
           <div
             ref={lineRef}
-            className="hidden lg:block absolute top-6 left-[60px] right-[60px] h-[2px] bg-gradient-to-r from-[rgba(200,147,10,0.5)] via-[var(--gold-dark)] to-[rgba(200,147,10,0.5)]"
+            className="hidden lg:block absolute top-6 left-[60px] right-[60px] h-[2px] bg-gradient-to-r from-[var(--accent-primary)]/50 via-[var(--accent-primary-hover)] to-[var(--accent-primary)]/50"
             style={{ width: '0%' }}
           />
 
@@ -101,12 +101,12 @@ export function HowItWorks() {
               className="flex-1 text-center relative px-3 mb-10 lg:mb-0 lg:pl-12 lg:text-left timeline-content"
             >
               <div
-                className="timeline-dot w-14 h-14 rounded-xl flex items-center justify-center mx-auto lg:absolute lg:-left-12 mb-5 bg-[var(--surface)] border-2 border-[var(--accent-gold)] font-display font-extrabold text-lg text-[var(--accent-gold)] relative z-10 shadow-[0_4px_20px_rgba(200,147,10,0.15)]"
+                className="timeline-dot w-14 h-14 rounded-xl flex items-center justify-center mx-auto lg:absolute lg:-left-12 mb-5 bg-[var(--surface)] border-2 border-[var(--accent-primary)] font-display font-extrabold text-lg text-[var(--accent-primary)] relative z-10 shadow-[0_4px_20px_var(--focus-ring)]"
               >
                 {step.num}
               </div>
               <h4 className="text-label font-bold mb-2 text-[var(--text-primary)]">{step.title}</h4>
-              <p className="text-body-sm text-[var(--text-muted)] leading-relaxed">{step.desc}</p>
+              <p className="text-body-sm text-[var(--text-secondary)] leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>

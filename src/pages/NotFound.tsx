@@ -19,7 +19,7 @@ export default function NotFound() {
         </p>
         <Link
           to="/"
-          className="inline-flex items-center gap-2 px-7 py-3.5 bg-accent-blue text-[var(--text-primary)] font-semibold text-sm border border-accent-blue hover:bg-accent-teal hover:border-accent-teal transition-all no-underline"
+          className="inline-flex items-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] hover:border-[var(--accent-primary-hover)] transition-all no-underline rounded-xl"
         >
           <ArrowLeft size={16} />          {t('notFound.cta')}
         </Link>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, MessageCircle, Phone, ShoppingCart, X, Mail, Globe } from 'lucide-react'
+import { Menu, MessageCircle, Phone, ShoppingCart, X, Mail, Globe, UserCircle2, LogOut, User, Package, LogIn } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
 import { ThemeToggle } from '../ui/ThemeToggle'
@@ -9,9 +9,10 @@ import type { Language } from '../../types'
 
 const navLinks = [
   { path: '/', labelKey: 'home' },
-  { path: '/about', labelKey: 'about' },
+  { path: '/products', labelKey: 'products' },
   { path: '/shop', labelKey: 'shop' },
   { path: '/brands', labelKey: 'brands' },
+  { path: '/about', labelKey: 'about' },
   { path: '/contact', labelKey: 'contact' },
 ]
 
@@ -32,8 +33,8 @@ function BrandLockup() {
         className="h-11 w-11 shrink-0 rounded-lg object-cover shadow-sm"
       />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-xl lg:text-[28px] font-bold tracking-tight">Alka Traders</span>
-        <span className="mt-1 text-xs font-bold uppercase tracking-[2px] text-[var(--text-muted)]">
+        <span className="font-display text-xl lg:text-[26px] font-bold tracking-tight text-[var(--text-primary)]">Alka Traders</span>
+        <span className="mt-1 text-[10px] font-bold uppercase tracking-[2px] text-[var(--text-muted)]">
           Marine & Industrial Equipment
         </span>
       </span>
@@ -51,8 +52,13 @@ export function Navbar() {
   const getCartCount = useStore((s) => s.getCartCount)
   const language = useStore((s) => s.language)
   const setLanguage = useStore((s) => s.setLanguage)
+  const isLoggedIn = useStore((s) => s.isLoggedIn)
+  const user = useStore((s) => s.user)
+  const logout = useStore((s) => s.logout)
+  const setShowAuthModal = useStore((s) => s.setShowAuthModal)
   const cartCount = getCartCount()
   const settings = useStoreSettings()
+  const [profileOpen, setProfileOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 32)
@@ -75,61 +81,61 @@ export function Navbar() {
     return () => { document.body.style.overflow = '' }
   }, [mobileOpen])
 
-  // Close language dropdown on outside click
+  // Close language and profile dropdowns on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement
-      if (!target.closest('[data-lang-switcher]')) {
-        setLangOpen(false)
-      }
+      if (!target.closest('[data-lang-switcher]')) setLangOpen(false)
+      if (!target.closest('[data-profile-menu]')) setProfileOpen(false)
     }
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
   }, [])
 
   return (
-    <header>
+    <header className="sticky top-0 z-50">
       {/* ── TOP BAR: Email, Phone, Free Shipping ── */}
-      <div className="bg-[var(--navy-deep)] border-b border-white/10 text-white/85 text-xs">
+      <div className="bg-[var(--surface-soft)] border-b border-[var(--border)] text-[var(--text-secondary)] text-xs">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex items-center justify-between h-9">
-          <div className="flex items-center gap-4">
-            <a href={`mailto:${settings.rfqEmail}`} className="flex items-center gap-1.5 text-white/80 hover:text-[var(--accent-gold)] transition-colors no-underline">
-              <Mail size={12} />
+          <div className="flex items-center gap-5">
+            <a href={`mailto:${settings.rfqEmail}`} className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors no-underline font-medium">
+              <Mail size={12} className="text-[var(--accent-primary)]" />
               <span className="hidden sm:inline">{settings.rfqEmail}</span>
             </a>
-            <a href={`tel:${settings.phoneNumber}`} className="flex items-center gap-1.5 text-white/80 hover:text-[var(--accent-gold)] transition-colors no-underline">
-              <Phone size={12} />
+            <a href={`tel:${settings.phoneNumber}`} className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors no-underline font-medium">
+              <Phone size={12} className="text-[var(--accent-primary)]" />
               <span className="hidden sm:inline">{settings.phoneNumber}</span>
             </a>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden md:inline text-white/70">{t('topbar.freeShipping')}</span>
-            <span className="hidden md:inline text-white/45">|</span>
-            <span className="hidden md:inline text-white/70">{t('topbar.timelyDelivery')}</span>
-            <span className="hidden md:inline text-white/45">|</span>
-            <span className="hidden md:inline text-white/70">{t('topbar.securePayment')}</span>
+          <div className="flex items-center gap-3 text-[11px] font-medium">
+            <span className="hidden md:inline text-[var(--text-muted)]">{t('topbar.freeShipping')}</span>
+            <span className="hidden md:inline text-[var(--border)]">|</span>
+            <span className="hidden md:inline text-[var(--text-muted)]">{t('topbar.timelyDelivery')}</span>
+            <span className="hidden md:inline text-[var(--border)]">|</span>
+            <span className="hidden md:inline text-[var(--text-muted)]">{t('topbar.securePayment')}</span>
           </div>
         </div>
       </div>
 
       {/* ── MAIN NAVBAR ── */}
       <nav
-        className={`sticky top-0 z-50 border-b bg-[var(--surface)]/96 px-4 py-3 backdrop-blur-sm md:backdrop-blur-xl transition-shadow pt-[env(safe-area-inset-top)] ${
-          scrolled ? 'border-[var(--border)] shadow-[0_10px_30px_rgba(15,23,42,0.08)]' : 'border-transparent'
+        className={`border-b bg-[var(--surface)]/98 px-4 py-3 backdrop-blur-md transition-all duration-300 ${
+          scrolled ? 'border-[var(--border)] shadow-[0_8px_24px_rgba(15,23,42,0.06)]' : 'border-[var(--border)]'
         }`}
       >
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-5">
           <BrandLockup />
 
           {/* Desktop Nav Links */}
-          <div className="hidden items-center gap-6 lg:flex">                {navLinks.map((link) => (
+          <div className="hidden items-center gap-7 lg:flex">
+            {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-bold no-underline transition-colors ${
-                  pathname === link.path
-                    ? 'text-[var(--accent-blue)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--accent-blue)]'
+                className={`text-sm font-semibold no-underline transition-colors ${
+                  pathname === link.path || (link.path !== '/' && pathname.startsWith(link.path))
+                    ? 'text-[var(--accent-primary)] font-bold'
+                    : 'text-[var(--text-primary)] hover:text-[var(--accent-primary)]'
                 }`}
               >
                 {t(`nav.${link.labelKey}`)}
@@ -142,7 +148,7 @@ export function Navbar() {
             <div className="relative" data-lang-switcher>
               <button
                 onClick={() => setLangOpen((v) => !v)}
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors"
                 aria-label="Switch language"
               >
                 <Globe size={16} />
@@ -157,7 +163,7 @@ export function Navbar() {
                         setLangOpen(false)
                       }}
                       className={`w-full px-4 py-2.5 text-xs font-bold text-left transition-colors hover:bg-[var(--surface-soft)] flex items-center gap-2 ${
-                        language === lang.code ? 'text-[var(--accent-blue)] bg-[var(--surface-soft)]' : 'text-[var(--text-secondary)]'
+                        language === lang.code ? 'text-[var(--accent-primary)] bg-[var(--surface-soft)]' : 'text-[var(--text-secondary)]'
                       }`}
                     >
                       {language === lang.code && (
@@ -174,12 +180,12 @@ export function Navbar() {
 
             <button
               onClick={() => setShowCartDrawer(true)}
-              className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-blue)]"
+              className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-primary)]"
               aria-label="Cart"
             >
               <ShoppingCart size={18} />
               {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--accent-gold)] px-1 text-xs font-bold leading-none text-navy-deep">
+                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--accent-primary)] px-1 text-xs font-bold leading-none text-white">
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               )}
@@ -197,10 +203,78 @@ export function Navbar() {
 
             <Link
               to="/rfq"
-              className="hidden items-center rounded-lg bg-[var(--accent-gold)] px-5 py-3 text-xs font-extrabold text-navy-deep no-underline transition-colors hover:bg-btn-hover-gold hover:text-white lg:inline-flex"
+              className="hidden items-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-extrabold text-white no-underline transition-colors hover:bg-[var(--accent-primary-hover)] lg:inline-flex"
             >
               {t('nav.requestQuote')}
             </Link>
+
+            {/* Profile / Auth */}
+            <div className="relative" data-profile-menu>
+              <button
+                onClick={() => setProfileOpen((v) => !v)}
+                className={`flex h-10 w-10 items-center justify-center rounded-lg border transition-colors ${
+                  isLoggedIn
+                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
+                    : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:text-[var(--accent-primary)]'
+                }`}
+                aria-label="Profile"
+              >
+                <UserCircle2 size={20} />
+              </button>
+              {profileOpen && (
+                <div className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-xl overflow-hidden z-50">
+                  {isLoggedIn ? (
+                    <>
+                      <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-soft)]">
+                        <p className="text-xs font-bold text-[var(--text-primary)] truncate">{user?.name || 'My Account'}</p>
+                        <p className="text-[11px] text-[var(--text-muted)] truncate mt-0.5">{user?.email || ''}</p>
+                      </div>
+                      <Link
+                        to="/account/profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--text-primary)] no-underline hover:bg-[var(--surface-soft)] transition-colors"
+                      >
+                        <User size={14} className="text-[var(--text-muted)]" /> My Profile
+                      </Link>
+                      <Link
+                        to="/account/orders"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--text-primary)] no-underline hover:bg-[var(--surface-soft)] transition-colors"
+                      >
+                        <Package size={14} className="text-[var(--text-muted)]" /> My Orders
+                      </Link>
+                      <div className="border-t border-[var(--border)]">
+                        <button
+                          onClick={() => { logout(); setProfileOpen(false) }}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--danger)] hover:bg-[var(--danger)]/5 transition-colors"
+                        >
+                          <LogOut size={14} /> Sign Out
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-soft)]">
+                        <p className="text-xs font-bold text-[var(--text-primary)]">Welcome</p>
+                        <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Sign in to access your account</p>
+                      </div>
+                      <button
+                        onClick={() => { setShowAuthModal(true); setProfileOpen(false) }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors"
+                      >
+                        <LogIn size={14} className="text-[var(--accent-primary)]" /> Sign In
+                      </button>
+                      <button
+                        onClick={() => { setShowAuthModal(true); setProfileOpen(false) }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--accent-primary)] hover:bg-[var(--surface-soft)] transition-colors"
+                      >
+                        <UserCircle2 size={14} /> Create Account
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
 
             <button
               onClick={() => setMobileOpen((value) => !value)}
@@ -221,7 +295,7 @@ export function Navbar() {
                   to={link.path}
                   className={`rounded-lg px-3 py-2 text-sm font-bold no-underline ${
                     pathname === link.path
-                      ? 'bg-[var(--surface-soft)] text-[var(--accent-blue)]'
+                      ? 'bg-[var(--surface-soft)] text-[var(--accent-primary)]'
                       : 'text-[var(--text-secondary)]'
                   }`}
                 >
@@ -239,7 +313,7 @@ export function Navbar() {
                       }}
                       className={`px-3 py-2 rounded-lg text-xs font-bold border ${
                         language === lang.code
-                          ? 'border-[var(--accent-gold)] bg-[var(--gold-muted)] text-[var(--accent-gold)]'
+                          ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
                           : 'border-[var(--border)] text-[var(--text-secondary)]'
                       }`}
                     >
@@ -257,14 +331,40 @@ export function Navbar() {
                 </a>
                 <a
                   href={`tel:${settings.phoneNumber}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3 text-xs font-bold text-[var(--accent-blue)] no-underline"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3 text-xs font-bold text-[var(--accent-primary)] no-underline"
                 >
                   <Phone size={14} /> Call
                 </a>
               </div>
+              <div className="border-t border-[var(--border)] pt-3 mt-1">
+                {isLoggedIn ? (
+                  <div className="flex flex-col gap-1">
+                    <div className="px-3 py-2 rounded-lg bg-[var(--surface-soft)]">
+                      <p className="text-xs font-bold text-[var(--text-primary)] truncate">{user?.name || 'My Account'}</p>
+                      <p className="text-[11px] text-[var(--text-muted)] truncate">{user?.email || ''}</p>
+                    </div>
+                    <Link to="/account/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold no-underline text-[var(--text-secondary)] hover:bg-[var(--surface-soft)]">
+                      <User size={13} /> My Profile
+                    </Link>
+                    <Link to="/account/orders" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold no-underline text-[var(--text-secondary)] hover:bg-[var(--surface-soft)]">
+                      <Package size={13} /> My Orders
+                    </Link>
+                    <button onClick={() => { logout(); setMobileOpen(false) }} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[var(--danger)] hover:bg-[var(--danger)]/5">
+                      <LogOut size={13} /> Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setShowAuthModal(true); setMobileOpen(false) }}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 px-4 py-3 text-xs font-extrabold text-[var(--accent-primary)] transition-colors hover:bg-[var(--accent-primary)]/20"
+                  >
+                    <UserCircle2 size={15} /> Sign In / Create Account
+                  </button>
+                )}
+              </div>
               <Link
                 to="/rfq"
-                className="inline-flex items-center justify-center rounded-lg bg-[var(--accent-gold)] px-5 py-3 text-xs font-extrabold text-navy-deep no-underline"
+                className="inline-flex items-center justify-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-extrabold text-white no-underline hover:bg-[var(--accent-primary-hover)] transition-colors"
               >
                 {t('nav.requestQuote')}
               </Link>

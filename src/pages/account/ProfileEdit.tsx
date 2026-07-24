@@ -49,7 +49,7 @@ export default function ProfileEdit() {
     }
   }
 
-  const inputClass = 'w-full pl-10 pr-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-blue)] transition-all placeholder:text-[var(--text-muted)]'
+  const inputClass = 'w-full pl-10 pr-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all placeholder:text-[var(--input-placeholder)]'
 
   return (
     <div className="min-h-screen bg-[var(--primary-bg)]">
@@ -69,8 +69,8 @@ export default function ProfileEdit() {
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 sm:p-8">
             {/* Avatar */}
             <div className="flex items-center gap-4 mb-8 pb-6 border-b border-[var(--border)]">
-              <div className="w-16 h-16 rounded-full bg-[var(--accent-blue)]/10 flex items-center justify-center">
-                <User size={28} className="text-[var(--accent-blue)]" />
+              <div className="w-16 h-16 rounded-full bg-[var(--accent-primary)]/10 flex items-center justify-center">
+                <User size={28} className="text-[var(--accent-primary)]" />
               </div>
               <div>
                 <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">{user.name}</h2>
@@ -132,14 +132,14 @@ export default function ProfileEdit() {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                  className="flex-1 py-3 text-sm font-semibold border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--primary-bg)] rounded-full transition-all"
+                  className="flex-1 py-3 text-sm font-semibold border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--primary-bg)] rounded-xl transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 py-3 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all disabled:opacity-50"
+                  className="flex-1 py-3 bg-[var(--accent-primary)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all disabled:opacity-50"
                 >
                   {loading ? <div className="h-5 w-5 mx-auto rounded-full border-2 border-white border-t-transparent animate-spin" /> : 'Save Changes'}
                 </button>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Package, Truck, CheckCircle, Clock, XCircle, Search, Anchor } from 'lucide-react'
+import { Package, Truck, CheckCircle, Clock, XCircle, Search } from 'lucide-react'
 import { storefront } from '../lib/api'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 import { SEO } from '../components/seo/SEO'
@@ -72,7 +72,11 @@ export default function TrackOrder() {
       <section className="bg-[var(--secondary-bg)] py-12">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Anchor size={20} className="text-[var(--accent-blue)]" />
+            <img
+              src="/images/alka-traders-logo.jpeg"
+              alt="Alka Traders Logo"
+              className="w-8 h-8 rounded-xl object-cover shadow-sm"
+            />
           </div>
           <h1 className="font-display text-3xl font-bold text-[var(--text-primary)] mb-2">Track Your Order</h1>
           <p className="text-sm text-[var(--text-secondary)]">Enter your order number to see the current status</p>
@@ -91,13 +95,13 @@ export default function TrackOrder() {
                 onChange={(e) => setOrderNumber(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleTrack()}
                 placeholder="Enter order number (e.g. AT-12345)"
-                className="w-full pl-10 pr-4 py-3.5 bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-xl outline-none focus:border-accent-gold focus:shadow-focus-gold transition-all placeholder:text-[var(--text-muted)]"
+                className="w-full pl-10 pr-4 py-3.5 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all placeholder:text-[var(--input-placeholder)]"
               />
             </div>
             <button
               onClick={() => handleTrack()}
               disabled={loading}
-              className="px-6 py-3.5 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-xl hover:bg-[var(--accent-blue)]/90 transition-all disabled:opacity-50 whitespace-nowrap"
+              className="px-6 py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all disabled:opacity-50 whitespace-nowrap"
             >
               {loading ? <div className="h-5 w-5 border-2 border-white border-t-transparent animate-spin" /> : 'Track'}
             </button>
@@ -125,7 +129,7 @@ export default function TrackOrder() {
                       order.status === 'delivered' ? 'bg-[var(--success)]/10 text-[var(--success)]' :
                       order.status === 'shipped' ? 'bg-[var(--accent-teal)]/10 text-[var(--accent-teal)]' :
                       order.status === 'cancelled' ? 'bg-[var(--danger)]/10 text-[var(--danger)]' :
-                      'bg-[var(--accent-blue)]/10 text-[var(--accent-blue)]'
+                      'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
                     }`}>
                       {order.status === 'delivered' ? <CheckCircle size={12} /> :
                        order.status === 'shipped' ? <Truck size={12} /> :
@@ -148,7 +152,7 @@ export default function TrackOrder() {
                     {/* Connection line */}
                     <div className="absolute top-5 left-0 right-0 h-0.5 bg-[var(--border)]" />
                     <div
-                      className="absolute top-5 left-0 h-0.5 bg-[var(--accent-blue)] transition-all duration-500"
+                      className="absolute top-5 left-0 h-0.5 bg-[var(--accent-primary)] transition-all duration-500"
                       style={{ width: `${Math.min(100, (currentStep / (statusSteps.length - 1)) * 100)}%` }}
                     />
 
@@ -160,13 +164,13 @@ export default function TrackOrder() {
                         <div key={step.key} className="relative flex flex-col items-center z-10" style={{ width: `${100 / statusSteps.length}%` }}>
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                             isCompleted
-                              ? 'bg-[var(--accent-blue)] border-[var(--accent-blue)] text-[var(--btn-blue-text)]'
+                              ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white'
                               : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-muted)]'
-                          } ${isCurrent ? 'ring-4 ring-[var(--accent-blue)]/20' : ''}`}>
+                          } ${isCurrent ? 'ring-4 ring-[var(--focus-ring)]' : ''}`}>
                             <StepIcon size={16} />
                           </div>
                           <span className={`text-[10px] mt-2 text-center font-medium leading-tight ${
-                            isCompleted ? 'text-[var(--accent-blue)]' : 'text-[var(--text-muted)]'
+                            isCompleted ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'
                           }`}>
                             {step.label}
                           </span>
@@ -182,7 +186,7 @@ export default function TrackOrder() {
                 <div className="px-6 pb-6">
                   <div className="bg-[var(--primary-bg)] border border-[var(--border)] rounded-xl p-4">
                     <p className="text-xs text-[var(--text-muted)] mb-1">Tracking Number</p>
-                    <p className="font-mono text-sm font-bold text-[var(--accent-blue)]">{order.trackingNumber}</p>
+                    <p className="font-mono text-sm font-bold text-[var(--accent-primary)]">{order.trackingNumber}</p>
                     {order.courier && <p className="text-xs text-[var(--text-muted)] mt-1">Carrier: {order.courier}</p>}
                   </div>
                 </div>
@@ -207,7 +211,7 @@ export default function TrackOrder() {
           <div className="text-center mt-8">
             <p className="text-xs text-[var(--text-muted)]">
               Need help?{' '}
-              <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="text-[var(--accent-blue)] hover:underline">
+              <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="text-[var(--accent-primary)] hover:underline">
                 Contact us on WhatsApp
               </a>
             </p>

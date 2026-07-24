@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Mail, ArrowLeft, CheckCircle, Anchor } from 'lucide-react'
+import { Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import { customerAuth } from '../lib/api'
 import { useStore } from '../store/useStore'
 import { SEO } from '../components/seo/SEO'
@@ -33,8 +33,12 @@ export default function ForgotPassword() {
       <div className="w-full max-w-[420px]">
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Anchor size={24} className="text-[var(--accent-blue)]" />
+          <div className="flex items-center justify-center gap-2.5 mb-2">
+            <img
+              src="/images/alka-traders-logo.jpeg"
+              alt="Alka Traders Logo"
+              className="w-8 h-8 rounded-xl object-cover shadow-sm"
+            />
             <span className="font-display text-xl font-bold tracking-tight text-[var(--text-primary)]">Alka Traders</span>
           </div>
           <p className="text-xs text-[var(--text-muted)] tracking-widest uppercase">Marine & Industrial Equipment</p>
@@ -52,7 +56,7 @@ export default function ForgotPassword() {
               </p>
               <Link
                 to="/"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-blue)] hover:underline"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-primary)] hover:underline"
               >
                 <ArrowLeft size={14} /> Back to Home
               </Link>
@@ -72,7 +76,7 @@ export default function ForgotPassword() {
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); setError('') }}
                     placeholder="Enter your email address"
-                    className="w-full pl-10 pr-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-blue)] transition-all placeholder:text-[var(--text-muted)]"
+                    className="w-full pl-10 pr-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all placeholder:text-[var(--input-placeholder)]"
                     autoFocus
                   />
                 </div>
@@ -82,7 +86,7 @@ export default function ForgotPassword() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <div className="h-5 w-5 mx-auto rounded-full border-2 border-white border-t-transparent animate-spin" />
@@ -92,7 +96,7 @@ export default function ForgotPassword() {
 
               <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
                 Remember your password?{' '}
-                <button onClick={() => useStore.getState().setShowAuthModal(true)} className="text-[var(--accent-blue)] font-semibold hover:underline">
+                <button onClick={() => useStore.getState().setShowAuthModal(true)} className="text-[var(--accent-primary)] font-semibold hover:underline">
                   Sign In
                 </button>
               </p>

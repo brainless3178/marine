@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Product } from '../../types'
+import { getProductImageUrl } from '../../lib/utils'
 
 interface HeroProductMarqueeProps {
   products: Product[]
@@ -22,7 +23,7 @@ function MarqueeCard({ product }: { product: Product }) {
           </span>
         ) : (
         <img
-          src={`/images/${product.filename}`}
+          src={getProductImageUrl(product.filename)}
           alt={product.name}
           width={56}
           height={56}

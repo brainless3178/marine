@@ -61,7 +61,7 @@ const AdminInsights = lazy(() => import('./pages/admin/AdminInsights'))
 function LoadingFallback() {
   return (
     <div className="flex items-center justify-center min-h-[50vh]">
-      <div className="w-8 h-8 border-2 border-accent-blue border-t-transparent animate-spin" />
+      <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin" />
     </div>
   )
 }
@@ -79,7 +79,7 @@ function AppContent() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--primary-bg)]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-accent-blue border-t-transparent animate-spin" />
+          <div className="w-10 h-10 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin" />
           <p className="text-[var(--text-muted)] text-sm">Loading...</p>
         </div>
       </div>

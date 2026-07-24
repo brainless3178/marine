@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { Lock, Eye, EyeOff, CheckCircle, Anchor } from 'lucide-react'
+import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import { customerAuth } from '../lib/api'
 import { useStore } from '../store/useStore'
 import { SEO } from '../components/seo/SEO'
@@ -39,10 +39,14 @@ export default function ResetPassword() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--primary-bg)] px-4">
         <div className="text-center">
-          <Anchor size={32} className="text-[var(--accent-blue)] mx-auto mb-4" />
+          <img
+            src="/images/alka-traders-logo.jpeg"
+            alt="Alka Traders Logo"
+            className="w-10 h-10 rounded-xl object-cover shadow-sm mx-auto mb-4"
+          />
           <h2 className="font-display text-xl font-bold text-[var(--text-primary)] mb-2">Invalid Reset Link</h2>
           <p className="text-sm text-[var(--text-secondary)] mb-4">This password reset link is invalid or has expired.</p>
-          <Link to="/" className="text-sm font-semibold text-[var(--accent-blue)] hover:underline">← Back to Home</Link>
+          <Link to="/" className="text-sm font-semibold text-[var(--accent-primary)] hover:underline">← Back to Home</Link>
         </div>
       </div>
     )
@@ -54,8 +58,12 @@ export default function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--primary-bg)] px-4 py-16">
       <div className="w-full max-w-[420px]">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Anchor size={24} className="text-[var(--accent-blue)]" />
+          <div className="flex items-center justify-center gap-2.5 mb-2">
+            <img
+              src="/images/alka-traders-logo.jpeg"
+              alt="Alka Traders Logo"
+              className="w-8 h-8 rounded-xl object-cover shadow-sm"
+            />
             <span className="font-display text-xl font-bold tracking-tight text-[var(--text-primary)]">Alka Traders</span>
           </div>
           <p className="text-xs text-[var(--text-muted)] tracking-widest uppercase">Marine & Industrial Equipment</p>
@@ -71,7 +79,7 @@ export default function ResetPassword() {
               <p className="text-sm text-[var(--text-secondary)] mb-6">Your password has been updated. You can now sign in with your new password.</p>
               <button
                 onClick={() => useStore.getState().setShowAuthModal(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-primary)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all"
               >
                 Sign In
               </button>
@@ -89,7 +97,7 @@ export default function ResetPassword() {
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); setError('') }}
                     placeholder="New password (min. 8 characters)"
-                    className="w-full pl-10 pr-10 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-xl outline-none focus:border-accent-gold focus:shadow-focus-gold transition-all placeholder:text-[var(--text-muted)]"
+                    className="w-full pl-10 pr-10 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all placeholder:text-[var(--input-placeholder)]"
                     autoFocus
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)]">
@@ -104,7 +112,7 @@ export default function ResetPassword() {
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); setError('') }}
                     placeholder="Confirm new password"
-                    className="w-full pl-10 pr-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-xl outline-none focus:border-accent-gold focus:shadow-focus-gold transition-all placeholder:text-[var(--text-muted)]"
+                    className="w-full pl-10 pr-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all placeholder:text-[var(--input-placeholder)]"
                   />
                 </div>
 
@@ -113,7 +121,7 @@ export default function ResetPassword() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-full hover:bg-[var(--accent-blue)]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <div className="h-5 w-5 mx-auto rounded-full border-2 border-white border-t-transparent animate-spin" />

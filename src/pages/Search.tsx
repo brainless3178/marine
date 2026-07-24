@@ -130,7 +130,7 @@ export default function SearchPage() {
       <div className="max-w-[720px] mx-auto px-4 sm:px-6">
         <h1 className="font-display font-bold text-section-lg tracking-tight mb-2">{t('search.title')}</h1>
         <p className="text-body-sm text-[var(--text-secondary)] mb-8">
-          {t('search.description')} <kbd className="hidden sm:inline px-1.5 py-0.5 bg-surface border border-[var(--border)] font-mono text-xs">Ctrl+K</kbd> to open from anywhere.
+          {t('search.description')} <kbd className="hidden sm:inline px-1.5 py-0.5 bg-[var(--surface)] border border-[var(--border)] font-mono text-xs">Ctrl+K</kbd> to open from anywhere.
         </p>
         <SearchInput
           ref={inputRef}

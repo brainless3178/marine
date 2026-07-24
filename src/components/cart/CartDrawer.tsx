@@ -26,6 +26,8 @@ const drawerVariants = {
   },
 } as const
 
+import { getProductImageUrl } from '../../lib/utils'
+
 export function CartDrawer() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -187,7 +189,7 @@ export function CartDrawer() {
                           {/* Thumbnail */}
                           <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--secondary-bg)]">
                             <OptimizedImage
-                              src={`/images/${product.filename}`}
+                              src={getProductImageUrl(product.filename)}
                               alt={product.name}
                               width={64}
                               height={64}

@@ -102,7 +102,7 @@ export default function Shop() {
                   return (
                     <div key={item.label} className="flex items-center gap-2.5">
                       <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
-                        <Icon size={20} className="text-[var(--accent-gold)]" />
+                        <Icon size={20} className="text-[var(--accent-primary)]" />
                       </div>
                       <div>
                         <span className="block text-xs font-bold text-white">{item.label}</span>
@@ -116,7 +116,7 @@ export default function Shop() {
             <div className="hidden lg:block">
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-6 py-3 rounded-xl hover:bg-[var(--accent-blue)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
+                className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-6 py-3 rounded-xl hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-300 no-underline"
               >
                 {t('shop.viewFullCatalog')} <ArrowRight size={16} />
               </Link>
@@ -137,7 +137,7 @@ export default function Shop() {
               <Link
                 key={cat.id}
                 to={`/products?category=${cat.id}`}
-                className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-gold)] hover:shadow-md transition-all duration-300 no-underline"
+                className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-primary)] hover:shadow-md transition-all duration-300 no-underline"
               >
                 <span className="text-xs font-bold text-center text-[var(--text-primary)] group-hover:text-[var(--accent-gold)] transition-colors leading-tight">
                   {cat.name}
@@ -160,7 +160,7 @@ export default function Shop() {
             </div>
             <Link
               to="/products"
-              className="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-[var(--accent-blue)] hover:text-[var(--accent-gold)] transition-colors no-underline"
+              className="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors no-underline"
             >
               {t('shop.viewAll')} <ArrowRight size={16} />
             </Link>
@@ -192,7 +192,7 @@ export default function Shop() {
             </div>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-blue)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-300 no-underline"
             >
               {t('shop.fullCatalog')} <ArrowRight size={16} />
             </Link>
@@ -223,7 +223,7 @@ export default function Shop() {
             </p>
             <Link
               to="/rfq"
-              className="inline-flex items-center gap-2 bg-[var(--accent-gold)] text-navy-deep font-bold px-8 py-3.5 rounded-xl hover:bg-[var(--gold-light)] transition-all no-underline"
+              className="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-white font-bold px-8 py-3.5 rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all no-underline"
             >
               {t('shop.submitRfq')} <ArrowRight size={16} />
             </Link>

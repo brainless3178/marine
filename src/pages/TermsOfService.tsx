@@ -44,7 +44,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-[var(--text-primary)] mb-3">5. Returns and Refunds</h2>
-            <p className="text-sm leading-relaxed">Returns are handled on a case-by-case basis. Contact us within 14 days of delivery for return requests. Used marine equipment is sold as-is unless explicitly stated otherwise. See our <a href="/refund-policy" className="text-[var(--accent-blue)] hover:underline">Refund Policy</a> for details.</p>
+            <p className="text-sm leading-relaxed">Returns are handled on a case-by-case basis. Contact us within 14 days of delivery for return requests. Used marine equipment is sold as-is unless explicitly stated otherwise. See our <a href="/refund-policy" className="text-[var(--accent-primary)] hover:underline">Refund Policy</a> for details.</p>
           </section>
 
           <section>
@@ -59,7 +59,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-[var(--text-primary)] mb-3">8. Contact</h2>
-            <p className="text-sm leading-relaxed">For questions about these terms, contact us at <a href="mailto:legal@alkatraders.com" className="text-[var(--accent-blue)] hover:underline">legal@alkatraders.com</a>.</p>
+            <p className="text-sm leading-relaxed">For questions about these terms, contact us at <a href="mailto:legal@alkatraders.com" className="text-[var(--accent-primary)] hover:underline">legal@alkatraders.com</a>.</p>
           </section>
         </div>
       </div>

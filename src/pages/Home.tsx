@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Truck, ShieldCheck, Clock, Package, Anchor, MessageCircle } from 'lucide-react'
+import { ArrowRight, Truck, ShieldCheck, Clock, Package, MessageCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAddToCart } from '../hooks/useAddToCart'
 import { SEO } from '../components/seo/SEO'
@@ -63,8 +63,8 @@ export default function Home() {
               const Icon = item.icon
               return (
                 <div key={item.label} className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/[0.04] border border-white/[0.08]">
-                  <div className="w-10 h-10 rounded-lg bg-[var(--accent-gold)]/[0.1] flex items-center justify-center flex-shrink-0">
-                    <Icon size={20} className="text-[var(--accent-gold)]" />
+                  <div className="w-10 h-10 rounded-lg bg-[var(--accent-primary)]/[0.1] flex items-center justify-center flex-shrink-0">
+                    <Icon size={20} className="text-[var(--accent-primary)]" />
                   </div>
                   <div>
                     <span className="block text-sm font-bold text-white">{item.label}</span>
@@ -93,7 +93,7 @@ export default function Home() {
             </div>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-blue)] text-[var(--accent-blue)] px-6 py-3 rounded-xl hover:bg-[var(--accent-blue)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-6 py-3 rounded-xl hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-300 no-underline"
             >
               {t('shop.cta')} <ArrowRight size={16} />
             </Link>
@@ -115,9 +115,11 @@ export default function Home() {
       <section className="bg-[var(--secondary-bg)] py-16">
         <div className="mx-auto grid max-w-[1280px] gap-5 px-4 sm:px-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-8 shadow-[var(--shadow-card)]">
-            <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--gold-muted)] text-[var(--accent-gold)]">
-              <Anchor size={24} />
-            </div>
+            <img
+              src="/images/alka-traders-logo.jpeg"
+              alt="Alka Traders Logo"
+              className="h-12 w-12 rounded-2xl object-cover shadow-sm mb-5"
+            />
             <h2 className="font-display text-display-lg font-bold tracking-tight text-[var(--text-primary)]">
               Built for marine buyers who cannot wait.
             </h2>
@@ -126,10 +128,10 @@ export default function Home() {
             </p>
           </div>
           <div className="rounded-[28px] bg-[var(--navy-deep)] p-8 text-white shadow-[var(--shadow-soft)]">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--accent-gold)]">Fast procurement lane</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--accent-primary)]">Fast procurement lane</p>
             <h3 className="mt-3 font-display text-3xl font-bold leading-tight">Need a rare spare?</h3>
             <p className="mt-3 text-sm leading-relaxed text-white/68">Send part number, photo, or vessel details. The CTA now stays visible and buyer-friendly.</p>
-            <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-5 py-3 text-xs font-black uppercase tracking-[0.1em] text-[var(--navy-deep)] no-underline hover:bg-[var(--gold-light)]">
+            <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--accent-primary)] px-5 py-3 text-xs font-black uppercase tracking-[0.1em] text-white no-underline hover:bg-[var(--accent-primary-hover)]">
               <MessageCircle size={16} /> WhatsApp RFQ
             </a>
           </div>

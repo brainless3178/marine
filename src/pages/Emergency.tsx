@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Clock, Phone, Mail, MessageCircle, TriangleAlert, Check, Loader2 } from 'lucide-react'
 import { useStoreSettings } from '../hooks/useStoreSettings'
@@ -91,7 +91,7 @@ export default function Emergency() {
 
       <section className="py-24 text-center relative">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <span className="inline-flex items-center gap-2 font-mono text-xs px-3 py-1.5 border border-danger text-danger bg-surface mb-4">
+          <span className="inline-flex items-center gap-2 font-mono text-xs px-3 py-1.5 border border-danger text-danger bg-[var(--surface)] mb-4">
             <TriangleAlert size={12} /> {t('emergency.label')}
           </span>
           <h1 className="font-display font-bold text-display-2xl tracking-tight text-danger mb-4">
@@ -102,11 +102,11 @@ export default function Emergency() {
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <a href={`https://wa.me/${whatsappNumber}`}
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-danger text-[var(--btn-danger-text)] font-semibold text-sm border border-danger hover:bg-danger hover:border-danger hover:-translate-y-0.5 transition-all shadow-[0_0_20px_var(--danger-border)]">
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-danger text-[var(--btn-danger-text)] font-semibold text-sm border border-danger hover:bg-danger hover:border-danger hover:-translate-y-0.5 transition-all shadow-[0_0_20px_var(--danger-border)] rounded-xl">
               <MessageCircle size={16} /> {t('emergency.ctaWhatsapp')}
             </a>
             <a href={`tel:${phoneNumber}`}
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-transparent text-danger font-semibold text-sm border border-danger hover:bg-danger/10 hover:-translate-y-0.5 transition-all">
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-transparent text-danger font-semibold text-sm border border-danger hover:bg-danger/10 hover:-translate-y-0.5 transition-all rounded-xl">
               <Phone size={16} /> {t('emergency.ctaCall')}
             </a>
           </div>
@@ -117,7 +117,7 @@ export default function Emergency() {
       <section className="py-16">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-            <div ref={pulseRef} className="bg-secondary-bg border border-[var(--border)] p-6 sm:p-10 text-center">
+            <div ref={pulseRef} className="bg-[var(--secondary-bg)] border border-[var(--border)] p-6 sm:p-10 text-center">
               <div ref={clockRef} className="inline-flex">
                 <Clock size={48} className="text-danger mb-4" />
               </div>
@@ -127,24 +127,24 @@ export default function Emergency() {
               <p className="text-xs text-[var(--text-muted)] mt-2">{t('emergency.alwaysOperational')}</p>
             </div>
 
-            <div className="emergency-contacts bg-secondary-bg border border-[var(--border)] border-l-[3px] border-l-danger p-5 sm:p-8">
+            <div className="emergency-contacts bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-danger p-5 sm:p-8">
               <h3 className="text-base font-semibold mb-4">{t('emergency.emergencyContacts')}</h3>
               <div className="flex flex-col gap-3">
-                <a href={`https://wa.me/${whatsappNumber}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-surface border border-[var(--border)]">
+                <a href={`https://wa.me/${whatsappNumber}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-[var(--surface)] border border-[var(--border)]">
                   <MessageCircle size={18} className="text-danger flex-shrink-0" />
                   <div>
                     <strong className="text-[var(--text-primary)] block text-xs">{t('emergency.whatsappLabel')}</strong>
                     {t('emergency.emergencyText')}
                   </div>
                 </a>
-                <a href={`tel:${phoneNumber}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-surface border border-[var(--border)]">
+                <a href={`tel:${phoneNumber}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-[var(--surface)] border border-[var(--border)]">
                   <Phone size={18} className="text-danger flex-shrink-0" />
                   <div>
                     <strong className="text-[var(--text-primary)] block text-xs">{t('emergency.phoneLabel')}</strong>
                     {phoneNumber}
                   </div>
                 </a>
-                <a href={`mailto:${emergencyEmail}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-surface border border-[var(--border)]">
+                <a href={`mailto:${emergencyEmail}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-[var(--surface)] border border-[var(--border)]">
                   <Mail size={18} className="text-danger flex-shrink-0" />
                   <div>
                     <strong className="text-[var(--text-primary)] block text-xs">{t('emergency.emailLabel')}</strong>
@@ -179,26 +179,26 @@ export default function Emergency() {
             } finally {
               setLoading(false)
             }
-          }} className="bg-secondary-bg border border-danger/30 p-6 sm:p-10">
+          }} className="bg-[var(--secondary-bg)] border border-[var(--danger)]/30 p-6 sm:p-10">
             <h2 className="text-lg font-semibold mb-6">{t('emergency.formTitle')}</h2>
             {error && <p className="text-xs text-[var(--danger)] mb-4">{error}</p>}
             <div className="mb-4">
               <label htmlFor="emergency-name" className="sr-only">{t('emergency.formName')}</label>
-              <input id="emergency-name" type="text" placeholder={t('emergency.formName')} required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-danger focus:shadow-[0_0_0_3px_rgba(239,68,68,0.25)] transition-all outline-none" />
+              <input id="emergency-name" type="text" placeholder={t('emergency.formName')} required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] rounded-xl focus:border-[var(--danger)] focus:shadow-[0_0_0_3px_var(--danger-border)] transition-all outline-none" />
             </div>
             <div className="mb-4">
               <label htmlFor="emergency-phone" className="sr-only">{t('emergency.formPhone')}</label>
-              <input id="emergency-phone" type="tel" placeholder={t('emergency.formPhone')} required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-danger focus:shadow-[0_0_0_3px_rgba(239,68,68,0.25)] transition-all outline-none" />
+              <input id="emergency-phone" type="tel" placeholder={t('emergency.formPhone')} required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] rounded-xl focus:border-[var(--danger)] focus:shadow-[0_0_0_3px_var(--danger-border)] transition-all outline-none" />
             </div>
             <div className="mb-4">
               <label htmlFor="emergency-part" className="sr-only">{t('emergency.formPartDesc')}</label>
-              <textarea id="emergency-part" rows={3} placeholder={t('emergency.formPartDesc')} required value={form.partDescription} onChange={(e) => setForm({ ...form, partDescription: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-danger focus:shadow-[0_0_0_3px_rgba(239,68,68,0.25)] transition-all outline-none resize-vertical min-h-[80px]" />
+              <textarea id="emergency-part" rows={3} placeholder={t('emergency.formPartDesc')} required value={form.partDescription} onChange={(e) => setForm({ ...form, partDescription: e.target.value })} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] rounded-xl focus:border-[var(--danger)] focus:shadow-[0_0_0_3px_var(--danger-border)] transition-all outline-none resize-vertical min-h-[80px]" />
             </div>
             <div className="mb-6">
               <label htmlFor="emergency-vessel" className="sr-only">{t('emergency.formVessel')}</label>
-              <input id="emergency-vessel" type="text" placeholder={t('emergency.formVessel')} value={form.vesselName} onChange={(e) => setForm({ ...form, vesselName: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-danger focus:shadow-[0_0_0_3px_rgba(239,68,68,0.25)] transition-all outline-none" />
+              <input id="emergency-vessel" type="text" placeholder={t('emergency.formVessel')} value={form.vesselName} onChange={(e) => setForm({ ...form, vesselName: e.target.value })} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] rounded-xl focus:border-[var(--danger)] focus:shadow-[0_0_0_3px_var(--danger-border)] transition-all outline-none" />
             </div>
-            <button type="submit" disabled={submitted || loading} aria-label={t('emergency.formSubmit')} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm border transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-[var(--btn-success-text)]' : 'bg-danger text-[var(--btn-danger-text)] border-danger hover:bg-danger shadow-[0_0_20px_var(--danger-border)]'}`}>
+            <button type="submit" disabled={submitted || loading} aria-label={t('emergency.formSubmit')} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm border transition-all rounded-xl ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-[var(--btn-success-text)]' : 'bg-danger text-[var(--btn-danger-text)] border-danger hover:bg-danger shadow-[0_0_20px_var(--danger-border)]'}`}>
               {loading ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : submitted ? <><Check size={16} /> Request Submitted!</> : <><TriangleAlert size={16} /> {t('emergency.formSubmit')}</>}
             </button>
           </form>

@@ -23,7 +23,8 @@ import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import { OptimizedImage } from '../components/ui/OptimizedImage'
 import { storefront } from '../lib/api'
 import { apiProductToFrontend, apiProductsToFrontend } from '../lib/adapters'
-import { isLightColor } from '../lib/utils'
+import { isLightColor, getProductImageUrl } from '../lib/utils'
+import { products as staticProducts } from '../data/products'
 import type { Product } from '../types'
 
 function getProductSpecs(product: Product): Record<string, string> {
@@ -59,7 +60,7 @@ export default function ProductDetail() {
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 })
   const [showShare, setShowShare] = useState(false)
 
-  // Fetch product from API
+  // Fetch product from API with fallback to static products
   useEffect(() => {
     if (!id) return
     let cancelled = false
@@ -73,14 +74,32 @@ export default function ProductDetail() {
           if (res.related?.length) {
             setRelated(apiProductsToFrontend(res.related).slice(0, 4))
           }
+          return
         }
       } catch {
-        // API unavailable — product not found
-      } finally {
-        if (!cancelled) setLoading(false)
+        // API failed — fallback to local static product dataset
       }
+
+      // Fallback to static catalog
+      const cleanId = id!.toLowerCase().replace(/^prod-/, '')
+      const staticProduct = staticProducts.find(
+        (p) => p.id === id || p.id === `prod-${cleanId}` || p.id.replace('prod-', '') === cleanId
+      )
+      if (!cancelled) {
+        if (staticProduct) {
+          setProduct(staticProduct)
+          setRelated(
+            staticProducts
+              .filter((p) => p.id !== staticProduct.id && p.category === staticProduct.category)
+              .slice(0, 4)
+          )
+        }
+      }
+      if (!cancelled) setLoading(false)
     }
-    load()
+    load().finally(() => {
+      if (!cancelled) setLoading(false)
+    })
     return () => { cancelled = true }
   }, [id])
 
@@ -112,7 +131,7 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-24 text-center">
-        <div className="w-8 h-8 border-2 border-accent-blue border-t-transparent animate-spin mx-auto" />
+        <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin mx-auto" />
       </div>
     )
   }
@@ -122,7 +141,7 @@ export default function ProductDetail() {
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-24 text-center">
         <h2 className="text-2xl font-bold mb-2">{t('product.productNotFound')}</h2>
         <p className="text-body-sm text-[var(--text-secondary)] mb-6">{t('product.productNotFoundDesc')}</p>
-        <Link to="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold rounded-full hover:bg-btn-hover-dark transition-all">
+        <Link to="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-primary)] text-white font-semibold rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all">
           <ArrowLeft size={16} /> {t('product.backToProducts')}
         </Link>
       </div>
@@ -173,7 +192,7 @@ export default function ProductDetail() {
         title={product ? `${product.name} — Alka Traders` : 'Product Detail — Alka Traders'}
         description={product ? product.description?.slice(0, 160) || `${product.name} — ${product.brand}, ${product.condition}. SKU: ${product.sku}.` : 'View product details'}
         canonical={`/product/${id}`}
-        ogImage={product ? `/images/${product.filename}` : undefined}
+        ogImage={product ? getProductImageUrl(product.filename) : undefined}
         ogType={product ? 'product' : 'website'}
         productPrice={product ? effectivePrice : undefined}
         productCurrency="USD"
@@ -184,7 +203,7 @@ export default function ProductDetail() {
         <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'Products', url: '/products' }, { name: product.category.replace(/-/g, ' '), url: `/products?category=${product.category}` }, { name: product.name, url: `/product/${id}` }]} />
       )}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-xs font-semibold text-accent-blue hover:text-accent-teal transition-colors mb-6 bg-transparent border-none cursor-pointer">
+        <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-xs font-semibold text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] transition-colors mb-6 bg-transparent border-none cursor-pointer">
           <ArrowLeft size={14} /> {t('product.backToCatalog')}
         </button>
 
@@ -193,7 +212,7 @@ export default function ProductDetail() {
           <div>
             <div className="relative bg-[var(--secondary-bg)] border border-[var(--border)] p-4 rounded-2xl overflow-hidden group cursor-crosshair" onMouseMove={handleMouseMove} onMouseEnter={() => setShowZoom(true)} onMouseLeave={() => setShowZoom(false)}>
               <div className="overflow-hidden rounded-xl bg-[var(--primary-bg)] h-[350px] sm:h-[450px] flex items-center justify-center relative">
-                <OptimizedImage src={`/images/${product.filename}`} alt={product.name} width={600} height={600} loading="eager" sizes="(max-width: 768px) 100vw, 55vw" className={`w-full h-full object-contain p-2 transition-transform duration-200 ${showZoom ? 'scale-150' : 'scale-100'}`} style={showZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined} onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
+                <OptimizedImage src={getProductImageUrl(product.filename)} alt={product.name} width={600} height={600} loading="eager" sizes="(max-width: 768px) 100vw, 55vw" className={`w-full h-full object-contain p-2 transition-transform duration-200 ${showZoom ? 'scale-150' : 'scale-100'}`} style={showZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined} onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
                 <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-xs text-white px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 opacity-0 group-hover:opacity-80 transition-opacity">
                   <ZoomIn size={12} /> {t('product.hoverToZoom')}
                 </div>
@@ -221,13 +240,13 @@ export default function ProductDetail() {
           <div className="space-y-6 text-left">
             <div>
               <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] font-mono mb-2">
-                <Link to="/shop" className="hover:text-[var(--accent-blue)]">{t('nav.shop')}</Link>
+                <Link to="/shop" className="hover:text-[var(--accent-primary)]">{t('nav.shop')}</Link>
                 <span>/</span>
                 <span className="capitalize">{product.category.replace(/-/g, ' ')}</span>
               </div>
-              <h1 className="font-display font-bold text-display-lg tracking-tight text-[var(--text-primary)] leading-tight">{product.name}</h1>
+              <h1 className="font-display font-bold text-2xl lg:text-3xl tracking-tight text-[var(--text-primary)] leading-snug">{product.name}</h1>
               <div className="flex items-center gap-3 mt-3 flex-wrap">
-                <span className="text-xs font-semibold px-2.5 py-0.5 border text-[var(--accent-blue)] border-[var(--info-border)] bg-[var(--surface)] rounded">{t('product.brandPrefix', { brand: product.brand })}</span>
+                <span className="text-xs font-semibold px-2.5 py-0.5 border text-[var(--accent-primary)] border-[var(--info-border)] bg-[var(--surface)] rounded">{t('product.brandPrefix', { brand: product.brand })}</span>
                 <span className="text-xs font-mono text-[var(--text-muted)]">{t('product.skuPrefix', { sku: product.sku })}</span>
                 <span className="text-xs font-semibold px-2.5 py-0.5 border text-[var(--text-secondary)] border-[var(--border)] rounded">{t('product.conditionLabel', { condition: product.condition.charAt(0).toUpperCase() + product.condition.slice(1) })}</span>
               </div>
@@ -242,7 +261,7 @@ export default function ProductDetail() {
                     <span className="text-xs font-bold bg-[var(--danger)] text-[var(--btn-danger-text)] px-2 py-0.5 rounded">{t('product.percentageOff', { percent: Math.round((1 - product.salePrice / product.price) * 100) })}</span>
                   </div>
                 ) : (
-                  <span className="font-display font-bold text-4xl text-[var(--accent-blue)] tabular-nums">${effectivePrice.toFixed(2)}</span>
+                  <span className="font-display font-bold text-4xl text-[var(--accent-primary)] tabular-nums">${effectivePrice.toFixed(2)}</span>
                 )}
               </div>
               <div className="text-right flex items-center gap-2">
@@ -283,16 +302,16 @@ export default function ProductDetail() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button onClick={handleAddToCart} className={`w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full transition-all duration-300 border cursor-pointer ${added ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]' : 'border-[var(--brick-ember)] bg-[var(--brick-ember)] text-[var(--honeydew)] hover:bg-btn-hover-dark'}`}>
+                  <button onClick={handleAddToCart} className={`w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-xl transition-all duration-300 border cursor-pointer ${added ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]' : 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary-hover)]'}`}>
                     {added ? <><Check size={14} /> {t('product.added')}</> : <><ShoppingCart size={14} /> {t('product.addToCartUpper')}</>}
                   </button>
-                  <button onClick={handleBuyNow} className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-full bg-[var(--accent-blue)] border border-[var(--accent-blue)] text-[var(--btn-blue-text)] hover:bg-[var(--muted-teal)] transition-all cursor-pointer">
+                  <button onClick={handleBuyNow} className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-xl bg-transparent border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white transition-all cursor-pointer">
                     {t('product.buyNow')}
                   </button>
                 </div>
 
                 {product.makeOffer && (
-                  <button onClick={() => setShowOfferModal(true)} className="w-full flex items-center justify-center gap-2 py-3 border border-[var(--border)] hover:border-[var(--accent-blue)] text-[var(--accent-blue)] bg-transparent font-semibold text-xs rounded-full transition-colors cursor-pointer">
+                  <button onClick={() => setShowOfferModal(true)} className="w-full flex items-center justify-center gap-2 py-3 border border-[var(--border)] hover:border-[var(--accent-primary)] text-[var(--accent-primary)] bg-transparent font-semibold text-xs rounded-xl transition-colors cursor-pointer">
                     <Percent size={14} /> {t('product.makeOffer')}
                   </button>
                 )}
@@ -303,7 +322,7 @@ export default function ProductDetail() {
               <div className="p-4 bg-[var(--surface-soft)] border border-[var(--border)] rounded-xl text-center">
                 <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">{t('product.outOfStockMsg')}</p>
                 <p className="text-xs text-[var(--text-muted)] mb-3">{t('product.checkAvailability')}</p>
-                <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[var(--accent-gold)] text-navy-deep font-bold px-6 py-2.5 rounded-xl text-xs transition-all hover:bg-[var(--gold-light)] no-underline">
+                <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all hover:bg-[var(--accent-primary-hover)] no-underline">
                   <MessageCircle size={14} /> {t('product.inquireWhatsApp')}
                 </a>
               </div>
@@ -330,7 +349,7 @@ export default function ProductDetail() {
         {/* DESCRIPTION SECTION */}
         <section className="mt-16 border-t border-[var(--border)] pt-10 text-left">
           <div className="border-b border-[var(--border)] mb-6">
-            <span className="inline-block border-b-2 border-[var(--accent-blue)] pb-2 font-semibold text-sm text-[var(--accent-blue)] tracking-wide uppercase">{t('product.description')}</span>
+            <span className="inline-block border-b-2 border-[var(--accent-primary)] pb-2 font-semibold text-sm text-[var(--accent-primary)] tracking-wide uppercase">{t('product.description')}</span>
           </div>
           <div className="space-y-6 text-sm text-[var(--text-secondary)] leading-relaxed max-w-[800px]">
             <div>
@@ -368,7 +387,7 @@ export default function ProductDetail() {
               const Icon = item.icon
               return (
                 <div key={idx} className="bg-[var(--primary-bg)] border border-[var(--border)] p-4 rounded-xl flex flex-col items-center">
-                  <Icon className="text-[var(--accent-blue)] mb-2.5" size={24} />
+                  <Icon className="text-[var(--accent-primary)] mb-2.5" size={24} />
                   <span className="text-xs font-bold text-[var(--text-primary)] block">{item.title}</span>
                   <span className="text-xs text-[var(--text-muted)]">{item.desc}</span>
                 </div>
@@ -385,7 +404,7 @@ export default function ProductDetail() {
               {related.map((item) => {
                 const itemPrice = item.onSale && item.salePrice ? item.salePrice : item.price
                 return (
-                  <div key={item.id} className="bg-[var(--secondary-bg)] border border-[var(--border)] overflow-hidden transition-all duration-300 hover:border-l-[var(--accent-blue)] hover:-translate-y-1 rounded-xl group flex flex-col justify-between">
+                  <div key={item.id} className="bg-[var(--secondary-bg)] border border-[var(--border)] overflow-hidden transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1 rounded-xl group flex flex-col justify-between">
                     <Link to={`/product/${item.id}`} className="overflow-hidden bg-[var(--primary-bg)] flex items-center justify-center relative block">
                       <OptimizedImage src={`/images/${item.filename}`} alt={item.name} width={400} height={400} loading="lazy" sizes="(max-width: 1024px) 50vw, 25vw" className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110" onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
                       {item.customLabel && (
@@ -395,17 +414,17 @@ export default function ProductDetail() {
                     <div className="p-4 flex-1 flex flex-col justify-between">
                       <div>
                         <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider block mb-1">{item.brand}</span>
-                        <Link to={`/product/${item.id}`} className="text-xs font-semibold leading-tight text-[var(--text-primary)] hover:text-[var(--accent-blue)] block mb-2 line-clamp-2">{item.name}</Link>
+                        <Link to={`/product/${item.id}`} className="text-xs font-semibold leading-tight text-[var(--text-primary)] hover:text-[var(--accent-primary)] block mb-2 line-clamp-2">{item.name}</Link>
                       </div>
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-[var(--border)]/40">
                         <div className="flex items-center gap-2">
                           {item.onSale && item.salePrice ? (
                             <><span className="font-display font-bold text-sm text-[var(--danger)]">${item.salePrice.toFixed(2)}</span><span className="font-display font-bold text-xs text-[var(--text-muted)] line-through">${item.price.toFixed(2)}</span></>
                           ) : (
-                            <span className="font-display font-bold text-sm text-[var(--accent-blue)]">${itemPrice.toFixed(2)}</span>
+                            <span className="font-display font-bold text-sm text-[var(--accent-primary)]">${itemPrice.toFixed(2)}</span>
                           )}
                         </div>
-                        <Link to={`/product/${item.id}`} className="text-xs font-semibold text-[var(--accent-blue)] hover:underline">{t('product.viewInfo')}</Link>
+                        <Link to={`/product/${item.id}`} className="text-xs font-semibold text-[var(--accent-primary)] hover:underline">{t('product.viewInfo')}</Link>
                       </div>
                     </div>
                   </div>
@@ -436,15 +455,15 @@ export default function ProductDetail() {
                 {offerError && <p className="text-xs text-[var(--danger)] text-center">{offerError}</p>}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">{t('product.yourOffer')}</label>
-                  <input type="number" required placeholder={t('product.offerPlaceholder', { amount: (effectivePrice * 0.85).toFixed(0) })} value={offerPrice} onChange={(e) => setOfferPrice(e.target.value)} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-blue)]" />
+                  <input type="number" required placeholder={t('product.offerPlaceholder', { amount: (effectivePrice * 0.85).toFixed(0) })} value={offerPrice} onChange={(e) => setOfferPrice(e.target.value)} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-primary)]" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">{t('product.email')}</label>
-                  <input type="email" required placeholder={t('product.emailPlaceholder')} value={offerEmail} onChange={(e) => setOfferEmail(e.target.value)} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-blue)]" />
+                  <input type="email" required placeholder={t('product.emailPlaceholder')} value={offerEmail} onChange={(e) => setOfferEmail(e.target.value)} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-primary)]" />
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-6">
-                  <button type="button" onClick={() => setShowOfferModal(false)} className="w-full py-3 border border-[var(--border)] bg-transparent font-semibold text-xs rounded-full transition-colors cursor-pointer hover:border-[var(--danger)] hover:text-[var(--danger)]">{t('product.cancel')}</button>
-                  <button type="submit" disabled={offerSubmitting} className="w-full py-3 bg-[var(--brick-ember)] text-[var(--honeydew)] font-semibold text-xs border border-[var(--brick-ember)] hover:bg-btn-hover-dark transition-all rounded-full cursor-pointer disabled:opacity-50">
+                  <button type="button" onClick={() => setShowOfferModal(false)} className="w-full py-3 border border-[var(--border)] bg-transparent font-semibold text-xs rounded-xl transition-colors cursor-pointer hover:border-[var(--danger)] hover:text-[var(--danger)]">{t('product.cancel')}</button>
+                  <button type="submit" disabled={offerSubmitting} className="w-full py-3 bg-[var(--accent-primary)] text-white font-semibold text-xs border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all rounded-xl cursor-pointer disabled:opacity-50">
                     {offerSubmitting ? 'Submitting...' : t('product.submitOffer')}
                   </button>
                 </div>
