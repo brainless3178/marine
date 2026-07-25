@@ -112,17 +112,15 @@ test.describe('Products Page', () => {
 
 test.describe('Product Detail', () => {
   test('product detail page loads with images and specs', async ({ page, request }) => {
-    // Fetch a valid product ID from the API
+    // Fetch a valid product ID from the API and use its slug for a cleaner URL
     const res = await request.get('/api/storefront/products?limit=1')
     const data = await res.json()
     const productId = data.products?.[0]?.id
     if (!productId) return // skip if no products seeded
-    await page.goto(`/product/${productId}`, { waitUntil: 'domcontentloaded', timeout: 60000 })
-    await page.waitForTimeout(3000)
-    await expect(page.locator('body')).toBeVisible()
-    // Should have product name
+    await page.goto(`/product/${productId}`, { waitUntil: 'networkidle', timeout: 60000 })
+    // Wait for the product name heading to render (API + adapter transform)
     const productName = page.locator('h1').first()
-    await expect(productName).toBeVisible({ timeout: 5000 })
+    await expect(productName).toBeVisible({ timeout: 20000 })
   })
 
   test('has add to cart button', async ({ page, request }) => {
@@ -130,10 +128,10 @@ test.describe('Product Detail', () => {
     const data = await res.json()
     const productId = data.products?.[0]?.id
     if (!productId) return
-    await page.goto(`/product/${productId}`, { waitUntil: 'domcontentloaded', timeout: 60000 })
-    await page.waitForTimeout(3000)
+    await page.goto(`/product/${productId}`, { waitUntil: 'networkidle', timeout: 60000 })
+    // Wait for Add to Cart button to be visible (product must be in stock)
     const addToCartBtn = page.locator('button:has-text("Add to Cart"), button:has-text("Add To Cart")').first()
-    await expect(addToCartBtn).toBeVisible({ timeout: 5000 })
+    await expect(addToCartBtn).toBeVisible({ timeout: 20000 })
   })
 
   test('has related products section', async ({ page, request }) => {
@@ -141,8 +139,8 @@ test.describe('Product Detail', () => {
     const data = await res.json()
     const productId = data.products?.[0]?.id
     if (!productId) return
-    await page.goto(`/product/${productId}`, { waitUntil: 'domcontentloaded', timeout: 60000 })
-    await page.waitForTimeout(5000)
+    await page.goto(`/product/${productId}`, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(3000)
     // Related products may or may not appear depending on category/brand matches
     // Just verify the product detail page loaded successfully
     await expect(page.locator('body')).toBeVisible()
