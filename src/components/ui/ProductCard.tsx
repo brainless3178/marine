@@ -49,7 +49,7 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
           height={compact ? 315 : 420}
           loading="lazy"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }}
+          onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
         />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[var(--overlay-dark)] to-transparent opacity-80" />
 

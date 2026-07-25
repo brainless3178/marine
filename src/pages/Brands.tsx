@@ -119,7 +119,7 @@ export default function Brands() {
                       loading="lazy"
                       decoding="async"
                       className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }}
+                      onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
                     />
                   </div>
                 ))}

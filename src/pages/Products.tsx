@@ -357,7 +357,7 @@ export default function Products() {
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                             className="w-full aspect-square object-cover border-b border-[var(--border)] transition-transform duration-500 group-hover:scale-105"
                             loading="lazy"
-                            onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }}
+                            onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
                           />
                           {product.customLabel && (
                             <span className="absolute top-2 left-2 z-10 px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider rounded" style={{ backgroundColor: product.customLabelColor || '#159a67', color: isLightColor(product.customLabelColor || '#159a67') ? '#1a1a1a' : '#ffffff' }}>

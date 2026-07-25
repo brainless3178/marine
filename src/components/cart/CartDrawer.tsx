@@ -195,7 +195,7 @@ export function CartDrawer() {
                               height={64}
                               sizes="64px"
                               className="h-full w-full object-cover"
-                              onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }}
+                              onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
                             />
                           </div>
 
