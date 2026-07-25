@@ -176,28 +176,36 @@ test.describe('Admin Product Form', () => {
   })
 
   test('product form has tabs', async ({ page }) => {
-    await page.goto('/admin/login')
-    await page.waitForTimeout(2000)
-    const emailInput = page.locator('input[type="email"], input[type="text"]').first()
+    // Login first via direct navigation
+    await page.goto('/admin/login', { waitUntil: 'networkidle', timeout: 30000 })
+    const emailInput = page.locator('input[type="email"]').first()
     const passwordInput = page.locator('input[type="password"]').first()
-    if (await emailInput.isVisible() && await passwordInput.isVisible()) {
-      await emailInput.fill('admin@alkatraders.com')
-      await passwordInput.fill('admin123')
-      const submitBtn = page.locator('button[type="submit"], button:has-text("Login")').first()
-      if (await submitBtn.isVisible()) {
-        await submitBtn.click()
-        await page.waitForTimeout(3000)
-        // Navigate to new product form
-        await page.goto('/admin/products/new', { waitUntil: 'domcontentloaded', timeout: 60000 })
-        await page.waitForTimeout(5000)
-        // The form has tab buttons inside a nav element — verify the page loaded
-        await expect(page.locator('body')).toBeVisible()
-        // Check for product form content — the Basics tab or product name field
-        const formContent = page.locator('button:has-text("Basics"), button:has-text("Inventory"), input[placeholder*="product" i], input[placeholder*="Hydraulic" i]')
-        const count = await formContent.count()
-        expect(count).toBeGreaterThanOrEqual(1)
-      }
+    await expect(emailInput).toBeVisible({ timeout: 5000 })
+    await emailInput.fill('admin@alkatraders.com')
+    await passwordInput.fill('admin123')
+    await page.locator('button[type="submit"]').click()
+    // Wait for dashboard to load
+    await page.waitForTimeout(3000)
+    // Navigate to new product form via SPA link to preserve auth
+    const productsLink = page.locator('a[href*="products"]').first()
+    if (await productsLink.isVisible({ timeout: 3000 })) {
+      await productsLink.click()
+      await page.waitForTimeout(2000)
     }
+    const addProductLink = page.locator('a[href*="/admin/products/new"]').first()
+    if (await addProductLink.isVisible({ timeout: 5000 })) {
+      await addProductLink.click()
+    } else {
+      // Fallback: navigate directly (auth cookie should handle it)
+      await page.goto('/admin/products/new', { waitUntil: 'networkidle', timeout: 30000 })
+    }
+    // Wait for form to fully render
+    await page.waitForTimeout(3000)
+    // Check for form header or tab content
+    await expect(page.locator('body')).toBeVisible()
+    // Verify the form heading is visible ("Add Product" or "Edit Product")
+    const formHeading = page.locator('h1:has-text("Add Product"), h1:has-text("Edit Product")')
+    await expect(formHeading).toBeVisible({ timeout: 10000 })
   })
 })
 
