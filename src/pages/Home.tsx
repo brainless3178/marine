@@ -10,6 +10,7 @@ import { storefront } from '../lib/api'
 import { apiProductsToFrontend } from '../lib/adapters'
 import { products as staticProducts } from '../data/products'
 import { Hero } from '../components/sections/Hero'
+import { ShopByCategory } from '../components/sections/ShopByCategory'
 const StatsBar = lazy(() => import('../components/sections/StatsBar').then(m => ({ default: m.StatsBar })))
 const CategoriesGrid = lazy(() => import('../components/sections/CategoriesGrid').then(m => ({ default: m.CategoriesGrid })))
 const HowItWorks = lazy(() => import('../components/sections/HowItWorks').then(m => ({ default: m.HowItWorks })))
@@ -50,6 +51,8 @@ export default function Home() {
         canonical="/"
       />
       <Hero />
+
+      <ShopByCategory />
 
       {/* ── SHIPPING BADGES ── */}
       <section className="py-8 bg-[var(--navy-deep)] border-b border-white/10" aria-label="Shipping and service guarantees">

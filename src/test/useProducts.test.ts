@@ -7,7 +7,7 @@ import type { Product } from '../types'
 function makeProduct(overrides: Partial<Product> = {}): Product {
   return {
     id: 'test-1',
-    filename: 'product-001.jpg',
+    filename: 'product-001_electrical.jpg',
     name: 'Hydraulic Pump HP-200',
     brand: 'Rexroth',
     sku: 'HP-200-MS',

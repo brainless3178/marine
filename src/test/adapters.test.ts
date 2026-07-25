@@ -32,7 +32,7 @@ function makeApiProduct(overrides: Record<string, any> = {}) {
     customLabelColor: '#ff0000',
     sortPriority: 1,
     images: [
-      { id: 'img1', url: '/images/product-001.jpg', altText: 'HP-200 front', label: 'Main', isMain: true, sortOrder: 0 },
+      { id: 'img1', url: '/images/product-001_electrical.jpg', altText: 'HP-200 front', label: 'Main', isMain: true, sortOrder: 0 },
       { id: 'img2', url: '/images/product-001-side.jpg', altText: 'HP-200 side', label: 'Side', isMain: false, sortOrder: 1 },
     ],
     specs: [
@@ -108,7 +108,7 @@ describe('apiProductToFrontend', () => {
 
   it('extracts filename from image URL', () => {
     const result = apiProductToFrontend(makeApiProduct())
-    expect(result.filename).toBe('products/product-001.jpg')
+    expect(result.filename).toBe('products/product-001_electrical.jpg')
   })
 
   it('maps images array with alt text', () => {
@@ -138,19 +138,19 @@ describe('apiProductToFrontend', () => {
 
   it('handles empty images array', () => {
     const result = apiProductToFrontend(makeApiProduct({ images: [] }))
-    // With no image URL, falls back to ID-based mapping: test-id-1 → product-002.jpg
-    expect(result.filename).toBe('products/product-002.jpg')
+    // With no image URL, falls back to ID-based mapping: test-id-1 → product-002_electrical.jpg
+    expect(result.filename).toBe('products/product-002_electrical.jpg')
     // Empty images array also triggers the fallback image
     expect(result.images).toHaveLength(1)
-    expect(result.images[0].url).toContain('product-002.jpg')
+    expect(result.images[0].url).toContain('product-002_electrical.jpg')
   })
 
   it('uses fallback images when images is null/undefined', () => {
     const result = apiProductToFrontend(makeApiProduct({ images: undefined }))
-    // With no image URL, falls back to ID-based mapping: test-id-1 → product-002.jpg
-    expect(result.filename).toBe('products/product-002.jpg')
+    // With no image URL, falls back to ID-based mapping: test-id-1 → product-002_electrical.jpg
+    expect(result.filename).toBe('products/product-002_electrical.jpg')
     expect(result.images).toHaveLength(1)
-    expect(result.images[0].url).toContain('product-002.jpg')
+    expect(result.images[0].url).toContain('product-002_electrical.jpg')
   })
 
   it('handles missing specs', () => {
