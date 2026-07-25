@@ -869,6 +869,17 @@ html:not(.light) {
   100% { left: 200%; }
 }
 
+@keyframes whatsappFloatIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track,
   [class*="marquee"] {

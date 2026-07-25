@@ -133,7 +133,7 @@ marine/
 │   ├── store/useStore.ts           # Zustand (cart, auth, filters — all local state)
 │   ├── types/index.ts              # TypeScript interfaces
 │   └── locales/                    # i18n (en, ar, es)
-└── public/images/                  # 133 product images (product-001.jpg to product-133.jpg)
+└── public/images/                  # 133 product images (product-001_electrical.jpg to product-133.jpg)
 ```
 
 ---

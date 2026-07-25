@@ -102,7 +102,7 @@ export default function Brands() {
               <div
                 className="flex gap-4 w-max"
                 style={{
-                  animation: `marqueeLeft ${60 + rowIndex * 10}s linear infinite`,
+                  animation: `marqueeLeft ${100 + rowIndex * 15}s linear infinite`,
                   animationDirection: rowIndex % 2 === 0 ? 'normal' : 'reverse',
                 }}
               >

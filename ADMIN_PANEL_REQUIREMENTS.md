@@ -11,7 +11,7 @@ The admin panel should turn those static frontend values into managed store data
 - Frontend framework: React, TypeScript, Vite, Tailwind-style CSS, Zustand, React Router.
 - Main customer routes: `/`, `/shop`, `/products`, `/product/:id`, `/brands`, `/industries`, `/rfq`, `/contact`, `/search`, `/emergency`, `/network`, `/intelligence`, `/checkout`.
 - Product source today: `src/data/products.ts`.
-- Product image source today: `public/images/product-001.jpg` style files.
+- Product image source today: `public/images/product-001_electrical.jpg` style files.
 - Product model already includes: id, filename, name, brand, sku, category, industry, availability, specs, description, condition, price, sale price, stock, images, label, new-arrival flag, date added, and make-offer flag.
 - Product count in data references roughly 255 products, but `public/images` currently has 133 `product-*.jpg` files. Admin image validation is required so listings do not point to missing assets.
 - Cart, checkout, RFQ, offers, and auth are currently simulated in frontend state. A real admin panel requires a backend database and APIs.

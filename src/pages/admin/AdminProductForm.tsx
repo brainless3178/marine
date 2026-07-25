@@ -768,7 +768,7 @@ export default function AdminProductForm() {
                           type="text"
                           value={img.url}
                           onChange={(e) => updateImage(i, 'url', e.target.value)}
-                          placeholder="/images/product-001.jpg"
+                          placeholder="/images/product-001_electrical.jpg"
                           className={getFieldClass('')}
                         />
                       </div>

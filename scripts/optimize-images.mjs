@@ -6,7 +6,7 @@
  * responsive sizes for modern browsers.
  * 
  * Output per image (e.g. product-001):
- *   - product-001.jpg      (1200px — full size fallback)
+ *   - product-001_electrical.jpg      (1200px — full size fallback)
  *   - product-001.webp     (1200px)
  *   - product-001.avif     (1200px)
  *   - product-001-800.jpg  (800px — tablet)
