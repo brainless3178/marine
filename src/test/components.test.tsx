@@ -71,7 +71,7 @@ describe('Button', () => {
   it('applies primary variant by default', () => {
     render(<Button>Primary</Button>)
     const btn = screen.getByRole('button')
-    expect(btn).toHaveClass('bg-[var(--brick-ember)]')
+    expect(btn).toHaveClass('bg-[var(--accent-primary)]')
   })
 
   it('applies outline variant', () => {
