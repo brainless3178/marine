@@ -108,7 +108,7 @@ describe('apiProductToFrontend', () => {
 
   it('extracts filename from image URL', () => {
     const result = apiProductToFrontend(makeApiProduct())
-    expect(result.filename).toBe('product-001.jpg')
+    expect(result.filename).toBe('products/product-001.jpg')
   })
 
   it('maps images array with alt text', () => {
@@ -138,16 +138,19 @@ describe('apiProductToFrontend', () => {
 
   it('handles empty images array', () => {
     const result = apiProductToFrontend(makeApiProduct({ images: [] }))
-    expect(result.filename).toBe('placeholder.png')
-    // Empty array stays empty — the fallback only triggers when images is null/undefined
-    expect(result.images).toHaveLength(0)
+    // With no image URL, falls back to ID-based mapping: test-id-1 → product-002.jpg
+    expect(result.filename).toBe('products/product-002.jpg')
+    // Empty images array also triggers the fallback image
+    expect(result.images).toHaveLength(1)
+    expect(result.images[0].url).toContain('product-002.jpg')
   })
 
   it('uses fallback images when images is null/undefined', () => {
     const result = apiProductToFrontend(makeApiProduct({ images: undefined }))
-    expect(result.filename).toBe('placeholder.png')
+    // With no image URL, falls back to ID-based mapping: test-id-1 → product-002.jpg
+    expect(result.filename).toBe('products/product-002.jpg')
     expect(result.images).toHaveLength(1)
-    expect(result.images[0].url).toContain('placeholder.png')
+    expect(result.images[0].url).toContain('product-002.jpg')
   })
 
   it('handles missing specs', () => {
