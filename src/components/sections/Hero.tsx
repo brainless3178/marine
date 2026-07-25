@@ -269,7 +269,7 @@ export function Hero() {
                         className={`grid w-full grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-[var(--border)] px-3 py-3 text-left transition last:border-b-0 ${searchSuggestions.indexOf(product) === suggestionIndex ? 'bg-[var(--surface-soft)]' : 'hover:bg-[var(--primary-bg)]'}`}
                       >
                         <span className="h-14 w-14 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-soft)]">
-                          <img src={getProductImageUrl(product.filename)} alt={product.name} width={56} height={56} loading="lazy" decoding="async" className="h-full w-full object-cover" onError={(event) => { const img = event.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
+                          <img src={getProductImageUrl(product.filename)} alt={product.name} width={56} height={56} loading="lazy" decoding="async" className="h-full w-full object-cover" onError={(event) => { const img = event.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }} />
                         </span>
                         <span className="min-w-0">
                           <span className="block truncate text-sm font-black text-[var(--text-primary)]">{product.name}</span>
@@ -359,7 +359,7 @@ export function Hero() {
                       height={480}
                       sizes="(max-width: 1024px) 100vw, 50vw"
                       className="w-full h-full object-cover"
-                      onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }}
+                      onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
                     />
                   </div>
                   <div className="flex items-center gap-2 mb-2">

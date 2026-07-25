@@ -29,8 +29,8 @@ export function OptimizedImage({
   const [imgSrc, setImgSrc] = useState(src)
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    if (imgSrc !== '/images/placeholder.avif') {
-      setImgSrc('/images/placeholder.avif')
+    if (imgSrc !== '/images/placeholder.jpg') {
+      setImgSrc('/images/placeholder.jpg')
     }
     if (onError) {
       onError(e)

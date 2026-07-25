@@ -76,7 +76,7 @@ export function apiProductToFrontend(api: ApiProduct): Product {
       const num = String((parseInt(match[0], 10) % 255) + 1).padStart(3, '0')
       rawFilename = `product-${num}.jpg`
     } else {
-      rawFilename = 'placeholder.avif'
+      rawFilename = 'placeholder.jpg'
     }
   }
 
@@ -106,7 +106,7 @@ export function apiProductToFrontend(api: ApiProduct): Product {
           const cleanName = (img.url.split('/').pop()?.split('?')[0] || '')
             .replace(/^prod-/, 'product-')
             .replace(/\.avif$/, '.jpg')
-            .replace(/\.png$/, '.jpg') || 'placeholder.avif'
+            .replace(/\.png$/, '.jpg') || 'placeholder.jpg'
           return {
             url: `/images/products/${cleanName}`,
             alt: img.altText || `${api.name} - ${img.label || 'View'}`,

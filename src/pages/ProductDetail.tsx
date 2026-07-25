@@ -212,7 +212,7 @@ export default function ProductDetail() {
           <div>
             <div className="relative bg-[var(--secondary-bg)] border border-[var(--border)] p-4 rounded-2xl overflow-hidden group cursor-crosshair" onMouseMove={handleMouseMove} onMouseEnter={() => setShowZoom(true)} onMouseLeave={() => setShowZoom(false)}>
               <div className="overflow-hidden rounded-xl bg-[var(--primary-bg)] h-[350px] sm:h-[450px] flex items-center justify-center relative">
-                <OptimizedImage src={getProductImageUrl(product.filename)} alt={product.name} width={600} height={600} loading="eager" sizes="(max-width: 768px) 100vw, 55vw" className={`w-full h-full object-contain p-2 transition-transform duration-200 ${showZoom ? 'scale-150' : 'scale-100'}`} style={showZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined} onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
+                <OptimizedImage src={getProductImageUrl(product.filename)} alt={product.name} width={600} height={600} loading="eager" sizes="(max-width: 768px) 100vw, 55vw" className={`w-full h-full object-contain p-2 transition-transform duration-200 ${showZoom ? 'scale-150' : 'scale-100'}`} style={showZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined} onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }} />
                 <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-xs text-white px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 opacity-0 group-hover:opacity-80 transition-opacity">
                   <ZoomIn size={12} /> {t('product.hoverToZoom')}
                 </div>
@@ -406,7 +406,7 @@ export default function ProductDetail() {
                 return (
                   <div key={item.id} className="bg-[var(--secondary-bg)] border border-[var(--border)] overflow-hidden transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1 rounded-xl group flex flex-col justify-between">
                     <Link to={`/product/${item.id}`} className="overflow-hidden bg-[var(--primary-bg)] flex items-center justify-center relative block">
-                      <OptimizedImage src={getProductImageUrl(item.filename)} alt={item.name} width={400} height={400} loading="lazy" sizes="(max-width: 1024px) 50vw, 25vw" className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110" onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.avif'; img.onerror = null; }} />
+                      <OptimizedImage src={getProductImageUrl(item.filename)} alt={item.name} width={400} height={400} loading="lazy" sizes="(max-width: 1024px) 50vw, 25vw" className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110" onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }} />
                       {item.customLabel && (
                         <span className="absolute top-2 left-2 z-10 px-2 py-0.5 text-xs font-extrabold uppercase rounded" style={{ backgroundColor: item.customLabelColor || '#159a67', color: isLightColor(item.customLabelColor || '#159a67') ? '#1a1a1a' : '#ffffff' }}>{item.customLabel}</span>
                       )}

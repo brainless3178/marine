@@ -40,7 +40,7 @@ interface Section {
 }
 
 const defaultSections: Section[] = [
-  { id: 'hero', type: 'hero', label: 'Hero Banner', icon: Image, enabled: true, sortOrder: 0, config: { title: 'Alka Traders', subtitle: 'Leading Supplier & Exporter of Used & Unbranded Marine Equipment', ctaText: 'Browse Products', heroImage: '/images/placeholder.avif' } },
+  { id: 'hero', type: 'hero', label: 'Hero Banner', icon: Image, enabled: true, sortOrder: 0, config: { title: 'Alka Traders', subtitle: 'Leading Supplier & Exporter of Used & Unbranded Marine Equipment', ctaText: 'Browse Products', heroImage: '/images/placeholder.jpg' } },
   { id: 'featured', type: 'featured', label: 'Featured Products', icon: Package, enabled: true, sortOrder: 1, config: { title: 'Featured Equipment', maxItems: '8', layout: 'grid' } },
   { id: 'stats', type: 'stats', label: 'Stats Bar', icon: Users, enabled: true, sortOrder: 2, config: { stat1Label: 'Products', stat1Value: '255+', stat2Label: 'Countries', stat2Value: '30+', stat3Label: 'Years', stat3Value: '25+', stat4Label: 'Clients', stat4Value: '500+' } },
   { id: 'categories', type: 'categories', label: 'Categories Grid', icon: Factory, enabled: true, sortOrder: 3, config: { title: 'Browse by Category', layout: 'grid' } },
