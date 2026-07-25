@@ -69,8 +69,9 @@ export function apiProductToFrontend(api: ApiProduct): Product {
       .replace(/\.png$/, '.jpg')
   }
 
-  if (!rawFilename || rawFilename.includes('placeholder')) {
-    // If backend returns UUID or no image, attempt matching by numeric part of ID or SKU, or fallback to product-001.jpg
+  // If no valid filename or doesn't match product-XXX.jpg pattern (e.g. UUID filename from admin upload),
+  // attempt matching by numeric part of product ID or SKU, or fallback to placeholder
+  if (!rawFilename || rawFilename.includes('placeholder') || !/^product-\d{3}\.jpg$/.test(rawFilename)) {
     const match = api.id.match(/\d+/) || api.sku.match(/\d+/)
     if (match) {
       const num = String((parseInt(match[0], 10) % 255) + 1).padStart(3, '0')
@@ -103,10 +104,14 @@ export function apiProductToFrontend(api: ApiProduct): Product {
     customLabelColor: api.customLabelColor || undefined,
     images: api.images?.length
       ? api.images.map((img) => {
-          const cleanName = (img.url.split('/').pop()?.split('?')[0] || '')
+          let cleanName = (img.url.split('/').pop()?.split('?')[0] || '')
             .replace(/^prod-/, 'product-')
             .replace(/\.avif$/, '.jpg')
-            .replace(/\.png$/, '.jpg') || 'placeholder.jpg'
+            .replace(/\.png$/, '.jpg') || ''
+          // If not a recognizable product-XXX.jpg, use the computed fallback filename
+          if (!cleanName || !/^product-\d{3}\.jpg$/.test(cleanName)) {
+            cleanName = filename.startsWith('products/') ? filename.slice(9) : filename
+          }
           return {
             url: `/images/products/${cleanName}`,
             alt: img.altText || `${api.name} - ${img.label || 'View'}`,
