@@ -115,7 +115,6 @@ export default function AdminProductForm() {
             {hook.activeTab === 'images' && (
               <ProductFormImages
                 form={hook.form}
-                updateField={hook.updateField}
                 updateImage={hook.updateImage}
                 addImage={hook.addImage}
                 removeImage={hook.removeImage}
