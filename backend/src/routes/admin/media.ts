@@ -33,12 +33,13 @@ function generateHash(buffer: Buffer): string {
 }
 
 // Helper: write file to disk and return URL
-async function saveFile(buffer: Buffer, originalName: string): Promise<{ filename: string; url: string }> {
-  const hash = generateHash(buffer)
-  const ext = path.extname(originalName).toLowerCase() || '.jpg'
-  const filename = `${hash.slice(0, 12)}-${Date.now()}${ext}`
+async function saveFile(buffer: Buffer, hash: string, ext: string): Promise<{ filename: string; url: string }> {
+  // Use hash as filename for dedup-friendly storage (same hash = same filename)
+  const filename = `${hash.slice(0, 12)}${ext}`
   const filepath = path.join(UPLOAD_DIR, filename)
-  fs.writeFileSync(filepath, buffer)
+  if (!fs.existsSync(filepath)) {
+    fs.writeFileSync(filepath, buffer)
+  }
   return { filename, url: `/uploads/${filename}` }
 }
 
@@ -54,8 +55,9 @@ async function optimizeImage(buffer: Buffer, mimetype: string): Promise<{ optimi
     image.resize({ width: Math.min(width, 2000), height: Math.min(height, 2000), fit: 'inside', withoutEnlargement: true })
   }
 
-  // Convert to WebP for smaller file size
-  const optimized = await image.webp({ quality: 85 }).toBuffer()
+  // Convert to WebP for smaller file size, auto-rotate from EXIF orientation
+  // Sharp strips EXIF metadata by default in WebP output (no .withMetadata() call needed)
+  const optimized = await image.rotate().webp({ quality: 85 }).toBuffer()
   return { optimized, width, height }
 }
 
@@ -95,14 +97,23 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
   const hash = generateHash(file.buffer)
   const existing = await prisma.mediaAsset.findFirst({ where: { hash } })
   if (existing) {
-    return res.status(209).json({ asset: existing, message: 'Duplicate file — existing asset returned' })
+    return res.status(200).json({ asset: existing, message: 'Duplicate file — existing asset returned' })
   }
 
   // Optimize image
   const { optimized, width, height } = await optimizeImage(file.buffer, file.mimetype)
 
-  // Save optimized file
-  const { filename, url } = await saveFile(optimized, file.originalname)
+  // Compute hash from OPTIMIZED buffer (after Sharp conversion)
+  const optimizedHash = generateHash(optimized)
+
+  // Check for duplicate again with hash of the optimized output
+  const existingOptimized = await prisma.mediaAsset.findFirst({ where: { hash: optimizedHash } })
+  if (existingOptimized) {
+    return res.status(200).json({ asset: existingOptimized, message: 'Duplicate file — existing asset returned' })
+  }
+
+  // Save optimized file — pass the computed hash directly to avoid re-hashing
+  const { filename, url } = await saveFile(optimized, optimizedHash, '.webp')
 
   // Create media asset record
   const asset = await prisma.mediaAsset.create({
@@ -114,7 +125,7 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
       fileSize: optimized.length,
       width,
       height,
-      hash,
+      hash: optimizedHash,
       uploadedBy: req.user!.id,
     },
   })
@@ -124,12 +135,47 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
 
 // ─── Delete Media ──────────────────────────────────────────────
 router.delete('/:id', requireRole('inventory-manager'), asyncHandler(async (req: AuthRequest, res) => {
-  // Check if used by any product
-  const usage = await prisma.productImage.count({ where: { mediaAssetId: req.params.id as string } })
-  if (usage > 0) {
-    return res.status(400).json({ error: `Cannot delete: used by ${usage} product(s)` })
+  const assetId = req.params.id as string
+
+  // Check usage across ALL entities, not just ProductImage
+  const [productImageCount, brandCount, adminUserCount, productCount] = await Promise.all([
+    prisma.productImage.count({ where: { mediaAssetId: assetId } }),
+    prisma.brand.count({ where: { logoUrl: { contains: assetId } } }),
+    prisma.adminUser.count({ where: { avatarUrl: { contains: assetId } } }),
+    prisma.product.count({ where: { ogImageUrl: { contains: assetId } } }),
+  ])
+
+  if (productImageCount > 0) {
+    return res.status(400).json({ error: `Cannot delete: used by ${productImageCount} product image(s)` })
   }
-  await prisma.mediaAsset.delete({ where: { id: req.params.id as string } })
+  if (brandCount > 0) {
+    return res.status(400).json({ error: 'Cannot delete: used as a brand logo' })
+  }
+  if (adminUserCount > 0) {
+    return res.status(400).json({ error: 'Cannot delete: used as an admin avatar' })
+  }
+  if (productCount > 0) {
+    return res.status(400).json({ error: 'Cannot delete: used as a product OG image' })
+  }
+
+  // Fetch asset to get disk file path before deleting record
+  const asset = await prisma.mediaAsset.findUnique({ where: { id: assetId } })
+  if (!asset) return res.status(404).json({ error: 'Media asset not found' })
+
+  // Delete DB record
+  await prisma.mediaAsset.delete({ where: { id: assetId } })
+
+  // Delete disk file if it exists
+  const filepath = path.join(UPLOAD_DIR, asset.filename)
+  try {
+    if (fs.existsSync(filepath)) {
+      fs.unlinkSync(filepath)
+    }
+  } catch {
+    // File might already be gone — log but don't fail the request
+    console.warn(`Failed to delete disk file: ${filepath}`)
+  }
+
   res.json({ message: 'Deleted' })
 }))
 
