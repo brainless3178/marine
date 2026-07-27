@@ -74,13 +74,7 @@ export function setCustomerToken(token: string | null) {
   customerAccessToken = token
 }
 
-export function getAdminToken(): string | null {
-  return adminAccessToken
-}
 
-export function getCustomerToken(): string | null {
-  return customerAccessToken
-}
 
 // ─── Core Fetch Wrapper ─────────────────────────────────────────
 

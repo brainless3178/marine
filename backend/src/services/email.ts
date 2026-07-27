@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 import { prisma } from '../server.js'
 import logger from '../utils/logger.js'
+import { escapeHtml } from '../utils/html-escape.js'
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -186,7 +187,7 @@ export const emailTemplates = {
 
     const html = baseLayout('Order Confirmation', `
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Order Confirmed ✅</h2>
-      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Thank you for your order, ${data.customerName}!</p>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Thank you for your order, ${escapeHtml(data.customerName)}!</p>
       
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;">
         <tr><td><table width="100%" cellpadding="0" cellspacing="0">${infoRow('Order Number', `<span style="color:#0ea5e9;font-weight:700;">${data.orderNumber}</span>`)}</table></td></tr>
@@ -222,20 +223,20 @@ export const emailTemplates = {
   }): QueueEmail {
     const html = baseLayout('Order Shipped', `
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Your Order Has Shipped 🚚</h2>
-      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${data.customerName}, your order is on its way!</p>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${escapeHtml(data.customerName)}, your order is on its way!</p>
       
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin-bottom:24px;">
         <tr><td><table width="100%" cellpadding="0" cellspacing="0">
-          ${infoRow('Order', `<span style="font-weight:700;">${data.orderNumber}</span>`)}
-          ${infoRow('Courier', data.courier)}
-          ${infoRow('Tracking', `<span style="color:#0ea5e9;font-weight:600;">${data.trackingNumber}</span>`)}
+          ${infoRow('Order', `<span style="font-weight:700;">${escapeHtml(data.orderNumber)}</span>`)}
+          ${infoRow('Courier', escapeHtml(data.courier))}
+          ${infoRow('Tracking', `<span style="color:#0ea5e9;font-weight:600;">${escapeHtml(data.trackingNumber)}</span>`)}
         </table></td></tr>
       </table>
 
-      <p style="color:#64748b;font-size:13px;">Track your shipment with ${data.courier} using tracking number <strong>${data.trackingNumber}</strong>.</p>
+      <p style="color:#64748b;font-size:13px;">Track your shipment with ${escapeHtml(data.courier)} using tracking number <strong>${escapeHtml(data.trackingNumber)}</strong>.</p>
     `)
 
-    return { to: '', subject: `Order ${data.orderNumber} Shipped — Tracking: ${data.trackingNumber}`, html, template: 'order-shipped', templateData: data as any }
+    return { to: '', subject: `Order ${data.orderNumber} Shipped — Tracking: ${escapeHtml(data.trackingNumber)}`, html, template: 'order-shipped', templateData: data as any }
   },
 
   orderCancelled(data: {
@@ -245,15 +246,17 @@ export const emailTemplates = {
   }): QueueEmail {
     const html = baseLayout('Order Cancelled', `
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Order Cancelled</h2>
-      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${data.customerName}, your order <strong>${data.orderNumber}</strong> has been cancelled.</p>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${escapeHtml(data.customerName)}, your order <strong>${escapeHtml(data.orderNumber)}</strong> has been cancelled.</p>
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin-bottom:24px;">
-        <tr><td style="color:#991b1b;font-size:13px;"><strong>Reason:</strong> ${data.reason}</td></tr>
+        <tr><td style="color:#991b1b;font-size:13px;"><strong>Reason:</strong> ${escapeHtml(data.reason)}</td></tr>
       </table>
       <p style="color:#64748b;font-size:13px;">If you have questions, contact us at <a href="mailto:${COMPANY}" style="color:#0ea5e9;">${COMPANY}</a>.</p>
     `)
 
     return { to: '', subject: `Order ${data.orderNumber} Cancelled — Alka Traders`, html, template: 'order-cancelled', templateData: data as any }
   },
+
+
 
   // ── RFQ Emails ───────────────────────────────────────────────
 
@@ -271,13 +274,13 @@ export const emailTemplates = {
           ${infoRow('RFQ Number', `<span style="color:#0ea5e9;font-weight:700;">${data.rfqNumber}</span>`)}
           ${infoRow('Customer', data.customerName)}
           ${infoRow('Urgency', `<span style="display:inline-block;background:${urgencyColor};color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;text-transform:uppercase;">${data.urgency}</span>`)}
-          ${infoRow('Description', data.productDescription)}
+          ${infoRow('Description', escapeHtml(data.productDescription))}
         </table></td></tr>
       </table>
       ${btn(`${FRONTEND_URL}/admin/rfqs`, 'View RFQ in Admin Panel', urgencyColor)}
     `)
 
-    return { to: RFQ_EMAIL, subject: `[RFQ ${data.urgency.toUpperCase()}] ${data.rfqNumber} — ${data.customerName}`, html, template: 'rfq-received', templateData: data as any }
+    return { to: RFQ_EMAIL, subject: `[RFQ ${data.urgency.toUpperCase()}] ${data.rfqNumber} — ${escapeHtml(data.customerName)}`, html, template: 'rfq-received', templateData: data as any }
   },
 
   rfqResponse(data: {
@@ -288,7 +291,7 @@ export const emailTemplates = {
     const html = baseLayout('RFQ Response', `
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Response to Your RFQ</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 16px;">Hi ${data.customerName}, we've received your RFQ <strong>${data.rfqNumber}</strong> and our team is working on it.</p>
-      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;color:#1e293b;font-size:14px;line-height:1.6;">${data.message}</div>
+      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;color:#1e293b;font-size:14px;line-height:1.6;">${escapeHtml(data.message)}</div>
       <p style="color:#64748b;font-size:13px;">Need immediate help? <a href="https://wa.me/${WHATSAPP}" style="color:#25d366;font-weight:600;">WhatsApp us</a></p>
     `)
 
@@ -383,11 +386,11 @@ export const emailTemplates = {
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">New Contact Message 📩</h2>
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;">
         <tr><td><table width="100%" cellpadding="0" cellspacing="0">
-          ${infoRow('From', `${data.name} &lt;${data.email}&gt;`)}
-          ${infoRow('Subject', data.subject || '(no subject)')}
+          ${infoRow('From', `${escapeHtml(data.name)} &lt;${escapeHtml(data.email)}&gt;`)}
+          ${infoRow('Subject', escapeHtml(data.subject) || '(no subject)')}
         </table></td></tr>
       </table>
-      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;color:#1e293b;font-size:14px;line-height:1.6;">${data.message}</div>
+      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;color:#1e293b;font-size:14px;line-height:1.6;">${escapeHtml(data.message)}</div>
       ${btn(`mailto:${data.email}?subject=Re: ${data.subject || 'Your Message'}`, 'Reply via Email', '#0ea5e9')}
     `)
 

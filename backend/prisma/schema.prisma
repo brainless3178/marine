@@ -309,7 +309,10 @@ model OrderItem {
   product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
+  @@index([productId])
   @@map("order_items")
+
+
 }
 
 // ─── Order Timeline ────────────────────────────────────────────

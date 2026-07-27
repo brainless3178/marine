@@ -1,3 +1,5 @@
+import crypto from 'crypto'
+
 // ─── Slug Generation ───────────────────────────────────────────
 export function generateSlug(text: string): string {
   return text
@@ -11,10 +13,11 @@ export function generateSlug(text: string): string {
 
 // ─── Order Number Generation (DB-backed) ──────────────────────
 export async function generateOrderNumber(): Promise<string> {
-  // Use a random unique number to avoid race conditions in multi-instance
+  // Use UUID-based prefix for uniqueness across multi-instance deployments
+  const shortUuid = crypto.randomUUID().split('-')[0].toUpperCase()
   const timestamp = Date.now().toString(36).toUpperCase()
   const random = Math.random().toString(36).substring(2, 6).toUpperCase()
-  return `MS7-ORD-${timestamp}${random}`
+  return `AT-ORD-${shortUuid}-${timestamp}${random}`
 }
 
 // ─── RFQ Number Generation (DB-backed) ─────────────────────────
