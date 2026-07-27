@@ -8,6 +8,19 @@ import { getPaypalAccessToken, PAYPAL_BASE, PAYPAL_WEBHOOK_ID, PAYPAL_CLIENT_ID,
 const router = Router()
 const hookLog = logger.child({ context: 'paypal-webhook' })
 
+// ─── Validate PayPal cert_url (SSRF defense) ─────────────────
+const ALLOWED_CERT_URL_PATTERNS = [
+  /^https:\/\/api[.]paypal\.com\/v1\/notifications\/cert\/.*$/i,
+  /^https:\/\/api-m[.]paypal\.com\/v1\/notifications\/cert\/.*$/i,
+  /^https:\/\/api[.]sandbox[.]paypal\.com\/v1\/notifications\/cert\/.*$/i,
+  /^https:\/\/api-m[.]sandbox[.]paypal\.com\/v1\/notifications\/cert\/.*$/i,
+]
+
+function isValidPaypalCertUrl(url: string): boolean {
+  if (!url || typeof url !== 'string') return false
+  return ALLOWED_CERT_URL_PATTERNS.some(pattern => pattern.test(url))
+}
+
 // ─── Verify PayPal Webhook Signature ────────────────────────
 async function verifyPayPalWebhook(req: any): Promise<boolean> {
   if (!PAYPAL_WEBHOOK_ID) {
@@ -18,13 +31,21 @@ async function verifyPayPalWebhook(req: any): Promise<boolean> {
     hookLog.warn('PAYPAL_WEBHOOK_ID not configured — skipping signature verification (dev mode)')
     return true
   }
+
+  // Validate cert_url to prevent SSRF to arbitrary endpoints
+  const certUrl = req.headers['paypal-cert-url']
+  if (!isValidPaypalCertUrl(certUrl)) {
+    hookLog.warn({ certUrl }, 'Invalid PayPal cert_url — possible SSRF attempt')
+    return false
+  }
+
   try {
     const accessToken = await getPaypalAccessToken()
     if (!accessToken) return false
 
     const verificationPayload = {
       auth_algo: req.headers['paypal-auth-algo'],
-      cert_url: req.headers['paypal-cert-url'],
+      cert_url: certUrl,
       transmission_id: req.headers['paypal-transmission-id'],
       transmission_sig: req.headers['paypal-transmission-sig'],
       transmission_time: req.headers['paypal-transmission-time'],

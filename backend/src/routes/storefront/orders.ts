@@ -26,7 +26,7 @@ const orderSchema = z.object({
     quantity: z.number().int().positive(),
   })).min(1),
   shipping: shippingSchema,
-  paymentMethod: z.enum(['bank-transfer', 'paypal']), // 'card' removed — not yet implemented
+  paymentMethod: z.enum(['bank-transfer', 'paypal']),
   customerNotes: z.string().optional(),
   idempotencyKey: z.string().max(200).optional(),
 })
