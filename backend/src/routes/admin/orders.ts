@@ -9,6 +9,7 @@ import { logAudit } from '../../utils/audit.js'
 import { sendOrderShipped, sendOrderCancelled, sendOrderConfirmation } from '../../services/email.js'
 import { escapeHtml } from '../../utils/html-escape.js'
 import logger from '../../utils/logger.js'
+import { processPaypalRefund } from '../../utils/paypal.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -116,6 +117,22 @@ router.patch('/:id/status', requireRole('store-manager'), validateBody(statusUpd
         )
       }
     }
+
+    // Process actual PayPal refund if this was a PayPal payment
+    if (order.paymentIntentId && order.paymentMethod === 'paypal') {
+      const refundResult = await processPaypalRefund(
+        order.paymentIntentId,
+        Number(order.total),
+        order.currency || 'USD'
+      )
+      if (refundResult.success) {
+        logger.info({ orderId: order.id, orderNumber: order.orderNumber }, 'PayPal refund processed for cancelled order')
+      } else {
+        logger.error({ orderId: order.id, error: refundResult.error }, 'PayPal refund failed for cancelled order — still marking as refunded')
+        // Continue with refunded status even if PayPal fails (for manual follow-up)
+      }
+    }
+
     // Update payment status to refunded on cancellation
     await prisma.order.update({
       where: { id: req.params.id as string },
@@ -220,6 +237,21 @@ router.post('/:id/cancel', requireRole('store-manager'), asyncHandler(async (req
         )
       }
     }
+
+    // Process actual PayPal refund if this was a PayPal payment
+    if (order.paymentIntentId && order.paymentMethod === 'paypal') {
+      const refundResult = await processPaypalRefund(
+        order.paymentIntentId,
+        Number(order.total),
+        order.currency || 'USD'
+      )
+      if (refundResult.success) {
+        logger.info({ orderId: order.id, orderNumber: order.orderNumber }, 'PayPal refund processed for cancelled order')
+      } else {
+        logger.error({ orderId: order.id, error: refundResult.error }, 'PayPal refund failed for cancelled order — still marking as refunded')
+      }
+    }
+
     // Update payment status to refunded on cancellation
     await prisma.order.update({
       where: { id: req.params.id as string },

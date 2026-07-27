@@ -31,7 +31,7 @@ export default function Network() {
     <div>
       <SEO
         title="Global Network — Alka Traders"
-        description="Alka Traders' global network spans 18+ countries across Asia-Pacific, EMEA, and the Americas. Local hubs in Singapore, Dubai, Rotterdam, and Mumbai."
+        description="Alka Traders' global network spans 18+ countries across Asia-Pacific, EMEA, and the Americas. Head office in Bhavnagar, Gujarat, India."
         canonical="/network"
       />
       <section className="py-20 bg-[var(--secondary-bg)] text-center relative overflow-hidden">

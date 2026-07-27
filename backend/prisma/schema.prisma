@@ -133,6 +133,7 @@ model Product {
   @@index([status])
   @@index([availability])
   @@index([sku])
+  @@index([name])
   @@map("products")
 }
 

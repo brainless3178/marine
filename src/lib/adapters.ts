@@ -61,23 +61,39 @@ export function apiProductToFrontend(api: ApiProduct): Product {
 
   const effectivePrice = isOnSale && salePriceNum ? salePriceNum : regularPrice
 
+  /**
+   * Derive a deterministic image filename from API product data.
+   * Priority order:
+   *   1. First image URL → extract filename
+   *   2. If UUID/path-based → fall back to numeric mapping from last 3 digits of product ID
+   *   3. If no valid digits → placeholder.jpg
+   */
   let rawFilename = api.images?.[0]?.url?.split('/').pop()?.split('?')[0]
   if (rawFilename) {
     rawFilename = rawFilename
-      .replace(/^prod-/, 'product-')
+      .replace(/^prod-/i, 'product-')
       .replace(/\.avif$/, '.jpg')
       .replace(/\.png$/, '.jpg')
   }
 
-  // If no valid filename or doesn't match product-XXX.jpg pattern (e.g. UUID filename from admin upload),
-  // attempt matching by numeric part of product ID or SKU, or fallback to placeholder
-  if (!rawFilename || rawFilename.includes('placeholder') || !/^product-\d{3}\.jpg$/.test(rawFilename)) {
-    const match = api.id.match(/\d+/) || api.sku.match(/\d+/)
-    if (match) {
-      const num = String((parseInt(match[0], 10) % 255) + 1).padStart(3, '0')
+  const isValidProductImage = (name: string) => /^product-\d{3}\.jpg$/.test(name)
+
+  if (!rawFilename || rawFilename.includes('placeholder') || !isValidProductImage(rawFilename)) {
+    // Extract last 3 meaningful digits from the product ID for deterministic image mapping
+    const idDigits = api.id.replace(/[^a-f0-9]/gi, '').slice(-3)
+    const parsed = parseInt(idDigits, 16)
+    if (!isNaN(parsed)) {
+      const num = String((parsed % 255) + 1).padStart(3, '0')
       rawFilename = `product-${num}.jpg`
     } else {
-      rawFilename = 'placeholder.jpg'
+      // Last resort: try SKU digits
+      const skuMatch = api.sku.match(/(\d+)/)
+      if (skuMatch) {
+        const num = String((parseInt(skuMatch[1], 10) % 255) + 1).padStart(3, '0')
+        rawFilename = `product-${num}.jpg`
+      } else {
+        rawFilename = 'placeholder.jpg'
+      }
     }
   }
 

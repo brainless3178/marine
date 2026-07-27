@@ -22,6 +22,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import { useStore } from '../../store/useStore'
+import { admin } from '../../lib/api'
 
 type BadgeConfig = {
   count?: number
@@ -71,15 +72,13 @@ export function AdminSidebar() {
 
   useEffect(() => {
     let cancelled = false
-    import('../../lib/api').then(({ admin }) => {
-      admin.dashboard.stats().then((stats: any) => {
-        if (cancelled) return
-        setBadges({
-          '/admin/orders': { count: stats.pendingOrders || 0, color: 'gold' },
-          '/admin/rfqs': { count: (stats.newRfqs || 0) + (stats.urgentRfqs || 0) + (stats.emergencyRfqs || 0), color: 'danger' },
-          '/admin/messages': { count: 0, color: 'teal' },
-        })
-      }).catch(() => {}) 
+    admin.dashboard.stats().then((stats: any) => {
+      if (cancelled) return
+      setBadges({
+        '/admin/orders': { count: stats.pendingOrders || 0, color: 'gold' },
+        '/admin/rfqs': { count: (stats.newRfqs || 0) + (stats.urgentRfqs || 0) + (stats.emergencyRfqs || 0), color: 'danger' },
+        '/admin/messages': { count: 0, color: 'teal' },
+      })
     }).catch(() => {})
     return () => { cancelled = true }
   }, [])

@@ -1,0 +1,207 @@
+import { AlertCircle } from 'lucide-react'
+import { isLightColor } from '../../lib/utils'
+import type { ProductFormData } from '../../hooks/useProductForm'
+
+interface ProductFormBasicsProps {
+  form: ProductFormData
+  updateField: <K extends keyof ProductFormData>(field: K, value: ProductFormData[K]) => void
+  markTouched: (field: string) => void
+  showError: (field: string) => string | boolean
+  getFieldClass: (field: string, extra?: string) => string
+  getSelectClass: (field: string) => string
+  labelClass: string
+  errorClass: string
+  errors: Record<string, string>
+  brandList: { id: string; name: string }[]
+  categoryList: { id: string; name: string }[]
+  industryList: { id: string; name: string }[]
+  toggleIndustry: (id: string) => void
+}
+
+export function ProductFormBasics({
+  form, updateField, markTouched, showError,
+  getFieldClass, getSelectClass, labelClass, errorClass, errors,
+  brandList, categoryList, industryList, toggleIndustry,
+}: ProductFormBasicsProps) {
+  return (
+    <div className="space-y-5">
+      <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">Basic Information</h2>
+
+      <div>
+        <label className={labelClass}>Product Name *</label>
+        <input
+          type="text"
+          value={form.name}
+          onChange={(e) => updateField('name', e.target.value)}
+          onBlur={() => markTouched('name')}
+          placeholder="e.g. Hydraulic Pump HP-200"
+          className={getFieldClass('name')}
+        />
+        {showError('name') && <p className={errorClass}><AlertCircle size={10} />{errors.name}</p>}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>SKU *</label>
+          <input
+            type="text"
+            value={form.sku}
+            onChange={(e) => updateField('sku', e.target.value)}
+            onBlur={() => markTouched('sku')}
+            placeholder="e.g. HP-200-MS"
+            className={`${getFieldClass('sku')} font-mono`}
+          />
+          {showError('sku') && <p className={errorClass}><AlertCircle size={10} />{errors.sku}</p>}
+        </div>
+        <div>
+          <label className={labelClass}>Brand *</label>
+          <select
+            value={form.brand}
+            onChange={(e) => updateField('brand', e.target.value)}
+            onBlur={() => markTouched('brand')}
+            className={getSelectClass('brand')}
+          >
+            <option value="">Select brand</option>
+            {brandList.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+          {showError('brand') && <p className={errorClass}><AlertCircle size={10} />{errors.brand}</p>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Category *</label>
+          <select
+            value={form.category}
+            onChange={(e) => updateField('category', e.target.value)}
+            onBlur={() => markTouched('category')}
+            className={getSelectClass('category')}
+          >
+            <option value="">Select category</option>
+            {categoryList.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+          {showError('category') && <p className={errorClass}><AlertCircle size={10} />{errors.category}</p>}
+        </div>
+        <div>
+          <label className={labelClass}>Condition *</label>
+          <select
+            value={form.condition}
+            onChange={(e) => updateField('condition', e.target.value)}
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+          >
+            <option value="new">New</option>
+            <option value="unused">Unused / New Old Stock</option>
+            <option value="used">Used</option>
+            <option value="refurbished">Refurbished</option>
+            <option value="reconditioned">Reconditioned</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className={labelClass}>Industries</label>
+        <div className="flex flex-wrap gap-2">
+          {industryList.map((ind) => (
+            <button
+              key={ind.id}
+              onClick={() => toggleIndustry(ind.id)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition-all ${
+                form.industries.includes(ind.id)
+                  ? 'border-[var(--accent-teal)] bg-[var(--accent-teal)]/10 text-[var(--accent-teal)]'
+                  : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:border-[var(--accent-teal)]'
+              }`}
+            >
+              {ind.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className={labelClass}>Short Description</label>
+        <input
+          type="text"
+          value={form.shortDescription}
+          onChange={(e) => updateField('shortDescription', e.target.value)}
+          placeholder="Brief description for cards and search previews"
+          className={getFieldClass('shortDescription')}
+        />
+      </div>
+
+      <div>
+        <label className={labelClass}>Full Description</label>
+        <textarea
+          value={form.description}
+          onChange={(e) => updateField('description', e.target.value)}
+          placeholder="Detailed product description..."
+          rows={5}
+          className={`${getFieldClass('description')} resize-y`}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.isNewArrival}
+            onChange={(e) => updateField('isNewArrival', e.target.checked)}
+            className="h-4 w-4 rounded border-[var(--border)] accent-[var(--accent-gold)]"
+          />
+          <span className="text-xs font-bold text-[var(--text-secondary)]">New Arrival</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.isFeatured}
+            onChange={(e) => updateField('isFeatured', e.target.checked)}
+            className="h-4 w-4 rounded border-[var(--border)] accent-[var(--accent-gold)]"
+          />
+          <span className="text-xs font-bold text-[var(--text-secondary)]">Featured Product</span>
+        </label>
+        <div className="sm:col-span-2">
+          <label className={labelClass}>Custom Label</label>
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={form.customLabel}
+                onChange={(e) => updateField('customLabel', e.target.value)}
+                placeholder="e.g. SALE, NEW"
+                className={getFieldClass('customLabel')}
+              />
+            </div>
+            {form.customLabel && (
+              <div className="flex items-center gap-2">
+                <div
+                  className="h-9 w-9 shrink-0 rounded-lg border-2 border-[var(--border)] cursor-pointer overflow-hidden relative"
+                  title={`Label color: ${form.customLabelColor}`}
+                >
+                  <input
+                    type="color"
+                    value={form.customLabelColor}
+                    onChange={(e) => updateField('customLabelColor', e.target.value)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="w-full h-full" style={{ backgroundColor: form.customLabelColor }} />
+                </div>
+                <span
+                  className="inline-flex items-center rounded-md px-2.5 py-1 text-[0.625rem] font-extrabold shrink-0"
+                  style={{
+                    backgroundColor: form.customLabelColor,
+                    color: isLightColor(form.customLabelColor) ? '#1a1a1a' : '#ffffff',
+                  }}
+                >
+                  {form.customLabel}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

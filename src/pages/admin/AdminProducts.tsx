@@ -2,33 +2,13 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useToast } from '../../components/admin/Toast'
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog'
-import {
-  Plus,
-  Search,
-  Filter,
-  ArrowUpDown,
-  Eye,
-  Pencil,
-  Trash2,
-  Package,
-  ImageOff,
-  Tag,
-  Download,
-  CheckSquare,
-  Square,
-  X,
-  Loader2,
-  Copy,
-  Upload,
-  CheckCircle,
-} from 'lucide-react'
+import { AdminProductFilters } from '../../components/admin/AdminProductFilters'
+import { AdminProductTable } from '../../components/admin/AdminProductTable'
+import type { SortKey, SortDir } from '../../components/admin/AdminProductTable'
+import { AdminImportModal } from '../../components/admin/AdminImportModal'
+import { Plus, Upload } from 'lucide-react'
 import Papa from 'papaparse'
 import { admin } from '../../lib/api'
-import { AdminPagination } from '../../components/admin/AdminPagination'
-import { OptimizedImage } from '../../components/ui/OptimizedImage'
-
-type SortKey = 'name' | 'sku' | 'brand' | 'category' | 'price' | 'stock' | 'condition'
-type SortDir = 'asc' | 'desc'
 
 const ITEMS_PER_PAGE = 20
 
@@ -156,7 +136,6 @@ export default function AdminProducts() {
   // Client-side filtering as fallback / refinement
   const filteredProducts = useMemo(() => {
     let result = [...productList]
-    // If API didn't filter, do it client-side
     if (search.trim()) {
       const q = search.toLowerCase()
       result = result.filter((p) => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || getBrandName(p.brand).toLowerCase().includes(q) || getCategoryName(p.category).toLowerCase().includes(q))
@@ -225,16 +204,6 @@ export default function AdminProducts() {
     setFilterCategory(''); setFilterBrand(''); setFilterCondition('')
     setFilterAvailability(''); setFilterOnSale(false); setFilterNewArrival(false)
     setSearch(''); setPage(1); setSearchParams({})
-  }
-
-  const getConditionBadge = (condition: string) => {
-    const map: Record<string, string> = { new: 'admin-badge-published', unused: 'admin-badge-info', used: 'admin-badge-draft', refurbished: 'admin-badge-draft', reconditioned: 'admin-badge-info' }
-    return map[condition] || 'admin-badge-hidden'
-  }
-
-  const getAvailabilityBadge = (availability: string) => {
-    const map: Record<string, string> = { 'in-stock': 'admin-badge-published', emergency: 'admin-badge-danger', sourced: 'admin-badge-info', 'out-of-stock': 'admin-badge-danger' }
-    return map[availability] || 'admin-badge-hidden'
   }
 
   const handleBulkAction = async (action: string) => {
@@ -334,7 +303,7 @@ export default function AdminProducts() {
   const handleExportCsv = () => {
     const headers = ['Name', 'SKU', 'Brand', 'Category', 'Price', 'Sale Price', 'Stock', 'Condition', 'Availability']
     const rows = filteredProducts.map((p) => [p.name, p.sku, getBrandName(p.brand), getCategoryName(p.category), p.price.toString(), p.salePrice?.toString() || '', p.stockCount.toString(), p.condition, p.availability])
-    const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `\"${c}\"`).join(','))].join('\\n')
+    const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `"${c}"`).join(','))].join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -346,6 +315,7 @@ export default function AdminProducts() {
   return (
     <>
     <div className="space-y-5">
+      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Products</h1>
@@ -355,217 +325,84 @@ export default function AdminProducts() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowImport(true)} className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] transition-all hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]">
+          <button
+            onClick={() => setShowImport(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] transition-all hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]"
+          >
             <Upload size={14} /> Import CSV
           </button>
-          <Link to="/admin/products/new" className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5">
+          <Link
+            to="/admin/products/new"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5"
+          >
             <Plus size={14} /> Add Product
           </Link>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-            <input type="text" placeholder="Search by name, SKU, brand, category..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]" />
-          </div>
-          <button onClick={() => setShowFilters((v) => !v)} className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold transition-all ${showFilters || activeFilterCount > 0 ? 'border-[var(--accent-gold)] bg-[var(--gold-muted)] text-[var(--accent-gold)]' : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
-            <Filter size={14} /> Filters
-            {activeFilterCount > 0 && <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--accent-gold)] px-1.5 text-[0.625rem] font-bold text-navy-deep">{activeFilterCount}</span>}
-          </button>
-          <button onClick={handleExportCsv} className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] transition-all hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]">
-            <Download size={14} /> Export CSV
-          </button>
-        </div>
+      {/* ── Filters ── */}
+      <AdminProductFilters
+        search={search}
+        onSearchChange={setSearch}
+        onPageReset={() => setPage(1)}
+        showFilters={showFilters}
+        onToggleFilters={() => setShowFilters((v) => !v)}
+        activeFilterCount={activeFilterCount}
+        onExportCsv={handleExportCsv}
+        filterCategory={filterCategory}
+        onFilterCategoryChange={setFilterCategory}
+        filterBrand={filterBrand}
+        onFilterBrandChange={setFilterBrand}
+        filterCondition={filterCondition}
+        onFilterConditionChange={setFilterCondition}
+        filterAvailability={filterAvailability}
+        onFilterAvailabilityChange={setFilterAvailability}
+        filterOnSale={filterOnSale}
+        onFilterOnSaleToggle={() => setFilterOnSale((v) => !v)}
+        filterNewArrival={filterNewArrival}
+        onFilterNewArrivalToggle={() => setFilterNewArrival((v) => !v)}
+        uniqueBrands={uniqueBrands}
+        uniqueCategories={uniqueCategories}
+        onClearFilters={clearFilters}
+      />
 
-        {showFilters && (
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 border-t border-[var(--border)] pt-4">
-            <div>
-              <label className="mb-1 block text-[0.625rem] font-bold uppercase tracking-wider text-[var(--text-muted)]">Category</label>
-              <select value={filterCategory} onChange={(e) => { setFilterCategory(e.target.value); setPage(1) }} className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]">
-                <option value="">All Categories</option>
-                {uniqueCategories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-[0.625rem] font-bold uppercase tracking-wider text-[var(--text-muted)]">Brand</label>
-              <select value={filterBrand} onChange={(e) => { setFilterBrand(e.target.value); setPage(1) }} className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]">
-                <option value="">All Brands</option>
-                {uniqueBrands.map((b) => <option key={b} value={b}>{b}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-[0.625rem] font-bold uppercase tracking-wider text-[var(--text-muted)]">Condition</label>
-              <select value={filterCondition} onChange={(e) => { setFilterCondition(e.target.value); setPage(1) }} className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]">
-                <option value="">All Conditions</option>
-                <option value="new">New</option><option value="unused">Unused</option><option value="used">Used</option><option value="refurbished">Refurbished</option><option value="reconditioned">Reconditioned</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-[0.625rem] font-bold uppercase tracking-wider text-[var(--text-muted)]">Availability</label>
-              <select value={filterAvailability} onChange={(e) => { setFilterAvailability(e.target.value); setPage(1) }} className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]">
-                <option value="">All</option><option value="in-stock">In Stock</option><option value="emergency">Emergency</option><option value="sourced">Sourced</option><option value="out-of-stock">Out of Stock</option>
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button onClick={() => { setFilterOnSale((v) => !v); setPage(1) }} className={`w-full rounded-lg border px-3 py-2 text-xs font-bold transition-all ${filterOnSale ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-navy-deep' : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)]'}`}>
-                <Tag size={12} className="inline mr-1" /> On Sale
-              </button>
-            </div>
-            <div className="flex items-end">
-              <button onClick={() => { setFilterNewArrival((v) => !v); setPage(1) }} className={`w-full rounded-lg border px-3 py-2 text-xs font-bold transition-all ${filterNewArrival ? 'border-[var(--accent-teal)] bg-[var(--accent-teal)] text-white' : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)]'}`}>
-                <Package size={12} className="inline mr-1" /> New Arrivals
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeFilterCount > 0 && !showFilters && (
-          <div className="mt-3 flex items-center gap-2 flex-wrap">
-            <span className="text-[0.625rem] font-bold text-[var(--text-muted)]">Active:</span>
-            {filterCategory && <span className="inline-flex items-center gap-1 rounded-md bg-[var(--accent-blue)]/10 px-2 py-1 text-[0.625rem] font-bold text-[var(--accent-blue)]">{filterCategory}<button onClick={() => setFilterCategory('')}><X size={10} /></button></span>}
-            {filterBrand && <span className="inline-flex items-center gap-1 rounded-md bg-[var(--accent-teal)]/10 px-2 py-1 text-[0.625rem] font-bold text-[var(--accent-teal)]">{filterBrand}<button onClick={() => setFilterBrand('')}><X size={10} /></button></span>}
-            {filterCondition && <span className="inline-flex items-center gap-1 rounded-md bg-[var(--accent-gold)]/10 px-2 py-1 text-[0.625rem] font-bold text-[var(--accent-gold)]">{filterCondition}<button onClick={() => setFilterCondition('')}><X size={10} /></button></span>}
-            {filterAvailability && <span className="inline-flex items-center gap-1 rounded-md bg-[var(--success)]/10 px-2 py-1 text-[0.625rem] font-bold text-[var(--success)]">{filterAvailability}<button onClick={() => setFilterAvailability('')}><X size={10} /></button></span>}
-            {filterOnSale && <span className="inline-flex items-center gap-1 rounded-md bg-[var(--danger)]/10 px-2 py-1 text-[0.625rem] font-bold text-[var(--danger)]">On Sale<button onClick={() => setFilterOnSale(false)}><X size={10} /></button></span>}
-            {filterNewArrival && <span className="inline-flex items-center gap-1 rounded-md bg-[var(--accent-teal)]/10 px-2 py-1 text-[0.625rem] font-bold text-[var(--accent-teal)]">New<button onClick={() => setFilterNewArrival(false)}><X size={10} /></button></span>}
-            <button onClick={clearFilters} className="text-[0.625rem] font-bold text-[var(--danger)] hover:underline ml-1">Clear all</button>
-          </div>
-        )}
-      </div>
-
-      {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-[var(--accent-gold)]/30 bg-[var(--gold-muted)] px-4 py-3">
-          <span className="text-xs font-bold text-[var(--accent-gold)]">{selectedIds.size} selected</span>
-          <div className="flex flex-wrap gap-2 ml-auto">
-            <button onClick={() => handleBulkAction('publish')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-teal)]">Publish</button>
-            <button onClick={() => handleBulkAction('hide')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-gold)]">Hide</button>
-            <button onClick={() => handleBulkAction('markSale')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-blue)]">Mark Sale</button>
-            <button onClick={() => handleBulkAction('newArrival')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-blue)]">New Arrival</button>
-          </div>
-          <button onClick={() => setSelectedIds(new Set())} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"><X size={14} /></button>
-        </div>
-      )}
-
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 size={24} className="animate-spin text-[var(--accent-gold)]" />
-            <span className="ml-3 text-sm text-[var(--text-muted)]">Loading products...</span>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th className="w-10"><button onClick={toggleSelectAll} className="flex items-center justify-center">{selectedIds.size === paginatedProducts.length && paginatedProducts.length > 0 ? <CheckSquare size={14} className="text-[var(--accent-gold)]" /> : <Square size={14} />}</button></th>
-                  <th><button onClick={() => handleSort('name')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">Product <ArrowUpDown size={10} /></button></th>
-                  <th><button onClick={() => handleSort('sku')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">SKU <ArrowUpDown size={10} /></button></th>
-                  <th><button onClick={() => handleSort('brand')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">Brand <ArrowUpDown size={10} /></button></th>
-                  <th><button onClick={() => handleSort('category')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">Category <ArrowUpDown size={10} /></button></th>
-                  <th><button onClick={() => handleSort('price')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">Price <ArrowUpDown size={10} /></button></th>
-                  <th><button onClick={() => handleSort('stock')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">Stock <ArrowUpDown size={10} /></button></th>
-                  <th>Condition</th><th>Status</th><th className="w-20">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedProducts.length === 0 ? (
-                  <tr><td colSpan={10} className="text-center py-12">
-                    <Package size={32} className="mx-auto text-[var(--text-muted)] mb-3" />
-                    <p className="text-sm font-semibold text-[var(--text-muted)]">No products found</p>
-                    <button onClick={clearFilters} className="mt-2 text-xs font-bold text-[var(--accent-gold)] hover:underline">Clear filters</button>
-                  </td></tr>
-                ) : paginatedProducts.map((product) => {
-                  const hasImage = product.images.length > 0 && product.images.some((img) => img.url && !img.url.includes('placeholder'))
-                  const effectivePrice = product.onSale && product.salePrice ? product.salePrice : product.price
-                  return (
-                    <tr key={product.id}>
-                      <td><button onClick={() => toggleSelect(product.id)} className="flex items-center justify-center">{selectedIds.has(product.id) ? <CheckSquare size={14} className="text-[var(--accent-gold)]" /> : <Square size={14} />}</button></td>
-                      <td>
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 shrink-0 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] overflow-hidden flex items-center justify-center">
-                            {hasImage ? <OptimizedImage src={product.images[0].url} alt={product.name} width={40} height={40} loading="lazy" className="h-full w-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ImageOff size={14} className="text-[var(--text-muted)]" />}
-                          </div>
-                          <div className="min-w-0">
-                            <Link to={`/admin/products/${product.id}/edit`} className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--accent-gold)] no-underline truncate block">{product.name}</Link>
-                            {product.onSale && <span className="inline-flex items-center gap-0.5 text-[0.5625rem] font-bold text-[var(--danger)]"><Tag size={8} /> SALE</span>}
-                            {product.isNewArrival && <span className="ml-1 inline-flex items-center gap-0.5 text-[0.5625rem] font-bold text-[var(--success)]">NEW</span>}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="font-mono text-xs">{product.sku}</td>
-                      <td className="text-xs font-semibold">{getBrandName(product.brand)}</td>
-                      <td className="text-xs capitalize">{getCategoryName(product.category).replace(/-/g, ' ')}</td>
-                      <td className="font-mono text-xs font-bold">
-                        {product.onSale && product.salePrice ? <><span className="text-[var(--danger)]">${product.salePrice}</span><span className="ml-1 line-through text-[var(--text-muted)]">${product.price}</span></> : <span className="text-[var(--text-primary)]">${effectivePrice}</span>}
-                      </td>
-                      <td><span className={`font-mono text-xs font-bold ${product.stockCount === 0 ? 'text-[var(--danger)]' : product.stockCount <= 3 ? 'text-[var(--accent-gold)]' : 'text-[var(--text-primary)]'}`}>{product.stockCount}</span></td>
-                      <td><span className={`admin-badge ${getConditionBadge(product.condition)} capitalize`}>{product.condition}</span></td>
-                      <td><span className={`admin-badge ${getAvailabilityBadge(product.availability)}`}>{product.availability.replace(/-/g, ' ')}</span></td>
-                      <td>
-                        <div className="flex items-center gap-1">
-                          <Link to={`/admin/products/${product.id}/edit`} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-gold)] hover:bg-[var(--gold-muted)] transition-colors" title="Edit"><Pencil size={12} /></Link>
-                          <a href={`/product/${product.id}`} target="_blank" rel="noopener noreferrer" className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 transition-colors" title="View on storefront"><Eye size={12} /></a>
-                          <button onClick={(e) => { e.stopPropagation(); handleDuplicate(product.id) }} disabled={duplicating === product.id} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-teal)] hover:bg-[var(--accent-teal)]/10 transition-colors" title="Duplicate as draft"><Copy size={12} /></button>
-                          <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(product.id) }} className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-danger/5 transition-colors" title="Delete"><Trash2 size={12} /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {!loading && <AdminPagination page={page} totalPages={totalPages} totalItems={filteredProducts.length} itemLabel="products" onPageChange={setPage} />}
-      </div>
+      {/* ── Table (with bulk actions, pagination) ── */}
+      <AdminProductTable
+        products={paginatedProducts}
+        loading={loading}
+        selectedIds={selectedIds}
+        onToggleSelect={toggleSelect}
+        onToggleSelectAll={toggleSelectAll}
+        sortKey={sortKey}
+        sortDir={sortDir}
+        onSort={handleSort}
+        onDuplicate={handleDuplicate}
+        duplicating={duplicating}
+        onDeleteRequest={setDeleteTarget}
+        onClearFilters={clearFilters}
+        onBulkAction={handleBulkAction}
+        onClearSelection={() => setSelectedIds(new Set())}
+        page={page}
+        totalPages={totalPages}
+        totalItems={filteredProducts.length}
+        onPageChange={setPage}
+      />
     </div>
 
-      {/* Import CSV Modal */}
-      {showImport && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => { setShowImport(false); setImportResult(null) }}>
-          <div className="relative w-full max-w-lg mx-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-[var(--border)] px-6 py-4">
-              <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">Import Products from CSV</h2>
-              <button onClick={() => { setShowImport(false); setImportResult(null) }} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors"><X size={16} /></button>
-            </div>
-            <div className="p-6 space-y-4">
-              {!importResult ? (
-                <>
-                  <div className="rounded-xl border-2 border-dashed border-[var(--border)] p-8 text-center">
-                    <Upload size={32} className="mx-auto text-[var(--text-muted)] mb-3" />
-                    <p className="text-sm font-semibold text-[var(--text-secondary)]">Upload a CSV file with columns:</p>
-                    <p className="text-xs text-[var(--text-muted)] mt-1 font-mono">name, sku, brand, category, condition, availability, regularPrice, salePrice, stockCount, status</p>
-                    <input type="file" accept=".csv" className="hidden" id="csv-import-input" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImportCsv(f) }} />
-                    <button onClick={() => document.getElementById('csv-import-input')?.click()} disabled={importing} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent-gold)] px-4 py-2 text-xs font-bold text-navy-deep hover:bg-[var(--gold-light)] transition-colors disabled:opacity-50">
-                      {importing ? <><Loader2 size={12} className="animate-spin" /> Importing...</> : <><Upload size={12} /> Choose CSV File</>}
-                    </button>
-                  </div>
-                  <p className="text-[0.625rem] text-[var(--text-muted)] text-center">Max 500 rows. Products with duplicate SKUs are skipped.</p>
-                </>
-              ) : (
-                <div className="text-center py-4">
-                  <CheckCircle size={40} className="mx-auto text-[var(--success)] mb-3" />
-                  <p className="text-sm font-bold text-[var(--text-primary)]">Import Complete</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-1">Created: {importResult.created} · Skipped: {importResult.skipped}</p>
-                  {importResult.errors.length > 0 && (
-                    <div className="mt-3 rounded-lg bg-[var(--surface-soft)] p-3 text-left max-h-40 overflow-y-auto">
-                      {importResult.errors.map((err, i) => <p key={i} className="text-[0.625rem] text-[var(--danger)]">{err}</p>)}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+    {/* ── Import Modal ── */}
+    <AdminImportModal
+      open={showImport}
+      onClose={() => { setShowImport(false); setImportResult(null) }}
+      onImport={handleImportCsv}
+      importing={importing}
+      importResult={importResult}
+    />
 
+    {/* ── Delete Confirm ── */}
     <ConfirmDialog
       open={!!deleteTarget}
       title="Delete Product"
-      message={`Are you sure you want to delete this product? This action cannot be undone.`}
+      message="Are you sure you want to delete this product? This action cannot be undone."
       confirmLabel={deleting ? 'Deleting...' : 'Delete'}
       danger
       onConfirm={handleDelete}

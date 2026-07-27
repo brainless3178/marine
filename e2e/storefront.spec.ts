@@ -215,7 +215,7 @@ test.describe('Contact Page', () => {
   test('contact page loads with office locations', async ({ page }) => {
     await page.goto('/contact')
     await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 10000 })
-    const officeCards = page.locator('text=/Singapore|Dubai|Rotterdam|Mumbai/i')
+    const officeCards = page.locator('text=/Bhavnagar|BHAVNAGAR/i')
     await expect(officeCards.first()).toBeVisible({ timeout: 5000 })
   })
 

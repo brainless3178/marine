@@ -568,7 +568,7 @@ CREATE TABLE offices (
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
-COMMENT ON TABLE offices IS 'Physical office locations for the company (Mumbai, Dubai, Singapore, Rotterdam)';
+COMMENT ON TABLE offices IS 'Physical office location for the company (Bhavnagar, Gujarat, India)';
 
 -- ============================================================================
 -- 22. STORE SETTINGS

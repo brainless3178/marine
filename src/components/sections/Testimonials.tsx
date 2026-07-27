@@ -3,29 +3,49 @@ import { useTranslation } from 'react-i18next'
 import { SectionLabel } from '../ui/SectionLabel'
 import { storefront } from '../../lib/api'
 import { Star } from 'lucide-react'
+import { testimonials as staticTestimonials } from '../../data/testimonials'
 
-interface Testimonial { id: string; name: string; role: string; company: string; avatar: string; rating: number; text: string }
+interface Testimonial { id: string; name: string; role: string; company: string; avatar: string; rating: number; text: string; productName?: string; productLink?: string }
 
 export function Testimonials() {
   const { t } = useTranslation()
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
     storefront.testimonials()
       .then((res) => {
         if (!cancelled && res.testimonials?.length) {
-          setTestimonials(res.testimonials.map((r: any) => ({
-            id: r.id, name: r.name || 'Anonymous', role: r.role || '', company: r.company || '',
-            avatar: r.avatar || r.name?.charAt(0) || '?', rating: r.rating ?? 5, text: r.text || r.content || '',
-          })))
+          // Merge API data with static data to preserve productName/productLink
+          const apiData = res.testimonials.map((r: any) => {
+            const staticMatch = staticTestimonials.find(s => s.id === r.id)
+            return {
+              id: r.id, name: r.name || 'Anonymous', role: r.role || '', company: r.company || '',
+              avatar: r.avatar || r.name?.charAt(0) || '?', rating: r.rating ?? 5, text: r.text || r.content || '',
+              productName: staticMatch?.productName,
+              productLink: staticMatch?.productLink,
+            }
+          })
+          if (!cancelled) setTestimonials(apiData)
+        } else if (!cancelled) {
+          // API returned empty — use static data directly
+          setTestimonials(staticTestimonials)
         }
       })
-      .catch(() => { /* API unavailable */ })
+      .catch(() => {
+        if (!cancelled) {
+          // API unavailable — fall back to static data
+          setTestimonials(staticTestimonials)
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
     return () => { cancelled = true }
   }, [])
 
-  if (testimonials.length === 0) return null
+  if (loading || testimonials.length === 0) return null
 
   return (
     <section className="py-28 bg-[var(--secondary-bg)]" id="testimonials">
@@ -48,6 +68,15 @@ export function Testimonials() {
                   <strong className="text-label block text-[var(--text-primary)]">{review.name}</strong>
                   <span className="font-mono text-xs text-[var(--text-secondary)] block">{review.role}</span>
                   <span className="text-xs text-[var(--text-secondary)]">{review.company}</span>
+                  {review.productName && (
+                    <a
+                      href={review.productLink || '#'}
+                      className="text-[0.625rem] text-[var(--accent-primary)] block mt-0.5 font-medium truncate max-w-[200px] hover:underline"
+                      title={review.productName}
+                    >
+                      Reviewed: {review.productName}
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

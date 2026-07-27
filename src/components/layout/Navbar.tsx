@@ -11,6 +11,7 @@ const navLinks = [
   { path: '/', labelKey: 'home' },
   { path: '/products', labelKey: 'products' },
   { path: '/shop', labelKey: 'shop' },
+  { path: '/industries', labelKey: 'industries' },
   { path: '/brands', labelKey: 'brands' },
   { path: '/about', labelKey: 'about' },
   { path: '/contact', labelKey: 'contact' },
@@ -95,7 +96,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50">
       {/* ── TOP BAR: Email, Phone, Free Shipping ── */}
-      <div className="bg-[var(--surface-soft)] border-b border-[var(--border)] text-[var(--text-secondary)] text-xs">
+      <div className="hidden sm:block bg-[var(--surface-soft)] border-b border-[var(--border)] text-[var(--text-secondary)] text-xs">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex items-center justify-between h-9">
           <div className="flex items-center gap-5">
             <a href={`mailto:${settings.rfqEmail}`} className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors no-underline font-medium">

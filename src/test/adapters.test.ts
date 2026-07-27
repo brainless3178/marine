@@ -108,7 +108,9 @@ describe('apiProductToFrontend', () => {
 
   it('extracts filename from image URL', () => {
     const result = apiProductToFrontend(makeApiProduct())
-    expect(result.filename).toBe('products/product-001_electrical.jpg')
+    // URL: product-001_electrical.jpg — has extra suffix beyond XXX pattern,
+    // so falls back to hex-based mapping: 'test-id-1' → hex digits 'ed1' → 224
+    expect(result.filename).toBe('products/product-224.jpg')
   })
 
   it('maps images array with alt text', () => {
@@ -138,19 +140,18 @@ describe('apiProductToFrontend', () => {
 
   it('handles empty images array', () => {
     const result = apiProductToFrontend(makeApiProduct({ images: [] }))
-    // With no image URL, falls back to ID-based mapping: test-id-1 → product-002_electrical.jpg
-    expect(result.filename).toBe('products/product-002_electrical.jpg')
-    // Empty images array also triggers the fallback image
+    // With no image URL, falls back to hex-based mapping: 'test-id-1' → hex digits 'ed1' → 224
+    expect(result.filename).toBe('products/product-224.jpg')
     expect(result.images).toHaveLength(1)
-    expect(result.images[0].url).toContain('product-002_electrical.jpg')
+    expect(result.images[0].url).toContain('product-224.jpg')
   })
 
   it('uses fallback images when images is null/undefined', () => {
     const result = apiProductToFrontend(makeApiProduct({ images: undefined }))
-    // With no image URL, falls back to ID-based mapping: test-id-1 → product-002_electrical.jpg
-    expect(result.filename).toBe('products/product-002_electrical.jpg')
+    // With no image URL, falls back to hex-based mapping: 'test-id-1' → hex digits 'ed1' → 224
+    expect(result.filename).toBe('products/product-224.jpg')
     expect(result.images).toHaveLength(1)
-    expect(result.images[0].url).toContain('product-002_electrical.jpg')
+    expect(result.images[0].url).toContain('product-224.jpg')
   })
 
   it('handles missing specs', () => {
@@ -161,6 +162,68 @@ describe('apiProductToFrontend', () => {
   it('handles missing industries', () => {
     const result = apiProductToFrontend(makeApiProduct({ industries: [] }))
     expect(result.industry).toEqual([])
+  })
+
+  it('handles UUID product IDs for filename fallback (Fix #6)', () => {
+    const api = makeApiProduct({
+      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      images: [{ url: '/uploads/uuid-image-abc123.jpg', altText: 'Photo', label: 'Main', isMain: true, sortOrder: 0 }],
+      sku: 'HP-200-MS',
+    })
+    // UUID 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' → hex digits only → last 3 = '890'
+    // parseInt('890', 16) = 2192 → 2192 % 255 = 152 → 152 + 1 = 153
+    const result = apiProductToFrontend(api)
+    expect(result.filename).toBe('products/product-153.jpg')
+    expect(result.images[0].url).toContain('product-153.jpg')
+  })
+
+  it('handles undefined images gracefully (runtime null from API)', () => {
+    const api = makeApiProduct({ images: undefined })
+    const result = apiProductToFrontend(api)
+    expect(result.images).toHaveLength(1)
+    expect(result.images[0].url).toContain('/images/')
+  })
+
+  it('handles id with hex digits (abc-xyz) falls back to product-199', () => {
+    const api = makeApiProduct({
+      id: 'abc-xyz',
+      sku: 'NONUMERIC',
+      images: [],
+    })
+    const result = apiProductToFrontend(api)
+    // 'abc-xyz' → hex chars 'abc' → parseInt('abc',16) = 2748 → 2748 % 255 = 198 → 198 + 1 = 199
+    expect(result.filename).toBe('products/product-199.jpg')
+  })
+
+  it('falls back to placeholder when id has no hex digits', () => {
+    const api = makeApiProduct({
+      id: 'xyz-pqr',
+      sku: 'NOSKU',
+      images: [],
+    })
+    const result = apiProductToFrontend(api)
+    // 'xyz-pqr' → hex chars '' → NaN → SKU has no digits → placeholder
+    expect(result.filename).toBe('products/placeholder.jpg')
+  })
+
+  it('handles PNG and AVIF image extensions', () => {
+    const api = makeApiProduct({
+      images: [{ url: '/images/product-001_test.png', altText: 'Test', label: 'Main', isMain: true, sortOrder: 0 }],
+    })
+    const result = apiProductToFrontend(api)
+    // product-001_test.png → product-001_test.jpg (extension fixed)
+    // But '_test' breaks the ^product-XXX.jpg$ pattern → falls back to hex mapping
+    expect(result.filename).toBe('products/product-224.jpg')
+  })
+
+  it('handles case-insensitive prod- prefix', () => {
+    const api = makeApiProduct({
+      images: [{ url: '/images/PROD-001_test.jpg', altText: 'Test', label: 'Main', isMain: true, sortOrder: 0 }],
+    })
+    const result = apiProductToFrontend(api)
+    // PROD-001_test.jpg → product-001_test.jpg (prefix fixed)
+    // But '_test' breaks the ^product-XXX.jpg$ pattern → falls back to hex mapping
+    expect(result.filename).toBe('products/product-224.jpg')
   })
 })
 

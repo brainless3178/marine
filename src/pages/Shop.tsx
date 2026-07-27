@@ -5,9 +5,11 @@ import { ArrowRight, Truck, ShieldCheck, Clock, Package } from 'lucide-react'
 import { storefront } from '../lib/api'
 import { apiProductsToFrontend } from '../lib/adapters'
 import { useAddToCart } from '../hooks/useAddToCart'
+import { products as staticProducts } from '../data/products'
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { ProductCard } from '../components/ui/ProductCard'
 import { SEO } from '../components/seo/SEO'
+import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import type { Product } from '../types'
 
 interface CategoryWithCount {
@@ -29,39 +31,63 @@ export default function Shop() {
     let cancelled = false
 
     async function load() {
-      // Fetch new arrivals
+      // Try fetching new arrivals from API; fallback to static products
+      let apiArrivals: any[] | null = null
       try {
         const res = await storefront.products.newArrivals()
-        if (!cancelled && res.products) {
-          setNewArrivals(apiProductsToFrontend(res.products).slice(0, 8))
+        if (res.products?.length) apiArrivals = res.products
+      } catch { /* API unavailable */ }
+
+      if (!cancelled) {
+        if (apiArrivals) {
+          setNewArrivals(apiProductsToFrontend(apiArrivals).slice(0, 8))
+        } else {
+          setNewArrivals(staticProducts.slice(0, 8))
         }
-      } catch {
-        // API unavailable — leave empty
       }
 
-      // Fetch featured products
+      // Try fetching featured products; fallback to static products
+      let apiFeatured: any[] | null = null
       try {
         const res = await storefront.products.featured()
-        if (!cancelled && res.products) {
-          setFeaturedProducts(apiProductsToFrontend(res.products).slice(0, 8))
+        if (res.products?.length) apiFeatured = res.products
+      } catch { /* API unavailable */ }
+
+      if (!cancelled) {
+        if (apiFeatured) {
+          setFeaturedProducts(apiProductsToFrontend(apiFeatured).slice(0, 8))
+        } else {
+          setFeaturedProducts(staticProducts.slice(0, 8))
         }
-      } catch {
-        // API unavailable — leave empty
       }
 
-      // Fetch categories
-      try {
-        const res = await storefront.categories.list()
-        if (!cancelled && res.categories) {
-          setCategories(res.categories.map((c: any) => ({
-            id: c.slug || c.id,
-            name: c.name,
-            icon: c.icon || 'Package',
-            count: c._count?.products ?? c.productCount ?? 0,
+      // Try fetching categories; fallback to derived from static products
+      if (!cancelled) {
+        try {
+          const res = await storefront.categories.list()
+          if (res.categories?.length) {
+            setCategories(res.categories.map((c: any) => ({
+              id: c.slug || c.id,
+              name: c.name,
+              icon: c.icon || 'Package',
+              count: c._count?.products ?? c.productCount ?? 0,
+            })))
+          } else {
+            throw new Error('No categories')
+          }
+        } catch {
+          // Derive categories from static products
+          const catMap = new Map<string, number>()
+          staticProducts.forEach(p => {
+            catMap.set(p.category, (catMap.get(p.category) || 0) + 1)
+          })
+          setCategories(Array.from(catMap.entries()).map(([id, count]) => ({
+            id,
+            name: id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+            icon: 'Package',
+            count,
           })))
         }
-      } catch {
-        // API unavailable — leave empty
       }
     }
 
@@ -78,6 +104,7 @@ export default function Shop() {
         description="Browse our catalog of marine spares, ship machinery, surplus equipment, hydraulics, pneumatics, and electrical automation components."
         canonical="/shop"
       />
+      <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'Shop', url: '/shop' }]} />
       {/* ── SHOP HERO ── */}
       <section className="relative overflow-hidden bg-[var(--navy-deep)] py-16 text-white border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,var(--gold-muted),transparent_28rem),radial-gradient(circle_at_85%_20%,var(--teal-soft),transparent_30rem)]" />

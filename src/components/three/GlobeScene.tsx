@@ -15,10 +15,7 @@ function GlobeInner() {
 
   const nodes = useMemo(
     () => [
-      { lat: 19.076, lng: 72.8777, label: 'Mumbai' },
-      { lat: 25.2048, lng: 55.2708, label: 'Dubai' },
-      { lat: 1.2848, lng: 103.8515, label: 'Singapore' },
-      { lat: 51.9244, lng: 4.4777, label: 'Rotterdam' },
+      { lat: 21.7645, lng: 72.1519, label: 'Bhavnagar' },
     ],
     []
   )
@@ -37,9 +34,7 @@ function GlobeInner() {
 
   // Connection lines between nodes
   const lines = useMemo(() => {
-    const pairs: [number, number][] = [
-      [0, 1], [1, 2], [2, 3], [3, 0], [0, 2], [1, 3],
-    ]
+    const pairs: [number, number][] = []
     return pairs.map(([i, j]) => ({
       from: nodePositions[i],
       to: nodePositions[j],

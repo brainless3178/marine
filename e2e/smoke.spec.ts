@@ -93,7 +93,7 @@ test.describe('Contact Page', () => {
     await page.goto('/contact')
     await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 10000 })
     // Should have office cards
-    const officeCards = page.locator('text=/Singapore|Dubai|Rotterdam|Mumbai/i')
+    const officeCards = page.locator('text=/Bhavnagar|BHAVNAGAR/i')
     await expect(officeCards.first()).toBeVisible({ timeout: 5000 })
   })
 
@@ -128,7 +128,7 @@ test.describe('Emergency Page', () => {
 })
 
 test.describe('About Page', () => {
-  test('about page loads with timeline and team sections', async ({ page }) => {
+  test('about page loads with timeline and office sections', async ({ page }) => {
     await page.goto('/about')
     await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 10000 })
   })

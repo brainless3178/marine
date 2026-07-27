@@ -92,7 +92,7 @@
 | Industries | 6 (Marine Shipping, Shipyards, Oil & Gas, Power Generation, Manufacturing, Chemical Processing) |
 | Products | 27 (sample from each category) |
 | Testimonials | 3 |
-| Offices | 4 (Mumbai, Dubai, Singapore, Rotterdam) |
+| Offices | 1 (Bhavnagar, Gujarat, India) |
 | Store settings | 11 |
 | Homepage sections | 8 |
 

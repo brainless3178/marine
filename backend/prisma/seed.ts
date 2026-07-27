@@ -219,6 +219,9 @@ async function main() {
     { name: 'Capt. R. Krishnamurthy', role: 'Chief Engineer, MV Pacific Fortune', company: 'Pacific Bulk Carriers', text: 'Critical hydraulic pump failure mid-voyage. Alka Traders delivered in 26 hours.', rating: 5 },
     { name: 'Sarah J. Hoffmann', role: 'Global Procurement Manager', company: 'Rheinstahl Industrial GmbH', text: 'Consolidated invoicing, better pricing, faster delivery. ROI was immediate.', rating: 5 },
     { name: 'Dinesh Patel', role: 'Head of Sourcing', company: 'Reliance Engineering Works', text: 'Emergency ABB drive delivered within 18 hours. No substitutes, no compromise.', rating: 5 },
+    { name: 'noraedward', role: 'Verified Buyer', company: '', text: 'Item: ROTHENBERGER ROLeak PRO LEAK DETECTOR GAS SNIFFER. Very helpful seller. They investigated the issue when the delivery company delivered my parcel to the wrong person. Quick to address the situation, kept me informed and got the parcel delivered to me. Would recommend.', rating: 5 },
+    { name: 'b2esurplus', role: 'Verified Buyer — B2E Surplus', company: 'Back to Earth Surplus', text: 'Item: RIDGID D223 PIPE THREADER RATCHET 1 INCH SQUARE DRIVE. Five star transaction. Good shipping. Good packaging. Item as described. Good quality product in good condition. Thank you! At B2E Surplus, we buy and sell similar merchandise and are always interested in bulk lots and good deals on industrial supplies.', rating: 5 },
+    { name: 'fuegocat77', role: 'Verified Buyer', company: '', text: 'RECORD 91 1/2 C Pipe Vise received as pictured. Shipping was very fast and FREE with unexpectedly quick delivery from India. Item was well wrapped in bubble wrap but box padding could have been better on the bottom. Nothing broken, so not an issue.', rating: 5 },
   ]
 
   for (let i = 0; i < testimonialData.length; i++) {
@@ -230,10 +233,7 @@ async function main() {
 
   // ─── Create Offices ────────────────────────────────────────
   const officeData = [
-    { city: 'Mumbai', country: 'India', address: '301, Trade Centre, BKC, Mumbai 400051', timezone: 'Asia/Kolkata', phone: '+91 22 6123 4000', email: 'mumbai@alkatraders.com', coordinatesLat: 19.0760, coordinatesLng: 72.8777 },
-    { city: 'Dubai', country: 'UAE', address: 'Office 704, JLT Cluster H, Dubai 114532', timezone: 'Asia/Dubai', phone: '+971 4 568 9200', email: 'dubai@alkatraders.com', coordinatesLat: 25.2048, coordinatesLng: 55.2708 },
-    { city: 'Singapore', country: 'Singapore', address: '1 Raffles Place, #20-01, Singapore 048616', timezone: 'Asia/Singapore', phone: '+65 6234 8900', email: 'singapore@alkatraders.com', coordinatesLat: 1.2848, coordinatesLng: 103.8515 },
-    { city: 'Rotterdam', country: 'Netherlands', address: 'Wijnhaven 107, 3011 WN Rotterdam', timezone: 'Europe/Amsterdam', phone: '+31 10 890 1234', email: 'rotterdam@alkatraders.com', coordinatesLat: 51.9244, coordinatesLng: 4.4777 },
+    { city: 'BHAVNAGAR', country: 'India', address: 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', timezone: 'Asia/Kolkata', phone: '+91 97269 00547', email: 'info@alkatraders.com', coordinatesLat: 21.7645, coordinatesLng: 72.1519 },
   ]
 
   for (let i = 0; i < officeData.length; i++) {

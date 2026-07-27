@@ -39,7 +39,7 @@ export default function Contact() {
     <div>
       <SEO
         title="Contact Us — Alka Traders"
-        description="Get in touch with Alka Traders. Global offices in Singapore, Dubai, Rotterdam, and Mumbai. Reach us via email, phone, WhatsApp, or our contact form."
+        description="Get in touch with Alka Traders. Based in Bhavnagar, Gujarat, India. Reach us via email, phone, WhatsApp, or our contact form."
         canonical="/contact"
       />
       <section className="py-20 bg-[var(--secondary-bg)] text-center">

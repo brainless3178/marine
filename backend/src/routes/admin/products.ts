@@ -231,7 +231,7 @@ router.post('/', requireRole('inventory-manager'), validateBody(productSchema), 
     entityType: 'product',
     entityId: product.id,
     entityName: product.name,
-    newValue: product,
+    newValue: { id: product.id, name: product.name, sku: product.sku, status: product.status, regularPrice: product.regularPrice },
     ipAddress: req.ip,
   })
 
@@ -318,8 +318,8 @@ router.put('/:id', requireRole('inventory-manager'), validateBody(productSchema.
     entityType: 'product',
     entityId: product.id,
     entityName: product.name,
-    previousValue: existing,
-    newValue: product,
+    previousValue: { id: existing.id, name: existing.name, sku: existing.sku, status: existing.status, regularPrice: existing.regularPrice },
+    newValue: { id: product.id, name: product.name, sku: product.sku, status: product.status, regularPrice: product.regularPrice },
     ipAddress: req.ip,
   })
 
@@ -341,7 +341,7 @@ router.delete('/:id', requireRole('store-manager'), asyncHandler(async (req: Aut
     entityType: 'product',
     entityId: product.id,
     entityName: product.name,
-    previousValue: product,
+    previousValue: { id: product.id, name: product.name, sku: product.sku, status: product.status },
     ipAddress: req.ip,
   })
 

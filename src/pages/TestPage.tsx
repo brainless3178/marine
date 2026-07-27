@@ -82,7 +82,7 @@ export default function TestPage() {
     <div className="min-h-screen" style={{ backgroundColor: WHITE, color: CHARCOAL }}>
       {/* ── SEO ── */}
       <div className="sr-only">
-        <h1>Marine Shop Seven — Leading Supplier & Exporter Of Used/Unbranded Marine Equipment</h1>
+        <h1>Alka Traders — Leading Supplier & Exporter Of Used/Unbranded Marine Equipment</h1>
       </div>
 
       {/* ═══════════════════════════════════════════════════════
@@ -505,7 +505,7 @@ export default function TestPage() {
               </div>
               <h2 className="font-display text-3xl font-bold text-white mb-6">Trusted Supplier to the Marine & Industrial Industry</h2>
               <p className="text-sm leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                With over 15 years of experience, Marine Shop Seven has established itself as a leading supplier and exporter of used and unbranded marine equipment. Our extensive network spans across Singapore, Dubai, Rotterdam, and Mumbai, ensuring global reach and competitive pricing.
+                With over 15 years of experience, Alka Traders has established itself as a leading supplier and exporter of marine and industrial equipment. From our headquarters in Bhavnagar, Gujarat, we serve customers worldwide with global reach and competitive pricing.
               </p>
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {[
@@ -586,7 +586,7 @@ export default function TestPage() {
                   MS
                 </div>
                 <div>
-                  <span className="text-sm font-bold text-white">Marine Shop Seven</span>
+                  <span className="text-sm font-bold text-white">Alka Traders</span>
                   <span className="block text-[10px] font-semibold tracking-wider uppercase text-white/50">Seven</span>
                 </div>
               </div>
@@ -652,7 +652,7 @@ export default function TestPage() {
                 <div className="flex items-start gap-3">
                   <MapPin size={16} className="mt-0.5 flex-shrink-0" style={{ color: RED }} />
                   <span className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                    Global Operations: Singapore · Dubai · Rotterdam · Mumbai
+                    Global Operations: Bhavnagar, Gujarat, India
                   </span>
                 </div>
                 <a href="tel:+919726900547" className="flex items-center gap-3 text-sm no-underline hover:text-white transition-colors" style={{ color: 'rgba(255,255,255,0.65)' }}>
@@ -666,7 +666,7 @@ export default function TestPage() {
           </div>
 
           <div className="mt-12 pt-6 border-t flex flex-wrap justify-between items-center gap-3 text-xs" style={{ borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}>
-            <span>&copy; {new Date().getFullYear()} Marine Shop Seven. All rights reserved.</span>
+            <span>&copy; {new Date().getFullYear()} Alka Traders. All rights reserved.</span>
             <div className="flex items-center gap-4">
               <Link to="/privacy-policy" className="hover:text-white transition-colors no-underline" style={{ color: 'inherit' }}>Privacy Policy</Link>
               <Link to="/terms-of-service" className="hover:text-white transition-colors no-underline" style={{ color: 'inherit' }}>Terms of Service</Link>
