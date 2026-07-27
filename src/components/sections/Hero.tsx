@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { getStaticImageUrl } from '@/lib/utils'
 
 const heroSlides = [
-  { id: 'banner-1', src: '/images/marq-3.png' },
-  { id: 'banner-2', src: '/images/marq11.png' },
-  { id: 'banner-3', src: '/images/marq-1%20(2).png' },
+  { id: 'banner-1', src: getStaticImageUrl('marq-3') },
+  { id: 'banner-2', src: getStaticImageUrl('marq11') },
+  { id: 'banner-3', src: getStaticImageUrl('marq-1') },
 ]
 
 export function Hero() {

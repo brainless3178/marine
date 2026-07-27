@@ -10,6 +10,7 @@ function LinkedInIcon({ size = 16 }: { size?: number }) {
 }
 import { useTranslation } from 'react-i18next'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
+import { getStaticImageUrl } from '@/lib/utils'
 
 export function Footer() {
   const { t } = useTranslation()
@@ -22,7 +23,7 @@ export function Footer() {
           <div>
             <Link to="/" className="flex items-center gap-3 no-underline mb-4 text-white">
               <img
-                src="/images/alka-traders-logo.jpeg"
+                src={getStaticImageUrl('alka-traders-logo')}
                 alt="Alka Traders Logo"
                 width={48}
                 height={48}
