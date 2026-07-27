@@ -160,7 +160,7 @@ router.get('/', asyncHandler(async (req, res) => {
 
 // ─── Get Single Product (Admin) ────────────────────────────────
 router.get('/:id', asyncHandler(async (req, res) => {
-  const { id } = req.params
+  const id = req.params.id as string
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
     return res.status(400).json({ error: 'Invalid product ID format' })
   }
@@ -338,7 +338,7 @@ router.put('/:id', requireRole('inventory-manager'), validateBody(productSchema.
 
 // ─── Archive Product (soft delete) ────────────────────────────
 router.delete('/:id', requireRole('store-manager'), asyncHandler(async (req: AuthRequest, res) => {
-  const { id } = req.params
+  const id = req.params.id as string
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
     return res.status(400).json({ error: 'Invalid product ID format' })
   }
