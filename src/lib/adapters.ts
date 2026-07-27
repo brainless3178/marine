@@ -64,35 +64,48 @@ export function apiProductToFrontend(api: ApiProduct): Product {
   /**
    * Derive a deterministic image filename from API product data.
    * Priority order:
-   *   1. First image URL → extract filename
+   *   1. Iterate ALL images to find a valid product-XXX[_category].jpg filename
    *   2. If UUID/path-based → fall back to numeric mapping from last 3 digits of product ID
    *   3. If no valid digits → placeholder.jpg
    */
-  let rawFilename = api.images?.[0]?.url?.split('/').pop()?.split('?')[0]
-  if (rawFilename) {
-    rawFilename = rawFilename
-      .replace(/^prod-/i, 'product-')
-      .replace(/\.avif$/, '.jpg')
-      .replace(/\.png$/, '.jpg')
+  // Match product-XXX.jpg OR product-XXX_categoryname.jpg (with optional suffix)
+  const isValidProductImage = (name: string) => /^product-\d{3}(_[a-z0-9-]+)?\.jpg$/.test(name)
+
+  let rawFilename: string | undefined
+  if (api.images?.length) {
+    // Try each image URL to find a valid-looking product filename
+    for (const img of api.images) {
+      const candidate = img.url?.split('/').pop()?.split('?')[0]
+      if (!candidate) continue
+      const normalized = candidate
+        .replace(/^prod-/i, 'product-')
+        .replace(/\.avif$/, '.jpg')
+        .replace(/\.png$/, '.jpg')
+      if (isValidProductImage(normalized)) {
+        rawFilename = normalized
+        break
+      }
+    }
   }
 
-  const isValidProductImage = (name: string) => /^product-\d{3}\.jpg$/.test(name)
-
-  if (!rawFilename || rawFilename.includes('placeholder') || !isValidProductImage(rawFilename)) {
-    // Extract last 3 meaningful digits from the product ID for deterministic image mapping
+  if (!rawFilename) {
+    // Fallback: extract deterministic number from last 3 hex digits of UUID -> range 1-100
     const idDigits = api.id.replace(/[^a-f0-9]/gi, '').slice(-3)
     const parsed = parseInt(idDigits, 16)
     if (!isNaN(parsed)) {
-      const num = String((parsed % 255) + 1).padStart(3, '0')
+      const num = String((parsed % 100) + 1).padStart(3, '0')
       rawFilename = `product-${num}.jpg`
+      console.warn(`[Image Fallback] Product ${api.id} (${api.sku}): no valid image URL, mapped to ${rawFilename}`)
     } else {
       // Last resort: try SKU digits
       const skuMatch = api.sku.match(/(\d+)/)
       if (skuMatch) {
-        const num = String((parseInt(skuMatch[1], 10) % 255) + 1).padStart(3, '0')
+        const num = String((parseInt(skuMatch[1], 10) % 100) + 1).padStart(3, '0')
         rawFilename = `product-${num}.jpg`
+        console.warn(`[Image Fallback] Product ${api.id} (${api.sku}): no valid image URL, mapped from SKU to ${rawFilename}`)
       } else {
         rawFilename = 'placeholder.jpg'
+        console.warn(`[Image Fallback] Product ${api.id} (${api.sku}): no valid image URL or SKU digits, using placeholder`)
       }
     }
   }
@@ -124,8 +137,8 @@ export function apiProductToFrontend(api: ApiProduct): Product {
             .replace(/^prod-/, 'product-')
             .replace(/\.avif$/, '.jpg')
             .replace(/\.png$/, '.jpg') || ''
-          // If not a recognizable product-XXX.jpg, use the computed fallback filename
-          if (!cleanName || !/^product-\d{3}\.jpg$/.test(cleanName)) {
+          // If not a recognizable product-XXX.jpg or product-XXX_category.jpg, use fallback
+          if (!cleanName || !/^product-\d{3}(_[a-z0-9-]+)?\.jpg$/.test(cleanName)) {
             cleanName = filename.startsWith('products/') ? filename.slice(9) : filename
           }
           return {

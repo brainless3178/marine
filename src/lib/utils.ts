@@ -24,13 +24,20 @@ export function isLightColor(hex: string): boolean {
 
 /**
  * Safely format a product image URL to ensure it points to /images/products/...
+ * Handles:
+ *   - Absolute URLs (http/https) → passed through
+ *   - /uploads/ paths (admin-uploaded images) → passed through as-is
+ *   - /images/products/ paths → normalized
+ *   - Bare filenames → prefixed with /images/products/
  */
 export function getProductImageUrl(pathOrFilename?: string): string {
   if (!pathOrFilename) return '/images/placeholder.jpg'
   if (pathOrFilename.startsWith('http://') || pathOrFilename.startsWith('https://')) return pathOrFilename
+  if (pathOrFilename.startsWith('/uploads/')) return pathOrFilename
   const clean = pathOrFilename.startsWith('/') ? pathOrFilename.slice(1) : pathOrFilename
   if (clean.startsWith('images/products/')) return `/${clean}`
   if (clean.startsWith('products/')) return `/images/${clean}`
   if (clean.startsWith('images/')) return `/images/products/${clean.slice(7)}`
+  if (clean.startsWith('uploads/')) return `/${clean}`
   return `/images/products/${clean}`
 }
