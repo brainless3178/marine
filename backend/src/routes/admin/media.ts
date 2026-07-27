@@ -93,56 +93,58 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
   const file = req.file
   if (!file) return res.status(400).json({ error: 'No file provided' })
 
-  // Check for duplicate by hash
-  const hash = generateHash(file.buffer)
-  const existing = await prisma.mediaAsset.findFirst({ where: { hash } })
-  if (existing) {
-    return res.status(200).json({ asset: existing, message: 'Duplicate file — existing asset returned' })
-  }
-
   // Optimize image
   const { optimized, width, height } = await optimizeImage(file.buffer, file.mimetype)
 
-  // Compute hash from OPTIMIZED buffer (after Sharp conversion)
-  const optimizedHash = generateHash(optimized)
+  // Compute hash from OPTIMIZED buffer — this is what gets stored and used for dedup
+  const fileHash = generateHash(optimized)
 
-  // Check for duplicate again with hash of the optimized output
-  const existingOptimized = await prisma.mediaAsset.findFirst({ where: { hash: optimizedHash } })
-  if (existingOptimized) {
-    return res.status(200).json({ asset: existingOptimized, message: 'Duplicate file — existing asset returned' })
-  }
+  // Save optimized file to disk FIRST (content-addressed filename = safe idempotent write)
+  const { filename, url } = await saveFile(optimized, fileHash, '.webp')
 
-  // Save optimized file — pass the computed hash directly to avoid re-hashing
-  const { filename, url } = await saveFile(optimized, optimizedHash, '.webp')
+  // Prisma $transaction ensures atomic check+create — no race condition
+  const result = await prisma.$transaction(async (tx) => {
+    const existing = await tx.mediaAsset.findFirst({ where: { hash: fileHash } })
+    if (existing) return { asset: existing, created: false }
 
-  // Create media asset record
-  const asset = await prisma.mediaAsset.create({
-    data: {
-      filename,
-      originalName: file.originalname,
-      url,
-      mimeType: 'image/webp',
-      fileSize: optimized.length,
-      width,
-      height,
-      hash: optimizedHash,
-      uploadedBy: req.user!.id,
-    },
+    const asset = await tx.mediaAsset.create({
+      data: {
+        filename,
+        originalName: file.originalname,
+        url,
+        mimeType: 'image/webp',
+        fileSize: optimized.length,
+        width,
+        height,
+        hash: fileHash,
+        uploadedBy: req.user!.id,
+      },
+    })
+    return { asset, created: true }
   })
 
-  res.status(201).json({ asset })
+  if (!result.created) {
+    return res.status(200).json({ asset: result.asset, message: 'Duplicate file — existing asset returned' })
+  }
+
+  res.status(201).json({ asset: result.asset })
 }))
 
 // ─── Delete Media ──────────────────────────────────────────────
 router.delete('/:id', requireRole('inventory-manager'), asyncHandler(async (req: AuthRequest, res) => {
   const assetId = req.params.id as string
 
-  // Check usage across ALL entities, not just ProductImage
+  // Fetch asset FIRST to get its URL for usage checks, and disk path for cleanup
+  const asset = await prisma.mediaAsset.findUnique({ where: { id: assetId } })
+  if (!asset) return res.status(404).json({ error: 'Media asset not found' })
+
+  // Check usage by URL across ALL entities (Brand, AdminUser, Product store URLs not asset IDs)
+  const assetUrl = asset.url
   const [productImageCount, brandCount, adminUserCount, productCount] = await Promise.all([
     prisma.productImage.count({ where: { mediaAssetId: assetId } }),
-    prisma.brand.count({ where: { logoUrl: { contains: assetId } } }),
-    prisma.adminUser.count({ where: { avatarUrl: { contains: assetId } } }),
-    prisma.product.count({ where: { ogImageUrl: { contains: assetId } } }),
+    prisma.brand.count({ where: { logoUrl: assetUrl } }),
+    prisma.adminUser.count({ where: { avatarUrl: assetUrl } }),
+    prisma.product.count({ where: { ogImageUrl: assetUrl } }),
   ])
 
   if (productImageCount > 0) {
@@ -157,10 +159,6 @@ router.delete('/:id', requireRole('inventory-manager'), asyncHandler(async (req:
   if (productCount > 0) {
     return res.status(400).json({ error: 'Cannot delete: used as a product OG image' })
   }
-
-  // Fetch asset to get disk file path before deleting record
-  const asset = await prisma.mediaAsset.findUnique({ where: { id: assetId } })
-  if (!asset) return res.status(404).json({ error: 'Media asset not found' })
 
   // Delete DB record
   await prisma.mediaAsset.delete({ where: { id: assetId } })

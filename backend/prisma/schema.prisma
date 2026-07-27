@@ -487,7 +487,7 @@ model MediaAsset {
   height       Int?
   altText      String?  @map("alt_text") @db.VarChar(500)
   label        String?  @db.VarChar(100)
-  hash         String?  @db.VarChar(64)
+  hash         String?  @unique @db.VarChar(64)
   uploadedBy   String?  @map("uploaded_by") @db.Uuid
   createdAt    DateTime @default(now()) @map("created_at")
 
