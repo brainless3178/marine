@@ -22,22 +22,50 @@ export function isLightColor(hex: string): boolean {
   return luminance > 0.179 // threshold per WCAG
 }
 
+/** Cloudinary base URL for this project */
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/y7up4zti/image/upload/v1'
+
 /**
- * Safely format a product image URL to ensure it points to /images/products/...
- * Handles:
- *   - Absolute URLs (http/https) → passed through
- *   - /uploads/ paths (admin-uploaded images) → passed through as-is
- *   - /images/products/ paths → normalized
- *   - Bare filenames → prefixed with /images/products/
+ * Safely format a product image URL.
+ * Priority:
+ *   1. Cloudinary CDN for product images (product-XXX[_category].jpg)
+ *   2. Absolute URLs (http/https) → passed through
+ *   3. /uploads/ paths (admin-uploaded images, stored in Cloudinary) → passed through
+ *   4. Local static files → /images/products/...
  */
 export function getProductImageUrl(pathOrFilename?: string): string {
-  if (!pathOrFilename) return '/images/placeholder.jpg'
+  if (!pathOrFilename) return `${CLOUDINARY_BASE}/alka/static/placeholder`
   if (pathOrFilename.startsWith('http://') || pathOrFilename.startsWith('https://')) return pathOrFilename
   if (pathOrFilename.startsWith('/uploads/')) return pathOrFilename
+  
   const clean = pathOrFilename.startsWith('/') ? pathOrFilename.slice(1) : pathOrFilename
+  const filename = clean.split('/').pop() || ''
+  
+  // If this is a product image pattern, serve from Cloudinary CDN
+  if (/^product-\d{3}(_[a-z0-9-]+)?\.jpg$/.test(filename)) {
+    const name = filename.replace(/\.jpg$/, '')
+    return `${CLOUDINARY_BASE}/alka/products/${name}`
+  }
+  
+  // Fallback: local static files
   if (clean.startsWith('images/products/')) return `/${clean}`
   if (clean.startsWith('products/')) return `/images/${clean}`
   if (clean.startsWith('images/')) return `/images/products/${clean.slice(7)}`
   if (clean.startsWith('uploads/')) return `/${clean}`
   return `/images/products/${clean}`
+}
+
+/**
+ * Get Cloudinary URL for a category image.
+ */
+export function getCategoryImageUrl(categoryFile: string): string {
+  const slug = categoryFile.replace(/\.\w+$/, '').toLowerCase().replace(/\s+/g, '-')
+  return `${CLOUDINARY_BASE}/alka/categories/${slug}`
+}
+
+/**
+ * Get Cloudinary URL for a static image (logo, placeholder, payments, hero).
+ */
+export function getStaticImageUrl(name: string): string {
+  return `${CLOUDINARY_BASE}/alka/static/${name}`
 }

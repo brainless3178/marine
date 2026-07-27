@@ -1,3 +1,5 @@
+import { getStaticImageUrl } from '@/lib/utils'
+
 interface LogoProps {
   className?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
@@ -16,7 +18,7 @@ export function Logo({ className = '', size = 'md', showText = false, textClassN
   return (
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
       <img
-        src="/images/alka-traders-logo.jpeg"
+        src={getStaticImageUrl('alka-traders-logo')}
         alt="Alka Traders Logo"
         className={`${sizeClasses[size]} shrink-0 rounded-xl object-cover shadow-sm`}
       />

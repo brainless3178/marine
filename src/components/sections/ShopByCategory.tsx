@@ -18,7 +18,9 @@ const categories = [
 ]
 
 function encodePath(name: string) {
-  return `/images/categories/${encodeURIComponent(name)}`
+  // Serve category images from Cloudinary CDN
+  const slug = name.replace(/\.\w+$/, '').toLowerCase().replace(/\s+/g, '-')
+  return `https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/categories/${slug}`
 }
 
 export function ShopByCategory() {

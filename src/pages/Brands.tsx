@@ -114,7 +114,7 @@ export default function Brands() {
                     className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface)]/50 hover:border-[var(--accent-gold)]/40 hover:shadow-lg transition-all duration-300 group"
                   >
                     <OptimizedImage
-                      src={`/brand/${img}`}
+                      src={img.startsWith('http') ? img : `/brand/${img}`}
                       alt={`${img.replace(/\.(avif|png|jpg|jpeg|webp)$/i, '').replace(/-/g, ' ')} brand logo`}
                       width={112}
                       height={112}
