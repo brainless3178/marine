@@ -5,6 +5,12 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Enable Brotli compression for all assets
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 # Proxy /api requests to the Render backend
 [[redirects]]
   from = "/api/*"

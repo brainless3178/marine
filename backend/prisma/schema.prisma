@@ -134,6 +134,9 @@ model Product {
   @@index([availability])
   @@index([sku])
   @@index([name])
+  // Note: Full-text search GIN index is created via raw migration SQL:
+  // CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  // CREATE INDEX IF NOT EXISTS idx_products_search ON products USING GIN (to_tsvector('english', coalesce(name, '') || ' ' || coalesce(description, '')));
   @@map("products")
 }
 
