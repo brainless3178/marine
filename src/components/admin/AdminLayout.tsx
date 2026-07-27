@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { AdminSidebar } from './AdminSidebar'
 import { AdminHeader } from './AdminHeader'
@@ -6,6 +6,11 @@ import { useStore } from '../../store/useStore'
 
 export function AdminLayout() {
   const collapsed = useStore((s) => s.adminSidebarCollapsed)
+
+  // Dynamically load admin CSS only when entering admin routes
+  useEffect(() => {
+    import('../../admin.css')
+  }, [])
 
   return (
     <div className="flex min-h-screen">

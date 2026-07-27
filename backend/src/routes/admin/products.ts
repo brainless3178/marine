@@ -160,8 +160,13 @@ router.get('/', asyncHandler(async (req, res) => {
 
 // ─── Get Single Product (Admin) ────────────────────────────────
 router.get('/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return res.status(400).json({ error: 'Invalid product ID format' })
+  }
+
   const product = await prisma.product.findUnique({
-    where: { id: req.params.id as string },
+    where: { id },
     include: productAdminInclude,
   })
 
@@ -242,7 +247,12 @@ router.post('/', requireRole('inventory-manager'), validateBody(productSchema), 
 router.put('/:id', requireRole('inventory-manager'), validateBody(productSchema.partial()), asyncHandler(async (req: AuthRequest, res) => {
   const { specs, images, industryIds, ...data } = req.body
 
-  const existing = await prisma.product.findUnique({ where: { id: req.params.id as string } })
+  const updateId = req.params.id as string
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(updateId)) {
+    return res.status(400).json({ error: 'Invalid product ID format' })
+  }
+
+  const existing = await prisma.product.findUnique({ where: { id: updateId } })
   if (!existing) {
     return res.status(404).json({ error: 'Product not found' })
   }
@@ -326,18 +336,27 @@ router.put('/:id', requireRole('inventory-manager'), validateBody(productSchema.
   res.json({ product })
 }))
 
-// ─── Delete Product ────────────────────────────────────────────
+// ─── Archive Product (soft delete) ────────────────────────────
 router.delete('/:id', requireRole('store-manager'), asyncHandler(async (req: AuthRequest, res) => {
-  const product = await prisma.product.findUnique({ where: { id: req.params.id as string } })
+  const { id } = req.params
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return res.status(400).json({ error: 'Invalid product ID format' })
+  }
+
+  const product = await prisma.product.findUnique({ where: { id } })
   if (!product) {
     return res.status(404).json({ error: 'Product not found' })
   }
 
-  await prisma.product.delete({ where: { id: req.params.id as string } })
+  // Soft-delete: archive instead of hard-delete to preserve order history
+  await prisma.product.update({
+    where: { id },
+    data: { status: 'archived', updatedBy: req.user!.id },
+  })
 
   await logAudit({
     actor: req.user!,
-    action: 'product.delete',
+    action: 'product.archive',
     entityType: 'product',
     entityId: product.id,
     entityName: product.name,
@@ -345,7 +364,7 @@ router.delete('/:id', requireRole('store-manager'), asyncHandler(async (req: Aut
     ipAddress: req.ip,
   })
 
-  res.json({ message: 'Product deleted successfully' })
+  res.json({ message: 'Product archived successfully' })
 }))
 
 // ─── Bulk Actions ──────────────────────────────────────────────
@@ -389,8 +408,13 @@ router.patch('/bulk', requireRole('inventory-manager'), asyncHandler(async (req:
 
 // ─── Duplicate Product ──────────────────────────────────────────
 router.post('/:id/duplicate', requireRole('inventory-manager'), asyncHandler(async (req: AuthRequest, res) => {
+  const dupId = req.params.id as string
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(dupId)) {
+    return res.status(400).json({ error: 'Invalid product ID format' })
+  }
+
   const source = await prisma.product.findUnique({
-    where: { id: req.params.id as string },
+    where: { id: dupId },
     include: {
       specs: true,
       images: true,
