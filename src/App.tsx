@@ -27,7 +27,6 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const TrackOrder = lazy(() => import('./pages/TrackOrder'))
-const TestPage = lazy(() => import('./pages/TestPage'))
 const OrderHistory = lazy(() => import('./pages/account/OrderHistory'))
 const ProfileEdit = lazy(() => import('./pages/account/ProfileEdit'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
@@ -122,13 +121,6 @@ function AppContent() {
           <Route path="products/:id/edit" element={<AdminProductForm />} />
           <Route path="*" element={<NotFound />} />
         </Route>
-
-        {/* Standalone page — outside PageWrapper so it has its own nav/footer */}
-        <Route path="/testpage" element={
-          <Suspense fallback={<LoadingFallback />}>
-            <TestPage />
-          </Suspense>
-        } />
 
         {/* Storefront routes — AFTER admin so /admin/* is not caught here */}
         <Route

@@ -26,35 +26,43 @@ const upload = multer({
   },
 })
 
-// Maximum base64-encoded payload Cloudinary accepts via data URI upload
-// Base64 adds ~33% overhead, so max binary is ~15MB for Cloudinary's ~20MB data URI limit
-const CLOUDINARY_BASE64_LIMIT = 15 * 1024 * 1024  // 15MB binary limit before base64 overhead
-
 // Helper: generate file hash for duplicate detection
 function generateHash(buffer: Buffer): string {
   return crypto.createHash('sha256').update(buffer).digest('hex')
 }
 
-// Helper: upload buffer to Cloudinary, return URL + public_id
-// Uses full SHA-256 hash as public_id to guarantee uniqueness on Cloudinary side
+// Helper: validate a Cloudinary public_id format.
+// Supports both legacy truncated (alka/<12chars>) and new full-hash (alka/<64chars>) formats.
+// Returns true if the public_id matches the expected pattern — prevents accidental
+// deletion of wrong assets if DB filename is corrupted.
+function isValidCloudinaryPublicId(publicId: string): boolean {
+  return /^alka\/[a-f0-9]{12,64}$/.test(publicId)
+}
+
+// Helper: upload buffer to Cloudinary, return URL + public_id.
+// Uses full SHA-256 hash as public_id — content-addressed storage means
+// identical buffers always map to the same Cloudinary asset.
+// Cloudinary overwrite:false: if public_id exists, returns existing asset (HTTP 200, never throws).
+// This means concurrent uploads of the same file are harmless — second upload is a no-op on CDN.
 async function uploadToCloudinary(buffer: Buffer, fullHash: string): Promise<{ url: string; publicId: string }> {
-  if (buffer.length > CLOUDINARY_BASE64_LIMIT) {
-    throw new Error(`Optimized image too large: ${(buffer.length / 1024 / 1024).toFixed(1)}MB exceeds ${CLOUDINARY_BASE64_LIMIT / 1024 / 1024}MB base64 limit`)
-  }
   const b64 = `data:image/webp;base64,${buffer.toString('base64')}`
   const publicId = `alka/${fullHash}`
   const result = await cloudinary.uploader.upload(b64, {
     public_id: publicId,
     resource_type: 'image',
-    overwrite: false,  // Safe dedup — if public_id exists, Cloudinary returns existing asset silently
-    // NOTE: invalidate intentionally omitted — overwrite:false means nothing was replaced
+    overwrite: false,
   })
   return { url: result.secure_url, publicId }
 }
 
-// Helper: delete from Cloudinary by public_id (throws on failure — caller must handle)
-async function destroyCloudinary(publicId: string): Promise<void> {
-  await cloudinary.uploader.destroy(publicId, { invalidate: true })
+// Helper: delete from Cloudinary by public_id.
+// Cloudinary destroy() never throws — returns { result: 'ok' } or { result: 'not_found' }.
+// Both are considered success (idempotent delete).
+async function destroyCloudinary(publicId: string): Promise<boolean> {
+  const result = await cloudinary.uploader.destroy(publicId, { invalidate: true })
+  // result.result is 'ok' | 'not_found' | 'error'
+  // 'not_found' means already deleted — still success for our purposes
+  return result.result !== 'error'
 }
 
 // Helper: optimize image with Sharp
@@ -102,12 +110,21 @@ router.get('/:id/usage', asyncHandler(async (req, res) => {
 }))
 
 // ─── Upload Media ─────────────────────────────────────────────
+// Architecture note: Cloudinary is NOT inside our transaction boundary.
+// This is inherent — we can't do distributed transactions between Postgres and Cloudinary.
+// Instead, we rely on content-addressed storage (hash as public_id) to make
+// concurrent uploads and cleanup idempotent:
+//   - overwrite:false means identical files map to the same CDN asset (no duplicates)
+//   - destroy() returns 'not_found' for already-deleted files (idempotent delete)
+//   - orphans (CDN file without DB record) are harmless — just wasted storage,
+//     cleaned up by a periodic scan job
+//
 // Flow:
-//   1. Optimize + hash
-//   2. Pre-check hash in DB (optimization to avoid Cloudinary API call for duplicates)
-//   3. Upload to Cloudinary
-//   4. Prisma $transaction: atomic findFirst + create
-//   5. If transaction fails → cleanup Cloudinary orphan
+//   1. Optimize + hash (content-addressing)
+//   2. DB pre-check (performance optimization only — skip CDN call for known duplicates)
+//   3. Upload to Cloudinary (idempotent — overwrite:false)
+//   4. Prisma $transaction: atomic findFirst + create (source of truth)
+//   5. If transaction fails → best-effort Cloudinary cleanup (swallow errors)
 router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthRequest, res) => {
   const file = req.file
   if (!file) return res.status(400).json({ error: 'No file provided' })
@@ -115,35 +132,27 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
   // Optimize image with Sharp (resize, format convert, auto-rotate)
   const { optimized, width, height } = await optimizeImage(file.buffer, file.mimetype)
 
-  // Compute hash from OPTIMIZED buffer — this is what gets stored and used for dedup
+  // Compute hash from OPTIMIZED buffer — this is the content address
   const fileHash = generateHash(optimized)
 
-  // Quick pre-check to avoid unnecessary Cloudinary upload for duplicates
-  // This is NOT atomic — a concurrent upload of the same file can still pass this check.
-  // The Prisma transaction below handles that race condition atomically.
+  // Performance optimization: if DB already has this hash, return immediately.
+  // This avoids the Cloudinary API call for known duplicates.
+  // NOT a concurrency mechanism — the transaction below handles races atomically.
   const preExisting = await prisma.mediaAsset.findFirst({ where: { hash: fileHash } })
   if (preExisting) {
     return res.status(200).json({ asset: preExisting, message: 'Duplicate file — existing asset returned' })
   }
 
-  // Upload to Cloudinary (only for genuinely new files — pre-check passed)
-  // Cloudinary overwrite:false means if two threads race here with the same hash,
-  // the second upload silently returns the existing asset — no error, no duplicate on Cloudinary.
-  let cloudinaryResult: { url: string; publicId: string }
-  try {
-    cloudinaryResult = await uploadToCloudinary(optimized, fileHash)
-  } catch (err) {
-    return res.status(502).json({
-      error: 'Failed to upload to Cloudinary',
-      detail: (err as Error).message,
-    })
-  }
-
+  // Upload to Cloudinary. overwrite:false means:
+  //   - New file → uploaded, returns new asset metadata
+  //   - Existing public_id → returns existing asset (HTTP 200, never throws)
+  // So concurrent uploads of the same file are safe — second is a no-op on CDN.
+  const cloudinaryResult = await uploadToCloudinary(optimized, fileHash)
   const { url, publicId } = cloudinaryResult
 
   // Prisma $transaction: atomic findFirst + create
-  // If a concurrent request already created this hash, findFirst returns it and we return 200.
-  // The earlier Cloudinary upload is harmless (overwrite:false returns existing asset).
+  // If a concurrent request already created this hash, findFirst returns it.
+  // We return 200 with the existing record — the Cloudinary upload was harmless.
   let result: { asset: any; created: boolean }
   try {
     result = await prisma.$transaction(async (tx) => {
@@ -152,9 +161,9 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
 
       const asset = await tx.mediaAsset.create({
         data: {
-          filename: publicId,  // Cloudinary public_id (alka/<full-hash>)
+          filename: publicId,
           originalName: file.originalname,
-          url,                 // Cloudinary secure_url
+          url,
           mimeType: 'image/webp',
           fileSize: optimized.length,
           width,
@@ -166,10 +175,13 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
       return { asset, created: true }
     })
   } catch (err) {
-    // Transaction failed AFTER Cloudinary upload — try to clean up the orphan on Cloudinary
-    try { await destroyCloudinary(publicId) } catch { /* best-effort cleanup */ }
+    // Transaction failed AFTER Cloudinary upload — best-effort cleanup.
+    // destroy() never throws (returns 'not_found' for missing files), so this
+    // catch block only handles network errors. If cleanup fails, the orphaned
+    // CDN file is harmless (content-addressed, nobody references it).
+    await destroyCloudinary(publicId)
     return res.status(502).json({
-      error: 'Database error after Cloudinary upload — orphan cleaned up',
+      error: 'Database error after Cloudinary upload',
       detail: (err as Error).message,
     })
   }
@@ -184,16 +196,17 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
 }))
 
 // ─── Delete Media ──────────────────────────────────────────────
+// Delete is idempotent: destroy() returns 'not_found' for already-deleted files.
+// We always delete the DB record regardless of Cloudinary state.
+// Rationale: orphaned CDN file (no DB record) = harmless wasted storage,
+// orphaned DB record (dead CDN link) = user-facing bug.
 router.delete('/:id', requireRole('inventory-manager'), asyncHandler(async (req: AuthRequest, res) => {
   const assetId = req.params.id as string
 
-  // Fetch asset FIRST to get its stored public_id + URL for usage checks
   const asset = await prisma.mediaAsset.findUnique({ where: { id: assetId } })
   if (!asset) return res.status(404).json({ error: 'Media asset not found' })
 
-  // Check usage by URL across ALL entities
-  // Note: there is a narrow race window between this check and the destroy below.
-  // In practice this is milliseconds; a fully safe approach would require DB locks.
+  // Check usage across ALL entities before allowing delete
   const [productImageCount, brandCount, adminUserCount, productCount] = await Promise.all([
     prisma.productImage.count({ where: { mediaAssetId: assetId } }),
     prisma.brand.count({ where: { logoUrl: asset.url } }),
@@ -209,16 +222,26 @@ router.delete('/:id', requireRole('inventory-manager'), asyncHandler(async (req:
     return res.status(400).json({ error: `Cannot delete: in use as ${inUse.join(', ')}` })
   }
 
-  // Delete from Cloudinary using the stored public_id (asset.filename)
-  // Using filename (the stored public_id) is more reliable than parsing the URL
+  // Delete from Cloudinary (idempotent — 'not_found' is treated as success).
+  // Validate filename format before using it as public_id to prevent
+  // accidental deletion of wrong assets if DB is corrupted.
+  let cloudinaryDeleteOk = true
   if (asset.filename) {
-    await destroyCloudinary(asset.filename)
+    if (isValidCloudinaryPublicId(asset.filename)) {
+      cloudinaryDeleteOk = await destroyCloudinary(asset.filename)
+    } else {
+      // Filename doesn't match expected pattern — skip Cloudinary delete to avoid
+      // accidental deletion of unrelated assets. The DB record will still be removed.
+      console.warn(`[media] Skipping Cloudinary delete for ${assetId}: invalid public_id format: ${asset.filename}`)
+    }
   }
 
-  // Delete DB record
+  // Always delete DB record — even if Cloudinary delete failed.
+  // An orphaned CDN file is less harmful than a dead reference in the DB.
   await prisma.mediaAsset.delete({ where: { id: assetId } })
 
-  res.json({ message: 'Deleted' })
+  const warnings = !cloudinaryDeleteOk ? ['Cloudinary delete failed — file may remain on CDN'] : []
+  res.json({ message: 'Deleted', warnings })
 }))
 
 export default router

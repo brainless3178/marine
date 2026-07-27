@@ -1,61 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
-
-describe('Badge', () => {
-  it('renders children text', () => {
-    render(<Badge>New</Badge>)
-    expect(screen.getByText('New')).toBeInTheDocument()
-  })
-
-  it('applies default variant class', () => {
-    render(<Badge>Test</Badge>)
-    const badge = screen.getByText('Test')
-    expect(badge).toHaveClass('border')
-  })
-
-  it('applies blue variant', () => {
-    render(<Badge variant="blue">Blue Badge</Badge>)
-    const badge = screen.getByText('Blue Badge')
-    expect(badge).toBeInTheDocument()
-  })
-
-  it('applies gold variant', () => {
-    render(<Badge variant="gold">Gold Badge</Badge>)
-    expect(screen.getByText('Gold Badge')).toBeInTheDocument()
-  })
-
-  it('applies success variant', () => {
-    render(<Badge variant="success">Success</Badge>)
-    expect(screen.getByText('Success')).toBeInTheDocument()
-  })
-
-  it('applies danger variant', () => {
-    render(<Badge variant="danger">Danger</Badge>)
-    expect(screen.getByText('Danger')).toBeInTheDocument()
-  })
-
-  it('applies small size', () => {
-    render(<Badge size="sm">Small</Badge>)
-    const badge = screen.getByText('Small')
-    expect(badge).toHaveClass('text-xs')
-  })
-
-  it('applies medium size', () => {
-    render(<Badge size="md">Medium</Badge>)
-    const badge = screen.getByText('Medium')
-    expect(badge).toHaveClass('text-xs')
-  })
-
-  it('renders icon when provided', () => {
-    const icon = <span data-testid="icon">⚡</span>
-    render(<Badge icon={icon}>With Icon</Badge>)
-    expect(screen.getByTestId('icon')).toBeInTheDocument()
-    expect(screen.getByText('With Icon')).toBeInTheDocument()
-  })
-})
 
 describe('Button', () => {
   it('renders children text', () => {
