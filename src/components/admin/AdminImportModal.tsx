@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import { Upload, X, CheckCircle, Loader2 } from 'lucide-react'
 
 interface ImportResult {

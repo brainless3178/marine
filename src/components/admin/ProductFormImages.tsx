@@ -5,7 +5,6 @@ import type { ProductFormData } from '../../hooks/useProductForm'
 
 interface ProductFormImagesProps {
   form: ProductFormData
-  updateField: <K extends keyof ProductFormData>(field: K, value: ProductFormData[K]) => void
   updateImage: (i: number, field: string, value: string) => void
   addImage: () => void
   removeImage: (i: number) => void
@@ -17,7 +16,7 @@ interface ProductFormImagesProps {
 }
 
 export function ProductFormImages({
-  form, updateField, updateImage, addImage, removeImage,
+  form, updateImage, addImage, removeImage,
   handleImageUpload, uploadingImage,
   getFieldClass, labelClass, productImageInputId,
 }: ProductFormImagesProps) {

@@ -83,7 +83,7 @@ function getAvailabilityBadge(availability: string): string {
 export function AdminProductTable({
   products: paginatedProducts, loading,
   selectedIds, onToggleSelect, onToggleSelectAll,
-  sortKey, sortDir, onSort,
+  onSort,
   onDuplicate, duplicating, onDeleteRequest, onClearFilters,
   onBulkAction, onClearSelection,
   page, totalPages, totalItems, onPageChange,
