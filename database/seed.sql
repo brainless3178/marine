@@ -256,17 +256,20 @@ INSERT INTO testimonials (id, name, role, company, text, rating, sort_order, is_
 ('t0000002-0000-0000-0000-000000000002', 'Sarah J. Hoffmann',     'Global Procurement Manager',        'Rheinstahl Industrial GmbH',
  'Our previous supplier managed 3 vendors. Alka Traders replaced all three. Consolidated invoicing, better pricing, faster delivery, and a single point of accountability. The ROI was immediate.', 5, 1, TRUE),
 ('t0000003-0000-0000-0000-000000000003', 'Dinesh Patel',           'Head of Sourcing',                  'Reliance Engineering Works',
- 'When our ABB drive failed during a critical production run, Alka Traders''s emergency procurement team had a genuine OEM replacement delivered within 18 hours. No substitutes, no compromise.', 5, 2, TRUE);
+ 'When our ABB drive failed during a critical production run, Alka Traders''s emergency procurement team had a genuine OEM replacement delivered within 18 hours. No substitutes, no compromise.', 5, 2, TRUE),
+('t0000004-0000-0000-0000-000000000004', 'noraedward',            'Verified Buyer',                    '',
+ 'Item: ROTHENBERGER ROLeak PRO LEAK DETECTOR GAS SNIFFER. Very helpful seller. They investigated the issue I had when the delivery company delivered my parcel to the wrong person. Was very quick to address the situation, keep me informed and get the parcel delivered to me. Would recommend.', 5, 3, TRUE),
+('t0000005-0000-0000-0000-000000000005', 'b2esurplus',            'Verified Buyer — B2E Surplus',      'Back to Earth Surplus',
+ 'Item: RIDGID D223 PIPE THREADER RATCHET 1 INCH SQUARE DRIVE. Five star transaction. Good shipping. Good packaging. Item as described. Good quality product in good condition. Good appearance. Thank you for the good transaction! At B2E Surplus, we buy and sell a lot of similar merchandise. We are always interested in bulk lots and/or good deals on industrial supplies.', 5, 4, TRUE),
+('t0000006-0000-0000-0000-000000000006', 'fuegocat77',            'Verified Buyer',                    '',
+ 'RECORD 91 1/2 C Pipe Vise received as pictured on eBay. Shipping was very fast and FREE, with unexpectedly quick delivery from India. Packaging could have been better. Item shipped in corrugated cardboard box completely wrapped in duct tape. Vise itself was heavily covered in bubble wrap. Box was padded with pieces of Styrofoam on the sides and top, but not the bottom. As a result, the front mounting pad wore through the box, resulting in scraped paint. Nothing broken, so not an issue.', 5, 5, TRUE);
 
 -- ============================================================================
 -- 6. OFFICES (4)
 -- ============================================================================
 
 INSERT INTO offices (id, city, country, address, timezone, phone, email, coordinates_lat, coordinates_lng, sort_order, is_visible) VALUES
-('o0000001-0000-0000-0000-000000000001', 'Mumbai',    'India',      '301, Trade Centre, BKC, Mumbai 400051',         'Asia/Kolkata',     '+91 22 6123 4000',  'mumbai@alkatraders.com',     19.0760000, 72.8777000, 0, TRUE),
-('o0000002-0000-0000-0000-000000000002', 'Dubai',      'UAE',        'Office 704, JLT Cluster H, Dubai 114532',       'Asia/Dubai',       '+971 4 568 9200',  'dubai@alkatraders.com',      25.2048000, 55.2708000, 1, TRUE),
-('o0000003-0000-0000-0000-000000000003', 'Singapore',  'Singapore',  '1 Raffles Place, #20-01, Singapore 048616',     'Asia/Singapore',   '+65 6234 8900',    'singapore@alkatraders.com',  1.2848000, 103.8515000, 2, TRUE),
-('o0000004-0000-0000-0000-000000000004', 'Rotterdam',  'Netherlands','Wijnhaven 107, 3011 WN Rotterdam',               'Europe/Amsterdam', '+31 10 890 1234',  'rotterdam@alkatraders.com',  51.9244000, 4.4777000, 3, TRUE);
+('o0000001-0000-0000-0000-000000000001', 'BHAVNAGAR', 'India',      'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', 'Asia/Kolkata', '+91 97269 00547', 'info@alkatraders.com', 21.7645000, 72.1519000, 0, TRUE);
 
 -- ============================================================================
 -- 7. STORE SETTINGS (11)

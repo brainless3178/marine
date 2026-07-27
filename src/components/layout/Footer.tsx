@@ -80,7 +80,7 @@ export function Footer() {
               <Phone size={14} /> {settings.phoneNumber}
             </a>
             <p className="text-sm text-white/78 flex items-start gap-2">
-              <MapPin size={14} className="mt-0.5 flex-shrink-0" />              Global Operations: Singapore · Dubai · Rotterdam · Mumbai
+              <MapPin size={14} className="mt-0.5 flex-shrink-0" />              PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA, BHAVNAGAR-364001, GUJARAT, INDIA
             </p>
             <a href={`https://wa.me/${settings.whatsappNumber}`} className="inline-flex items-center gap-2 rounded-lg text-xs font-bold border border-white/12 bg-white/8 text-white px-[18px] py-[10px] mt-3 hover:border-[var(--accent-primary)] transition-all no-underline">
               <MessageCircle size={14} className="text-success" /> {t('contact.whatsapp')}

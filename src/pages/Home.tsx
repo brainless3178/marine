@@ -47,7 +47,7 @@ export default function Home() {
     <>
       <SEO
         title="Marine & Industrial Equipment Supplier"
-        description="Alka Traders — global supplier of marine spares, ship machinery, electrical automation, hydraulics, and emergency procurement. Serving Singapore, Dubai, Rotterdam, Mumbai."
+        description="Alka Traders — global supplier of marine spares, ship machinery, electrical automation, hydraulics, and emergency procurement. Based in Bhavnagar, Gujarat, India."
         canonical="/"
       />
       <Hero />

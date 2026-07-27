@@ -84,6 +84,8 @@ export interface Testimonial {
   avatar: string
   text: string
   rating: number
+  productName?: string
+  productLink?: string
 }
 
 export interface Office {
@@ -100,12 +102,6 @@ export interface TimelineEvent {
   year: string
   title: string
   description: string
-}
-
-export interface TeamMember {
-  name: string
-  role: string
-  initials: string
 }
 
 export interface RFQFormData {

@@ -24,7 +24,8 @@ const conditionLabel: Record<Product['condition'], string> = {
 }
 
 export const ProductCard = memo(function ProductCard({ product, added = false, onAddToCart, t, compact = false }: ProductCardProps) {
-  const effectivePrice = product.onSale && product.salePrice ? product.salePrice : product.price
+  // product.price is already the effective price (adapter sets it to salePrice when on sale)
+  const displayPrice = product.onSale && product.salePrice ? product.salePrice : product.price
   const canBuy = product.inStock && Boolean(onAddToCart)
   const { whatsappNumber } = useStoreSettings()
   const whatsappText = encodeURIComponent('Hi, I need a quote for ' + product.name + ' (SKU: ' + product.sku + ').')
@@ -122,7 +123,7 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
                 </div>
               ) : (
                 <span className="font-display text-2xl font-black tabular-nums text-[var(--text-primary)]">
-                  {'$'}{effectivePrice.toFixed(2)}
+                  {'$'}{displayPrice.toFixed(2)}
                 </span>
               )}
             </div>

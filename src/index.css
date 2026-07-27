@@ -288,12 +288,15 @@ html:not(.light) {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* removes the gray flash on tap */
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     overflow-x: clip;
+    overscroll-behavior-y: contain;
     font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
     -webkit-font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
     text-rendering: optimizeLegibility;
@@ -890,7 +893,14 @@ html:not(.light) {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+}
+
+/* ── Full-height sections (dvh fallback for mobile browser chrome) ── */
+.full-height {
+  height: 100vh;   /* fallback for older browsers */
+  height: 100dvh;  /* dynamic viewport height — recalculates as browser chrome shows/hides */
 }
 
 /* ── Mobile-first global fixes ──────────────────────────── */
@@ -901,19 +911,15 @@ html:not(.light) {
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Minimum touch target size for interactive elements */
+  /* Minimum touch target size for interactive elements (Apple 44pt / Google 48dp) */
   button, a, input[type="checkbox"], input[type="radio"], select {
-    min-height: 44px;
+    min-height: 48px;
+    min-width: 48px;
   }
 
   /* Prevent iOS auto-zoom on input focus — use !important to override Tailwind text-sm */
   input, select, textarea {
     font-size: max(16px, 1em) !important;
-  }
-
-  /* Better tap highlights */
-  button, a {
-    -webkit-tap-highlight-color: var(--tap-highlight);
   }
 
   /* Reduce animations on mobile for performance */
@@ -942,21 +948,44 @@ html:not(.light) {
     max-width: 100% !important;
     border-radius: 0 !important;
     height: 100vh;
+    height: 100dvh;
   }
 
   /* Reduce padding on mobile */
   .admin-content {
     padding: 12px !important;
   }
+
+  /* Navbar mobile menu: full-viewport height with safe area */
+  .nav-mobile-menu {
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* ── Small phone optimizations (320-374px) ──────────────── */
 @media (max-width: 23.375em) {
   h1 {
-    font-size: 28px;
+    font-size: clamp(24px, 8vw, 28px) !important;
   }
   h2 {
-    font-size: 24px;
+    font-size: clamp(20px, 6vw, 24px) !important;
+  }
+  h3 {
+    font-size: clamp(16px, 5vw, 18px) !important;
+  }
+
+  /* Tighter padding on tiny phones */
+  .max-w-\[1280px\] {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Tighter padding on tiny phones */
+  .max-w-\[1280px\] {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
 }
 
@@ -969,9 +998,16 @@ html:not(.light) {
   .group:hover .group-hover\:opacity-100 {
     opacity: 0;
   }
-  /* Ensure tap targets are large enough — min-height only, no min-width to avoid grid breakage */
+  /* Ensure tap targets are large enough — satisfy both Apple (≥44pt) and Google (≥48dp) */
   button, a, input, select, textarea {
-    min-height: 44px;
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Disable tilt/hover card effects on touch */
+  [style*="rotateX"],
+  [style*="rotateY"] {
+    transform: none !important;
   }
 }
 
@@ -981,6 +1017,16 @@ html:not(.light) {
   .hero-maritime-bg {
     padding-top: 1rem;
     padding-bottom: 1rem;
+  }
+
+  /* Compact hero slider on very short landscape screens */
+  section[aria-roledescription="carousel"] {
+    height: 180px !important;
+  }
+
+  /* Compact hero slider */
+  section[aria-roledescription="carousel"] {
+    height: 180px !important;
   }
 }
 
@@ -992,10 +1038,25 @@ html:not(.light) {
 
 /* ── Safe area padding for notched phones ───────────────── */
 @supports (padding: env(safe-area-inset-bottom)) {
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  /* Only apply to fixed/sticky elements, NOT to body (to avoid layout gaps) */
   .admin-sidebar {
+    padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
   }
+  /* Sticky header gets top safe area */
+  header.sticky {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* ── Ensure body text has adequate line length on large screens ── */
+.prose-max-width {
+  max-width: 65ch;
+}
+
+/* ── Prevent overflow from long words on small screens ─── */
+p, li, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }

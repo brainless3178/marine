@@ -26,7 +26,7 @@ const orderSchema = z.object({
     quantity: z.number().int().positive(),
   })).min(1),
   shipping: shippingSchema,
-  paymentMethod: z.enum(['card', 'bank-transfer', 'paypal']),
+  paymentMethod: z.enum(['bank-transfer', 'paypal']), // 'card' removed — not yet implemented
   customerNotes: z.string().optional(),
   idempotencyKey: z.string().max(200).optional(),
 })
@@ -176,34 +176,21 @@ router.post('/:id/cancel', authenticateCustomer, asyncHandler(async (req: AuthRe
 
   if (order.status === 'cancelled') return res.status(400).json({ error: 'Order already cancelled' })
 
+  // Only set cancelRequested flag — admin must approve actual cancellation and refund
   const updated = await prisma.order.update({
     where: { id: req.params.id as string },
-    data: { cancelRequested: true, cancelReason: req.body.reason || 'Customer requested' },
+    data: {
+      cancelRequested: true,
+      cancelReason: req.body.reason || 'Customer requested',
+      cancelRequestedAt: new Date(),
+    },
   })
-
-  // Restore stock atomically (only if stock was previously reduced — check payment status)
-  if (order.paymentStatus === 'paid') {
-    const items = await prisma.orderItem.findMany({ where: { orderId: req.params.id as string } })
-    for (const item of items) {
-      if (item.productId) {
-        await prisma.$executeRawUnsafe(
-          'UPDATE products SET stock_count = stock_count + $1 WHERE id = $2::uuid',
-          item.quantity, item.productId
-        )
-      }
-    }
-    // Update payment status to refunded on cancellation
-    await prisma.order.update({
-      where: { id: req.params.id as string },
-      data: { paymentStatus: 'refunded' },
-    })
-  }
 
   await prisma.orderTimeline.create({
-    data: { orderId: req.params.id as string, status: 'cancelled', note: req.body.reason || 'Customer cancellation request' },
+    data: { orderId: req.params.id as string, status: order.status, note: 'Cancellation requested: ' + (req.body.reason || 'No reason provided') },
   })
 
-  // Send cancellation email (non-blocking)
+  // Send cancellation request notification (non-blocking)
   const cancelCustomer = await prisma.customer.findUnique({ where: { id: req.user!.id }, select: { email: true, name: true } })
   if (cancelCustomer) {
     sendOrderCancelled({

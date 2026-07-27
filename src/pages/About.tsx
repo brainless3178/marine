@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { MapPin, Clock } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { offices, timelineEvents, teamMembers } from '../data/testimonials'
+import { offices, timelineEvents } from '../data/testimonials'
 import { SEO } from '../components/seo/SEO'
+import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -77,9 +78,10 @@ export default function About() {
     <div>
       <SEO
         title="About Us — Marine Equipment Specialists"
-        description="Alka Traders — globally connected marine and industrial equipment supplier with offices in Singapore, Dubai, Rotterdam, and Mumbai. 25+ years of industry expertise."
+        description="Alka Traders — globally connected marine and industrial equipment supplier based in Bhavnagar, Gujarat, India. 25+ years of industry expertise."
         canonical="/about"
       />
+      <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'About', url: '/about' }]} />
       {/* Hero */}
       <section className="py-24 bg-[var(--secondary-bg)] text-center relative overflow-hidden">
         <div className="absolute inset-0 dot-grid-bg opacity-40" />
@@ -163,28 +165,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Team */}
-      <section className="py-24">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
-            {t('about.teamLabel')}
-          </span>
-          <h2 className="font-display font-bold text-section-lg tracking-tight mb-10">
-            {t('about.teamTitle')}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-            {teamMembers.map((member) => (
-              <div key={member.name} className="text-center">
-                <div className="w-20 h-20 rounded-full bg-[var(--surface)] border border-[var(--accent-primary)] flex items-center justify-center mx-auto mb-3 font-display font-bold text-lg text-[var(--accent-primary)]">
-                  {member.initials}
-                </div>
-                <h4 className="text-sm font-semibold">{member.name}</h4>
-                <p className="text-xs text-[var(--text-muted)]">{member.role}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

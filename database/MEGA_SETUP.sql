@@ -856,16 +856,16 @@ ON CONFLICT DO NOTHING;
 INSERT INTO testimonials (name, role, company, text, rating, sort_order, is_visible) VALUES
 ('Capt. R. Krishnamurthy', 'Chief Engineer, MV Pacific Fortune', 'Pacific Bulk Carriers', 'Critical hydraulic pump failure mid-voyage. Alka Traders delivered in 26 hours. Absolutely lifesaving service.', 5, 0, TRUE),
 ('Sarah J. Hoffmann', 'Global Procurement Manager', 'Rheinstahl Industrial GmbH', 'Consolidated invoicing, better pricing, faster delivery. ROI was immediate. Our go-to supplier for marine parts.', 5, 1, TRUE),
-('Dinesh Patel', 'Head of Sourcing', 'Reliance Engineering Works', 'Emergency ABB drive delivered within 18 hours. No substitutes, no compromise. Highly recommended.', 5, 2, TRUE);
+('Dinesh Patel', 'Head of Sourcing', 'Reliance Engineering Works', 'Emergency ABB drive delivered within 18 hours. No substitutes, no compromise. Highly recommended.', 5, 2, TRUE),
+('noraedward', 'Verified Buyer', '', 'Item: ROTHENBERGER ROLeak PRO LEAK DETECTOR GAS SNIFFER. Very helpful seller. They investigated the issue I had when the delivery company delivered my parcel to the wrong person. Was very quick to address the situation, keep me informed and get the parcel delivered to me. Would recommend.', 5, 3, TRUE),
+('b2esurplus', 'Verified Buyer — B2E Surplus', 'Back to Earth Surplus', 'Item: RIDGID D223 PIPE THREADER RATCHET 1 INCH SQUARE DRIVE. Five star transaction. Good shipping. Good packaging. Item as described. Good quality product in good condition. Good appearance. Thank you for the good transaction! At B2E Surplus, we buy and sell a lot of similar merchandise. We are always interested in bulk lots and/or good deals on industrial supplies.', 5, 4, TRUE),
+('fuegocat77', 'Verified Buyer', '', 'RECORD 91 1/2 C Pipe Vise received as pictured on eBay. Shipping was very fast and FREE, with unexpectedly quick delivery from India. Packaging could have been better. Item shipped in corrugated cardboard box completely wrapped in duct tape. Vise itself was heavily covered in bubble wrap. Box was padded with pieces of Styrofoam on the sides and top, but not the bottom. As a result, the front mounting pad wore through the box, resulting in scraped paint. Nothing broken, so not an issue.', 5, 5, TRUE);
 
 -- ============================================================================
 -- S6. OFFICES (4)
 -- ============================================================================
 INSERT INTO offices (city, country, address, timezone, phone, email, coordinates_lat, coordinates_lng, sort_order, is_visible) VALUES
-('Mumbai', 'India', '301, Trade Centre, BKC, Mumbai 400051', 'Asia/Kolkata', '+91 22 6123 4000', 'mumbai@alkatraders.com', 19.0760, 72.8777, 0, TRUE),
-('Dubai', 'UAE', 'Office 704, JLT Cluster H, Dubai 114532', 'Asia/Dubai', '+971 4 568 9200', 'dubai@alkatraders.com', 25.2048, 55.2708, 1, TRUE),
-('Singapore', 'Singapore', '1 Raffles Place, #20-01, Singapore 048616', 'Asia/Singapore', '+65 6234 8900', 'singapore@alkatraders.com', 1.2848, 103.8515, 2, TRUE),
-('Rotterdam', 'Netherlands', 'Wijnhaven 107, 3011 WN Rotterdam', 'Europe/Amsterdam', '+31 10 890 1234', 'rotterdam@alkatraders.com', 51.9244, 4.4777, 3, TRUE);
+('BHAVNAGAR', 'India', 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', 'Asia/Kolkata', '+91 97269 00547', 'info@alkatraders.com', 21.7645, 72.1519, 0, TRUE);
 
 -- ============================================================================
 -- S7. STORE SETTINGS (11)

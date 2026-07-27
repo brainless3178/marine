@@ -8,7 +8,7 @@
     <priority>1.0</priority>
   </url>
 
-  <!-- Main Pages -->
+  <!-- Main Catalog Pages -->
   <url>
     <loc>https://alkatraders.co/shop</loc>
     <changefreq>weekly</changefreq>
@@ -21,30 +21,13 @@
   </url>
   <url>
     <loc>https://alkatraders.co/brands</loc>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://alkatraders.co/industries</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>
-
-  <!-- Company Pages -->
-  <url>
-    <loc>https://alkatraders.co/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://alkatraders.co/contact</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://alkatraders.co/network</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
   </url>
 
   <!-- Service Pages -->
@@ -63,6 +46,33 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://alkatraders.co/search</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Company Pages -->
+  <url>
+    <loc>https://alkatraders.co/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://alkatraders.co/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://alkatraders.co/network</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://alkatraders.co/intelligence</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 
   <!-- Legal Pages -->
   <url>
@@ -79,12 +89,5 @@
     <loc>https://alkatraders.co/refund-policy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-  </url>
-
-  <!-- Intelligence -->
-  <url>
-    <loc>https://alkatraders.co/intelligence</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
 </urlset>

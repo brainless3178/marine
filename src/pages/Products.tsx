@@ -9,6 +9,7 @@ import { OptimizedImage } from '../components/ui/OptimizedImage'
 import { storefront } from '../lib/api'
 import { isLightColor, getProductImageUrl } from '../lib/utils'
 import { SEO } from '../components/seo/SEO'
+import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import { apiProductsToFrontend } from '../lib/adapters'
 import { products as staticProducts } from '../data/products'
 import type { Product } from '../types'
@@ -135,6 +136,7 @@ export default function Products() {
         description="Browse our full catalog of marine spares, surplus machinery, hydraulic systems, electrical automation components, and safety equipment."
         canonical="/products"
       />
+      <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'Products', url: '/products' }]} />
       {/* Header */}
       <section className="bg-[var(--secondary-bg)] py-16 border-b border-[var(--border)]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 text-center">

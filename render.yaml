@@ -10,7 +10,7 @@ services:
     rootDir: backend
     buildCommand: npm install --include=dev && npx prisma generate && npm run build
     startCommand: node dist/server.js
-    postDeployCommand: npx prisma db push --accept-data-loss
+    postDeployCommand: npx prisma migrate deploy
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:

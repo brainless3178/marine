@@ -5,6 +5,7 @@ import type { LucideIcon } from 'lucide-react'
 import { storefront } from '../lib/api'
 import { industries as staticIndustries } from '../data/industries'
 import { SEO } from '../components/seo/SEO'
+import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import type { Industry } from '../types'
 
 const iconMap: Record<string, LucideIcon> = {
@@ -55,6 +56,7 @@ export default function Industries() {
         description="Alka Traders serves marine shipping, oil and gas, power generation, manufacturing, chemical processing, shipbuilding, and mining industries with specialized equipment."
         canonical="/industries"
       />
+      <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'Industries', url: '/industries' }]} />
       <section className="py-20 bg-[var(--secondary-bg)] text-center">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">

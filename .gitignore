@@ -46,7 +46,7 @@ test-results/
 !public/images/*.webp
 brand/
 .nul
+NUL
 *.rar
-.nul
 .netlify/
 src/nul

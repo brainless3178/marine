@@ -1,4 +1,4 @@
-import type { Testimonial, Office, TimelineEvent, TeamMember, FAQItem } from '../types'
+import type { Testimonial, Office, TimelineEvent, FAQItem } from '../types'
 
 export const testimonials: Testimonial[] = [
   {
@@ -28,63 +28,60 @@ export const testimonials: Testimonial[] = [
     text: 'When our ABB drive failed during a critical production run, Alka Traders\'s emergency procurement team had a genuine OEM replacement delivered within 18 hours. No substitutes, no compromise.',
     rating: 5,
   },
+  {
+    id: 't4',
+    name: 'noraedward',
+    role: 'Verified Buyer',
+    company: '',
+    avatar: 'NE',
+    text: 'Item: ROTHENBERGER ROLeak PRO LEAK DETECTOR GAS SNIFFER. Very helpful seller. They investigated the issue I had when the delivery company delivered my parcel to the wrong person. Was very quick to address the situation, keep me informed and get the parcel delivered to me. Would recommend.',
+    rating: 5,
+    productName: 'ROTHENBERGER ROLeak PRO LEAK DETECTOR GAS SNIFFER',
+    productLink: '/products?search=ROTHENBERGER',
+  },
+  {
+    id: 't5',
+    name: 'b2esurplus',
+    role: 'Verified Buyer — B2E Surplus',
+    company: 'Back to Earth Surplus',
+    avatar: 'BS',
+    text: 'Item: RIDGID D223 PIPE THREADER RATCHET 1 INCH SQUARE DRIVE. Five star transaction. Good shipping. Good packaging. Item as described. Good quality product in good condition. Good appearance. Thank you for the good transaction! At B2E Surplus, we buy and sell a lot of similar merchandise. We are always interested in bulk lots and/or good deals on industrial supplies.',
+    rating: 5,
+    productName: 'RIDGID D223 PIPE THREADER RATCHET 1 INCH SQUARE DRIVE',
+    productLink: '/products?search=RIDGID+D223',
+  },
+  {
+    id: 't6',
+    name: 'fuegocat77',
+    role: 'Verified Buyer',
+    company: '',
+    avatar: 'FC',
+    text: 'RECORD 91 1/2 C Pipe Vise received as pictured. Shipping was very fast and FREE, with unexpectedly quick delivery from India. Packaging could have been better — item shipped in corrugated cardboard box wrapped in duct tape. Vise itself was heavily covered in bubble wrap. Box was padded with pieces of Styrofoam on the sides and top, but not the bottom. As a result, the front mounting pad wore through the box, resulting in scraped paint. Nothing broken, so not an issue.',
+    rating: 5,
+    productName: 'RECORD 91 1/2 C PIPE VISE BENCH MOUNT PIPE CLAMP MADE IN E',
+    productLink: '/products?search=RECORD+PIPE+VISE',
+  },
 ]
 
 export const offices: Office[] = [
   {
-    city: 'Mumbai',
+    city: 'BHAVNAGAR',
     country: 'India',
-    address: '301, Trade Centre, Bandra Kurla Complex, Mumbai 400051',
+    address: 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA',
     timezone: 'Asia/Kolkata',
-    phone: '+91 22 6123 4000',
-    email: 'mumbai@alkatraders.com',
-    coordinates: [19.0760, 72.8777],
-  },
-  {
-    city: 'Dubai',
-    country: 'UAE',
-    address: 'Office 704, JLT Cluster H, Dubai 114532',
-    timezone: 'Asia/Dubai',
-    phone: '+971 4 568 9200',
-    email: 'dubai@alkatraders.com',
-    coordinates: [25.2048, 55.2708],
-  },
-  {
-    city: 'Singapore',
-    country: 'Singapore',
-    address: '1 Raffles Place, #20-01 One Raffles Place, Singapore 048616',
-    timezone: 'Asia/Singapore',
-    phone: '+65 6234 8900',
-    email: 'singapore@alkatraders.com',
-    coordinates: [1.2848, 103.8515],
-  },
-  {
-    city: 'Rotterdam',
-    country: 'Netherlands',
-    address: 'Wijnhaven 107, 3011 WN Rotterdam, Netherlands',
-    timezone: 'Europe/Amsterdam',
-    phone: '+31 10 890 1234',
-    email: 'rotterdam@alkatraders.com',
-    coordinates: [51.9244, 4.4777],
+    phone: '+91 97269 00547',
+    email: 'info@alkatraders.com',
+    coordinates: [21.7645, 72.1519],
   },
 ]
 
 export const timelineEvents: TimelineEvent[] = [
   { year: '2010', title: 'Founded in Mumbai', description: 'Alka Traders established as a marine procurement specialist serving the Indian coastal fleet.' },
-  { year: '2013', title: 'Singapore Office Opens', description: 'Strategic expansion into Southeast Asia\'s largest maritime hub.' },
-  { year: '2016', title: '100+ Brand Partnerships', description: 'Crossed 100 authorized brand partnerships across marine and industrial sectors.' },
-  { year: '2019', title: 'Dubai & Rotterdam Hubs', description: 'Opened procurement hubs in Dubai (MENA) and Rotterdam (Europe) for 24/7 coverage.' },
-  { year: '2022', title: '10,000+ Products', description: 'Catalog crossed 10,000 line items across 6 major categories.' },
-  { year: '2024', title: 'Global Operations', description: 'Serving 50+ countries with a network of 200+ brand partners and 4 operational hubs.' },
-]
-
-export const teamMembers: TeamMember[] = [
-  { name: 'Arjun Mehta', role: 'CEO & Founder', initials: 'AM' },
-  { name: 'Priya Sharma', role: 'Global Procurement Director', initials: 'PS' },
-  { name: 'Marcus Chen', role: 'Head of Singapore Operations', initials: 'MC' },
-  { name: 'Fatima Al-Rashid', role: 'Regional Director, MENA', initials: 'FA' },
-  { name: 'Lars van der Berg', role: 'Head of European Operations', initials: 'LV' },
-  { name: 'Rajesh Kumar', role: 'Supply Chain Manager', initials: 'RK' },
+  { year: '2013', title: '100+ Brand Partnerships', description: 'Crossed 100 authorized brand partnerships across marine and industrial sectors.' },
+  { year: '2016', title: '10,000+ Products', description: 'Catalog crossed 10,000 line items across 6 major categories.' },
+  { year: '2019', title: 'Global Expansion', description: 'Expanded global reach serving customers in 30+ countries worldwide.' },
+  { year: '2022', title: 'Bhavnagar Headquarters', description: 'Consolidated operations at our headquarters in Bhavnagar, Gujarat.' },
+  { year: '2024', title: 'Global Operations', description: 'Serving 50+ countries with a network of 200+ brand partners from our Bhavnagar hub.' },
 ]
 
 export const faqItems: FAQItem[] = [
@@ -98,7 +95,7 @@ export const faqItems: FAQItem[] = [
   },
   {
     question: 'Can you handle emergency orders?',
-    answer: 'Yes. Our emergency procurement line operates 24/7. We maintain pre-positioned inventory hubs in Singapore, Dubai, Rotterdam, and Mumbai specifically for critical-path deliveries. We\'ve successfully fulfilled emergency orders within 18 hours of RFQ submission.',
+    answer: 'Yes. Our emergency procurement line operates 24/7. We maintain strategic inventory for critical-path deliveries from our Bhavnagar hub. We\'ve successfully fulfilled emergency orders within 18 hours of RFQ submission.',
   },
   {
     question: 'What regions do you ship to?',

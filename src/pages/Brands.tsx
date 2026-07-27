@@ -5,6 +5,7 @@ import { brandImages } from '../data/brandImages'
 import { brands as staticBrands } from '../data/brands'
 import { storefront } from '../lib/api'
 import { SEO } from '../components/seo/SEO'
+import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import { OptimizedImage } from '../components/ui/OptimizedImage'
 import type { Brand } from '../types'
 
@@ -60,6 +61,7 @@ export default function Brands() {
         description="Explore the brands we work with — ABB, Siemens, Parker Hannifin, Bosch Rexroth, Danfoss, Honeywell, and 100+ more leading manufacturers."
         canonical="/brands"
       />
+      <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'Brands', url: '/brands' }]} />
       {/* Hero Section */}
       <section className="py-20 bg-[var(--secondary-bg)] text-center">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">

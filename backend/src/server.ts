@@ -53,7 +53,7 @@ import fs from 'fs'
 import { PrismaClient } from '@prisma/client'
 import { sanitize } from './middleware/sanitize.js'
 import { verifyCsrf, issueCsrfToken } from './middleware/csrf.js'
-import { loginLimiter } from './middleware/rateLimit.js'
+import { loginLimiter, registerLimiter, passwordResetLimiter } from './middleware/rateLimit.js'
 
 // ─── Database ──────────────────────────────────────────────────
 export const prisma = new PrismaClient({
@@ -231,6 +231,10 @@ app.use('/api/storefront/payments', publicLimiter, storefrontPaymentRoutes)
 app.use('/api/sitemap.xml', publicLimiter, storefrontSitemapRoutes)
 
 // ─── Customer Auth ──────────────────────────────────────────────
+app.use('/api/auth/login', loginLimiter)
+app.use('/api/auth/register', registerLimiter)
+app.use('/api/auth/forgot-password', passwordResetLimiter)
+app.use('/api/auth/reset-password', passwordResetLimiter)
 app.use('/api/auth', publicLimiter, customerAuthRoutes)
 
 // ─── 404 Handler ───────────────────────────────────────────────
