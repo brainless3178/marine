@@ -2,20 +2,19 @@ import { Router } from 'express'
 import multer from 'multer'
 import sharp from 'sharp'
 import crypto from 'crypto'
-import path from 'path'
-import fs from 'fs'
+import { v2 as cloudinary } from 'cloudinary'
 import { prisma } from '../../server.js'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler } from '../../middleware/validate.js'
 import { paginationParams, paginationResponse } from '../../utils/helpers.js'
 
+// Configure Cloudinary from env — auto-reads CLOUDINARY_URL (cloudinary://key:secret@cloudname)
+cloudinary.config()
+
 const router = Router()
 router.use(authenticateAdmin)
 
 // ─── Multer Config ────────────────────────────────────────────
-const UPLOAD_DIR = path.resolve('uploads')
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true, mode: 0o755 })
-
 const storage = multer.memoryStorage()
 const upload = multer({
   storage,
@@ -32,15 +31,26 @@ function generateHash(buffer: Buffer): string {
   return crypto.createHash('sha256').update(buffer).digest('hex')
 }
 
-// Helper: write file to disk and return URL
-async function saveFile(buffer: Buffer, hash: string, ext: string): Promise<{ filename: string; url: string }> {
-  // Use hash as filename for dedup-friendly storage (same hash = same filename)
-  const filename = `${hash.slice(0, 12)}${ext}`
-  const filepath = path.join(UPLOAD_DIR, filename)
-  if (!fs.existsSync(filepath)) {
-    fs.writeFileSync(filepath, buffer)
-  }
-  return { filename, url: `/uploads/${filename}` }
+// Helper: upload buffer to Cloudinary, return URL + public_id
+async function uploadToCloudinary(buffer: Buffer, hashPrefix: string): Promise<{ url: string; publicId: string }> {
+  const b64 = `data:image/webp;base64,${buffer.toString('base64')}`
+  const publicId = `alka/${hashPrefix}`
+  const result = await cloudinary.uploader.upload(b64, {
+    public_id: publicId,
+    resource_type: 'image',
+    overwrite: false,  // Don't overwrite if same public_id exists (dedup via filename)
+    invalidate: true,
+  })
+  return { url: result.secure_url, publicId }
+}
+
+// Helper: extract Cloudinary public_id from a URL for deletion
+function extractCloudinaryPublicId(url: string): string | null {
+  // URL format: https://res.cloudinary.com/CLOUD/image/upload/v12345/alka/HASH.webp
+  const match = url.match(/\/image\/upload\/v\d+\/(.+)\/?$/)
+  if (!match) return null
+  // Remove file extension from the path
+  return match[1].replace(/\.[^.]+$/, '')
 }
 
 // Helper: optimize image with Sharp
@@ -55,8 +65,7 @@ async function optimizeImage(buffer: Buffer, mimetype: string): Promise<{ optimi
     image.resize({ width: Math.min(width, 2000), height: Math.min(height, 2000), fit: 'inside', withoutEnlargement: true })
   }
 
-  // Convert to WebP for smaller file size, auto-rotate from EXIF orientation
-  // Sharp strips EXIF metadata by default in WebP output (no .withMetadata() call needed)
+  // Convert to WebP, auto-rotate from EXIF orientation
   const optimized = await image.rotate().webp({ quality: 85 }).toBuffer()
   return { optimized, width, height }
 }
@@ -93,14 +102,21 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
   const file = req.file
   if (!file) return res.status(400).json({ error: 'No file provided' })
 
-  // Optimize image
+  // Optimize image with Sharp (resize, format convert, auto-rotate)
   const { optimized, width, height } = await optimizeImage(file.buffer, file.mimetype)
 
   // Compute hash from OPTIMIZED buffer — this is what gets stored and used for dedup
   const fileHash = generateHash(optimized)
+  const hashPrefix = fileHash.slice(0, 12)
 
-  // Save optimized file to disk FIRST (content-addressed filename = safe idempotent write)
-  const { filename, url } = await saveFile(optimized, fileHash, '.webp')
+  // Quick pre-check to avoid unnecessary Cloudinary upload for duplicates
+  const preExisting = await prisma.mediaAsset.findFirst({ where: { hash: fileHash } })
+  if (preExisting) {
+    return res.status(200).json({ asset: preExisting, message: 'Duplicate file — existing asset returned' })
+  }
+
+  // Upload to Cloudinary (only for new files)
+  const { url, publicId } = await uploadToCloudinary(optimized, hashPrefix)
 
   // Prisma $transaction ensures atomic check+create — no race condition
   const result = await prisma.$transaction(async (tx) => {
@@ -109,9 +125,9 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
 
     const asset = await tx.mediaAsset.create({
       data: {
-        filename,
+        filename: publicId,           // Cloudinary public_id (alka/hash123456)
         originalName: file.originalname,
-        url,
+        url,                          // Cloudinary secure_url
         mimeType: 'image/webp',
         fileSize: optimized.length,
         width,
@@ -124,6 +140,8 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
   })
 
   if (!result.created) {
+    // Duplicate detected inside transaction (race condition window) — Cloudinary
+    // image is idempotent (overwrite: false) so no harm done
     return res.status(200).json({ asset: result.asset, message: 'Duplicate file — existing asset returned' })
   }
 
@@ -134,11 +152,11 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req: AuthReque
 router.delete('/:id', requireRole('inventory-manager'), asyncHandler(async (req: AuthRequest, res) => {
   const assetId = req.params.id as string
 
-  // Fetch asset FIRST to get its URL for usage checks, and disk path for cleanup
+  // Fetch asset FIRST to get its URL for usage checks
   const asset = await prisma.mediaAsset.findUnique({ where: { id: assetId } })
   if (!asset) return res.status(404).json({ error: 'Media asset not found' })
 
-  // Check usage by URL across ALL entities (Brand, AdminUser, Product store URLs not asset IDs)
+  // Check usage by URL across ALL entities
   const assetUrl = asset.url
   const [productImageCount, brandCount, adminUserCount, productCount] = await Promise.all([
     prisma.productImage.count({ where: { mediaAssetId: assetId } }),
@@ -160,19 +178,18 @@ router.delete('/:id', requireRole('inventory-manager'), asyncHandler(async (req:
     return res.status(400).json({ error: 'Cannot delete: used as a product OG image' })
   }
 
+  // Delete from Cloudinary
+  const cloudinaryPublicId = extractCloudinaryPublicId(assetUrl)
+  if (cloudinaryPublicId) {
+    try {
+      await cloudinary.uploader.destroy(cloudinaryPublicId, { invalidate: true })
+    } catch {
+      console.warn(`Failed to delete from Cloudinary: ${cloudinaryPublicId}`)
+    }
+  }
+
   // Delete DB record
   await prisma.mediaAsset.delete({ where: { id: assetId } })
-
-  // Delete disk file if it exists
-  const filepath = path.join(UPLOAD_DIR, asset.filename)
-  try {
-    if (fs.existsSync(filepath)) {
-      fs.unlinkSync(filepath)
-    }
-  } catch {
-    // File might already be gone — log but don't fail the request
-    console.warn(`Failed to delete disk file: ${filepath}`)
-  }
 
   res.json({ message: 'Deleted' })
 }))
