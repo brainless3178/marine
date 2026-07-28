@@ -34,7 +34,7 @@ User-agent: Amazonbot
 Allow: /
 
 # Sitemaps
-Sitemap: https://alkatraders.co/api/sitemap.xml
+Sitemap: https://alkatraders.co/sitemap.xml
 
 # Crawl-delay for polite bots
 Crawl-delay: 1
