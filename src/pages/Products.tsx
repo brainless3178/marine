@@ -51,7 +51,7 @@ export default function Products() {
     return []
   }, [apiProducts, productListData, isLoading])
 
-  const { products: allProducts, filteredCount } = useProducts(finalProducts)
+  const { filteredCount } = useProducts(finalProducts)
   const finalCount = filteredCount
 
   // Pagination

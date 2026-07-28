@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'images/*.{avif,png}'],
+      includeAssets: ['favicon.ico', 'images/*.avif'],
       manifest: {
         name: 'Alka Traders — Marine Equipment Supplier',
         short_name: 'Alka Traders',
@@ -24,7 +24,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,avif,png,woff2}'],
+        globPatterns: ['**/*.{js,css,html,avif,woff2}'],
         runtimeCaching: [
           {
             urlPattern: /^https?:\/\/res\.cloudinary\.com\/.*/i,

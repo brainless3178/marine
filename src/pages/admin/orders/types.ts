@@ -58,7 +58,7 @@ export function mapApiOrder(o: ApiOrder): Order {
     timeline: (o.timeline || []).map((t: ApiOrderTimeline) => ({
       status: (t.status || 'pending') as OrderStatus,
       date: t.date || t.createdAt || new Date().toISOString(),
-      note: t.note || t.message || '',
+      note: t.note || '',
     })),
   }
 }

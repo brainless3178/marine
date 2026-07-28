@@ -67,12 +67,20 @@ export function clearCsrfToken() {
   csrfTokenFetchedAt = 0
 }
 
+export function getAdminToken(): string | null {
+  return adminAccessToken
+}
+
 export function setAdminToken(token: string | null) {
   adminAccessToken = token
 }
 
 export function setCustomerToken(token: string | null) {
   customerAccessToken = token
+}
+
+export function getCustomerToken(): string | null {
+  return customerAccessToken
 }
 
 

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { PayPalButtons } from '@paypal/react-paypal-js'
 import { Package, CreditCard, ChevronLeft, ClipboardCheck, Shield, MapPin, Loader2 } from 'lucide-react'
-import type { CartItem } from '../../store/useStore'
+import type { CartItem } from '../../types'
 import { getProductImageUrl } from '../../lib/utils'
 import { OptimizedImage } from '../../components/ui/OptimizedImage'
 
