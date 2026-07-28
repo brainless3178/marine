@@ -41,9 +41,52 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="Marine & Industrial Equipment Supplier"
-        description="Alka Traders — global supplier of marine spares, ship machinery, electrical automation, hydraulics, and emergency procurement. Based in Bhavnagar, Gujarat, India."
+        title="Marine Spare Parts Supplier in India | Ship Spares from Bhavnagar"
+        description="Alka Traders supplies tested marine spare parts, ship automation, engine spares, hydraulic pumps, electrical drives, and surplus industrial equipment from Bhavnagar, India."
         canonical="/"
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Alka Traders',
+            url: 'https://alkatraders.co',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: 'https://alkatraders.co/products?search={search_term_string}',
+              'query-input': 'required name=search_term_string',
+            },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'What marine spare parts does Alka Traders supply?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Alka Traders supplies ship automation parts, marine engine spares, hydraulic pumps and motors, navigation equipment, electrical drives, marine pumps, rigging, lifting gear, and surplus industrial machinery.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Where are Alka Traders marine parts shipped from?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Most export orders are coordinated from Bhavnagar, Gujarat, India, near the Alang marine equipment and ship recycling market, with courier, air freight, and sea freight options.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Can I request a quote with only a part number or nameplate photo?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Yes. Buyers can send a part number, maker name, model, serial plate photo, or product description through the RFQ form, email, or WhatsApp.',
+                },
+              },
+            ],
+          },
+        ]}
       />
       <Hero />
 
@@ -86,7 +129,7 @@ export default function Home() {
                 {t('shop.freshInventory')}
               </h2>
               <p className="mt-3 max-w-[620px] text-sm leading-relaxed text-[var(--text-secondary)]">
-                Ship-ready spares, tested surplus, and hard-to-find equipment presented for fast buying decisions.
+                Ready-to-quote ship spares, tested surplus machinery, and hard-to-find automation parts for urgent vessel and plant maintenance.
               </p>
               <div className="gold-accent-bar mt-4" />
             </div>
@@ -120,16 +163,22 @@ export default function Home() {
               className="h-12 w-12 rounded-2xl object-cover shadow-sm mb-5"
             />
             <h2 className="font-display text-display-lg font-bold tracking-tight text-[var(--text-primary)]">
-              Built for marine buyers who cannot wait.
+              Ship spares sourcing for buyers who cannot wait.
             </h2>
             <p className="mt-3 max-w-[720px] text-sm leading-relaxed text-[var(--text-secondary)]">
-              Clear stock status, direct WhatsApp quote paths, verified condition labels, and RFQ-first buying make the store feel practical for vessel owners, shipyards, and maintenance teams.
+              Send a maker, model, part number, serial plate, or product photo. Our team checks availability, condition, compatibility notes, export packing, and freight options before quoting.
             </p>
+            <div className="mt-6 grid gap-3 text-sm text-[var(--text-secondary)] sm:grid-cols-2">
+              <p><strong className="text-[var(--text-primary)]">Marine focus:</strong> ship automation, navigation, pumps, engine spares, rigging, and deck equipment.</p>
+              <p><strong className="text-[var(--text-primary)]">Industrial focus:</strong> ABB, Siemens, Parker, Bosch Rexroth, Danfoss, Festo, SMC, and similar MRO components.</p>
+              <p><strong className="text-[var(--text-primary)]">Condition clarity:</strong> new old stock, used, refurbished, and reconditioned items are labelled before dispatch.</p>
+              <p><strong className="text-[var(--text-primary)]">Export support:</strong> DHL, FedEx, air freight, sea freight, and buyer-arranged shipping from India.</p>
+            </div>
           </div>
           <div className="rounded-[28px] bg-[var(--navy-deep)] p-8 text-white shadow-[var(--shadow-soft)]">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--accent-primary)]">Fast procurement lane</p>
-            <h3 className="mt-3 font-display text-3xl font-bold leading-tight">Need a rare spare?</h3>
-            <p className="mt-3 text-sm leading-relaxed text-white/68">Send part number, photo, or vessel details. The CTA now stays visible and buyer-friendly.</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--accent-primary)]">Urgent vessel procurement</p>
+            <h3 className="mt-3 font-display text-3xl font-bold leading-tight">Need a rare ship spare?</h3>
+            <p className="mt-3 text-sm leading-relaxed text-white/68">Send the part number, photo, maker name, vessel details, and delivery port. We will confirm stock or source an alternative.</p>
             <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--accent-primary)] px-5 py-3 text-xs font-black uppercase tracking-[0.1em] text-white no-underline hover:bg-[var(--accent-primary-hover)]">
               <MessageCircle size={16} /> WhatsApp RFQ
             </a>

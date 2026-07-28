@@ -19,9 +19,9 @@ export default function ProfileEdit() {
   useEffect(() => {
     if (!user) { navigate('/'); return }
     setName(user.name || '')
-    setPhone((user as any).phone || '')
-    setCompany((user as any).company || '')
-    setCountry((user as any).country || '')
+    setPhone('phone' in user ? (user as { phone?: string }).phone || '' : '')
+    setCompany('company' in user ? (user as { company?: string }).company || '' : '')
+    setCountry('country' in user ? (user as { country?: string }).country || '' : '')
   }, [user, navigate])
 
   if (!user) return null

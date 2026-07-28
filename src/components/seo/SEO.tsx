@@ -1,4 +1,8 @@
 import { Helmet } from 'react-helmet-async'
+import { useLocation } from 'react-router-dom'
+import { useStore } from '../../store/useStore'
+import { VALID_LOCALES, LOCALE_TO_OG } from '../../lib/locale'
+import type { Language } from '../../types'
 
 interface SEOProps {
   title: string
@@ -18,6 +22,26 @@ const SITE_NAME = 'Alka Traders'
 const DEFAULT_DESCRIPTION = 'Marine & industrial equipment supplier — ship spares, surplus machinery, electrical automation, hydraulic systems, and emergency procurement. Based in Bhavnagar, Gujarat, India.'
 const DEFAULT_OG_IMAGE = `${BASE_URL}/images/alka-traders-logo.jpeg`
 
+/** Build absolute hreflang links for all supported locales. */
+function buildHreflangLinks(locale: Language, pathWithoutLocale: string): Array<{ hreflang: string; href: string }> {
+  const links: Array<{ hreflang: string; href: string }> = []
+
+  for (const lang of VALID_LOCALES) {
+    const fullPath = lang === 'en' && (pathWithoutLocale === '' || pathWithoutLocale === '/')
+      ? BASE_URL
+      : `${BASE_URL}/${lang}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
+    links.push({ hreflang: lang, href: fullPath })
+  }
+
+  // x-default points to English
+  const defaultHref = pathWithoutLocale === '/' || pathWithoutLocale === ''
+    ? BASE_URL
+    : `${BASE_URL}/en${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
+  links.push({ hreflang: 'x-default', href: defaultHref })
+
+  return links
+}
+
 export function SEO({
   title,
   description,
@@ -30,9 +54,26 @@ export function SEO({
   ogImageAlt,
   jsonLd,
 }: SEOProps) {
+  const { pathname } = useLocation()
+  const language = useStore((s) => s.language)
+
+  // Derive the path without locale prefix
+  const segments = pathname.split('/').filter(Boolean)
+  const firstSegment = segments[0]
+  const isLocalePrefixed = firstSegment !== undefined && VALID_LOCALES.includes(firstSegment as Language)
+  const pathWithoutLocale = isLocalePrefixed
+    ? '/' + segments.slice(1).join('/')
+    : pathname
+
   const fullTitle = `${title} | ${SITE_NAME}`
-  const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : BASE_URL
+  const canonicalUrl = canonical
+    ? `${BASE_URL}${canonical}`
+    : isLocalePrefixed
+      ? `${BASE_URL}/${language}${pathWithoutLocale === '/' && segments.length <= 1 ? '' : pathWithoutLocale}`
+      : BASE_URL
   const ogImageUrl = ogImage ? `${BASE_URL}${ogImage}` : DEFAULT_OG_IMAGE
+  const ogLocale = LOCALE_TO_OG[language] || 'en_US'
+  const hreflangLinks = buildHreflangLinks(language, pathWithoutLocale)
 
   // Build default JSON-LD for Organization
   const organizationJsonLd = {
@@ -134,6 +175,12 @@ export function SEO({
       <title>{fullTitle}</title>
       <meta name="description" content={description || DEFAULT_DESCRIPTION} />
       <link rel="canonical" href={canonicalUrl} />
+
+      {/* hreflang alternate links */}
+      {hreflangLinks.map(({ hreflang, href }) => (
+        <link key={hreflang} rel="alternate" hrefLang={hreflang} href={href} />
+      ))}
+
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description || DEFAULT_DESCRIPTION} />
       <meta property="og:url" content={canonicalUrl} />
@@ -143,7 +190,7 @@ export function SEO({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content={ogImageAlt || `${SITE_NAME} — Marine & Industrial Equipment`} />
-      <meta property="og:locale" content="en_US" />
+      <meta property="og:locale" content={ogLocale} />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description || DEFAULT_DESCRIPTION} />

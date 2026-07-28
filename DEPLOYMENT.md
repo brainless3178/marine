@@ -59,7 +59,84 @@
 7. Wait for the deploy to finish — your backend URL will be something like `https://alka-traders-api.onrender.com`
 8. Test: Visit `https://alka-traders-api.onrender.com/api/health`
 
-**⚠️ Render Free Tier:** The backend will spin down after ~15 minutes of inactivity and cold-start in ~30 seconds. To keep it alive, set up a free cron ping at [cron-job.org](https://cron-job.org) hitting `/api/health` every 10 minutes.
+**⚠️ Render Free Tier:** The backend will spin down after ~15 minutes of inactivity and cold-start in ~30 seconds. To keep it alive, set up a free cron ping (see keep-alive setup below).
+
+---
+
+## Keep-Alive Setup (Required for Render Free Tier)
+
+Render's free tier spins down the backend after ~15 minutes of inactivity. The first request after spin-down takes **30-60 seconds** (cold start). This burns crawl budget, hurts Core Web Vitals, and frustrates users.
+
+**Fix:** Ping the health endpoint every 5 minutes from an external monitor. Choose one option below.
+
+### Option A: cron-job.org (Recommended — Free, No Account Required)
+
+[cron-job.org](https://cron-job.org) is free, requires no credit card, and supports custom intervals.
+
+1. Go to [cron-job.org](https://cron-job.org) and create a free account
+2. Click **Create Cronjob**
+3. Fill in:
+   - **Title:** `Alka Traders Keep-Alive`
+   - **URL:** `https://YOUR-BACKEND-URL.onrender.com/api/health`
+   - **Schedule:** Every **5 minutes** (or use cron expression `*/5 * * * *`)
+   - **Request Method:** `GET`
+   - **Notification:** Optional (email on failure)
+4. Click **Create**
+5. Test: After the first ping, check your backend logs for `"GET /api/health"` entries
+
+### Option B: UptimeRobot (Free Tier — 50 Monitors)
+
+[UptimeRobot](https://uptimerobot.com) offers 50 monitors on the free plan with 5-minute checks.
+
+1. Go to [uptimerobot.com](https://uptimerobot.com) and sign up
+2. Click **Add New Monitor**
+3. Fill in:
+   - **Monitor Type:** `HTTP(s)`
+   - **Friendly Name:** `Alka Traders API`
+   - **URL / IP:** `https://YOUR-BACKEND-URL.onrender.com/api/health`
+   - **Monitoring Interval:** `5 minutes`
+   - **Advanced:** Set timeout to `30 seconds` (Render cold starts can be slow)
+4. Click **Create Monitor**
+
+### Option C: GitHub Actions (If you want it in-repo)
+
+Add `.github/workflows/keep-alive.yml`:
+
+```yaml
+name: Keep Render Alive
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Every 5 minutes
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            "https://YOUR-BACKEND-URL.onrender.com/api/health" || true
+```
+
+**⚠️ Note:** GitHub Actions scheduled workflows on free plans may be delayed by up to 30 minutes during runner queue congestion. cron-job.org is more reliable for tight intervals.
+
+### Verification
+
+After setting up the keep-alive, confirm it works:
+
+1. Wait at least 10 minutes (allows for cron scheduling granularity)
+2. Visit `https://YOUR-BACKEND-URL.onrender.com/api/health` in a browser
+3. Expected response time: **< 2 seconds** (warm, not cold-started)
+4. Expected body:
+
+```json
+{
+  "status": "ok",
+  "database": "connected",
+  "timestamp": "2026-07-28T..."
+}
+```
+
+If you see a 30+ second delay, the keep-alive is NOT working — the instance is spinning down between pings. Check the monitor's logs.
 
 ---
 

@@ -5,6 +5,7 @@ import { sendOrderConfirmation } from '../../services/email.js'
 import logger from '../../utils/logger.js'
 import { getPaypalAccessToken, PAYPAL_BASE, PAYPAL_WEBHOOK_ID, PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } from '../../utils/paypal.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
+import type { Prisma } from '@prisma/client'
 
 const router = Router()
 const hookLog = logger.child({ context: 'paypal-webhook' })
@@ -93,7 +94,7 @@ router.post('/', async (req, res) => {
       data: {
         source: 'paypal',
         eventType: event.event_type || 'unknown',
-        payload: event as any,
+        payload: event as unknown as Prisma.InputJsonValue,
         status: 'received',
       },
     })

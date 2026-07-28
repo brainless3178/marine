@@ -180,12 +180,12 @@ if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true, mode
 app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '1y', immutable: true, index: false }))
 
 // ─── CSRF Protection (after cookies are parsed) ──────────────
-app.get('/api/csrf-token', issueCsrfToken as any)
+app.get('/api/csrf-token', issueCsrfToken as unknown as express.RequestHandler)
 app.use(verifyCsrf)
 
 // ─── Request ID (for log correlation) ──────────────────────────
 app.use((req: express.Request, _res: express.Response, next: express.NextFunction) => {
-  ;(req as any).id = (req.headers['x-request-id'] as string) || crypto.randomUUID()
+  ;(req as express.Request & { id: string }).id = (req.headers['x-request-id'] as string) || crypto.randomUUID()
   next()
 })
 

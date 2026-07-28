@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { usePayPalScriptReducer } from '@paypal/react-paypal-js'
+import type { CreateOrderActions, OnApproveData, OnApproveActions } from '@paypal/react-paypal-js'
 import { Truck, Shield } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { storefront } from '../lib/api'
@@ -146,9 +147,8 @@ export default function Checkout() {
   }
 
   // PayPal Smart Buttons callbacks
-  const handleCreatePaypalOrder = async (_data: unknown, actions: unknown) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const paypalActions = actions as any
+  const handleCreatePaypalOrder = async (_data: Record<string, unknown>, actions: CreateOrderActions) => {
+    const paypalActions = actions
     // First create the store order if not already created
     let currentOrderId = createdOrderId
     if (!currentOrderId) {
@@ -184,11 +184,9 @@ export default function Checkout() {
     }
   }
 
-  const handleApprovePaypalOrder = async (data: unknown, actions: unknown) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const paypalData = data as any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const paypalActions = actions as any
+  const handleApprovePaypalOrder = async (data: OnApproveData, actions: OnApproveActions) => {
+    const paypalData = data
+    const paypalActions = actions
     setOrderLoading(true)
     setOrderError('')
     try {

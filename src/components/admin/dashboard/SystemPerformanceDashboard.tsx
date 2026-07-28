@@ -33,7 +33,7 @@ export function SystemPerformanceDashboard() {
       const cssCount = resources.filter(r => r.initiatorType === 'css' || r.name.endsWith('.css')).length
       const jsCount = resources.filter(r => r.initiatorType === 'script' || r.name.endsWith('.js')).length
 
-      const mem = (performance as any).memory
+      const mem = (performance as unknown as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory
       const memoryUsage = mem ? `${Math.round(mem.usedJSHeapSize / 1048576)}MB / ${Math.round(mem.totalJSHeapSize / 1048576)}MB` : 'N/A'
       const jsHeapUsed = mem ? `${Math.round(mem.usedJSHeapSize / 1048576)}MB` : 'N/A'
 

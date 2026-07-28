@@ -192,7 +192,7 @@ export async function generateInvoiceHtml(id: string) {
     </tr>`
   ).join('')
 
-  const customer = (order as any).customer || {}
+  const customer = (order as Record<string, unknown>).customer as Record<string, string> || {}
   const shipping = {
     fullName: order.shippingFullName || '',
     addressLine1: order.shippingAddressLine1 || '',

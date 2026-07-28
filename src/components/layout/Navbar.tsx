@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, MessageCircle, Phone, ShoppingCart, X, Mail, Globe, UserCircle2, LogOut, User, Package, LogIn } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
 import { ThemeToggle } from '../ui/ThemeToggle'
+import { useLocale, useLocalizedPath, switchLocalePath } from '../../lib/locale'
 import type { Language } from '../../types'
 
-const navLinks = [
+const STATIC_NAV_LINKS = [
   { path: '/', labelKey: 'home' },
   { path: '/products', labelKey: 'products' },
   { path: '/shop', labelKey: 'shop' },
@@ -17,16 +18,16 @@ const navLinks = [
   { path: '/contact', labelKey: 'contact' },
 ]
 
-const languages: { code: Language; label: string }[] = [
+const LANGUAGES: { code: Language; label: string }[] = [
   { code: 'en', label: 'EN' },
   { code: 'ar', label: 'AR' },
   { code: 'es', label: 'ES' },
 ]
 
 function BrandLockup() {
+  const locale = useLocale()
   return (
-    <Link to="/" className="flex items-center gap-3 no-underline text-[var(--text-primary)]">
-      <img
+    <Link to={`/${locale}`} className="flex items-center gap-3 no-underline text-[var(--text-primary)]"><img
         src="/images/alka-traders-logo.jpeg"
         alt="Alka Traders Logo"
         width={44}
@@ -46,6 +47,9 @@ function BrandLockup() {
 export function Navbar() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const locale = useLocale()
+  const localizedPath = useLocalizedPath()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
@@ -129,19 +133,22 @@ export function Navbar() {
 
           {/* Desktop Nav Links */}
           <div className="hidden items-center gap-7 lg:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm font-semibold no-underline transition-colors ${
-                  pathname === link.path || (link.path !== '/' && pathname.startsWith(link.path))
-                    ? 'text-[var(--accent-primary)] font-bold'
-                    : 'text-[var(--text-primary)] hover:text-[var(--accent-primary)]'
-                }`}
-              >
-                {t(`nav.${link.labelKey}`)}
-              </Link>
-            ))}
+            {STATIC_NAV_LINKS.map((link) => {
+              const localizedTo = localizedPath(link.path)
+              return (
+                <Link
+                  key={link.path}
+                  to={localizedTo}
+                  className={`text-sm font-semibold no-underline transition-colors ${
+                    pathname === localizedTo || (localizedTo !== `/${locale}` && pathname.startsWith(localizedTo))
+                      ? 'text-[var(--accent-primary)] font-bold'
+                      : 'text-[var(--text-primary)] hover:text-[var(--accent-primary)]'
+                  }`}
+                >
+                  {t(`nav.${link.labelKey}`)}
+                </Link>
+              )
+            })}
           </div>
 
           <div className="flex items-center gap-2">
@@ -156,11 +163,12 @@ export function Navbar() {
               </button>
               {langOpen && (
                 <div className="absolute right-0 top-full mt-1 w-28 rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-lg overflow-hidden z-50">
-                  {languages.map((lang) => (
+                  {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => {
-                        setLanguage(lang.code)
+                        const newPath = switchLocalePath(pathname, lang.code)
+                        navigate(newPath)
                         setLangOpen(false)
                       }}
                       className={`w-full px-4 py-2.5 text-xs font-bold text-left transition-colors hover:bg-[var(--surface-soft)] flex items-center gap-2 ${
@@ -203,7 +211,7 @@ export function Navbar() {
             </a>
 
             <Link
-              to="/rfq"
+              to={localizedPath('/rfq')}
               className="hidden items-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-extrabold text-white no-underline transition-colors hover:bg-[var(--accent-primary-hover)] lg:inline-flex"
             >
               {t('nav.requestQuote')}
@@ -231,14 +239,14 @@ export function Navbar() {
                         <p className="text-[11px] text-[var(--text-muted)] truncate mt-0.5">{user?.email || ''}</p>
                       </div>
                       <Link
-                        to="/account/profile"
+                        to={localizedPath('/account/profile')}
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--text-primary)] no-underline hover:bg-[var(--surface-soft)] transition-colors"
                       >
                         <User size={14} className="text-[var(--text-muted)]" /> My Profile
                       </Link>
                       <Link
-                        to="/account/orders"
+                        to={localizedPath('/account/orders')}
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--text-primary)] no-underline hover:bg-[var(--surface-soft)] transition-colors"
                       >
@@ -290,27 +298,31 @@ export function Navbar() {
         {/* Mobile Menu */}
         <div className={`absolute left-0 right-0 top-full border-b border-[var(--border)] bg-[var(--surface)] px-5 py-4 shadow-lg lg:hidden z-50 transition-all duration-300 ease-in-out ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`} style={{ maxHeight: mobileOpen ? '80vh' : '0', overflow: 'hidden' }}>
             <div className="mx-auto flex max-w-[1280px] flex-col gap-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`rounded-lg px-3 py-2 text-sm font-bold no-underline ${
-                    pathname === link.path
-                      ? 'bg-[var(--surface-soft)] text-[var(--accent-primary)]'
-                      : 'text-[var(--text-secondary)]'
-                  }`}
-                >
-                  {t(`nav.${link.labelKey}`)}
-                </Link>
-              ))}
+              {STATIC_NAV_LINKS.map((link) => {
+                const localizedTo = localizedPath(link.path)
+                return (
+                  <Link
+                    key={link.path}
+                    to={localizedTo}
+                    className={`rounded-lg px-3 py-2 text-sm font-bold no-underline ${
+                      pathname === localizedTo
+                        ? 'bg-[var(--surface-soft)] text-[var(--accent-primary)]'
+                        : 'text-[var(--text-secondary)]'
+                    }`}
+                  >
+                    {t(`nav.${link.labelKey}`)}
+                  </Link>
+                )
+              })}
               <div className="border-t border-[var(--border)] pt-3 mt-1">
                 <span className="text-xs text-[var(--text-muted)] font-bold uppercase tracking-wider block mb-2">{t('nav.language')}</span>
                 <div className="flex gap-2">
-                  {languages.map((lang) => (
+                  {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => {
-                        setLanguage(lang.code)
+                        const newPath = switchLocalePath(pathname, lang.code)
+                        navigate(newPath)
                       }}
                       className={`px-3 py-2 rounded-lg text-xs font-bold border ${
                         language === lang.code
@@ -344,10 +356,10 @@ export function Navbar() {
                       <p className="text-xs font-bold text-[var(--text-primary)] truncate">{user?.name || 'My Account'}</p>
                       <p className="text-[11px] text-[var(--text-muted)] truncate">{user?.email || ''}</p>
                     </div>
-                    <Link to="/account/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold no-underline text-[var(--text-secondary)] hover:bg-[var(--surface-soft)]">
+                    <Link to={localizedPath('/account/profile')} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold no-underline text-[var(--text-secondary)] hover:bg-[var(--surface-soft)]">
                       <User size={13} /> My Profile
                     </Link>
-                    <Link to="/account/orders" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold no-underline text-[var(--text-secondary)] hover:bg-[var(--surface-soft)]">
+                    <Link to={localizedPath('/account/orders')} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold no-underline text-[var(--text-secondary)] hover:bg-[var(--surface-soft)]">
                       <Package size={13} /> My Orders
                     </Link>
                     <button onClick={() => { logout(); setMobileOpen(false) }} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[var(--danger)] hover:bg-[var(--danger)]/5">
@@ -364,7 +376,7 @@ export function Navbar() {
                 )}
               </div>
               <Link
-                to="/rfq"
+                to={localizedPath('/rfq')}
                 className="inline-flex items-center justify-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-extrabold text-white no-underline hover:bg-[var(--accent-primary-hover)] transition-colors"
               >
                 {t('nav.requestQuote')}

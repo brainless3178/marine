@@ -169,7 +169,7 @@ export function FraudDetectionCenter({ orders }: Props) {
           { label: 'High', count: analysis.high, color: 'text-[var(--accent-gold)]' },
           { label: 'Medium', count: analysis.medium, color: 'text-[var(--accent-blue)]' },
         ].map(s => (
-          <button key={s.label} onClick={() => setFilter(filter === s.label.toLowerCase() ? 'all' : s.label.toLowerCase() as any)}
+          <button key={s.label} onClick={() => setFilter(filter === s.label.toLowerCase() ? 'all' : s.label.toLowerCase() as 'all' | 'critical' | 'high' | 'medium')}
             className={`rounded-lg px-2 py-1 text-[0.625rem] font-bold transition-all ${
               filter === s.label.toLowerCase() ? `${s.color} ring-2 ring-current/20 bg-[var(--surface-soft)]` : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
             }`}>

@@ -89,7 +89,7 @@ export async function processPaypalRefund(
     if (!refundRes.ok) {
       const err = await refundRes.json().catch(() => ({})) as Record<string, unknown>
       paypalLog.error({ err, paypalOrderId, captureId }, 'PayPal refund failed')
-      return { success: false, error: (err as any)?.message || 'PayPal refund request rejected' }
+      return { success: false, error: err instanceof Error ? err.message : (err as Record<string, string>)?.message || 'PayPal refund request rejected' }
     }
 
     paypalLog.info({ paypalOrderId, captureId, amount }, 'PayPal refund processed successfully')
