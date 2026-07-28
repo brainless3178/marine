@@ -275,27 +275,6 @@ html:not(.light) .admin-badge-info {
   background: var(--badge-info-bg);
 }
 
-/* ── Pulse dot for emergency/urgent ──────────────────────── */
-.admin-pulse-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  animation: adminPulse 2s ease-in-out infinite;
-}
-
-.admin-pulse-dot.emergency {
-  background: var(--danger);
-}
-
-.admin-pulse-dot.urgent {
-  background: var(--accent-gold);
-}
-
-@keyframes adminPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.5); }
-}
-
 /* ── Admin Login ─────────────────────────────────────────── */
 .admin-login-bg {
   background:

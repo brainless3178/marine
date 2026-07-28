@@ -452,16 +452,7 @@ html:not(.light) {
 
 @layer components {
   /* ── Typographic utilities ─────────────────────────────── */
-  .type-hero {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(36px, 5.5vw, 68px);
-    line-height: 1.12;
-    letter-spacing: -0.02em;
-    font-weight: 700;
-  }
-
-  .text-display-2xl,
-  .type-display-2xl {
+  .text-display-2xl {
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(34px, 4.8vw, 60px);
     line-height: 1.15;
@@ -470,8 +461,7 @@ html:not(.light) {
     color: var(--text-primary);
   }
 
-  .text-display-lg,
-  .type-display-lg {
+  .text-display-lg {
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(30px, 4vw, 52px);
     line-height: 1.18;
@@ -480,8 +470,7 @@ html:not(.light) {
     color: var(--text-primary);
   }
 
-  .text-section-lg,
-  .type-section-lg {
+  .text-section-lg {
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(26px, 3.5vw, 42px);
     line-height: 1.2;
@@ -490,17 +479,7 @@ html:not(.light) {
     color: var(--text-primary);
   }
 
-  .type-h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(24px, 3.2vw, 38px);
-    line-height: 1.22;
-    letter-spacing: -0.01em;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  .text-section,
-  .type-section {
+  .text-section {
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(22px, 2.8vw, 34px);
     line-height: 1.25;
@@ -509,52 +488,12 @@ html:not(.light) {
     color: var(--text-primary);
   }
 
-  .type-body-lead {
-    font-size: 1.125rem;
-    line-height: 1.65;
-    letter-spacing: 0;
-  }
-
-  .type-body {
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-
-  .type-body-sm {
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-
-  .type-label {
-    font-size: 0.8125rem;
-    line-height: 1.4;
-    letter-spacing: 0.01em;
-    font-weight: 600;
-  }
-
-  .type-caption {
-    font-size: 0.75rem;
-    line-height: 1.4;
-    letter-spacing: 0.01em;
-  }
-
   .type-overline {
     font-size: 0.6875rem;
     line-height: 1.4;
     letter-spacing: 0.15em;
     font-weight: 700;
     text-transform: uppercase;
-  }
-
-  .type-mono {
-    font-family: 'JetBrains Mono', monospace;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .type-price {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums lining-nums;
   }
 
   /* ── Heading size utilities (for use outside h1-h6 elements) ── */
@@ -576,63 +515,9 @@ html:not(.light) {
     color: var(--text-primary);
   }
 
-  .heading-md {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1rem;
-    line-height: 1.35;
-    letter-spacing: 0;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  .heading-sm {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.875rem;
-    line-height: 1.4;
-    letter-spacing: 0;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
   /* ── Tabular numbers for prices & stats ────────────────── */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
-  }
-
-  .lining-nums {
-    font-variant-numeric: lining-nums;
-  }
-
-  /* Premium Maritime Hero Background */
-  .hero-maritime-bg {
-    background:
-      linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-mid)),
-      radial-gradient(circle at 75% 20%, var(--hero-gold-glow), transparent 26rem),
-      linear-gradient(160deg, var(--navy-deep) 0%, var(--navy-mid) 42%, var(--navy-light) 100%);
-    position: relative;
-  }
-
-  html:not(.light) .hero-maritime-bg {
-    background: linear-gradient(160deg, #0f1419 0%, #111827 40%, #0f2133 100%);
-  }
-
-  .hero-maritime-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 50% at 70% 30%, rgba(56,189,248,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 70% at 20% 80%, rgba(45,212,191,0.04) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  /* Gradient text for headings */
-  .maritime-gradient-text {
-    background: linear-gradient(135deg, #ffffff 0%, #38bdf8 50%, #60a5fa 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.25));
   }
 
   /* Shimmer button effect */
@@ -645,12 +530,6 @@ html:not(.light) {
     height: 100%;
     background: linear-gradient(90deg, transparent, var(--shimmer-white), transparent);
     animation: shimmerSweep 2.5s ease-in-out infinite;
-  }
-
-  /* Marquee fade edges */
-  .marquee-fade-edges {
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
   }
 
   /* Premium card styling */
@@ -735,66 +614,6 @@ html:not(.light) {
     box-shadow: 0 8px 24px var(--focus-ring);
   }
 
-  .maritime-btn-secondary {
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--btn-secondary-border);
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 14px 28px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-
-  .maritime-btn-secondary:hover {
-    background: var(--btn-secondary-hover-bg);
-    border-color: var(--btn-secondary-hover-border);
-    color: var(--text-primary);
-  }
-
-  /* Section divider */
-  .maritime-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-    max-width: 1280px;
-    margin: 0 auto;
-  }
-
-  /* Glass card for overlays */
-  .glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-  }
-
-  /* Product marquee card */
-  .product-marquee-track {
-    display: flex;
-    width: max-content;
-    gap: 1rem;
-  }
-
-  .product-marquee-card {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.875rem;
-    padding: 0.625rem 1rem 0.625rem 0.625rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 10px;
-    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    backdrop-filter: blur(8px);
-  }
-
-  .product-marquee-card:hover {
-    border-color: var(--accent-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px var(--focus-ring);
-  }
-
   /* Accent bar */
   .gold-accent-bar {
     width: 48px;
@@ -818,53 +637,7 @@ html:not(.light) {
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .text-pretty {
-    text-wrap: pretty;
-  }
-
-  /* Hanging punctuation for refined typography */
-  .hanging-punct {
-    hanging-punctuation: first last;
-  }
-
-  /* Font feature utilities */
-  .feature-kern {
-    font-feature-settings: 'kern' 1;
-  }
-
-  .feature-liga {
-    font-feature-settings: 'liga' 1;
-  }
-
-  .feature-tnum {
-    font-variant-numeric: tabular-nums;
-  }
-
-  .feature-lnum {
-    font-variant-numeric: lining-nums;
-  }
-
-  .feature-onum {
-    font-variant-numeric: oldstyle-nums;
-  }
-
-  .feature-pnum {
-    font-variant-numeric: proportional-nums;
-  }
-
-  /* Optical sizing hint */
-  .optical-size {
-    font-optical-sizing: auto;
-  }
-}
-
-@keyframes gradientText {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  /* Reserved for future utility classes */
 }
 
 @keyframes shimmerSweep {
@@ -884,7 +657,6 @@ html:not(.light) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track,
   [class*="marquee"] {
     animation-play-state: paused !important;
   }
@@ -895,12 +667,6 @@ html:not(.light) {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* ── Full-height sections (dvh fallback for mobile browser chrome) ── */
-.full-height {
-  height: 100vh;   /* fallback for older browsers */
-  height: 100dvh;  /* dynamic viewport height — recalculates as browser chrome shows/hides */
 }
 
 /* ── Mobile-first global fixes ──────────────────────────── */
@@ -936,31 +702,9 @@ html:not(.light) {
     transform: translate(var(--tw-translate-x), 0) scale(var(--tw-scale-x), var(--tw-scale-y));
   }
 
-  /* Admin table horizontal scroll */
-  .admin-table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    max-width: 100vw;
-  }
-
-  /* Admin slide-over full-width on mobile */
-  .admin-slide-over {
-    max-width: 100% !important;
-    border-radius: 0 !important;
-    height: 100vh;
-    height: 100dvh;
-  }
-
   /* Reduce padding on mobile */
   .admin-content {
     padding: 12px !important;
-  }
-
-  /* Navbar mobile menu: full-viewport height with safe area */
-  .nav-mobile-menu {
-    max-height: calc(100dvh - 60px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -974,12 +718,6 @@ html:not(.light) {
   }
   h3 {
     font-size: clamp(16px, 5vw, 18px) !important;
-  }
-
-  /* Tighter padding on tiny phones */
-  .max-w-\[1280px\] {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
   }
 
   /* Tighter padding on tiny phones */
@@ -1013,18 +751,7 @@ html:not(.light) {
 
 /* ── Orientation support ────────────────────────────────── */
 @media (orientation: landscape) and (max-height: 500px) {
-  /* Collapse vertical padding in landscape on short screens */
-  .hero-maritime-bg {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
-
   /* Compact hero slider on very short landscape screens */
-  section[aria-roledescription="carousel"] {
-    height: 180px !important;
-  }
-
-  /* Compact hero slider */
   section[aria-roledescription="carousel"] {
     height: 180px !important;
   }
@@ -1048,11 +775,6 @@ html:not(.light) {
   header.sticky {
     padding-top: env(safe-area-inset-top);
   }
-}
-
-/* ── Ensure body text has adequate line length on large screens ── */
-.prose-max-width {
-  max-width: 65ch;
 }
 
 /* ── Prevent overflow from long words on small screens ─── */
