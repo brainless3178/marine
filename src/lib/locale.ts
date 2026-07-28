@@ -1,5 +1,4 @@
 import { createContext, useContext } from 'react'
-import { useStore } from '../store/useStore'
 import type { Language } from '../types'
 
 /** Supported locales */

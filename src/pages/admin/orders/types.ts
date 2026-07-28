@@ -30,6 +30,7 @@ export interface Order {
 export const STATUS_FLOW: OrderStatus[] = ['pending', 'confirmed', 'paid', 'processing', 'packed', 'shipped', 'delivered']
 
 export function mapApiOrder(o: ApiOrder): Order {
+  const oAny = o as any
   const items = (o.items || o.orderItems || []).map((item: ApiOrderItem) => ({
     productName: item.product?.name || item.productName || 'Unknown Product',
     sku: item.product?.sku || item.sku || '',
@@ -38,10 +39,10 @@ export function mapApiOrder(o: ApiOrder): Order {
   }))
   return {
     id: o.orderNumber || o.id,
-    customerName: o.customer?.name || o.customerName || '',
-    customerEmail: o.customer?.email || o.customerEmail || '',
-    company: o.company || '',
-    country: o.shippingCountry || o.country || '',
+    customerName: (o.customer as any)?.name || oAny.customerName || (o.customer as any)?.email || '',
+    customerEmail: (o.customer as any)?.email || oAny.customerEmail || '',
+    company: oAny.company || '',
+    country: oAny.shippingCountry || oAny.country || '',
     items,
     subtotal: o.subtotal ?? 0,
     shipping: o.shippingCost ?? 0,
@@ -50,14 +51,14 @@ export function mapApiOrder(o: ApiOrder): Order {
     status: (o.status || 'pending') as OrderStatus,
     paymentMethod: o.paymentMethod || 'Bank Transfer',
     paymentStatus: (o.paymentStatus || 'pending') as 'pending' | 'paid' | 'refunded',
-    shippingAddress: o.shippingAddress || '',
+    shippingAddress: oAny.shippingAddress || '',
     trackingNumber: o.trackingNumber || '',
     courier: o.courier || '',
     createdAt: o.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
-    notes: o.notes || '',
+    notes: oAny.notes || '',
     timeline: (o.timeline || []).map((t: ApiOrderTimeline) => ({
       status: (t.status || 'pending') as OrderStatus,
-      date: t.date || t.createdAt || new Date().toISOString(),
+      date: (t as any).date || t.createdAt || new Date().toISOString(),
       note: t.note || '',
     })),
   }

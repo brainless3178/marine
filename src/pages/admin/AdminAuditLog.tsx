@@ -57,8 +57,9 @@ function buildDetails(log: ApiAuditLog): string {
   const entity = log.entityName || log.entityType || ''
   const action = log.action || ''
 
-  if (log.previousValue && log.newValue) {
-    const prev = typeof log.previousValue === 'object' ? JSON.stringify(log.previousValue) : String(log.previousValue)
+  const logAny = log as any
+  if (logAny.previousValue && log.newValue) {
+    const prev = typeof logAny.previousValue === 'object' ? JSON.stringify(logAny.previousValue) : String(logAny.previousValue)
     const next = typeof log.newValue === 'object' ? JSON.stringify(log.newValue) : String(log.newValue)
     return `${action} on ${entity}: ${prev} → ${next}`
   }
@@ -76,8 +77,9 @@ function buildMetadata(log: ApiAuditLog): Record<string, string> {
   if (log.entityName) meta.entity = log.entityName
   if (log.entityType) meta.type = log.entityType
   if (log.ipAddress) meta.ip = log.ipAddress
-  if (log.previousValue && typeof log.previousValue === 'object') {
-    Object.entries(log.previousValue).forEach(([k, v]) => { meta[`prev.${k}`] = String(v) })
+  const logAny2 = log as any
+  if (logAny2.previousValue && typeof logAny2.previousValue === 'object') {
+    Object.entries(logAny2.previousValue).forEach(([k, v]) => { meta[`prev.${k}`] = String(v) })
   }
   if (log.newValue && typeof log.newValue === 'object') {
     Object.entries(log.newValue).forEach(([k, v]) => { meta[`new.${k}`] = String(v) })
@@ -90,7 +92,7 @@ function mapApiLog(log: ApiAuditLog): AuditEntry {
     id: log.id,
     action: log.action || 'Unknown Action',
     type: mapEntityType(log.entityType || ''),
-    user: log.actorEmail || log.actor?.email || 'System',
+    user: log.actorEmail || (log as any).actor?.email || 'System',
     details: buildDetails(log),
     timestamp: log.createdAt || new Date().toISOString(),
     metadata: buildMetadata(log),

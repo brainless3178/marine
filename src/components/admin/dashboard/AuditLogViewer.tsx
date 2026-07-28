@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { History, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { admin } from '../../../lib/api'
-import type { ApiResponse } from '../../../lib/api-types'
+import type { ApiResponse } from '../../../../shared/api-responses'
 
 interface AuditEntry {
   id: string

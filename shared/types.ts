@@ -49,6 +49,7 @@ export interface Product {
   sku: string
   brandId?: string | null
   categoryId?: string | null
+  industryId?: string | null
   status: string
   availability: string
   condition: string
@@ -61,6 +62,7 @@ export interface Product {
   currency: string
   showPrice: boolean
   makeOfferEnabled: boolean
+  makeOffer?: boolean
   stockCount: number
   lowStockThreshold: number
   warehouseLocation?: string | null
@@ -74,6 +76,15 @@ export interface Product {
   seoTitle?: string | null
   seoDescription?: string | null
   ogImageUrl?: string | null
+  keyFeatures?: string[]
+  compatibilityNotes?: string
+  warrantyNotes?: string
+  conditionNotes?: string
+  includedItems?: string[]
+  excludedItems?: string[]
+  seoKeywords?: string[]
+  searchKeywords?: string[]
+  internalNotes?: string
   createdAt?: string | null
   updatedAt?: string | null
   // Relations
@@ -82,6 +93,9 @@ export interface Product {
   images: ProductImage[]
   specs: ProductSpec[]
   industries: { industry: { id: string; name: string; slug: string } }[]
+  industryIds?: string[]
+  brandId?: string
+  categoryId?: string
   // Computed
   price?: number
   onSale?: boolean
@@ -248,6 +262,7 @@ export interface OfferItem {
   quantity?: number | null
   unitPrice?: number | null
   price?: number | null
+  sku?: string | null
 }
 
 export interface Offer {
@@ -263,6 +278,21 @@ export interface Offer {
   updatedAt?: string | null
   product?: { name: string; sku: string; regularPrice: number } | null
   items?: OfferItem[]
+  rfqNumber?: string | null
+  rfqId?: string | null
+  company?: string | null
+  customerCompany?: string | null
+  country?: string | null
+  customerCountry?: string | null
+  subject?: string | null
+  subtotal?: number | null
+  shipping?: number | null
+  total?: number | null
+  grandTotal?: number | null
+  currency?: string | null
+  validUntil?: string | null
+  notes?: string | null
+  terms?: string | null
 }
 
 // ─── Customer ──────────────────────────────────────────────────
@@ -279,6 +309,10 @@ export interface Customer {
   website?: string | null
   status?: string
   lastLoginAt?: string | null
+  lastOrderAt?: string | null
+  totalSpent?: number | null
+  tags?: string[]
+  notes?: string | null
   createdAt: string
   _count?: {
     orders?: number
@@ -295,6 +329,13 @@ export interface Message {
   subject?: string | null
   message: string
   status?: string
+  from?: string | null
+  fromName?: string | null
+  fromCompany?: string | null
+  source?: string | null
+  to?: string | null
+  body?: string | null
+  isStarred?: boolean | null
   internalNotes?: string | null
   createdAt: string
   updatedAt?: string | null
@@ -309,6 +350,7 @@ export interface MediaAsset {
   url: string
   mimeType?: string | null
   size?: number | null
+  fileSize?: number | null
   width?: number | null
   height?: number | null
   altText?: string | null
@@ -367,11 +409,19 @@ export interface DashboardStats {
   emergencyRfqs: number
   totalOffers: number
   newOffers: number
-  lowStockProducts?: { id: string; name: string; sku: string; stockCount: number }[]
-  missingImageProducts?: { id: string; name: string; sku: string }[]
-  categoryBreakdown?: { name: string; count: number }[]
-  brandBreakdown?: { name: string; count: number }[]
+  inStockProducts?: number
+  saleProducts?: number
+  newArrivals?: number
+  totalBrands?: number
+  totalCategories?: number
+  totalIndustries?: number
+  totalStockUnits?: number
+  lowStockProducts?: { id: string; name: string; sku: string; stockCount: number; brand?: string; category?: string; availability?: string; images?: string[] }[]
+  missingImageProducts?: { id: string; name: string; sku: string; brand?: string; category?: string; stockCount?: number; availability?: string; images?: string[] }[]
+  categoryBreakdown?: { name: string; count: number; id?: string; category?: string; _count?: { products: number }; condition?: string }[]
+  brandBreakdown?: { name: string; count: number; id?: string; _count?: { products: number } }[]
   conditionBreakdown?: { name: string; count: number }[]
+  outOfStockCount?: number
 }
 
 // ─── Settings ──────────────────────────────────────────────────

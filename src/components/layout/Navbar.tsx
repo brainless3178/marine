@@ -56,7 +56,6 @@ export function Navbar() {
   const setShowCartDrawer = useStore((s) => s.setShowCartDrawer)
   const getCartCount = useStore((s) => s.getCartCount)
   const language = useStore((s) => s.language)
-  const setLanguage = useStore((s) => s.setLanguage)
   const isLoggedIn = useStore((s) => s.isLoggedIn)
   const user = useStore((s) => s.user)
   const logout = useStore((s) => s.logout)

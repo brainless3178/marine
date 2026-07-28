@@ -49,7 +49,7 @@ const baseProduct: Product = {
 }
 
 function renderProductCard(product = baseProduct, options?: { added?: boolean; onAddToCart?: any; compact?: boolean }) {
-  const t = (key: string, vars?: any) => {
+  const t = (key: string, _vars?: any) => {
     const translations: Record<string, string> = {
       'product.emergency': 'EMERGENCY',
       'product.inStock': 'In Stock',

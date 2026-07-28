@@ -132,7 +132,7 @@ describe('useDashboardData', () => {
 
     await act(async () => {})
 
-    expect(result.current.stats.totalProducts).toBe(10)
+    expect(result.current.stats?.totalProducts).toBe(10)
 
     mockStats.mockResolvedValue({ totalProducts: 25 })
 
@@ -140,7 +140,7 @@ describe('useDashboardData', () => {
       await result.current.refresh()
     })
 
-    expect(result.current.stats.totalProducts).toBe(25)
+    expect(result.current.stats?.totalProducts).toBe(25)
   })
 
   it('extracts alerts from nested response', async () => {
