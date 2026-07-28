@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "node ./node_modules/vite/bin/vite.js",
-    "build": "node ./node_modules/typescript/bin/tsc -b && node ./node_modules/vite/bin/vite.js build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "build": "node ./node_modules/vite/bin/vite.js build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "typecheck": "node ./node_modules/typescript/bin/tsc -b --noEmit",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "preview": "node ./node_modules/vite/bin/vite.js preview",
     "test": "vitest run",

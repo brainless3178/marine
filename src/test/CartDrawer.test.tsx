@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import React from 'react'
 
 // Mock framer-motion — function-based mock to avoid JSX transform issues in vi.mock callback
 vi.mock('framer-motion', () => {

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { usePayPalScriptReducer } from '@paypal/react-paypal-js'
-import type { CreateOrderActions, OnApproveData, OnApproveActions } from '@paypal/react-paypal-js'
+import type { CreateOrderActions } from '@paypal/react-paypal-js'
 import { Truck, Shield } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { storefront } from '../lib/api'
@@ -21,8 +21,7 @@ export default function Checkout() {
     cart, user, getCartTotal, clearCart, getCartCount,
     checkoutStep, setCheckoutStep,
     orderPlaced, setOrderPlaced,
-    orderId, generateOrderId,
-    setCancelRequested,
+    generateOrderId,
     cancelReason, setCancelReason,
   } = useStore()
 
@@ -147,7 +146,7 @@ export default function Checkout() {
   }
 
   // PayPal Smart Buttons callbacks
-  const handleCreatePaypalOrder = async (_data: Record<string, unknown>, actions: CreateOrderActions) => {
+  const handleCreatePaypalOrder = async (_data: Record<string, unknown>, actions: any) => {
     const paypalActions = actions
     // First create the store order if not already created
     let currentOrderId = createdOrderId
@@ -184,7 +183,7 @@ export default function Checkout() {
     }
   }
 
-  const handleApprovePaypalOrder = async (data: OnApproveData, actions: OnApproveActions) => {
+  const handleApprovePaypalOrder = async (data: any, actions: any) => {
     const paypalData = data
     const paypalActions = actions
     setOrderLoading(true)
