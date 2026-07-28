@@ -14,11 +14,11 @@ interface OrderDetailSlideOverProps {
   onAdvanceStatus: (orderId: string) => void
   onCancelOrder: (orderId: string) => void
   onOpenTracking: (order: Order) => void
-  onRefresh: () => void
+  onRefresh?: () => void
 }
 
 export function OrderDetailSlideOver({
-  order, orders, onClose, onAdvanceStatus, onCancelOrder, onOpenTracking, onRefresh,
+  order, orders, onClose, onAdvanceStatus, onCancelOrder, onOpenTracking, onRefresh: _onRefresh,
 }: OrderDetailSlideOverProps) {
   const { toast } = useToast()
 

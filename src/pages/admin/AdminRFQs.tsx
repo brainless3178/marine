@@ -80,15 +80,15 @@ const ITEMS_PER_PAGE = 12
 function mapApiRfq(r: ApiRfq): RFQ {
   return {
     id: r.rfqNumber || r.id,
-    customerName: r.fullName || r.customer?.name || '',
-    customerEmail: r.email || r.customer?.email || '',
+    customerName: r.fullName || (r as any).customer?.name || '',
+    customerEmail: r.email || (r as any).customer?.email || '',
     customerPhone: r.phone || '',
     company: r.company || '',
     country: r.country || '',
     urgency: (r.urgency || 'standard') as RFQUrgency,
     status: (r.status || 'new') as RFQStatus,
     items: [{ productName: r.productDescription || 'RFQ Request', quantity: r.quantity || 1, unit: 'pcs', notes: r.notes || '' }],
-    subject: r.productDescription?.slice(0, 80) || r.subject || 'RFQ Request',
+    subject: r.productDescription?.slice(0, 80) || (r as any).subject || 'RFQ Request',
     message: r.productDescription || r.notes || '',
     assignedTo: r.assignedTo || '',
     createdAt: r.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],

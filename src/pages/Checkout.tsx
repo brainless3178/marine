@@ -146,7 +146,7 @@ export default function Checkout() {
   }
 
   // PayPal Smart Buttons callbacks
-  const handleCreatePaypalOrder = async (_data: Record<string, unknown>, actions: any) => {
+  const handleCreatePaypalOrder = async (_data: unknown, actions: any) => {
     const paypalActions = actions
     // First create the store order if not already created
     let currentOrderId = createdOrderId

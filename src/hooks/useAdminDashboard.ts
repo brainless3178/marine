@@ -165,7 +165,7 @@ export function useAdminDashboard() {
         if (a.overdueRfqs?.length) {
           result.push({ type: 'danger', message: `${a.overdueRfqs.length} RFQs have exceeded response SLA`, entityType: 'rfq' })
         }
-        if (a.outOfStockCount > 0) {
+        if ((a.outOfStockCount ?? 0) > 0) {
           result.push({ type: 'danger', message: `${a.outOfStockCount} products are out of stock`, entityType: 'product' })
         }
         setAlerts(result)
