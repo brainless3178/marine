@@ -1,12 +1,8 @@
 import { Router } from 'express'
-import { prisma } from '../../server.js'
 import { asyncHandler, validateBody } from '../../middleware/validate.js'
 import { z } from 'zod'
-import { generateRfqNumber } from '../../utils/helpers.js'
-import { logAudit } from '../../utils/audit.js'
-import { sendRfqReceived } from '../../services/email.js'
-import logger from '../../utils/logger.js'
 import { sendSuccess } from '../../middleware/response.js'
+import * as rfqService from '../../services/rfqService.js'
 
 const router = Router()
 
@@ -30,34 +26,7 @@ const rfqSchema = z.object({
 
 // ─── Submit RFQ ────────────────────────────────────────────────
 router.post('/', validateBody(rfqSchema), asyncHandler(async (req, res) => {
-  const rfq = await prisma.rfq.create({
-    data: {
-      rfqNumber: await generateRfqNumber(),
-      ...req.body,
-      status: 'new',
-      responseDeadline: req.body.urgency === 'emergency'
-        ? new Date(Date.now() + 2 * 60 * 60 * 1000) // 2 hours
-        : req.body.urgency === 'urgent'
-          ? new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-          : null,
-    },
-  })
-
-  await logAudit({
-    action: 'rfq.create',
-    entityType: 'rfq',
-    entityId: rfq.id,
-    entityName: rfq.rfqNumber,
-    newValue: rfq,
-  })
-
-  // Notify admin team (non-blocking)
-  sendRfqReceived({
-    rfqNumber: rfq.rfqNumber,
-    customerName: req.body.fullName,
-    productDescription: req.body.productDescription,
-    urgency: req.body.urgency,
-  }).catch(err => logger.error({ err }, 'RFQ email failed'))
+  const rfq = await rfqService.createRfq(req.body)
 
   sendSuccess(res, {
     message: 'RFQ submitted successfully',

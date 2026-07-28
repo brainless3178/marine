@@ -1,155 +1,80 @@
 import { Router } from 'express'
-import { prisma } from '../../server.js'
 import { asyncHandler } from '../../middleware/validate.js'
-import { productInclude } from '../../utils/prisma-helpers.js'
-import { paginationParams, paginationResponse, getEffectivePrice, isOnSale } from '../../utils/helpers.js'
+import * as productService from '../../services/productService.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 
 // ─── List Products (Storefront) ────────────────────────────────
 router.get('/', asyncHandler(async (req, res) => {
-  const { page, limit, skip } = paginationParams(Number(req.query.page), Number(req.query.limit))
-
-  const where: any = { status: 'published' }
-  if ((req.query.category as string)) where.category = { slug: (req.query.category as string) }
-  if ((req.query.brand as string)) where.brand = { slug: (req.query.brand as string) }
-  if ((req.query.industry as string)) where.industries = { some: { industry: { slug: (req.query.industry as string) } } }
-  if ((req.query.condition as string)) where.condition = (req.query.condition as string)
-  if ((req.query.availability as string)) where.availability = (req.query.availability as string)
-  if ((req.query.onSale as string) === 'true') where.salePrice = { not: null }
-  if ((req.query.isNewArrival as string) === 'true') where.isNewArrival = true
-  if ((req.query.isFeatured as string) === 'true') where.isFeatured = true
-  if ((req.query.makeOffer as string) === 'true') where.makeOfferEnabled = true
-  if ((req.query.priceMin as string) || (req.query.priceMax as string)) {
-    where.regularPrice = {}
-    if ((req.query.priceMin as string)) where.regularPrice.gte = Number((req.query.priceMin as string))
-    if ((req.query.priceMax as string)) where.regularPrice.lte = Number((req.query.priceMax as string))
-  }
-  if ((req.query.search as string)) {
-    where.OR = [
-      { name: { contains: (req.query.search as string), mode: 'insensitive' } },
-      { sku: { contains: (req.query.search as string), mode: 'insensitive' } },
-      { brand: { name: { contains: (req.query.search as string), mode: 'insensitive' } } },
-    ]
+  const filters = {
+    category: req.query.category as string | undefined,
+    brand: req.query.brand as string | undefined,
+    industry: req.query.industry as string | undefined,
+    condition: req.query.condition as string | undefined,
+    availability: req.query.availability as string | undefined,
+    onSale: (req.query.onSale as string) === 'true' || undefined,
+    isNewArrival: (req.query.isNewArrival as string) === 'true' || undefined,
+    isFeatured: (req.query.isFeatured as string) === 'true' || undefined,
+    makeOffer: (req.query.makeOffer as string) === 'true' || undefined,
+    priceMin: req.query.priceMin ? Number(req.query.priceMin) : undefined,
+    priceMax: req.query.priceMax ? Number(req.query.priceMax) : undefined,
+    search: req.query.search as string | undefined,
+    sort: req.query.sort as string | undefined,
+    page: Number(req.query.page) || undefined,
+    limit: Number(req.query.limit) || undefined,
   }
 
-  let orderBy: any = { createdAt: 'desc' }
-  if ((req.query.sort as string) === 'price-asc') orderBy = { regularPrice: 'asc' }
-  else if ((req.query.sort as string) === 'price-desc') orderBy = { regularPrice: 'desc' }
-  else if ((req.query.sort as string) === 'name-asc') orderBy = { name: 'asc' }
-  else if ((req.query.sort as string) === 'name-desc') orderBy = { name: 'desc' }
-  else if ((req.query.sort as string) === 'newest') orderBy = { createdAt: 'desc' }
-  else if ((req.query.sort as string) === 'oldest') orderBy = { createdAt: 'asc' }
-
-  const [products, total] = await Promise.all([
-    prisma.product.findMany({ where, include: productInclude, orderBy, skip, take: limit }),
-    prisma.product.count({ where }),
-  ])
-
-  // Compute filter counts
-  const [categories, brands, priceAgg] = await Promise.all([
-    prisma.category.findMany({
-      where: { isVisible: true },
-      include: { _count: { select: { products: { where: { status: 'published' } } } } },
-      orderBy: { sortOrder: 'asc' },
-    }),
-    prisma.brand.findMany({
-      where: { isVisible: true },
-      include: { _count: { select: { products: { where: { status: 'published' } } } } },
-      orderBy: { sortOrder: 'asc' },
-    }),
-    prisma.product.aggregate({ where: { status: 'published' }, _min: { regularPrice: true }, _max: { regularPrice: true } }),
+  const [result, filterCounts] = await Promise.all([
+    productService.listStorefrontProducts(filters),
+    productService.getFilterCounts(),
   ])
 
   sendSuccess(res, {
-    products: products.map(p => ({
-      ...p,
-      price: getEffectivePrice(p),
-      onSale: isOnSale(p),
-      inStock: p.stockCount > 0,
-    })),
-    pagination: paginationResponse(total, page, limit),
-    filters: {
-      categories: categories.map(c => ({ id: c.slug, name: c.name, count: c._count.products })),
-      brands: brands.map(b => ({ id: b.slug, name: b.name, count: b._count.products })),
-      priceRange: { min: Number(priceAgg._min.regularPrice) || 0, max: Number(priceAgg._max.regularPrice) || 1000 },
-    },
+    products: result.products,
+    pagination: result.pagination,
+    filters: filterCounts,
   })
 }))
 
 // ─── Get Featured Products ─────────────────────────────────────
 router.get('/featured', asyncHandler(async (_req, res) => {
-  const products = await prisma.product.findMany({
-    where: { status: 'published', isFeatured: true },
-    include: productInclude,
-    take: 8,
-    orderBy: { sortPriority: 'desc' },
-  })
+  const products = await productService.getFeaturedProducts()
   sendSuccess(res, { products })
 }))
 
 // ─── Get New Arrivals ──────────────────────────────────────────
 router.get('/new-arrivals', asyncHandler(async (_req, res) => {
-  const products = await prisma.product.findMany({
-    where: { status: 'published', isNewArrival: true },
-    include: productInclude,
-    take: 8,
-    orderBy: { createdAt: 'desc' },
-  })
+  const products = await productService.getNewArrivals()
   sendSuccess(res, { products })
 }))
 
 // ─── Get Emergency Products ────────────────────────────────────
 router.get('/emergency', asyncHandler(async (_req, res) => {
-  const products = await prisma.product.findMany({
-    where: { status: 'published', availability: 'emergency' },
-    include: productInclude,
-    take: 12,
-    orderBy: { createdAt: 'desc' },
-  })
-  res.json({ products })
+  const products = await productService.getEmergencyProducts()
+  sendSuccess(res, { products })
 }))
 
 // ─── Get Single Product ────────────────────────────────────────
 router.get('/:id', asyncHandler(async (req, res) => {
-  const product = await prisma.product.findFirst({
-    where: { OR: [{ id: req.params.id as string }, { slug: req.params.id as string }], status: 'published' },
-    include: productInclude,
-  })
+  const id = req.params.id as string
+  const product = await productService.getStorefrontProduct(id)
   if (!product) return sendError(res, 'Product not found', 404)
 
-  // Get related products
-  const related = await prisma.product.findMany({
-    where: {
-      status: 'published',
-      id: { not: product.id },
-      OR: [
-        { categoryId: product.categoryId },
-        { brandId: product.brandId },
-      ],
-    },
-    include: productInclude,
-    take: 4,
-    orderBy: { createdAt: 'desc' },
-  })
+  // Get category/brand for related products query
+  const info = await productService.getProductCategoryAndBrand(product.id)
+  const related = info ? await productService.getRelatedProducts(product.id, info.categoryId, info.brandId) : []
 
-  sendSuccess(res, {
-    product: { ...product, price: getEffectivePrice(product), onSale: isOnSale(product), inStock: product.stockCount > 0 },
-    related: related.map(p => ({ ...p, price: getEffectivePrice(p), onSale: isOnSale(p), inStock: p.stockCount > 0 })),
-  })
+  sendSuccess(res, { product, related })
 }))
 
 // ─── Get Related Products ──────────────────────────────────────
 router.get('/:id/related', asyncHandler(async (req, res) => {
-  const product = await prisma.product.findUnique({ where: { id: req.params.id as string }, select: { categoryId: true, brandId: true } })
-  if (!product) return sendError(res, 'Product not found', 404)
+  const id = req.params.id as string
+  const info = await productService.getProductCategoryAndBrand(id)
+  if (!info) return sendError(res, 'Product not found', 404)
 
-  const related = await prisma.product.findMany({
-    where: { status: 'published', id: { not: req.params.id as string }, OR: [{ categoryId: product.categoryId }, { brandId: product.brandId }] },
-    include: productInclude,
-    take: 4,
-  })
+  const related = await productService.getRelatedProducts(id, info.categoryId, info.brandId)
   sendSuccess(res, { products: related })
 }))
 

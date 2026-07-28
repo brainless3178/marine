@@ -1,5 +1,5 @@
 import { prisma } from '../server.js'
-import { paginationParams, paginationResponse } from '../utils/helpers.js'
+import { generateOrderNumber, paginationParams, paginationResponse } from '../utils/helpers.js'
 import { orderInclude } from '../utils/prisma-helpers.js'
 import { logAudit } from '../utils/audit.js'
 import { sendOrderShipped, sendOrderCancelled, sendOrderConfirmation } from './email.js'
@@ -20,7 +20,7 @@ export interface OrderFilters {
   limit?: number
 }
 
-// ─── Queries ──────────────────────────────────────────────────
+// ─── Queries (Admin) ──────────────────────────────────────────
 
 export async function listOrders(params: OrderFilters) {
   const { page, limit, skip } = paginationParams(params.page, params.limit)
@@ -54,6 +54,174 @@ export async function getOrder(id: string) {
   })
   if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
   return order
+}
+
+// ─── Queries (Storefront — customer's own orders) ──────────────
+
+export async function listCustomerOrders(customerId: string, page = 1, limit = 20) {
+  const skip = (page - 1) * limit
+  const where = { customerId }
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: { items: true },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.order.count({ where }),
+  ])
+
+  return {
+    orders,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    },
+  }
+}
+
+export async function getCustomerOrder(id: string, customerId: string) {
+  const order = await prisma.order.findFirst({
+    where: { id, customerId },
+    include: { items: true, timeline: { orderBy: { createdAt: 'desc' } } },
+  })
+  if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
+  return order
+}
+
+// ─── Mutations (Storefront) ────────────────────────────────────
+
+export interface CreateOrderInput {
+  items: { productId: string; quantity: number }[]
+  shipping: {
+    fullName: string; addressLine1: string; addressLine2?: string
+    city: string; state?: string; postalCode?: string; country: string
+  }
+  paymentMethod: string
+  customerNotes?: string
+  idempotencyKey?: string
+  customerId: string
+}
+
+export async function createOrder(input: CreateOrderInput) {
+  const { items, shipping, paymentMethod, customerNotes, idempotencyKey, customerId } = input
+
+  // Idempotency check
+  if (idempotencyKey) {
+    const existingOrder = await prisma.order.findFirst({
+      where: {
+        customerId,
+        customerNotes: { contains: `[idem:${idempotencyKey}]` },
+        createdAt: { gte: new Date(Date.now() - 5 * 60 * 1000) },
+      },
+      include: { items: true },
+    })
+    if (existingOrder) return existingOrder
+  }
+
+  // Validate products and calculate totals
+  let subtotal = 0
+  const orderItems = []
+
+  for (const item of items) {
+    const product = await prisma.product.findUnique({ where: { id: item.productId } })
+    if (!product) throw Object.assign(new Error(`Product ${item.productId} not found`), { status: 400 })
+    if (product.stockCount < item.quantity) {
+      throw Object.assign(new Error(`Insufficient stock for ${product.name}`), { status: 400 })
+    }
+    const price = Number(product.salePrice && Number(product.salePrice) < Number(product.regularPrice) ? product.salePrice : product.regularPrice)
+    orderItems.push({
+      productId: product.id,
+      productName: product.name,
+      productSku: product.sku,
+      quantity: item.quantity,
+      unitPrice: price,
+      totalPrice: price * item.quantity,
+    })
+    subtotal += price * item.quantity
+  }
+
+  // Get settings for shipping/tax
+  const [shippingCostSetting, taxRateSetting] = await Promise.all([
+    prisma.storeSetting.findUnique({ where: { key: 'checkout.shippingCost' } }),
+    prisma.storeSetting.findUnique({ where: { key: 'checkout.taxRate' } }),
+  ])
+
+  const shippingCost = Number(shippingCostSetting?.value) || Number(process.env.DEFAULT_SHIPPING_COST) || 25
+  const taxRate = Number(taxRateSetting?.value) || Number(process.env.DEFAULT_TAX_RATE) || 0.08
+  const tax = Math.round(subtotal * taxRate * 100) / 100
+  const total = subtotal + shippingCost + tax
+
+  const order = await prisma.order.create({
+    data: {
+      orderNumber: await generateOrderNumber(),
+      customerId,
+      status: 'pending',
+      paymentMethod,
+      paymentStatus: 'pending',
+      subtotal, shippingCost, tax, total,
+      currency: 'USD',
+      shippingFullName: shipping.fullName,
+      shippingAddressLine1: shipping.addressLine1,
+      shippingAddressLine2: shipping.addressLine2 || null,
+      shippingCity: shipping.city,
+      shippingState: shipping.state || null,
+      shippingPostalCode: shipping.postalCode || null,
+      shippingCountry: shipping.country,
+      customerNotes: idempotencyKey ? `[idem:${idempotencyKey}] ${customerNotes || ''}` : (customerNotes || null),
+      items: { create: orderItems },
+      timeline: { create: { status: 'pending', note: 'Order placed' } },
+    },
+    include: { items: true, timeline: true },
+  })
+
+  await logAudit({
+    action: 'order.create',
+    entityType: 'order',
+    entityId: order.id,
+    entityName: order.orderNumber,
+    newValue: order,
+  })
+
+  return order
+}
+
+export async function requestOrderCancellation(id: string, customerId: string, reason?: string) {
+  const order = await prisma.order.findFirst({ where: { id, customerId } })
+  if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
+  if (order.status === 'cancelled') throw Object.assign(new Error('Order already cancelled'), { status: 400 })
+
+  const updated = await prisma.order.update({
+    where: { id },
+    data: {
+      cancelRequested: true,
+      cancelReason: reason || 'Customer requested',
+      cancelRequestedAt: new Date(),
+    },
+  })
+
+  await prisma.orderTimeline.create({
+    data: { orderId: id, status: order.status, note: 'Cancellation requested: ' + (reason || 'No reason provided') },
+  })
+
+  // Send notification (non-blocking)
+  const cancelCustomer = await prisma.customer.findUnique({ where: { id: customerId }, select: { email: true, name: true } })
+  if (cancelCustomer) {
+    sendOrderCancelled({
+      to: cancelCustomer.email,
+      customerName: cancelCustomer.name,
+      orderNumber: updated.orderNumber,
+      reason: reason || 'Customer cancellation request',
+    }).catch(err => logger.error({ err }, 'Order cancel email failed'))
+  }
+
+  return updated
 }
 
 // ─── Mutations ────────────────────────────────────────────────
