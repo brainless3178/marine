@@ -13,6 +13,12 @@ export const PAYPAL_BASE = process.env.PAYPAL_MODE === 'live'
 let cachedToken: string | null = null
 let tokenExpiresAt = 0
 
+/** @internal Exported only for testing — resets the token cache */
+export function resetPaypalCache() {
+  cachedToken = null
+  tokenExpiresAt = 0
+}
+
 export async function getPaypalAccessToken(): Promise<string | null> {
   // Return cached token if still valid (with 5 min buffer)
   if (cachedToken && Date.now() < tokenExpiresAt - 5 * 60 * 1000) {
