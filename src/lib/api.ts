@@ -590,16 +590,14 @@ export const admin = {
     },
     usage: (id: string) => api.get<{ id: string; productName: string }[]>(`/admin/media/${id}/usage`, { auth: 'admin' }),
     delete: (id: string) => api.del<{ message: string }>(`/admin/media/${id}`, { auth: 'admin' }),
-    upload: async (file: File) => {
+    upload: (file: File) => {
       const formData = new FormData()
       formData.append('file', file)
-      const res = await fetch(`${API_BASE}/admin/media/upload`, {
+      return apiFetch<{ asset: any }>('/admin/media/upload', {
         method: 'POST',
         body: formData,
-        headers: adminAccessToken ? { Authorization: `Bearer ${adminAccessToken}` } : undefined,
-        credentials: 'include',
+        auth: 'admin',
       })
-      return handleResponse<{ asset: any }>(res)
     },
   },
 
