@@ -4,6 +4,7 @@ import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/au
 import { asyncHandler } from '../../middleware/validate.js'
 import { logAudit } from '../../utils/audit.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
+import type { Prisma } from '@prisma/client'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -33,8 +34,8 @@ router.put('/', requireRole('store-manager'), asyncHandler(async (req: AuthReque
     updates.push(
       prisma.storeSetting.upsert({
         where: { key },
-        update: { value: value as any, updatedBy: req.user!.id },
-        create: { key, value: value as any, updatedBy: req.user!.id },
+        update: { value: value as Prisma.InputJsonValue, updatedBy: req.user!.id },
+        create: { key, value: value as Prisma.InputJsonValue, updatedBy: req.user!.id },
       })
     )
   }

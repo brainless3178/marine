@@ -106,7 +106,7 @@ export function InventoryRiskRadar({ products, orders }: Props) {
           { label: 'Warning', count: analysis.warnings.length, color: 'text-[var(--accent-gold)]' },
           { label: 'Healthy', count: analysis.healthy.length, color: 'text-[var(--success)]' },
         ].map(s => (
-          <button key={s.label} onClick={() => setView(s.label.toLowerCase() as any)}
+          <button key={s.label} onClick={() => setView(s.label.toLowerCase() as 'overview' | 'critical' | 'warning')}
             className={`flex-1 rounded-xl p-2 text-center transition-all ${view === s.label.toLowerCase() ? 'ring-2 ring-current/20 bg-[var(--surface-soft)]' : 'bg-[var(--surface-soft)] hover:bg-[var(--border)]'}`}>
             <p className={`font-mono text-lg font-extrabold ${s.color}`}>{s.count}</p>
             <p className="text-[0.5rem] font-bold text-[var(--text-muted)] uppercase">{s.label}</p>

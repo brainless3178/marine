@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { History, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { admin } from '../../../lib/api'
+import type { ApiResponse } from '../../../lib/api-types'
 
 interface AuditEntry {
   id: string
@@ -26,9 +27,9 @@ export function AuditLogViewer() {
       const params: Record<string, string> = { page: String(page), limit: '20' }
       if (search) params.search = search
       if (entityFilter) params.entityType = entityFilter
-      const res = await admin.audit.list(params)
-      setLogs((res as any)?.logs || [])
-      setTotalPages((res as any)?.pagination?.totalPages || 1)
+      const res: ApiResponse<{ logs: AuditEntry[]; pagination: { totalPages: number } }> = await admin.audit.list(params)
+      setLogs(res.data?.logs || [])
+      setTotalPages(res.data?.pagination?.totalPages || 1)
     } catch {
       setLogs([])
     } finally {

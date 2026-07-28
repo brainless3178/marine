@@ -94,12 +94,12 @@ export function requireOwner(req: AuthRequest, res: Response, next: NextFunction
 // ─── Generate JWT ──────────────────────────────────────────────
 export function generateToken(user: { id: string; email: string; role: string; type?: string }): string {
   const payload = { id: user.id, email: user.email, role: user.role, type: user.type || 'admin' }
-  const options: SignOptions = { expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any }
+  const options: SignOptions = { expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as unknown as SignOptions['expiresIn'] }
   return jwt.sign(payload, JWT_SECRET, options)
 }
 
 export function generateRefreshToken(user: { id: string; email: string; role: string; type?: string }): string {
   const payload = { id: user.id, email: user.email, role: user.role, type: user.type || 'admin', refresh: true }
-  const options: SignOptions = { expiresIn: (process.env.REFRESH_TOKEN_EXPIRES_IN || '7d') as any }
+  const options: SignOptions = { expiresIn: (process.env.REFRESH_TOKEN_EXPIRES_IN || '7d') as unknown as SignOptions['expiresIn'] }
   return jwt.sign(payload, JWT_SECRET, options)
 }

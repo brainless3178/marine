@@ -30,13 +30,13 @@ export function ShopByCategory() {
         {/* ── Header ── */}
         <div className="text-center mb-14">
           <span className="inline-block text-xs font-black uppercase tracking-[0.22em] text-[var(--accent-primary)] mb-4">
-            Categories
+            Marine and industrial inventory
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-[var(--navy-deep)]">
-            Shop By Category
+            Find ship spares by equipment type
           </h2>
           <p className="mt-4 text-base leading-relaxed text-[var(--text-secondary)] max-w-2xl mx-auto">
-            Dive into Our Marine Selections, Sorted by Categories!
+            Browse the parts buyers actually search for: ship machinery, engine spares, marine pumps, hydraulic motors, electrical automation, safety equipment, and industrial MRO stock.
           </p>
           <div className="mt-5 mx-auto w-16 h-1 bg-[var(--accent-primary)] rounded-full" />
         </div>

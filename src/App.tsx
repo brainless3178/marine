@@ -1,9 +1,11 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
 import { useStore } from './store/useStore'
 import { PageWrapper } from './components/layout/PageWrapper'
 import { PageErrorBoundary } from './components/ui/PageErrorBoundary'
 import { ToastProvider } from './components/admin/Toast'
+import { LocaleContext, VALID_LOCALES } from './lib/locale'
+import type { Language } from './types'
 const CommandSearch = lazy(() => import('./components/sections/CommandSearch').then(m => ({ default: m.CommandSearch })))
 
 const AuthModal = lazy(() => import('./components/auth/AuthModal').then(m => ({ default: m.AuthModal })))
@@ -67,10 +69,93 @@ function LoadingFallback() {
   )
 }
 
+/**
+ * Validates that `:locale` is one of the supported locales.
+ * If not, redirects the legacy /path to /en/path.
+ * Sets the store language on valid locale changes.
+ * Provides LocaleContext so all child components know the current locale.
+ */
+function LocaleLayout() {
+  const { locale } = useParams<{ locale: string }>()
+  const location = useLocation()
+  const setLanguage = useStore((s) => s.setLanguage)
+  const language = useStore((s) => s.language)
+
+  const isValid = locale !== undefined && VALID_LOCALES.includes(locale as Language)
+
+  // Redirect legacy non-prefixed URLs like /products → /en/products
+  // When :locale doesn't match a valid locale, the full path e.g. /products
+  // is captured as locale="products". We redirect to /en/products.
+  if (!isValid) {
+    // The entire unmatched path is `location.pathname` (e.g. /products or /some/path)
+    // We redirect to /en<pathname> — the route re-matches with locale="en"
+    return <Navigate to={`/en${location.pathname}`} replace />
+  }
+
+  // Set language when locale changes
+  useEffect(() => {
+    if (locale !== language) {
+      setLanguage(locale as Language)
+    }
+  }, [locale, setLanguage, language])
+
+  return (
+    <LocaleContext.Provider value={locale as Language}>
+      <PageErrorBoundary>
+        <PageWrapper>
+          <Suspense fallback={null}>
+            <CommandSearch />
+            <AuthModal />
+            <CartDrawer />
+          </Suspense>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route index element={<Home />} />
+              <Route path="shop" element={<Shop />} />
+              <Route path="products" element={<Products />} />
+              <Route path="industries" element={<Industries />} />
+              <Route path="brands" element={<Brands />} />
+              <Route path="about" element={<About />} />
+              <Route path="rfq" element={<RFQ />} />
+              <Route path="contact" element={<Contact />} />
+              <Route path="search" element={<SearchPage />} />
+              <Route path="emergency" element={<Emergency />} />
+              <Route path="network" element={<Network />} />
+              <Route path="intelligence" element={<Intelligence />} />
+              <Route path="checkout" element={<Checkout />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+              <Route path="reset-password" element={<ResetPassword />} />
+              <Route path="track-order" element={<TrackOrder />} />
+              <Route path="account/orders" element={<OrderHistory />} />
+              <Route path="account/profile" element={<ProfileEdit />} />
+              <Route path="product/:id" element={<ProductDetail />} />
+              <Route path="privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="terms-of-service" element={<TermsOfService />} />
+              <Route path="refund-policy" element={<RefundPolicy />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </PageWrapper>
+      </PageErrorBoundary>
+    </LocaleContext.Provider>
+  )
+}
+
+/** Redirects / to the detected browser language or English. */
+function RootRedirect() {
+  const detected: Language = navigator.language?.startsWith('ar')
+    ? 'ar'
+    : navigator.language?.startsWith('es')
+      ? 'es'
+      : 'en'
+  return <Navigate to={`/${detected}`} replace />
+}
+
 function AppContent() {
+  const isSessionLoading = useStore((s) => s.isSessionLoading)
   const loadAdminSession = useStore((s) => s.loadAdminSession)
   const loadCustomerSession = useStore((s) => s.loadCustomerSession)
-  const isSessionLoading = useStore((s) => s.isSessionLoading)
+
   useEffect(() => {
     if (localStorage.getItem('alka-admin-auth')) loadAdminSession()
     if (localStorage.getItem('alka-auth')) loadCustomerSession()
@@ -88,83 +173,46 @@ function AppContent() {
   }
 
   return (
-      <Routes>
-        {/* Admin routes — listed FIRST so they take priority over storefront catch-all */}
-        <Route path="/admin/login" element={<Suspense fallback={<LoadingFallback />}><AdminLogin /></Suspense>} />
-        <Route
-          path="/admin"
-          element={
-            <AdminGuard>
-              <ErrorBoundary pageName="Admin Panel">
-                <AdminLayout />
-              </ErrorBoundary>
-            </AdminGuard>
-          }
-        >
-          <Route index element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="media" element={<AdminMedia />} />
-          <Route path="brands" element={<AdminBrands />} />
-          <Route path="industries" element={<AdminIndustries />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="customers" element={<AdminCustomers />} />
-          <Route path="categories" element={<AdminCategories />} />
-          <Route path="rfqs" element={<AdminRFQs />} />
-          <Route path="offers" element={<AdminOffers />} />
-          <Route path="messages" element={<AdminMessages />} />
-          <Route path="homepage" element={<AdminHomepage />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="audit-log" element={<AdminAuditLog />} />
-          <Route path="settings" element={<AdminSettings />} />
-          <Route path="insights" element={<AdminInsights />} />
-          <Route path="products/new" element={<AdminProductForm />} />
-          <Route path="products/:id/edit" element={<AdminProductForm />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
+    <Routes>
+      {/* Admin routes — listed FIRST so they take priority */}
+      <Route path="/admin/login" element={<Suspense fallback={<LoadingFallback />}><AdminLogin /></Suspense>} />
+      <Route
+        path="/admin"
+        element={
+          <AdminGuard>
+            <ErrorBoundary pageName="Admin Panel">
+              <AdminLayout />
+            </ErrorBoundary>
+          </AdminGuard>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="media" element={<AdminMedia />} />
+        <Route path="brands" element={<AdminBrands />} />
+        <Route path="industries" element={<AdminIndustries />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="customers" element={<AdminCustomers />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="rfqs" element={<AdminRFQs />} />
+        <Route path="offers" element={<AdminOffers />} />
+        <Route path="messages" element={<AdminMessages />} />
+        <Route path="homepage" element={<AdminHomepage />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="audit-log" element={<AdminAuditLog />} />
+        <Route path="settings" element={<AdminSettings />} />
+        <Route path="insights" element={<AdminInsights />} />
+        <Route path="products/new" element={<AdminProductForm />} />
+        <Route path="products/:id/edit" element={<AdminProductForm />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
 
-        {/* Storefront routes — AFTER admin so /admin/* is not caught here */}
-        <Route
-          path="/*"
-          element={
-            <PageErrorBoundary>
-            <PageWrapper>
-              <Suspense fallback={null}>
-                <CommandSearch />
-                <AuthModal />
-                <CartDrawer />
-              </Suspense>
-              <Suspense fallback={<LoadingFallback />}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/shop" element={<Shop />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/industries" element={<Industries />} />
-                  <Route path="/brands" element={<Brands />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/rfq" element={<RFQ />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/emergency" element={<Emergency />} />
-                  <Route path="/network" element={<Network />} />
-                  <Route path="/intelligence" element={<Intelligence />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/track-order" element={<TrackOrder />} />
-                  <Route path="/account/orders" element={<OrderHistory />} />
-                  <Route path="/account/profile" element={<ProfileEdit />} />
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  <Route path="/terms-of-service" element={<TermsOfService />} />
-                  <Route path="/refund-policy" element={<RefundPolicy />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </PageWrapper>
-            </PageErrorBoundary>
-          }
-        />
-      </Routes>
+      {/* Root redirect: / → /en (or detected browser language) */}
+      <Route path="/" element={<RootRedirect />} />
+
+      {/* Storefront with locale prefix */}
+      <Route path="/:locale/*" element={<LocaleLayout />} />
+    </Routes>
   )
 }
 

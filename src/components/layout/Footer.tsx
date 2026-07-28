@@ -11,17 +11,19 @@ function LinkedInIcon({ size = 16 }: { size?: number }) {
 import { useTranslation } from 'react-i18next'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
 import { getStaticImageUrl } from '@/lib/utils'
+import { useLocalizedPath } from '../../lib/locale'
 
 export function Footer() {
   const { t } = useTranslation()
   const settings = useStoreSettings()
+  const lp = useLocalizedPath()
   return (
     <footer className="bg-navy-deep text-white border-t border-white/10 pt-16 pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr] gap-10">
           {/* Brand */}
           <div>
-            <Link to="/" className="flex items-center gap-3 no-underline mb-4 text-white">
+            <Link to={lp('/')} className="flex items-center gap-3 no-underline mb-4 text-white">
               <img
                 src={getStaticImageUrl('alka-traders-logo')}
                 alt="Alka Traders Logo"
@@ -53,22 +55,22 @@ export function Footer() {
           {/* Quick Links */}
           <div className="flex flex-col gap-2.5">
             <span className="font-body font-bold text-xs tracking-[3px] uppercase text-white/65 mb-2">{t('footer.quickLinks')}</span>
-            <Link to="/" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkHome')}</Link>
-            <Link to="/products" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkProducts')}</Link>
-            <Link to="/brands" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkBrands')}</Link>
-            <Link to="/industries" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkIndustries')}</Link>
-            <Link to="/rfq" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkRfq')}</Link>
+            <Link to={lp('/')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkHome')}</Link>
+            <Link to={lp('/products')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkProducts')}</Link>
+            <Link to={lp('/brands')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkBrands')}</Link>
+            <Link to={lp('/industries')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkIndustries')}</Link>
+            <Link to={lp('/rfq')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.linkRfq')}</Link>
           </div>
 
           {/* Categories */}
           <div className="flex flex-col gap-2.5">
             <span className="font-body font-bold text-xs tracking-[3px] uppercase text-white/65 mb-2">{t('footer.productCategories')}</span>
-            <Link to="/products?category=marine" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catMarine')}</Link>
-            <Link to="/products?category=electrical" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catElectrical')}</Link>
-            <Link to="/products?category=hydraulic" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catHydraulic')}</Link>
-            <Link to="/products?category=pneumatic" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catPneumatic')}</Link>
-            <Link to="/products?category=spares" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catSpares')}</Link>
-            <Link to="/products?category=surplus" className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catSurplus')}</Link>
+            <Link to={lp('/products?category=marine')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catMarine')}</Link>
+            <Link to={lp('/products?category=electrical')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catElectrical')}</Link>
+            <Link to={lp('/products?category=hydraulic')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catHydraulic')}</Link>
+            <Link to={lp('/products?category=pneumatic')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catPneumatic')}</Link>
+            <Link to={lp('/products?category=spares')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catSpares')}</Link>
+            <Link to={lp('/products?category=surplus')} className="inline-flex items-center min-h-[44px] py-2 text-sm text-white/78 no-underline hover:text-[var(--accent-primary)] transition-colors">{t('footer.catSurplus')}</Link>
           </div>
 
           {/* Contact */}
@@ -92,9 +94,9 @@ export function Footer() {
         <div className="mt-12 py-6 border-t border-white/10 flex flex-wrap justify-between items-center gap-3 text-xs text-white/65">
           <span>&copy; 2026 {t('footer.copyright')}</span>
           <div className="flex items-center gap-4">
-            <Link to="/privacy-policy" className="hover:text-white/90 transition-colors no-underline text-white/65">Privacy Policy</Link>
-            <Link to="/terms-of-service" className="hover:text-white/90 transition-colors no-underline text-white/65">Terms of Service</Link>
-            <Link to="/refund-policy" className="hover:text-white/90 transition-colors no-underline text-white/65">Refund Policy</Link>
+            <Link to={lp('/privacy-policy')} className="hover:text-white/90 transition-colors no-underline text-white/65">Privacy Policy</Link>
+            <Link to={lp('/terms-of-service')} className="hover:text-white/90 transition-colors no-underline text-white/65">Terms of Service</Link>
+            <Link to={lp('/refund-policy')} className="hover:text-white/90 transition-colors no-underline text-white/65">Refund Policy</Link>
           </div>
           <span>{t('footer.tagline')}</span>
         </div>

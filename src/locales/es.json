@@ -24,10 +24,21 @@
   "hero": {
     "label": "Adquisiciones Marinas e Industriales Globales",
     "headline": "Proveemos",
-    "headlineAccent": "Lo Que Otros No Pueden.",
+    "headlineSuffix": "lo que otros no pueden.",
     "sub": "Equipos marinos, automatización industrial, sistemas hidráulicos, repuestos — obtenidos globalmente y entregados en su embarcación o instalación.",
+    "searchLabel": "Buscar productos",
+    "searchPlaceholder": "Buscar producto, marca, SKU, número de pieza...",
+    "searchButton": "Buscar",
     "ctaRfq": "Enviar una Cotización",
     "ctaProducts": "Ver Productos",
+    "trustVerified": "Verificaciones de condición certificadas",
+    "trustExport": "Soporte de embalaje para exportación",
+    "trustRare": "Búsqueda de piezas difíciles",
+    "liveInventory": "Inventario en vivo",
+    "inStock": "En stock",
+    "requestQuote": "Solicitar cotización",
+    "newArrivals": "Novedades y stock listo",
+    "viewAll": "Ver todo",
     "statsProducts": "Productos",
     "statsBrands": "Marcas",
     "statsCountries": "Países",
@@ -74,6 +85,8 @@
   "industries": {
     "label": "Sectores que Servimos",
     "title": "Construido para las Industrias que Mueven el Mundo.",
+    "sub": "Amplia experiencia en seis sectores críticos, desde el transporte marítimo hasta el procesamiento químico.",
+    "keyChallenges": "Principales Desafíos que Resolvemos",
     "viewProducts": "Ver Productos"
   },
   "featured": {
@@ -86,9 +99,13 @@
   "brands": {
     "label": "Marcas Autorizadas",
     "title": "200+ Marcas. Un Solo Contacto.",
+    "sub": "Proveemos desde los principales fabricantes mundiales de equipos marinos e industriales.",
     "all": "Todas las Marcas",
     "marine": "Marinas",
-    "pneumatic": "Neumáticas"
+    "industrial": "Industriales",
+    "automation": "Automatización",
+    "pneumatic": "Neumáticas",
+    "productCount": "{{count}} productos"
   },
   "rfq": {
     "label": "Solicitud de Cotización",
@@ -128,6 +145,7 @@
     "nextProduct": "Siguiente: Detalles del Producto →",
     "back": "← Atrás",
     "nextUrgency": "Siguiente: Urgencia y Notas →",
+    "urgencyLabel": "Nivel de Urgencia *",
     "urgencyStandardDesc": "7-14 días hábiles",
     "urgencyUrgentDesc": "2-5 días hábiles",
     "urgencyEmergencyDesc": "Mismo día / Siguiente día",
@@ -164,11 +182,23 @@
     "productCategories": "Categorías de Productos",
     "contactUs": "Contáctenos",
     "copyright": "Alka Traders. Todos los Derechos Reservados.",
-    "tagline": "Marino · Industrial · Equipos · Exportación"
+    "tagline": "Marino · Industrial · Equipos · Exportación",
+    "linkHome": "Inicio Alka Traders",
+    "linkProducts": "Productos Marinos e Industriales",
+    "linkBrands": "Marcas de Equipos",
+    "linkIndustries": "Industrias que Servimos",
+    "linkRfq": "Solicitar Cotización",
+    "catMarine": "Equipos Marinos y Repuestos de Buques",
+    "catElectrical": "Componentes de Automatización Eléctrica",
+    "catHydraulic": "Sistemas Hidráulicos y Bombas",
+    "catPneumatic": "Cilindros y Válvulas Neumáticas",
+    "catSpares": "Repuestos Industriales",
+    "catSurplus": "Equipos Excedentes y Reacondicionados"
   },
   "products": {
     "title": "Catálogo Completo de Productos",
     "catalog": "Catálogo de Productos",
+    "description": "Explore, filtre y encuentre el equipo que necesita. Use la barra lateral para reducir por categoría, marca, precio o disponibilidad.",
     "searchPlaceholder": "Buscar por nombre de producto, número de pieza o marca...",
     "category": "Categoría",
     "brand": "Marca",
@@ -186,7 +216,14 @@
     "sortPriceDesc": "Precio Alto-Bajo",
     "showing": "Mostrando",
     "products": "productos",
-    "product": "producto"
+    "product": "producto",
+    "hideFilters": "Ocultar Filtros",
+    "showFilters": "Mostrar Filtros",
+    "priceRange": "Rango de Precio ($)",
+    "priceMin": "Mín",
+    "priceMax": "Máx",
+    "applyPrice": "Aplicar Precio",
+    "onSaleOnly": "Solo en Oferta"
   },
   "shop": {
     "title": "Tienda de Equipos Marinos e Industriales",
@@ -216,44 +253,82 @@
     "easyReturnsSub": "Política de 30 días"
   },
   "about": {
+    "heroLabel": "Acerca de Alka Traders",
     "heroTitle": "Nacido en Mumbai. Conectado Globalmente.",
     "heroSub": "De una sola oficina en Mumbai a una red global de adquisiciones que abarca 4 centros y más de 50 países.",
-    "storyTitle": "Nuestra Historia",
+    "storyLabel": "Nuestra Historia",
+    "storyTitle": "De 2010 a Operaciones Globales.",
+    "hubLabel": "Centros Globales",
+    "hubTitle": "Cuatro Oficinas. Cobertura 24/7.",
+    "teamLabel": "Liderazgo",
     "teamTitle": "Equipo de Liderazgo"
   },
   "contact": {
-    "title": "Póngase en Contacto",
+    "label": "Contacto",
+    "title": "Póngase en Contacto.",
     "sub": "Nuestro equipo global está listo para ayudar con sus requisitos de adquisición.",
+    "formTitle": "Envíenos un Mensaje",
     "formName": "Su Nombre",
     "formEmail": "Su Correo Electrónico",
     "formSubject": "Asunto",
     "formMessage": "Mensaje",
     "formSubmit": "Enviar Mensaje",
-    "whatsapp": "Chatear en WhatsApp"
+    "instantTitle": "¿Prefiere Contacto Inmediato?",
+    "whatsapp": "Chatear en WhatsApp",
+    "officeHours": "Horario de Oficina",
+    "officeHoursDetail": "Lunes - Viernes: Cobertura 24/5 en centros globales",
+    "emergencyLine": "Línea de Emergencia: 24/7"
   },
   "search": {
+    "title": "Buscar",
     "placeholder": "Buscar productos, marcas, categorías...",
+    "description": "Busque en productos, marcas, categorías y páginas.",
     "products": "Productos",
     "pages": "Páginas",
     "categories": "Categorías",
-    "noResults": "Sin resultados",
-    "recent": "Búsquedas Recientes"
+    "noResults": "Sin resultados para",
+    "noResultsGeneric": "Sin resultados",
+    "recent": "Búsquedas Recientes",
+    "typeToSearch": "Escriba para buscar en productos, marcas y páginas"
   },
   "emergency": {
-    "title": "Adquisición de Emergencia",
+    "label": "Adquisición de Emergencia",
+    "title": "Adquisición de Emergencia.",
     "sub": "Equipo de Adquisiciones de Emergencia 24/7",
     "available247": "Disponible 24/7",
     "ctaWhatsapp": "Línea de Emergencia WhatsApp",
     "ctaCall": "Llamar a Línea de Emergencia",
-    "formTitle": "Cotización de Emergencia"
+    "formTitle": "Cotización de Emergencia",
+    "responseClock": "Reloj de Respuesta de Emergencia",
+    "responseRecord": "Nuestro récord: 18 minutos desde la cotización hasta la confirmación del proveedor",
+    "alwaysOperational": "Siempre operativo",
+    "emergencyContacts": "Contactos de Emergencia",
+    "whatsappLabel": "WhatsApp",
+    "emergencyText": "Línea de texto de emergencia",
+    "phoneLabel": "Teléfono",
+    "emailLabel": "Correo Electrónico",
+    "formName": "Su Nombre *",
+    "formPhone": "Número de Teléfono *",
+    "formPartDesc": "Número de Pieza / Descripción *",
+    "formVessel": "Nombre del Buque / Instalación",
+    "formSubmit": "Enviar Cotización de Emergencia"
   },
   "network": {
-    "title": "Red Global de Proveedores",
-    "sub": "Conectados a más de 200 marcas en más de 50 países"
+    "label": "Red Global",
+    "title": "Red Global de Proveedores.",
+    "sub": "Conectados a más de 200 marcas en más de 50 países — un solo contacto de adquisiciones para el mundo.",
+    "regionsCapabilities": "Regiones y Capacidades",
+    "categories": "categorías",
+    "loadingGlobe": "Cargando globo terráqueo 3D..."
   },
   "intelligence": {
     "title": "Inteligencia de Mercado",
-    "sub": "Perspectivas de adquisición y tendencias de abastecimiento de nuestro equipo global."
+    "sub": "Perspectivas de adquisición y tendencias de abastecimiento de nuestro equipo global.",
+    "globalSuppliers": "Proveedores Globales",
+    "countriesServed": "Países Atendidos",
+    "avgResponseTime": "Tiempo de Respuesta Promedio",
+    "productsSourced": "Productos Abastecidos",
+    "insightsTitle": "Perspectivas de Adquisición"
   },
   "dashboard": {
     "title": "Panel de Adquisiciones",
@@ -365,6 +440,9 @@
     "shippingCalc": "Envío e impuestos calculados al pagar",
     "checkout": "Proceder al Pago",
     "clearCart": "Vaciar Carrito",
+    "secureCheckout": "Pago Seguro",
+    "globalShipping": "Envío Global",
+    "completeOrder": "Complete su Pedido",
     "cancelOrder": "Cancelar Pedido",
     "cancelRequest": "Solicitar Cancelación de Pedido",
     "cancelReason": "Motivo de la cancelación",

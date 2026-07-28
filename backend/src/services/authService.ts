@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import type { SignOptions } from 'jsonwebtoken'
+import type { SignOptions, JwtPayload } from 'jsonwebtoken'
 import { prisma } from '../server.js'
 import { logAudit } from '../utils/audit.js'
 import { sendWelcome, sendPasswordReset } from './email.js'
@@ -16,7 +16,7 @@ const JWT_SECRET = _jwtSecret as string
 // ─── Token Generation ─────────────────────────────────────────
 
 function generateAccessToken(payload: { id: string; email: string; role: string; type?: string }) {
-  const options: SignOptions = { expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any }
+  const options: SignOptions = { expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as unknown as SignOptions['expiresIn'] }
   return jwt.sign(payload, JWT_SECRET, options)
 }
 
@@ -26,7 +26,7 @@ function generateCustomerAccessToken(payload: { id: string; email: string; role:
 
 function generateRefreshToken(payload: { id: string; email: string; role: string; type?: string }, expiresIn: string | undefined = undefined) {
   const expiry = expiresIn || process.env.REFRESH_TOKEN_EXPIRES_IN || '7d'
-  const options: SignOptions = { expiresIn: expiry as any }
+  const options: SignOptions = { expiresIn: expiry as unknown as SignOptions['expiresIn'] }
   return jwt.sign({ ...payload, refresh: true }, JWT_SECRET, options)
 }
 
@@ -112,7 +112,7 @@ export async function refreshCustomerToken(refreshToken: string | undefined) {
   if (!refreshToken) throw Object.assign(new Error('No refresh token'), { status: 401 })
 
   try {
-    const decoded = jwt.verify(refreshToken, JWT_SECRET) as any
+    const decoded = jwt.verify(refreshToken, JWT_SECRET) as JwtPayload
     if (!decoded.refresh || decoded.type !== 'customer') {
       throw Object.assign(new Error('Invalid refresh token'), { status: 401 })
     }
@@ -156,7 +156,7 @@ export async function forgotPassword(email: string) {
 }
 
 export async function resetPassword(token: string, newPassword: string) {
-  const decoded = jwt.decode(token) as any
+  const decoded = jwt.decode(token) as JwtPayload | null
   if (!decoded || !decoded.id || !decoded.reset || decoded.type !== 'customer') {
     throw Object.assign(new Error('Invalid reset token'), { status: 400 })
   }
@@ -174,7 +174,7 @@ export async function resetPassword(token: string, newPassword: string) {
 
   const passwordHash = await bcrypt.hash(newPassword, 12)
   await prisma.customer.update({
-    where: { id: decoded.id },
+    where: { id: decoded.id as string },
     data: { passwordHash },
   })
 
@@ -222,7 +222,7 @@ export async function refreshAdminToken(refreshToken: string | undefined) {
   if (!refreshToken) throw Object.assign(new Error('No refresh token'), { status: 401 })
 
   try {
-    const decoded = jwt.verify(refreshToken, JWT_SECRET) as any
+    const decoded = jwt.verify(refreshToken, JWT_SECRET) as JwtPayload
     if (!decoded.refresh) throw Object.assign(new Error('Invalid refresh token'), { status: 401 })
 
     const user = await prisma.adminUser.findUnique({ where: { id: decoded.id } })

@@ -36,7 +36,7 @@ export function PayPalProvider({ children }: { children: ReactNode }) {
   }
 
   // Prevent double-loading the SDK if another provider instance exists
-  if (typeof window !== 'undefined' && (window as any).__paypal_sdk_loaded) {
+  if (typeof window !== 'undefined' && (window as unknown as Record<string, boolean>).__paypal_sdk_loaded) {
     return <>{children}</>
   }
 

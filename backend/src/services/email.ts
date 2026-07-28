@@ -2,6 +2,7 @@ import { Resend } from 'resend'
 import { prisma } from '../server.js'
 import logger from '../utils/logger.js'
 import { escapeHtml } from '../utils/html-escape.js'
+import type { Prisma } from '@prisma/client'
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -27,7 +28,7 @@ interface QueueEmail {
   html: string
   text?: string
   template?: string
-  templateData?: Record<string, any>
+  templateData?: Record<string, unknown>
 }
 
 /**
@@ -44,7 +45,7 @@ export async function queueEmail(email: QueueEmail): Promise<void> {
         htmlBody: email.html,
         textBody: email.text,
         template: email.template,
-        templateData: email.templateData as any,
+        templateData: email.templateData as unknown as Prisma.InputJsonValue,
         status: 'pending',
       },
     })
@@ -212,7 +213,7 @@ export const emailTemplates = {
       <p style="color:#64748b;font-size:13px;text-align:center;">We'll send you tracking information once your order ships.</p>
     `)
 
-    return { to: '', subject: `Order ${data.orderNumber} Confirmed — Alka Traders`, html, template: 'order-confirmation', templateData: data as any }
+    return { to: '', subject: `Order ${data.orderNumber} Confirmed — Alka Traders`, html, template: 'order-confirmation', templateData: data as Record<string, unknown> }
   },
 
   orderShipped(data: {
@@ -236,7 +237,7 @@ export const emailTemplates = {
       <p style="color:#64748b;font-size:13px;">Track your shipment with ${escapeHtml(data.courier)} using tracking number <strong>${escapeHtml(data.trackingNumber)}</strong>.</p>
     `)
 
-    return { to: '', subject: `Order ${data.orderNumber} Shipped — Tracking: ${escapeHtml(data.trackingNumber)}`, html, template: 'order-shipped', templateData: data as any }
+    return { to: '', subject: `Order ${data.orderNumber} Shipped — Tracking: ${escapeHtml(data.trackingNumber)}`, html, template: 'order-shipped', templateData: data as Record<string, unknown> }
   },
 
   orderCancelled(data: {
@@ -253,7 +254,7 @@ export const emailTemplates = {
       <p style="color:#64748b;font-size:13px;">If you have questions, contact us at <a href="mailto:${COMPANY}" style="color:#0ea5e9;">${COMPANY}</a>.</p>
     `)
 
-    return { to: '', subject: `Order ${data.orderNumber} Cancelled — Alka Traders`, html, template: 'order-cancelled', templateData: data as any }
+    return { to: '', subject: `Order ${data.orderNumber} Cancelled — Alka Traders`, html, template: 'order-cancelled', templateData: data as Record<string, unknown> }
   },
 
 
@@ -280,7 +281,7 @@ export const emailTemplates = {
       ${btn(`${FRONTEND_URL}/admin/rfqs`, 'View RFQ in Admin Panel', urgencyColor)}
     `)
 
-    return { to: RFQ_EMAIL, subject: `[RFQ ${data.urgency.toUpperCase()}] ${data.rfqNumber} — ${escapeHtml(data.customerName)}`, html, template: 'rfq-received', templateData: data as any }
+    return { to: RFQ_EMAIL, subject: `[RFQ ${data.urgency.toUpperCase()}] ${data.rfqNumber} — ${escapeHtml(data.customerName)}`, html, template: 'rfq-received', templateData: data as Record<string, unknown> }
   },
 
   rfqResponse(data: {
@@ -295,7 +296,7 @@ export const emailTemplates = {
       <p style="color:#64748b;font-size:13px;">Need immediate help? <a href="https://wa.me/${WHATSAPP}" style="color:#25d366;font-weight:600;">WhatsApp us</a></p>
     `)
 
-    return { to: '', subject: `RE: RFQ ${data.rfqNumber} — Alka Traders`, html, template: 'rfq-response', templateData: data as any }
+    return { to: '', subject: `RE: RFQ ${data.rfqNumber} — Alka Traders`, html, template: 'rfq-response', templateData: data as Record<string, unknown> }
   },
 
   emergencyAlert(data: {
@@ -323,7 +324,7 @@ export const emailTemplates = {
       ${btn(`https://wa.me/${data.phone.replace(/[^0-9]/g, '')}`, '💬 WhatsApp Now', '#25d366')}
     `)
 
-    return { to: EMERGENCY_EMAIL, subject: `🚨 EMERGENCY RFQ ${data.rfqNumber} — ${data.customerName} — ${data.vesselName || 'Vessel Unknown'}`, html, template: 'emergency-rfq', templateData: data as any }
+    return { to: EMERGENCY_EMAIL, subject: `🚨 EMERGENCY RFQ ${data.rfqNumber} — ${data.customerName} — ${data.vesselName || 'Vessel Unknown'}`, html, template: 'emergency-rfq', templateData: data as Record<string, unknown> }
   },
 
   // ── Offer Emails ─────────────────────────────────────────────
@@ -347,7 +348,7 @@ export const emailTemplates = {
       ${btn(`${FRONTEND_URL}/admin/offers`, 'Review Offer in Admin', '#059669')}
     `)
 
-    return { to: ADMIN_EMAIL, subject: `[OFFER] ${data.offerNumber} — $${data.offeredPrice.toFixed(2)} — ${data.productName}`, html, template: 'offer-received', templateData: data as any }
+    return { to: ADMIN_EMAIL, subject: `[OFFER] ${data.offerNumber} — $${data.offeredPrice.toFixed(2)} — ${data.productName}`, html, template: 'offer-received', templateData: data as Record<string, unknown> }
   },
 
   offerDecision(data: {
@@ -371,7 +372,7 @@ export const emailTemplates = {
       ${data.decision === 'countered' ? `<p style="color:#1e293b;font-size:14px;">We've countered with <strong>$${data.counterPrice?.toFixed(2)}</strong>. Reply to this email or <a href="https://wa.me/${WHATSAPP}" style="color:#25d366;">WhatsApp us</a> to continue.</p>` : ''}
     `)
 
-    return { to: '', subject: `Offer ${data.offerNumber} ${labels[data.decision]} — Alka Traders`, html, template: 'offer-decision', templateData: data as any }
+    return { to: '', subject: `Offer ${data.offerNumber} ${labels[data.decision]} — Alka Traders`, html, template: 'offer-decision', templateData: data as Record<string, unknown> }
   },
 
   // ── Contact / Emergency ──────────────────────────────────────
@@ -394,7 +395,7 @@ export const emailTemplates = {
       ${btn(`mailto:${data.email}?subject=Re: ${data.subject || 'Your Message'}`, 'Reply via Email', '#0ea5e9')}
     `)
 
-    return { to: ADMIN_EMAIL, subject: `[CONTACT] ${data.subject || 'New message from ' + data.name}`, html, template: 'contact-notification', templateData: data as any }
+    return { to: ADMIN_EMAIL, subject: `[CONTACT] ${data.subject || 'New message from ' + data.name}`, html, template: 'contact-notification', templateData: data as Record<string, unknown> }
   },
 
   // ── Password Reset ───────────────────────────────────────────
@@ -411,7 +412,7 @@ export const emailTemplates = {
       <p style="color:#94a3b8;font-size:12px;margin:24px 0 0;">This link expires in 1 hour. If you didn't request this, ignore this email.</p>
     `)
 
-    return { to: '', subject: 'Password Reset — Alka Traders', html, template: 'password-reset', templateData: data as any }
+    return { to: '', subject: 'Password Reset — Alka Traders', html, template: 'password-reset', templateData: data as Record<string, unknown> }
   },
 
   // ── Welcome ──────────────────────────────────────────────────
@@ -430,7 +431,7 @@ export const emailTemplates = {
       ${btn(`${FRONTEND_URL}/products`, 'Browse Products', '#0ea5e9')}
     `)
 
-    return { to: data.email, subject: 'Welcome to Alka Traders! 🎉', html, template: 'welcome', templateData: data as any }
+    return { to: data.email, subject: 'Welcome to Alka Traders! 🎉', html, template: 'welcome', templateData: data as Record<string, unknown> }
   },
 }
 

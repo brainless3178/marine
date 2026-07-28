@@ -79,21 +79,21 @@ export function RFQSection() {
       >
         <div>
           <h2 className="font-display font-bold text-section-xl tracking-tight mb-5">
-            Cannot find it?<br />We will source it.
+            Cannot find the ship spare?<br />Send the nameplate.
           </h2>
           <div className="gold-accent-bar mt-4 mb-6" />
           <p className="text-body text-[var(--text-secondary)] leading-relaxed mb-7 max-w-[520px]">
-            Upload a part description, photo, SKU or equipment plate. We will check stock, condition and export options, then come back with a quote.
+            Upload a part description, model number, maker name, serial plate, or product photo. We will check Alang/Bhavnagar stock, compatible alternatives, condition, packing, and export options before quoting.
           </p>
           <ul className="flex flex-col gap-3.5 mb-7">
             <li className="flex items-center gap-3 text-body-sm text-[var(--text-secondary)]">
-              <CircleCheck size={18} className="text-[var(--success)] flex-shrink-0" /> {t('rfq.verifiedSuppliers')}
+              <CircleCheck size={18} className="text-[var(--success)] flex-shrink-0" /> Tested used, refurbished, and new old stock options
             </li>
             <li className="flex items-center gap-3 text-body-sm text-[var(--text-secondary)]">
-              <CircleCheck size={18} className="text-[var(--success)] flex-shrink-0" /> {t('rfq.hourResponse')}
+              <CircleCheck size={18} className="text-[var(--success)] flex-shrink-0" /> Response target within 4 business hours
             </li>
             <li className="flex items-center gap-3 text-body-sm text-[var(--text-secondary)]">
-              <CircleCheck size={18} className="text-[var(--success)] flex-shrink-0" /> {t('rfq.countries')}
+              <CircleCheck size={18} className="text-[var(--success)] flex-shrink-0" /> DHL, FedEx, air freight, and sea freight support
             </li>
           </ul>
           <div className="flex flex-col gap-2.5">
@@ -156,7 +156,7 @@ export function RFQSection() {
               value={formData.productDesc}
               onChange={(e) => setFormData((p) => ({ ...p, productDesc: e.target.value }))}
               rows={3}
-              placeholder="Describe the part, include SKU or brand if known"
+              placeholder="Example: Furuno radar display, ABB drive, Parker hydraulic pump, MAN B&W engine spare, or a nameplate photo reference"
               className="w-full px-4 py-3.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none resize-vertical min-h-[80px]"
             />
           </div>
