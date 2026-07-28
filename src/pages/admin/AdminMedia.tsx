@@ -147,8 +147,8 @@ export default function AdminMedia() {
         productSku: u.product?.sku || '',
       }))
       setUsageMap((prev) => new Map(prev).set(assetId, usage))
-    } catch {
-      // Usage endpoint may not be available — graceful degradation
+    } catch (err) {
+      console.warn('[AdminMedia] Usage fetch failed (graceful degradation):', err)
     }
   }, [])
 
@@ -203,8 +203,8 @@ export default function AdminMedia() {
       try {
         await admin.media.delete(id)
         deleted++
-      } catch {
-        // Continue with next
+      } catch (err) {
+        console.warn('[AdminMedia] Bulk delete failed for', id, ':', err)
       }
     }
     if (deleted > 0) {
