@@ -1,15 +1,20 @@
 import { Router } from 'express'
+import { z } from 'zod'
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
 import { prisma } from '../../server.js'
 import { authenticateAdmin, AuthRequest } from '../../middleware/auth.js'
-import { asyncHandler } from '../../middleware/validate.js'
+import { asyncHandler, validateParams } from '../../middleware/validate.js'
 import { logAudit } from '../../utils/audit.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
+
+const uuidParamSchema = z.object({
+  id: z.string().uuid(),
+})
 
 // ─── Multer Config ────────────────────────────────────────────
 const UPLOAD_DIR = path.resolve('uploads')
@@ -27,7 +32,7 @@ const upload = multer({
 })
 
 // ─── Upload Brand Logo ─────────────────────────────────────
-router.post('/:id/logo', upload.single('file'), asyncHandler(async (req: AuthRequest, res) => {
+router.post('/:id/logo', validateParams(uuidParamSchema), upload.single('file'), asyncHandler(async (req: AuthRequest, res) => {
   const brandId = req.params.id as string
   const brand = await prisma.brand.findUnique({ where: { id: brandId } })
   if (!brand) return sendError(res, 'Brand not found', 404)
@@ -50,7 +55,6 @@ router.post('/:id/logo', upload.single('file'), asyncHandler(async (req: AuthReq
     }
   }
 
-  // Update brand logo URL
   const updated = await prisma.brand.update({
     where: { id: brandId },
     data: { logoUrl: url },

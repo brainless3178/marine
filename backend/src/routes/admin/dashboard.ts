@@ -1,8 +1,13 @@
 import { Router } from 'express'
 import { prisma } from '../../server.js'
 import { authenticateAdmin } from '../../middleware/auth.js'
-import { asyncHandler } from '../../middleware/validate.js'
+import { asyncHandler, validateQuery } from '../../middleware/validate.js'
 import { sendSuccess } from '../../middleware/response.js'
+import { z } from 'zod'
+
+const activityQuerySchema = z.object({
+  limit: z.string().optional(),
+})
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -73,7 +78,7 @@ router.get('/alerts', asyncHandler(async (_req, res) => {
 }))
 
 // ─── Recent Activity ───────────────────────────────────────────
-router.get('/activity', asyncHandler(async (req, res) => {
+router.get('/activity', validateQuery(activityQuerySchema), asyncHandler(async (req, res) => {
   const limit = Number(req.query.limit) || 20
   const logs = await prisma.auditLog.findMany({
     orderBy: { createdAt: 'desc' },
