@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Search, ShoppingCart, Check, SlidersHorizontal, X as XIcon } from 'lucide-react'
@@ -6,7 +6,7 @@ import { useStore } from '../store/useStore'
 import { useProducts } from '../hooks/useProducts'
 import { useAddToCart } from '../hooks/useAddToCart'
 import { OptimizedImage } from '../components/ui/OptimizedImage'
-import { storefront } from '../lib/api'
+import { useProductList } from '../hooks/useApiQuery'
 import { isLightColor, getProductImageUrl } from '../lib/utils'
 import { SEO } from '../components/seo/SEO'
 import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
@@ -31,35 +31,28 @@ export default function Products() {
 
   const { handleAddToCart, addedIds } = useAddToCart()
 
-  // Fetch products from API with fallback to static catalog
-  const [apiProducts, setApiProducts] = useState<Product[]>([])
-  const [apiLoaded, setApiLoaded] = useState(false)
+  // React Query caches the product list with deduplication + background refetch
+  const { data: productListData, isLoading } = useProductList()
 
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      try {
-        const res = await storefront.products.list()
-        if (!cancelled && res.products?.length > 0) {
-          setApiProducts(apiProductsToFrontend(res.products))
-          setApiLoaded(true)
-          return
-        }
-      } catch {
-        // API unavailable — fallback to static catalog
-      }
-      if (!cancelled) {
-        setApiProducts(staticProducts)
-        setApiLoaded(true)
-      }
+  const apiProducts: Product[] = useMemo(() => {
+    if (productListData?.products?.length) {
+      return apiProductsToFrontend(productListData.products)
     }
-    load()
-    return () => { cancelled = true }
-  }, [])
+    return []
+  }, [productListData])
 
-  const { products: allProducts, filteredCount } = useProducts(apiProducts)
-  const finalProducts = apiLoaded ? allProducts : []
-  const finalCount = apiLoaded ? filteredCount : 0
+  const apiLoaded = !isLoading
+
+  const finalProducts: Product[] = useMemo(() => {
+    if (productListData?.products?.length) {
+      return apiProducts
+    }
+    if (!isLoading) return staticProducts
+    return []
+  }, [apiProducts, productListData, isLoading])
+
+  const { products: allProducts, filteredCount } = useProducts(finalProducts)
+  const finalCount = filteredCount
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)

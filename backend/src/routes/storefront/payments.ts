@@ -7,6 +7,7 @@ import logger from '../../utils/logger.js'
 import { sendOrderConfirmation } from '../../services/email.js'
 import { logAudit } from '../../utils/audit.js'
 import { getPaypalAccessToken, PAYPAL_BASE, PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } from '../../utils/paypal.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 const payLog = logger.child({ context: 'paypal' })
@@ -14,9 +15,9 @@ const payLog = logger.child({ context: 'paypal' })
 // ─── Get PayPal Client ID (for frontend SDK) ─────────────────
 router.get('/client-id', asyncHandler(async (_req, res) => {
   if (!PAYPAL_CLIENT_ID) {
-    return res.status(503).json({ error: 'PayPal not configured' })
+    return sendError(res, 'PayPal not configured', 503)
   }
-  res.json({ clientId: PAYPAL_CLIENT_ID })
+  sendSuccess(res, { clientId: PAYPAL_CLIENT_ID })
 }))
 
 // ─── Create PayPal Order ─────────────────────────────────────
@@ -26,7 +27,7 @@ const createOrderSchema = z.object({
 
 router.post('/create-order', authenticateCustomer, validateBody(createOrderSchema), asyncHandler(async (req: AuthRequest, res) => {
   if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-    return res.status(503).json({ error: 'PayPal not configured' })
+    return sendError(res, 'PayPal not configured', 503)
   }
 
   const { orderId } = req.body
@@ -34,15 +35,15 @@ router.post('/create-order', authenticateCustomer, validateBody(createOrderSchem
   const order = await prisma.order.findFirst({
     where: { id: orderId, customerId: req.user!.id },
   })
-  if (!order) return res.status(404).json({ error: 'Order not found' })
+  if (!order) return sendError(res, 'Order not found', 404)
   if (order.paymentStatus === 'paid') {
-    return res.status(400).json({ error: 'Order already paid' })
+    return sendError(res, 'Order already paid', 400)
   }
 
   // Get PayPal access token
   const accessToken = await getPaypalAccessToken()
   if (!accessToken) {
-    return res.status(502).json({ error: 'Failed to connect to PayPal' })
+    return sendError(res, 'Failed to connect to PayPal', 502)
   }
 
   // Create PayPal order
@@ -80,7 +81,7 @@ router.post('/create-order', authenticateCustomer, validateBody(createOrderSchem
   if (!paypalOrderRes.ok) {
     const err: Record<string, unknown> = await paypalOrderRes.json() as Record<string, unknown>
     payLog.error({ err, orderId }, 'PayPal create order failed')
-    return res.status(502).json({ error: 'PayPal order creation failed' })
+    return sendError(res, 'PayPal order creation failed', 502)
   }
 
   const paypalData = await paypalOrderRes.json() as { id: string }
@@ -92,7 +93,7 @@ router.post('/create-order', authenticateCustomer, validateBody(createOrderSchem
     data: { paymentIntentId: paypalData.id },
   })
 
-  res.json({ paypalOrderId: paypalData.id })
+  sendSuccess(res, { paypalOrderId: paypalData.id })
 }))
 
 // ─── Capture PayPal Order ────────────────────────────────────
@@ -103,7 +104,7 @@ const captureSchema = z.object({
 
 router.post('/capture-order', authenticateCustomer, validateBody(captureSchema), asyncHandler(async (req: AuthRequest, res) => {
   if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-    return res.status(503).json({ error: 'PayPal not configured' })
+    return sendError(res, 'PayPal not configured', 503)
   }
 
   const { paypalOrderId, orderId } = req.body
@@ -112,15 +113,15 @@ router.post('/capture-order', authenticateCustomer, validateBody(captureSchema),
     where: { id: orderId, customerId: req.user!.id },
     include: { items: true },
   })
-  if (!order) return res.status(404).json({ error: 'Order not found' })
+  if (!order) return sendError(res, 'Order not found', 404)
   if (order.paymentStatus === 'paid') {
-    return res.status(400).json({ error: 'Order already paid' })
+    return sendError(res, 'Order already paid', 400)
   }
 
   // Get PayPal access token
   const accessToken = await getPaypalAccessToken()
   if (!accessToken) {
-    return res.status(502).json({ error: 'Failed to connect to PayPal' })
+    return sendError(res, 'Failed to connect to PayPal', 502)
   }
 
   // Capture the PayPal order
@@ -135,14 +136,14 @@ router.post('/capture-order', authenticateCustomer, validateBody(captureSchema),
   if (!captureRes.ok) {
     const err: Record<string, unknown> = await captureRes.json() as Record<string, unknown>
     payLog.error({ err, orderId, paypalOrderId }, 'PayPal capture failed')
-    return res.status(502).json({ error: 'Payment capture failed' })
+    return sendError(res, 'Payment capture failed', 502)
   }
 
   const captureData = await captureRes.json() as { status: string }
 
   if (captureData.status !== 'COMPLETED') {
     payLog.warn({ status: captureData.status, orderId }, 'PayPal capture not completed')
-    return res.status(400).json({ error: 'Payment not completed', status: captureData.status })
+    return sendError(res, 'Payment not completed', 400)
   }
 
   // Atomic idempotency guard: only transition to paid if not already paid
@@ -150,7 +151,7 @@ router.post('/capture-order', authenticateCustomer, validateBody(captureSchema),
     where: { id: orderId, paymentStatus: { not: 'paid' } },
     data: { paymentStatus: 'paid', status: 'confirmed' },
   })
-  if (updated.count === 0) return res.json({ status: 'completed', orderId })
+  if (updated.count === 0) return sendSuccess(res, { status: 'completed', orderId })
 
   await prisma.orderTimeline.create({
     data: { orderId, status: 'confirmed', note: 'Payment confirmed via PayPal' },
@@ -199,7 +200,7 @@ router.post('/capture-order', authenticateCustomer, validateBody(captureSchema),
   }
 
   payLog.info({ orderId, orderNumber: order.orderNumber, paypalOrderId }, 'PayPal payment captured')
-  res.json({ status: 'completed', orderId })
+  sendSuccess(res, { status: 'completed', orderId })
 }))
 
 export default router

@@ -19,6 +19,7 @@ import {
 import { admin } from '../../lib/api'
 import { useToast } from '../../components/admin/Toast'
 import { AdminPagination } from '../../components/admin/AdminPagination'
+import type { ApiRfq } from '../../lib/api-types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────────
 
@@ -76,7 +77,7 @@ const ITEMS_PER_PAGE = 12
 
 // ─── Component ────────────────────────────────────────────────────────────────────
 
-function mapApiRfq(r: any): RFQ {
+function mapApiRfq(r: ApiRfq): RFQ {
   return {
     id: r.rfqNumber || r.id,
     customerName: r.fullName || r.customer?.name || '',
@@ -119,7 +120,7 @@ export default function AdminRFQs() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.rfqs.list(params)
       setRfqs((res.rfqs || []).map(mapApiRfq))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load RFQs:', err)
       toast('Failed to load RFQs', 'error')
     } finally {
@@ -161,8 +162,8 @@ export default function AdminRFQs() {
       await admin.rfqs.assign(rfqId, assignee)
       toast(`RFQ assigned to ${assignee}`, 'success')
       fetchRfqs()
-    } catch (err: any) {
-      toast(err.message || 'Failed to assign', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to assign', 'error')
     }
   }
 
@@ -176,8 +177,8 @@ export default function AdminRFQs() {
       await admin.rfqs.updateStatus(rfqId, newStatus)
       toast(`RFQ ${rfqId} → ${statusConfig[newStatus].label}`, 'success')
       fetchRfqs()
-    } catch (err: any) {
-      toast(err.message || 'Failed to update status', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to update status', 'error')
     }
   }
 

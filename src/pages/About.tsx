@@ -1,78 +1,15 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { motion, useInView } from 'framer-motion'
 import { MapPin, Clock } from 'lucide-react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { offices, timelineEvents } from '../data/testimonials'
 import { SEO } from '../components/seo/SEO'
 import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 
-gsap.registerPlugin(ScrollTrigger)
-
 export default function About() {
   const { t } = useTranslation()
   const timelineRef = useRef<HTMLDivElement>(null!)
-  const timelineLineRef = useRef<HTMLDivElement>(null!)
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Vertical line draw
-      gsap.fromTo(
-        timelineLineRef.current,
-        { height: '0%' },
-        {
-          height: '100%',
-          scrollTrigger: {
-            trigger: timelineRef.current,
-            start: 'top 70%',
-            end: 'bottom 30%',
-            scrub: 1.5,
-          },
-        }
-      )
-
-      // Timeline events stagger
-      const events = gsap.utils.toArray<HTMLElement>('.about-timeline-event')
-      gsap.fromTo(
-        events,
-        { x: -30, opacity: 0 },
-        {
-          x: 0,
-          opacity: 1,
-          stagger: 0.3,
-          ease: 'power2.out',
-          duration: 0.7,
-          scrollTrigger: {
-            trigger: timelineRef.current,
-            start: 'top 75%',
-            end: 'bottom 40%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      )
-
-      // Timeline dots stagger
-      const dots = gsap.utils.toArray<HTMLElement>('.about-timeline-dot')
-      gsap.fromTo(
-        dots,
-        { scale: 0 },
-        {
-          scale: 1,
-          stagger: 0.3,
-          ease: 'back.out(2)',
-          duration: 0.5,
-          scrollTrigger: {
-            trigger: timelineRef.current,
-            start: 'top 75%',
-            end: 'bottom 40%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      )
-    }, timelineRef)
-
-    return () => ctx.revert()
-  }, [])
+  const timelineInView = useInView(timelineRef, { once: true, amount: 0.2 })
 
   return (
     <div>
@@ -111,23 +48,35 @@ export default function About() {
           <div ref={timelineRef} className="relative pl-8">
             {/* Static background line */}
             <div className="absolute left-[3px] top-0 w-[1px] h-full bg-[var(--border)]" />
-            {/* Animated accent line — drawn by GSAP */}
-            <div
-              ref={timelineLineRef}
+            {/* Animated accent line */}
+            <motion.div
               className="absolute left-[3px] top-0 w-[2px] bg-[var(--accent-primary)]/50"
-              style={{ height: '0%' }}
+              initial={{ height: '0%' }}
+              animate={timelineInView ? { height: '100%' } : { height: '0%' }}
+              transition={{ duration: 1.5, ease: 'easeInOut' }}
             />
-            {timelineEvents.map((event) => (
-              <div key={event.year} className="about-timeline-event relative pb-10 last:pb-0">
-                <div className="about-timeline-dot absolute -left-[41px] w-8 h-8 rounded-full bg-[var(--surface)] border-2 border-[var(--accent-primary)] flex items-center justify-center font-display font-bold text-xs text-[var(--accent-primary)] z-10">
+            {timelineEvents.map((event, i) => (
+              <motion.div
+                key={event.year}
+                className="relative pb-10 last:pb-0"
+                initial={{ x: -30, opacity: 0 }}
+                animate={timelineInView ? { x: 0, opacity: 1 } : { x: -30, opacity: 0 }}
+                transition={{ delay: i * 0.15, duration: 0.6, ease: 'easeOut' }}
+              >
+                <motion.div
+                  className="absolute -left-[41px] w-8 h-8 rounded-full bg-[var(--surface)] border-2 border-[var(--accent-primary)] flex items-center justify-center font-display font-bold text-xs text-[var(--accent-primary)] z-10"
+                  initial={{ scale: 0 }}
+                  animate={timelineInView ? { scale: 1 } : { scale: 0 }}
+                  transition={{ delay: i * 0.2, duration: 0.4, ease: 'backOut' }}
+                >
                   {event.year.slice(2)}
-                </div>
+                </motion.div>
                 <div className="ml-4">
                   <span className="font-mono text-xs text-[var(--accent-primary)]">{event.year}</span>
                   <h3 className="text-base font-semibold mt-1">{event.title}</h3>
                   <p className="text-sm text-[var(--text-secondary)] mt-1">{event.description}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -144,9 +93,14 @@ export default function About() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {offices.map((office) => (
-              <div
+              <motion.div
                 key={office.city}
                 className="bg-[var(--surface)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1"
+                whileHover={{ y: -4 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
               >
                 <h3 className="font-display font-bold text-lg mb-1">{office.city}</h3>
                 <p className="text-xs text-[var(--text-muted)] mb-3">{office.country}</p>
@@ -159,7 +113,7 @@ export default function About() {
                   {office.timezone.split('/')[1]}
                 </p>
                 <p className="text-xs text-[var(--text-secondary)]">{office.phone}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

@@ -17,6 +17,7 @@ import {
 import { admin } from '../../lib/api'
 import { useToast } from '../../components/admin/Toast'
 import { AdminPagination } from '../../components/admin/AdminPagination'
+import type { ApiAuditLog } from '../../lib/api-types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────────
 
@@ -52,7 +53,7 @@ function mapEntityType(entityType: string): ActionType {
 }
 
 // Build human-readable details from audit log fields
-function buildDetails(log: any): string {
+function buildDetails(log: ApiAuditLog): string {
   const entity = log.entityName || log.entityType || ''
   const action = log.action || ''
 
@@ -69,7 +70,7 @@ function buildDetails(log: any): string {
 }
 
 // Build metadata from previousValue/newValue
-function buildMetadata(log: any): Record<string, string> {
+function buildMetadata(log: ApiAuditLog): Record<string, string> {
   const meta: Record<string, string> = {}
   if (log.entityId) meta.entityId = log.entityId
   if (log.entityName) meta.entity = log.entityName
@@ -84,7 +85,7 @@ function buildMetadata(log: any): Record<string, string> {
   return meta
 }
 
-function mapApiLog(log: any): AuditEntry {
+function mapApiLog(log: ApiAuditLog): AuditEntry {
   return {
     id: log.id,
     action: log.action || 'Unknown Action',
@@ -130,7 +131,7 @@ export default function AdminAuditLog() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.audit.list(params)
       setLog((res.logs || []).map(mapApiLog))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load audit log:', err)
       toast('Failed to load audit log', 'error')
     } finally {

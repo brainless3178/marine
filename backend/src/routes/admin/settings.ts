@@ -3,6 +3,7 @@ import { prisma } from '../../server.js'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler } from '../../middleware/validate.js'
 import { logAudit } from '../../utils/audit.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -17,14 +18,14 @@ router.get('/', asyncHandler(async (_req, res) => {
     if (!grouped[cat]) grouped[cat] = {}
     grouped[cat][s.key] = s.value
   }
-  res.json({ settings: grouped, flat: settings })
+  sendSuccess(res, { settings: grouped, flat: settings })
 }))
 
 // ─── Update Settings (store-manager+ only) ──────────────────────
 router.put('/', requireRole('store-manager'), asyncHandler(async (req: AuthRequest, res) => {
   const { settings } = req.body // { [key]: value }
   if (!settings || typeof settings !== 'object') {
-    return res.status(400).json({ error: 'settings object required' })
+    return sendError(res, 'settings object required', 400)
   }
 
   const updates = []
@@ -40,7 +41,7 @@ router.put('/', requireRole('store-manager'), asyncHandler(async (req: AuthReque
 
   await Promise.all(updates)
   await logAudit({ actor: req.user, action: 'settings.update', entityType: 'store_settings', entityName: Object.keys(settings).join(', '), ipAddress: req.ip })
-  res.json({ message: 'Settings updated', count: updates.length })
+  sendSuccess(res, { message: 'Settings updated', count: updates.length })
 }))
 
 export default router

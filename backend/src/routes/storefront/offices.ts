@@ -4,6 +4,7 @@ import { asyncHandler, validateBody } from '../../middleware/validate.js'
 import { z } from 'zod'
 import { authenticateAdmin, AuthRequest } from '../../middleware/auth.js'
 import { logAudit } from '../../utils/audit.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -13,7 +14,7 @@ router.get('/', asyncHandler(async (_req, res) => {
     where: { isVisible: true },
     orderBy: { sortOrder: 'asc' },
   })
-  res.json({ offices })
+  sendSuccess(res, { offices })
 }))
 
 // ─── Admin: List All Offices (must be before /:slug) ──────────
@@ -21,7 +22,7 @@ router.get('/admin/all', authenticateAdmin, asyncHandler(async (_req, res) => {
   const offices = await prisma.office.findMany({
     orderBy: { sortOrder: 'asc' },
   })
-  res.json({ offices })
+  sendSuccess(res, { offices })
 }))
 
 // ─── Admin: Update All Offices ────────────────────────────────
@@ -69,7 +70,7 @@ router.put('/admin', authenticateAdmin, validateBody(officeSchema), asyncHandler
     ipAddress: req.ip,
   })
 
-  res.json({ offices: result })
+  sendSuccess(res, { offices: result })
 }))
 
 // ─── Get Office by Slug (Public — must be last) ───────────────
@@ -77,8 +78,8 @@ router.get('/:slug', asyncHandler(async (req, res) => {
   const office = await prisma.office.findFirst({
     where: { city: req.params.slug as string, isVisible: true },
   })
-  if (!office) return res.status(404).json({ error: 'Office not found' })
-  res.json({ office })
+  if (!office) return sendError(res, 'Office not found', 404)
+  sendSuccess(res, { office })
 }))
 
 export default router

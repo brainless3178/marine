@@ -5,6 +5,7 @@ import { asyncHandler, validateBody } from '../../middleware/validate.js'
 import { logAudit } from '../../utils/audit.js'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -24,7 +25,7 @@ router.get('/', asyncHandler(async (_req, res) => {
     select: { id: true, name: true, email: true, role: true, avatarUrl: true, isActive: true, lastLoginAt: true, createdAt: true },
     orderBy: { createdAt: 'asc' },
   })
-  res.json({ users })
+  sendSuccess(res, { users })
 }))
 
 // ─── Create Admin User ─────────────────────────────────────────
@@ -33,11 +34,11 @@ router.post('/', validateBody(userSchema), asyncHandler(async (req: AuthRequest,
   const passwordHash = await bcrypt.hash(password, 12)
 
   const existing = await prisma.adminUser.findUnique({ where: { email: data.email } })
-  if (existing) return res.status(400).json({ error: 'Email already exists' })
+  if (existing) return sendError(res, 'Email already exists', 400)
 
   const user = await prisma.adminUser.create({ data: { ...data, passwordHash } })
   await logAudit({ actor: req.user, action: 'user.create', entityType: 'admin_user', entityId: user.id, entityName: user.name, newValue: { id: user.id, name: user.name, email: user.email, role: user.role }, ipAddress: req.ip })
-  res.status(201).json({ user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+  sendSuccess(res, { user: { id: user.id, name: user.name, email: user.email, role: user.role } }, 201)
 }))
 
 const updateUserSchema = z.object({
@@ -59,17 +60,17 @@ router.put('/:id', validateBody(updateUserSchema), asyncHandler(async (req: Auth
 
   const user = await prisma.adminUser.update({ where: { id: req.params.id as string }, data: updateData })
   await logAudit({ actor: req.user, action: 'user.update', entityType: 'admin_user', entityId: user.id, entityName: user.name, newValue: { id: user.id, name: user.name, email: user.email, role: user.role }, ipAddress: req.ip })
-  res.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+  sendSuccess(res, { user: { id: user.id, name: user.name, email: user.email, role: user.role } })
 }))
 
 // ─── Deactivate Admin User ─────────────────────────────────────
 router.delete('/:id', asyncHandler(async (req: AuthRequest, res) => {
   if (req.params.id as string === req.user!.id) {
-    return res.status(400).json({ error: 'Cannot deactivate yourself' })
+    return sendError(res, 'Cannot deactivate yourself', 400)
   }
   await prisma.adminUser.update({ where: { id: req.params.id as string }, data: { isActive: false } })
   await logAudit({ actor: req.user, action: 'user.deactivate', entityType: 'admin_user', entityId: req.params.id as string, ipAddress: req.ip })
-  res.json({ message: 'User deactivated' })
+  sendSuccess(res, { message: 'User deactivated' })
 }))
 
 const roleChangeSchema = z.object({
@@ -80,7 +81,7 @@ const roleChangeSchema = z.object({
 router.patch('/:id/role', validateBody(roleChangeSchema), asyncHandler(async (req: AuthRequest, res) => {
   // Prevent self-demotion to non-owner role
   if (req.params.id === req.user!.id && req.body.role !== 'owner') {
-    return res.status(400).json({ error: 'Cannot change your own role from owner' })
+    return sendError(res, 'Cannot change your own role from owner', 400)
   }
 
   const user = await prisma.adminUser.update({
@@ -88,7 +89,7 @@ router.patch('/:id/role', validateBody(roleChangeSchema), asyncHandler(async (re
     data: { role: req.body.role },
   })
   await logAudit({ actor: req.user, action: 'user.changeRole', entityType: 'admin_user', entityId: user.id, entityName: user.name, newValue: { role: req.body.role }, ipAddress: req.ip })
-  res.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+  sendSuccess(res, { user: { id: user.id, name: user.name, email: user.email, role: user.role } })
 }))
 
 export default router

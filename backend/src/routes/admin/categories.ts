@@ -3,6 +3,7 @@ import { prisma } from '../../server.js'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler, validateBody } from '../../middleware/validate.js'
 import { logAudit } from '../../utils/audit.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 import { z } from 'zod'
 import { generateSlug } from '../../utils/helpers.js'
 
@@ -36,7 +37,7 @@ router.get('/', asyncHandler(async (_req, res) => {
     orderBy: { sortOrder: 'asc' },
   })
 
-  res.json({ categories })
+  sendSuccess(res, { categories })
 }))
 
 // ─── Create Category ───────────────────────────────────────────
@@ -44,7 +45,7 @@ router.post('/', requireRole('inventory-manager'), validateBody(categorySchema),
   const slug = generateSlug(req.body.name)
   const existing = await prisma.category.findUnique({ where: { slug } })
   if (existing) {
-    return res.status(400).json({ error: 'Category with this name already exists' })
+    return sendError(res, 'Category with this name already exists', 400)
   }
 
   const category = await prisma.category.create({
@@ -52,14 +53,14 @@ router.post('/', requireRole('inventory-manager'), validateBody(categorySchema),
   })
 
   await logAudit({ actor: req.user, action: 'category.create', entityType: 'category', entityId: category.id, entityName: category.name, newValue: category, ipAddress: req.ip })
-  res.status(201).json({ category })
+  sendSuccess(res, { category }, 201)
 }))
 
 // ─── Update Category ───────────────────────────────────────────
 router.put('/:id', requireRole('inventory-manager'), validateBody(categorySchema.partial()), asyncHandler(async (req: AuthRequest, res) => {
   const existing = await prisma.category.findUnique({ where: { id: req.params.id as string } })
   if (!existing) {
-    return res.status(404).json({ error: 'Category not found' })
+    return sendError(res, 'Category not found', 404)
   }
 
   let slug = existing.slug
@@ -75,7 +76,7 @@ router.put('/:id', requireRole('inventory-manager'), validateBody(categorySchema
   })
 
   await logAudit({ actor: req.user, action: 'category.update', entityType: 'category', entityId: category.id, entityName: category.name, previousValue: existing, newValue: category, ipAddress: req.ip })
-  res.json({ category })
+  sendSuccess(res, { category })
 }))
 
 // ─── Delete Category ───────────────────────────────────────────
@@ -86,20 +87,20 @@ router.delete('/:id', requireRole('store-manager'), asyncHandler(async (req: Aut
   })
 
   if (!existing) {
-    return res.status(404).json({ error: 'Category not found' })
+    return sendError(res, 'Category not found', 404)
   }
 
   if (existing._count.products > 0) {
-    return res.status(400).json({ error: 'Cannot delete category with products. Move products first.' })
+    return sendError(res, 'Cannot delete category with products. Move products first.', 400)
   }
 
   if (existing._count.children > 0) {
-    return res.status(400).json({ error: 'Cannot delete category with subcategories.' })
+    return sendError(res, 'Cannot delete category with subcategories.', 400)
   }
 
   await prisma.category.delete({ where: { id: req.params.id as string } })
   await logAudit({ actor: req.user, action: 'category.delete', entityType: 'category', entityId: existing.id, entityName: existing.name, previousValue: existing, ipAddress: req.ip })
-  res.json({ message: 'Category deleted' })
+  sendSuccess(res, { message: 'Category deleted' })
 }))
 
 // ─── Reorder Categories ────────────────────────────────────────
@@ -110,7 +111,7 @@ router.patch('/:id/reorder', requireRole('inventory-manager'), asyncHandler(asyn
     data: { sortOrder },
   })
   await logAudit({ actor: req.user, action: 'category.reorder', entityType: 'category', entityId: category.id, entityName: category.name, newValue: { sortOrder }, ipAddress: req.ip })
-  res.json({ category })
+  sendSuccess(res, { category })
 }))
 
 export default router

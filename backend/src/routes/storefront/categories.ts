@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { prisma } from '../../server.js'
 import { asyncHandler } from '../../middleware/validate.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -18,7 +19,7 @@ router.get('/', asyncHandler(async (_req, res) => {
     },
     orderBy: { sortOrder: 'asc' },
   })
-  res.json({ categories })
+  sendSuccess(res, { categories })
 }))
 
 // ─── Get Category by Slug ──────────────────────────────────────
@@ -33,8 +34,8 @@ router.get('/:slug', asyncHandler(async (req, res) => {
       _count: { select: { products: { where: { status: 'published' } } } },
     },
   })
-  if (!category) return res.status(404).json({ error: 'Category not found' })
-  res.json({ category })
+  if (!category) return sendError(res, 'Category not found', 404)
+  sendSuccess(res, { category })
 }))
 
 export default router

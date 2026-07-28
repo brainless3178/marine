@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { admin } from '../lib/api'
+import type { ApiDashboardStats, ApiAuditLog } from '../lib/api-types'
 
 export interface DashboardStats {
   totalProducts: number
@@ -83,7 +84,7 @@ export function useAdminDashboard() {
 
       // Process stats
       if (statsRes.status === 'fulfilled') {
-        const s = statsRes.value as any
+        const s = statsRes.value as ApiDashboardStats
         const total = s.totalProducts || 0
         setStats({
           totalProducts: total,
@@ -96,42 +97,52 @@ export function useAdminDashboard() {
           totalCategories: s.totalCategories || 0,
           totalIndustries: s.totalIndustries || 0,
           totalStockUnits: s.totalStockUnits || 0,
-          lowStockProducts: (s.lowStockProducts || []).map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            sku: p.sku,
-            brand: p.brand?.name || p.brand || 'Unknown',
-            category: p.category?.name || p.category || 'Unknown',
-            stockCount: p.stockCount ?? 0,
-            availability: p.availability || 'unknown',
-            hasImage: !!(p.images?.length && p.images[0]?.url),
-          })),
-          missingImageProducts: (s.missingImageProducts || []).map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            sku: p.sku,
-            brand: p.brand?.name || p.brand || 'Unknown',
-            category: p.category?.name || p.category || 'Unknown',
-            stockCount: p.stockCount ?? 0,
-            availability: p.availability || 'unknown',
-            hasImage: false,
-          })),
-          categoryBreakdown: (s.categoryBreakdown || []).map((c: any, i: number) => ({
-            id: c.id || `cat-${i}`,
-            name: c.name || c.category || 'Unknown',
-            count: c.count || c._count || 0,
-            percentage: total > 0 ? Math.round(((c.count || c._count || 0) / total) * 100) : 0,
-          })).sort((a: CategoryBreakdown, b: CategoryBreakdown) => b.count - a.count),
-          brandBreakdown: (s.brandBreakdown || []).map((b: any) => ({
-            name: b.name || 'Unknown',
-            count: b.count || b._count || 0,
-            percentage: total > 0 ? Math.round(((b.count || b._count || 0) / total) * 100) : 0,
-          })).sort((a: BrandBreakdown, b: BrandBreakdown) => b.count - a.count).slice(0, 15),
-          conditionBreakdown: (s.conditionBreakdown || []).map((c: any) => ({
-            condition: c.condition || 'unknown',
-            count: c.count || 0,
-            percentage: total > 0 ? Math.round(((c.count || 0) / total) * 100) : 0,
-          })).sort((a: ConditionBreakdown, b: ConditionBreakdown) => b.count - a.count),
+          lowStockProducts: (s.lowStockProducts || []).map((p) => {
+            return {
+              id: p.id,
+              name: p.name,
+              sku: p.sku,
+              brand: p.brand?.name || p.brand || 'Unknown',
+              category: p.category?.name || p.category || 'Unknown',
+              stockCount: p.stockCount ?? 0,
+              availability: p.availability || 'unknown',
+              hasImage: !!(p.images?.length && p.images[0]?.url),
+            }
+          }),
+          missingImageProducts: (s.missingImageProducts || []).map((p) => {
+            return {
+              id: p.id,
+              name: p.name,
+              sku: p.sku,
+              brand: p.brand?.name || p.brand || 'Unknown',
+              category: p.category?.name || p.category || 'Unknown',
+              stockCount: p.stockCount ?? 0,
+              availability: p.availability || 'unknown',
+              hasImage: false,
+            }
+          }),
+          categoryBreakdown: (s.categoryBreakdown || []).map((c, i) => {
+            return {
+              id: c.id || `cat-${i}`,
+              name: c.name || c.category || 'Unknown',
+              count: c.count || c._count || 0,
+              percentage: total > 0 ? Math.round(((c.count || c._count || 0) / total) * 100) : 0,
+            }
+          }).sort((a: CategoryBreakdown, b: CategoryBreakdown) => b.count - a.count),
+          brandBreakdown: (s.brandBreakdown || []).map((b) => {
+            return {
+              name: b.name || 'Unknown',
+              count: b.count || b._count || 0,
+              percentage: total > 0 ? Math.round(((b.count || b._count || 0) / total) * 100) : 0,
+            }
+          }).sort((a: BrandBreakdown, b: BrandBreakdown) => b.count - a.count).slice(0, 15),
+          conditionBreakdown: (s.conditionBreakdown || []).map((c) => {
+            return {
+              condition: c.condition || 'unknown',
+              count: c.count || 0,
+              percentage: total > 0 ? Math.round(((c.count || 0) / total) * 100) : 0,
+            }
+          }).sort((a: ConditionBreakdown, b: ConditionBreakdown) => b.count - a.count),
         })
       } else {
         // Fallback: compute from empty state
@@ -146,7 +157,7 @@ export function useAdminDashboard() {
 
       // Process alerts
       if (alertsRes.status === 'fulfilled') {
-        const a = alertsRes.value as any
+        const a = alertsRes.value as { lowStockProducts?: unknown[]; overdueRfqs?: unknown[]; outOfStockCount?: number }
         const result: DashboardAlert[] = []
         if (a.lowStockProducts?.length) {
           result.push({ type: 'warning', message: `${a.lowStockProducts.length} products are low on stock`, entityType: 'product' })
@@ -162,8 +173,9 @@ export function useAdminDashboard() {
 
       // Process activity
       if (activityRes.status === 'fulfilled') {
-        const act = activityRes.value as any
-        setActivity((act.logs || act || []).map((l: any) => ({
+        const act = activityRes.value as { logs?: ApiAuditLog[] } | ApiAuditLog[]
+        const logs = Array.isArray(act) ? act : (act?.logs || [])
+        setActivity(logs.map((l) => ({
           id: l.id,
           action: l.action || 'unknown',
           entityType: l.entityType || 'unknown',
@@ -172,8 +184,8 @@ export function useAdminDashboard() {
           createdAt: l.createdAt || new Date().toISOString(),
         })))
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load dashboard')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard')
       // Set empty defaults so the UI still renders
       setStats({
         totalProducts: 0, inStockProducts: 0, outOfStockProducts: 0,

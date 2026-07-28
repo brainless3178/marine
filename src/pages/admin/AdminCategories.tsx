@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { admin } from '../../lib/api'
 import { useToast } from '../../components/admin/Toast'
+import type { ApiCategory } from '../../lib/api-types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────────
 
@@ -58,10 +59,9 @@ function buildTree(categories: Category[]): TreeNode[] {
   return roots.sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
-function getCategoryProductCount(categoryId: string, _categories: Category[]): number {
-  // Product count is fetched from API with each category
+function getCategoryProductCount(categoryId: string, _categories: (Category & { productCount?: number })[]): number {
   const cat = _categories.find((c) => c.id === categoryId)
-  return (cat as any)?.productCount ?? 0
+  return cat?.productCount ?? 0
 }
 
 
@@ -83,7 +83,7 @@ export default function AdminCategories() {
     setLoading(true)
     try {
       const res = await admin.categories.list()
-      const cats = (res.categories || []).map((c: any) => ({
+      const cats = (res.categories || []).map((c: ApiCategory & { productCount?: number }) => ({
         id: c.id || c.slug,
         name: c.name,
         slug: c.slug,
@@ -96,7 +96,7 @@ export default function AdminCategories() {
       setCategories(cats)
       // Auto-expand top-level
       setExpandedIds(new Set(cats.filter((c: Category) => !c.parentId).map((c: Category) => c.id)))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load categories:', err)
       toast('Failed to load categories', 'error')
     } finally {
@@ -146,8 +146,8 @@ export default function AdminCategories() {
         setNewParentId(null)
       }
       fetchCategories()
-    } catch (err: any) {
-      toast(err.message || 'Failed to save category', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to save category', 'error')
     }
   }
 
@@ -157,8 +157,8 @@ export default function AdminCategories() {
       toast('Category deleted', 'success')
       setDeleteConfirmId(null)
       fetchCategories()
-    } catch (err: any) {
-      toast(err.message || 'Failed to delete category', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to delete category', 'error')
     }
   }
 
@@ -188,7 +188,7 @@ export default function AdminCategories() {
         admin.categories.reorder(catId, other.sortOrder),
         admin.categories.reorder(other.id, cat.sortOrder),
       ])
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast('Failed to save order', 'error')
       fetchCategories() // Revert on error
     }

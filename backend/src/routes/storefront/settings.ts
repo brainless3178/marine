@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { prisma } from '../../server.js'
 import { asyncHandler } from '../../middleware/validate.js'
+import { sendSuccess } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -29,7 +30,7 @@ router.get('/', asyncHandler(async (_req, res) => {
   result['checkout.shippingCost'] = result['checkout.shippingCost'] || Number(process.env.DEFAULT_SHIPPING_COST) || 25
   result['checkout.taxRate'] = result['checkout.taxRate'] || Number(process.env.DEFAULT_TAX_RATE) || 0.08
 
-  res.json({ settings: result })
+  sendSuccess(res, { settings: result })
 }))
 
 export default router

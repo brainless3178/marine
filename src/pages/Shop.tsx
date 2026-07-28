@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Truck, ShieldCheck, Clock, Package } from 'lucide-react'
-import { storefront } from '../lib/api'
 import { apiProductsToFrontend } from '../lib/adapters'
 import { useAddToCart } from '../hooks/useAddToCart'
+import { useNewArrivals, useFeaturedProducts, useCategories } from '../hooks/useApiQuery'
 import { products as staticProducts } from '../data/products'
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { ProductCard } from '../components/ui/ProductCard'
@@ -23,77 +23,47 @@ export default function Shop() {
   const { t } = useTranslation()
   const { handleAddToCart, addedIds } = useAddToCart()
 
-  const [newArrivals, setNewArrivals] = useState<Product[]>([])
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<CategoryWithCount[]>([])
+  // React Query provides caching, deduplication, and background refetching
+  const { data: newArrivalsData } = useNewArrivals()
+  const { data: featuredData } = useFeaturedProducts()
+  const { data: categoriesData } = useCategories()
 
-  useEffect(() => {
-    let cancelled = false
-
-    async function load() {
-      // Try fetching new arrivals from API; fallback to static products
-      let apiArrivals: any[] | null = null
-      try {
-        const res = await storefront.products.newArrivals()
-        if (res.products?.length) apiArrivals = res.products
-      } catch { /* API unavailable */ }
-
-      if (!cancelled) {
-        if (apiArrivals) {
-          setNewArrivals(apiProductsToFrontend(apiArrivals).slice(0, 8))
-        } else {
-          setNewArrivals(staticProducts.slice(0, 8))
-        }
-      }
-
-      // Try fetching featured products; fallback to static products
-      let apiFeatured: any[] | null = null
-      try {
-        const res = await storefront.products.featured()
-        if (res.products?.length) apiFeatured = res.products
-      } catch { /* API unavailable */ }
-
-      if (!cancelled) {
-        if (apiFeatured) {
-          setFeaturedProducts(apiProductsToFrontend(apiFeatured).slice(0, 8))
-        } else {
-          setFeaturedProducts(staticProducts.slice(0, 8))
-        }
-      }
-
-      // Try fetching categories; fallback to derived from static products
-      if (!cancelled) {
-        try {
-          const res = await storefront.categories.list()
-          if (res.categories?.length) {
-            setCategories(res.categories.map((c: any) => ({
-              id: c.slug || c.id,
-              name: c.name,
-              icon: c.icon || 'Package',
-              count: c._count?.products ?? c.productCount ?? 0,
-            })))
-          } else {
-            throw new Error('No categories')
-          }
-        } catch {
-          // Derive categories from static products
-          const catMap = new Map<string, number>()
-          staticProducts.forEach(p => {
-            catMap.set(p.category, (catMap.get(p.category) || 0) + 1)
-          })
-          setCategories(Array.from(catMap.entries()).map(([id, count]) => ({
-            id,
-            name: id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-            icon: 'Package',
-            count,
-          })))
-        }
-      }
+  const newArrivals: Product[] = useMemo(() => {
+    if (newArrivalsData?.products?.length) {
+      return apiProductsToFrontend(newArrivalsData.products).slice(0, 8)
     }
+    const staticArrivals = staticProducts.filter(p => p.isNewArrival).slice(0, 8)
+    return staticArrivals.length > 0 ? staticArrivals : staticProducts.slice(0, 8)
+  }, [newArrivalsData])
 
-    load()
-    return () => { cancelled = true }
-  }, [])
+  const featuredProducts: Product[] = useMemo(() => {
+    if (featuredData?.products?.length) {
+      return apiProductsToFrontend(featuredData.products).slice(0, 8)
+    }
+    return staticProducts.slice(0, 8)
+  }, [featuredData])
+
+  const categories: CategoryWithCount[] = useMemo(() => {
+    if (categoriesData?.categories?.length) {
+      return categoriesData.categories.map((c: any) => ({
+        id: c.slug || c.id,
+        name: c.name,
+        icon: c.icon || 'Package',
+        count: c._count?.products ?? c.productCount ?? 0,
+      }))
+    }
+    // Fallback: derive categories from static products
+    const catMap = new Map<string, number>()
+    staticProducts.forEach(p => {
+      catMap.set(p.category, (catMap.get(p.category) || 0) + 1)
+    })
+    return Array.from(catMap.entries()).map(([id, count]) => ({
+      id,
+      name: id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      icon: 'Package',
+      count,
+    }))
+  }, [categoriesData])
 
 
 

@@ -54,6 +54,8 @@ import { PrismaClient } from '@prisma/client'
 import { sanitize } from './middleware/sanitize.js'
 import { verifyCsrf, issueCsrfToken } from './middleware/csrf.js'
 import { loginLimiter, registerLimiter, passwordResetLimiter } from './middleware/rateLimit.js'
+import { createUserAwareLimiter } from './middleware/perUserRateLimit.js'
+import { sendSuccess, sendError } from './middleware/response.js'
 
 // ─── Database ──────────────────────────────────────────────────
 export const prisma = new PrismaClient({
@@ -111,17 +113,24 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'", 'https://api-m.paypal.com', 'https://www.paypal.com'],
+      scriptSrc: ["'self'", 'https://www.paypal.com', 'https://www.paypalobjects.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      imgSrc: ["'self'", 'data:', 'https:', 'https://res.cloudinary.com'],
+      connectSrc: ["'self'", 'https://api-m.paypal.com', 'https://www.paypal.com', 'https://res.cloudinary.com'],
       frameSrc: ['https://www.paypal.com', 'https://sandbox.paypal.com'],
-      frameAncestors: ["'self'"],
-      fontSrc: ["'self'", 'data:'],
+      frameAncestors: ["'none'"],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
       objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      manifestSrc: ["'self'"],
+      upgradeInsecureRequests: [],
     },
   },
   crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
@@ -193,59 +202,70 @@ app.get('/api/health', async (_req, res) => {
   }
 })
 
+// ─── Per-User Rate Limiting (applies BEFORE routes) ────────────
+const userAwareAdminLimiter = createUserAwareLimiter({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: 'Too many requests. Slow down.',
+})
+
 // ─── Admin Routes ──────────────────────────────────────────────
-app.use('/api/admin/auth', loginLimiter, adminAuthRoutes)
-app.use('/api/admin/products', adminLimiter, adminProductRoutes)
-app.use('/api/admin/categories', adminLimiter, adminCategoryRoutes)
-app.use('/api/admin/brands', adminLimiter, adminBrandRoutes)
-app.use('/api/admin/brands', adminLimiter, adminBrandLogoRoutes) // logo upload — handles POST /:id/logo only, no conflict with main brand routes
-app.use('/api/admin/industries', adminLimiter, adminIndustryRoutes)
-app.use('/api/admin/orders', adminLimiter, adminOrderRoutes)
-app.use('/api/admin/rfqs', adminLimiter, adminRfqRoutes)
-app.use('/api/admin/offers', adminLimiter, adminOfferRoutes)
-app.use('/api/admin/customers', adminLimiter, adminCustomerRoutes)
-app.use('/api/admin/messages', adminLimiter, adminMessageRoutes)
-app.use('/api/admin/media', adminLimiter, adminMediaRoutes)
-app.use('/api/admin/settings', adminLimiter, adminSettingsRoutes)
-app.use('/api/admin/homepage', adminLimiter, adminHomepageRoutes)
-app.use('/api/admin/users', adminLimiter, adminUserRoutes)
-app.use('/api/admin/dashboard', adminLimiter, adminDashboardRoutes)
-app.use('/api/admin/audit', adminLimiter, adminAuditRoutes)
-app.use('/api/admin/testimonials', adminLimiter, adminTestimonialRoutes)
+// ─── API Versioning ─────────────────────────────────────────────
+// All routes are registered under both /api/ and /api/v1/ prefixes
+// for backward compatibility during the versioning migration.
+const API_PREFIXES = ['/api', '/api/v1']
 
-// ─── Storefront Routes ─────────────────────────────────────────
-app.use('/api/storefront/products', publicLimiter, storefrontProductRoutes)
-app.use('/api/storefront/categories', publicLimiter, storefrontCategoryRoutes)
-app.use('/api/storefront/brands', publicLimiter, storefrontBrandRoutes)
-app.use('/api/storefront/industries', publicLimiter, storefrontIndustryRoutes)
-app.use('/api/storefront/orders', publicLimiter, storefrontOrderRoutes)
-app.use('/api/storefront/rfq', publicLimiter, storefrontRfqRoutes)
-app.use('/api/storefront/offers', publicLimiter, storefrontOfferRoutes)
-app.use('/api/storefront/contact', publicLimiter, storefrontContactRoutes)
-app.use('/api/storefront/search', publicLimiter, storefrontSearchRoutes)
-app.use('/api/storefront/homepage', publicLimiter, storefrontHomepageRoutes)
-app.use('/api/storefront/settings', publicLimiter, storefrontSettingsRoutes)
-app.use('/api/storefront/testimonials', publicLimiter, storefrontTestimonialRoutes)
-app.use('/api/storefront/offices', publicLimiter, storefrontOfficeRoutes)
-app.use('/api/storefront/payments', publicLimiter, storefrontPaymentRoutes)
-app.use('/api/sitemap.xml', publicLimiter, storefrontSitemapRoutes)
+for (const prefix of API_PREFIXES) {
+  app.use(`${prefix}/admin/auth`, loginLimiter, userAwareAdminLimiter, adminAuthRoutes)
+  app.use(`${prefix}/admin/products`, adminLimiter, userAwareAdminLimiter, adminProductRoutes)
+  app.use(`${prefix}/admin/categories`, adminLimiter, userAwareAdminLimiter, adminCategoryRoutes)
+  app.use(`${prefix}/admin/brands`, adminLimiter, userAwareAdminLimiter, adminBrandRoutes)
+  app.use(`${prefix}/admin/brands`, adminLimiter, userAwareAdminLimiter, adminBrandLogoRoutes)
+  app.use(`${prefix}/admin/industries`, adminLimiter, userAwareAdminLimiter, adminIndustryRoutes)
+  app.use(`${prefix}/admin/orders`, adminLimiter, userAwareAdminLimiter, adminOrderRoutes)
+  app.use(`${prefix}/admin/rfqs`, adminLimiter, userAwareAdminLimiter, adminRfqRoutes)
+  app.use(`${prefix}/admin/offers`, adminLimiter, userAwareAdminLimiter, adminOfferRoutes)
+  app.use(`${prefix}/admin/customers`, adminLimiter, userAwareAdminLimiter, adminCustomerRoutes)
+  app.use(`${prefix}/admin/messages`, adminLimiter, userAwareAdminLimiter, adminMessageRoutes)
+  app.use(`${prefix}/admin/media`, adminLimiter, userAwareAdminLimiter, adminMediaRoutes)
+  app.use(`${prefix}/admin/settings`, adminLimiter, userAwareAdminLimiter, adminSettingsRoutes)
+  app.use(`${prefix}/admin/homepage`, adminLimiter, userAwareAdminLimiter, adminHomepageRoutes)
+  app.use(`${prefix}/admin/users`, adminLimiter, userAwareAdminLimiter, adminUserRoutes)
+  app.use(`${prefix}/admin/dashboard`, adminLimiter, userAwareAdminLimiter, adminDashboardRoutes)
+  app.use(`${prefix}/admin/audit`, adminLimiter, userAwareAdminLimiter, adminAuditRoutes)
+  app.use(`${prefix}/admin/testimonials`, adminLimiter, userAwareAdminLimiter, adminTestimonialRoutes)
 
-// ─── Customer Auth ──────────────────────────────────────────────
-app.use('/api/auth/login', loginLimiter)
-app.use('/api/auth/register', registerLimiter)
-app.use('/api/auth/forgot-password', passwordResetLimiter)
-app.use('/api/auth/reset-password', passwordResetLimiter)
-app.use('/api/auth', publicLimiter, customerAuthRoutes)
+  app.use(`${prefix}/storefront/products`, publicLimiter, storefrontProductRoutes)
+  app.use(`${prefix}/storefront/categories`, publicLimiter, storefrontCategoryRoutes)
+  app.use(`${prefix}/storefront/brands`, publicLimiter, storefrontBrandRoutes)
+  app.use(`${prefix}/storefront/industries`, publicLimiter, storefrontIndustryRoutes)
+  app.use(`${prefix}/storefront/orders`, publicLimiter, storefrontOrderRoutes)
+  app.use(`${prefix}/storefront/rfq`, publicLimiter, storefrontRfqRoutes)
+  app.use(`${prefix}/storefront/offers`, publicLimiter, storefrontOfferRoutes)
+  app.use(`${prefix}/storefront/contact`, publicLimiter, storefrontContactRoutes)
+  app.use(`${prefix}/storefront/search`, publicLimiter, storefrontSearchRoutes)
+  app.use(`${prefix}/storefront/homepage`, publicLimiter, storefrontHomepageRoutes)
+  app.use(`${prefix}/storefront/settings`, publicLimiter, storefrontSettingsRoutes)
+  app.use(`${prefix}/storefront/testimonials`, publicLimiter, storefrontTestimonialRoutes)
+  app.use(`${prefix}/storefront/offices`, publicLimiter, storefrontOfficeRoutes)
+  app.use(`${prefix}/storefront/payments`, publicLimiter, storefrontPaymentRoutes)
+  app.use(`${prefix}/sitemap.xml`, publicLimiter, storefrontSitemapRoutes)
 
+  app.use(`${prefix}/auth/login`, loginLimiter)
+  app.use(`${prefix}/auth/register`, registerLimiter)
+  app.use(`${prefix}/auth/forgot-password`, passwordResetLimiter)
+  app.use(`${prefix}/auth/reset-password`, passwordResetLimiter)
+  app.use(`${prefix}/auth`, publicLimiter, customerAuthRoutes)
+}
 // ─── 404 Handler ───────────────────────────────────────────────
 app.use((_req, res) => {
-  res.status(404).json({ error: 'Not found' })
+  sendError(res, 'Not found', 404)
 })
 
 // ─── Error Handler ─────────────────────────────────────────────
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   logger.error({ err }, 'Unhandled error')
-  res.status(500).json({ error: 'Internal server error' })
+  sendError(res, 'Internal server error', 500)
 })
 
 // ─── Start Server ──────────────────────────────────────────────

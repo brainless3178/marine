@@ -112,6 +112,7 @@ function loadState<T>(key: string, fallback: T): T {
     const raw = localStorage.getItem(`alka-${key}`)
     return raw ? JSON.parse(raw) : fallback
   } catch {
+    // Corrupted JSON in localStorage — fall back to default
     return fallback
   }
 }
@@ -184,7 +185,7 @@ export const useStore = create<AppState>((set, get) => ({
         localStorage.removeItem('alka-admin-auth')
       }
     } catch {
-      // Token expired — clear admin state
+      // Token expired or invalid — clear admin state
       localStorage.removeItem('alka-admin-auth')
       set({ adminUser: null, isAdminLoggedIn: false })
     }

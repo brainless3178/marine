@@ -3,6 +3,7 @@ import { prisma } from '../../server.js'
 import { asyncHandler } from '../../middleware/validate.js'
 import { productInclude } from '../../utils/prisma-helpers.js'
 import { paginationParams, paginationResponse, getEffectivePrice, isOnSale } from '../../utils/helpers.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -61,7 +62,7 @@ router.get('/', asyncHandler(async (req, res) => {
     prisma.product.aggregate({ where: { status: 'published' }, _min: { regularPrice: true }, _max: { regularPrice: true } }),
   ])
 
-  res.json({
+  sendSuccess(res, {
     products: products.map(p => ({
       ...p,
       price: getEffectivePrice(p),
@@ -85,7 +86,7 @@ router.get('/featured', asyncHandler(async (_req, res) => {
     take: 8,
     orderBy: { sortPriority: 'desc' },
   })
-  res.json({ products })
+  sendSuccess(res, { products })
 }))
 
 // ─── Get New Arrivals ──────────────────────────────────────────
@@ -96,7 +97,7 @@ router.get('/new-arrivals', asyncHandler(async (_req, res) => {
     take: 8,
     orderBy: { createdAt: 'desc' },
   })
-  res.json({ products })
+  sendSuccess(res, { products })
 }))
 
 // ─── Get Emergency Products ────────────────────────────────────
@@ -116,7 +117,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
     where: { OR: [{ id: req.params.id as string }, { slug: req.params.id as string }], status: 'published' },
     include: productInclude,
   })
-  if (!product) return res.status(404).json({ error: 'Product not found' })
+  if (!product) return sendError(res, 'Product not found', 404)
 
   // Get related products
   const related = await prisma.product.findMany({
@@ -133,7 +134,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
     orderBy: { createdAt: 'desc' },
   })
 
-  res.json({
+  sendSuccess(res, {
     product: { ...product, price: getEffectivePrice(product), onSale: isOnSale(product), inStock: product.stockCount > 0 },
     related: related.map(p => ({ ...p, price: getEffectivePrice(p), onSale: isOnSale(p), inStock: p.stockCount > 0 })),
   })
@@ -142,14 +143,14 @@ router.get('/:id', asyncHandler(async (req, res) => {
 // ─── Get Related Products ──────────────────────────────────────
 router.get('/:id/related', asyncHandler(async (req, res) => {
   const product = await prisma.product.findUnique({ where: { id: req.params.id as string }, select: { categoryId: true, brandId: true } })
-  if (!product) return res.status(404).json({ error: 'Product not found' })
+  if (!product) return sendError(res, 'Product not found', 404)
 
   const related = await prisma.product.findMany({
     where: { status: 'published', id: { not: req.params.id as string }, OR: [{ categoryId: product.categoryId }, { brandId: product.brandId }] },
     include: productInclude,
     take: 4,
   })
-  res.json({ products: related })
+  sendSuccess(res, { products: related })
 }))
 
 export default router

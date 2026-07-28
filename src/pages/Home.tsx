@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useAddToCart } from '../hooks/useAddToCart'
 import { SEO } from '../components/seo/SEO'
 import { useStoreSettings } from '../hooks/useStoreSettings'
-import { useApi } from '../hooks/useApi'
-import { storefront } from '../lib/api'
+import { useNewArrivals } from '../hooks/useApiQuery'
 import { apiProductsToFrontend } from '../lib/adapters'
 import { products as staticProducts } from '../data/products'
 import { Hero } from '../components/sections/Hero'
@@ -27,17 +26,13 @@ export default function Home() {
   const { whatsappNumber } = useStoreSettings()
 
   // Fetch new arrivals from backend API; fall back to static data if backend is unavailable
-  const { data: apiNewArrivals, loading } = useApi(
-    async () => {
-      const res = await storefront.products.newArrivals()
-      return apiProductsToFrontend(res.products)
-    },
-    [],
-  )
+  const { data: newArrivalsData, isLoading } = useNewArrivals()
+
+  const apiNewArrivals = newArrivalsData?.products ? apiProductsToFrontend(newArrivalsData.products) : null
 
   // Use API data if available, otherwise fall back to static products marked as new arrivals
   const staticNewArrivals = staticProducts.filter(p => p.isNewArrival).slice(0, 8)
-  const displayProducts = loading
+  const displayProducts = isLoading
     ? []
     : (apiNewArrivals && apiNewArrivals.length > 0 
         ? apiNewArrivals.slice(0, 8) 

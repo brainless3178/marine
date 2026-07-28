@@ -1,82 +1,21 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { motion, useInView } from 'framer-motion'
 import { Clock, Phone, Mail, MessageCircle, TriangleAlert, Check, Loader2 } from 'lucide-react'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 import { storefront } from '../lib/api'
 import { SEO } from '../components/seo/SEO'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 export default function Emergency() {
   const { t } = useTranslation()
-  const clockRef = useRef<HTMLDivElement>(null!)
-  const pulseRef = useRef<HTMLDivElement>(null!)
-  const counterRef = useRef<HTMLDivElement>(null!)
+  const clockSectionRef = useRef<HTMLDivElement>(null!)
+  const clockInView = useInView(clockSectionRef, { once: true, amount: 0.3 })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { whatsappNumber, phoneNumber, emergencyEmail } = useStoreSettings()
   const [form, setForm] = useState({ name: '', phone: '', partDescription: '', vesselName: '' })
 
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const ctx = gsap.context(() => {
-      // Pulsing glow on the clock card
-      gsap.to(pulseRef.current, {
-        boxShadow: '0 0 40px 15px var(--danger-subtle)',
-        scale: 1.02,
-        duration: 1.5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      })
-
-      // Clock icon spin + pulse that activates on scroll
-      gsap.to(clockRef.current, {
-        rotation: 360,
-        duration: 10,
-        repeat: -1,
-        ease: 'none',
-      })
-
-      // Animated countdown digits â€” visual pulse
-      gsap.fromTo(
-        counterRef.current,
-        { scale: 0.8, opacity: 0.5 },
-        {
-          scale: 1,
-          opacity: 1,
-          duration: 1.2,
-          repeat: -1,
-          yoyo: true,
-          ease: 'power1.inOut',
-        }
-      )
-
-      // Scroll-triggered entrance for the emergency contacts panel
-      const contactCards = gsap.utils.toArray<HTMLElement>('.emergency-contact-card')
-      gsap.fromTo(
-        contactCards,
-        { x: 30, opacity: 0 },
-        {
-          x: 0,
-          opacity: 1,
-          stagger: 0.15,
-          duration: 0.5,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: '.emergency-contacts',
-            start: 'top 75%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      )
-    }, clockRef)
-
-    return () => ctx.revert()
-  }, [])
   return (
     <div className="relative">
       <SEO
@@ -114,43 +53,60 @@ export default function Emergency() {
       </section>
 
       {/* Emergency clock demo */}
-      <section className="py-16">
+      <section className="py-16" ref={clockSectionRef}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-            <div ref={pulseRef} className="bg-[var(--secondary-bg)] border border-[var(--border)] p-6 sm:p-10 text-center">
-              <div ref={clockRef} className="inline-flex">
+            <motion.div
+              className="bg-[var(--secondary-bg)] border border-[var(--border)] p-6 sm:p-10 text-center"
+              animate={clockInView ? {
+                boxShadow: ['0 0 0px 0px var(--danger-subtle)', '0 0 40px 15px var(--danger-subtle)', '0 0 0px 0px var(--danger-subtle)'],
+                scale: [1, 1.02, 1],
+              } : {}}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <motion.div
+                className="inline-flex"
+                animate={clockInView ? { rotate: 360 } : { rotate: 0 }}
+                transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+              >
                 <Clock size={48} className="text-danger mb-4" />
-              </div>
+              </motion.div>
               <h2 className="text-lg font-semibold mb-2">{t('emergency.responseClock')}</h2>
               <p className="text-sm text-[var(--text-secondary)] mb-4">{t('emergency.responseRecord')}</p>
-              <div ref={counterRef} className="font-mono text-4xl text-danger">24/7</div>
+              <motion.div
+                className="font-mono text-4xl text-danger"
+                animate={clockInView ? { scale: [0.8, 1, 0.8], opacity: [0.5, 1, 0.5] } : {}}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                24/7
+              </motion.div>
               <p className="text-xs text-[var(--text-muted)] mt-2">{t('emergency.alwaysOperational')}</p>
-            </div>
+            </motion.div>
 
-            <div className="emergency-contacts bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-danger p-5 sm:p-8">
+            <div className="bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-danger p-5 sm:p-8">
               <h3 className="text-base font-semibold mb-4">{t('emergency.emergencyContacts')}</h3>
               <div className="flex flex-col gap-3">
-                <a href={`https://wa.me/${whatsappNumber}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-[var(--surface)] border border-[var(--border)]">
-                  <MessageCircle size={18} className="text-danger flex-shrink-0" />
-                  <div>
-                    <strong className="text-[var(--text-primary)] block text-xs">{t('emergency.whatsappLabel')}</strong>
-                    {t('emergency.emergencyText')}
-                  </div>
-                </a>
-                <a href={`tel:${phoneNumber}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-[var(--surface)] border border-[var(--border)]">
-                  <Phone size={18} className="text-danger flex-shrink-0" />
-                  <div>
-                    <strong className="text-[var(--text-primary)] block text-xs">{t('emergency.phoneLabel')}</strong>
-                    {phoneNumber}
-                  </div>
-                </a>
-                <a href={`mailto:${emergencyEmail}`} className="emergency-contact-card flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-[var(--surface)] border border-[var(--border)]">
-                  <Mail size={18} className="text-danger flex-shrink-0" />
-                  <div>
-                    <strong className="text-[var(--text-primary)] block text-xs">{t('emergency.emailLabel')}</strong>
-                    {emergencyEmail}
-                  </div>
-                </a>
+                {[
+                  { Icon: MessageCircle, href: `https://wa.me/${whatsappNumber}`, label: t('emergency.whatsappLabel'), text: t('emergency.emergencyText') },
+                  { Icon: Phone, href: `tel:${phoneNumber}`, label: t('emergency.phoneLabel'), text: phoneNumber },
+                  { Icon: Mail, href: `mailto:${emergencyEmail}`, label: t('emergency.emailLabel'), text: emergencyEmail },
+                ].map((item, i) => (
+                  <motion.a
+                    key={item.label}
+                    href={item.href}
+                    className="flex items-center gap-3 text-sm text-[var(--text-secondary)] no-underline hover:text-danger transition-colors p-3 bg-[var(--surface)] border border-[var(--border)]"
+                    initial={{ x: 30, opacity: 0 }}
+                    animate={clockInView ? { x: 0, opacity: 1 } : { x: 30, opacity: 0 }}
+                    transition={{ delay: i * 0.15, duration: 0.4, ease: 'easeOut' }}
+                    whileHover={{ x: 4 }}
+                  >
+                    <item.Icon size={18} className="text-danger flex-shrink-0" />
+                    <div>
+                      <strong className="text-[var(--text-primary)] block text-xs">{item.label}</strong>
+                      {item.text}
+                    </div>
+                  </motion.a>
+                ))}
               </div>
             </div>
           </div>
@@ -173,7 +129,6 @@ export default function Emergency() {
               })
               setSubmitted(true)
               setForm({ name: '', phone: '', partDescription: '', vesselName: '' })
-              // Keep success message visible until user interacts
             } catch (err: any) {
               setError(err.message || 'Failed to submit emergency request. Please call us directly.')
             } finally {

@@ -108,9 +108,8 @@ describe('apiProductToFrontend', () => {
 
   it('extracts filename from image URL', () => {
     const result = apiProductToFrontend(makeApiProduct())
-    // URL: product-001_electrical.jpg — has extra suffix beyond XXX pattern,
-    // so falls back to hex-based mapping: 'test-id-1' → hex digits 'ed1' → 224
-    expect(result.filename).toBe('products/product-224.jpg')
+    // URL: product-001_electrical.jpg — regex now accepts _suffix, so it's used as-is
+    expect(result.filename).toBe('products/product-001_electrical.jpg')
   })
 
   it('maps images array with alt text', () => {
@@ -140,18 +139,18 @@ describe('apiProductToFrontend', () => {
 
   it('handles empty images array', () => {
     const result = apiProductToFrontend(makeApiProduct({ images: [] }))
-    // With no image URL, falls back to hex-based mapping: 'test-id-1' → hex digits 'ed1' → 224
-    expect(result.filename).toBe('products/product-224.jpg')
+    // With no image URL, falls back to hex-based mapping: 'test-id-1' → hex digits 'ed1' → 94
+    expect(result.filename).toBe('products/product-094.jpg')
     expect(result.images).toHaveLength(1)
-    expect(result.images[0].url).toContain('product-224.jpg')
+    expect(result.images[0].url).toContain('product-094.jpg')
   })
 
   it('uses fallback images when images is null/undefined', () => {
     const result = apiProductToFrontend(makeApiProduct({ images: undefined }))
-    // With no image URL, falls back to hex-based mapping: 'test-id-1' → hex digits 'ed1' → 224
-    expect(result.filename).toBe('products/product-224.jpg')
+    // With no image URL, falls back to hex-based mapping: 'test-id-1' → hex digits 'ed1' → 94
+    expect(result.filename).toBe('products/product-094.jpg')
     expect(result.images).toHaveLength(1)
-    expect(result.images[0].url).toContain('product-224.jpg')
+    expect(result.images[0].url).toContain('product-094.jpg')
   })
 
   it('handles missing specs', () => {
@@ -171,10 +170,10 @@ describe('apiProductToFrontend', () => {
       sku: 'HP-200-MS',
     })
     // UUID 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' → hex digits only → last 3 = '890'
-    // parseInt('890', 16) = 2192 → 2192 % 255 = 152 → 152 + 1 = 153
+    // parseInt('890', 16) = 2192 → 2192 % 100 = 92 → 92 + 1 = 93
     const result = apiProductToFrontend(api)
-    expect(result.filename).toBe('products/product-153.jpg')
-    expect(result.images[0].url).toContain('product-153.jpg')
+    expect(result.filename).toBe('products/product-093.jpg')
+    expect(result.images[0].url).toContain('product-093.jpg')
   })
 
   it('handles undefined images gracefully (runtime null from API)', () => {
@@ -184,15 +183,15 @@ describe('apiProductToFrontend', () => {
     expect(result.images[0].url).toContain('/images/')
   })
 
-  it('handles id with hex digits (abc-xyz) falls back to product-199', () => {
+  it('handles id with hex digits (abc-xyz) falls back to product-049', () => {
     const api = makeApiProduct({
       id: 'abc-xyz',
       sku: 'NONUMERIC',
       images: [],
     })
     const result = apiProductToFrontend(api)
-    // 'abc-xyz' → hex chars 'abc' → parseInt('abc',16) = 2748 → 2748 % 255 = 198 → 198 + 1 = 199
-    expect(result.filename).toBe('products/product-199.jpg')
+    // 'abc-xyz' → hex chars 'abc' → parseInt('abc',16) = 2748 → 2748 % 100 = 48 → 48 + 1 = 49
+    expect(result.filename).toBe('products/product-049.jpg')
   })
 
   it('falls back to placeholder when id has no hex digits', () => {
@@ -212,8 +211,8 @@ describe('apiProductToFrontend', () => {
     })
     const result = apiProductToFrontend(api)
     // product-001_test.png → product-001_test.jpg (extension fixed)
-    // But '_test' breaks the ^product-XXX.jpg$ pattern → falls back to hex mapping
-    expect(result.filename).toBe('products/product-224.jpg')
+    // Regex now accepts _suffix, so it's used as-is
+    expect(result.filename).toBe('products/product-001_test.jpg')
   })
 
   it('handles case-insensitive prod- prefix', () => {
@@ -222,8 +221,8 @@ describe('apiProductToFrontend', () => {
     })
     const result = apiProductToFrontend(api)
     // PROD-001_test.jpg → product-001_test.jpg (prefix fixed)
-    // But '_test' breaks the ^product-XXX.jpg$ pattern → falls back to hex mapping
-    expect(result.filename).toBe('products/product-224.jpg')
+    // Regex now accepts _suffix, so it's used as-is
+    expect(result.filename).toBe('products/product-001_test.jpg')
   })
 })
 

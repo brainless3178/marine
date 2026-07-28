@@ -49,8 +49,9 @@ async function getCsrfToken(): Promise<string | null> {
       csrfToken = data.csrfToken || null
       csrfTokenFetchedAt = Date.now()
       return csrfToken
-    } catch {
+    } catch (err) {
       // If fetch fails, reset promise so next caller retries
+      console.warn('[api] CSRF token fetch failed:', err)
       csrfTokenPromise = null
       return null
     } finally {
@@ -177,7 +178,7 @@ async function handleResponse<T>(res: Response): Promise<T> {
       message = json.error || message
       details = json.details
     } catch {
-      // non-JSON error body
+      // Response body is not JSON — use default message
     }
 
     throw new ApiError(res.status, message, details)
@@ -214,7 +215,8 @@ async function tryRefreshAdmin(): Promise<boolean> {
     const data = await res.json()
     adminAccessToken = data.accessToken
     return true
-  } catch {
+  } catch (err) {
+    console.warn('[api] Admin token refresh failed:', err)
     adminAccessToken = null
     return false
   }
@@ -234,7 +236,8 @@ async function tryRefreshCustomer(): Promise<boolean> {
     const data = await res.json()
     customerAccessToken = data.accessToken
     return true
-  } catch {
+  } catch (err) {
+    console.warn('[api] Customer token refresh failed:', err)
     customerAccessToken = null
     return false
   }

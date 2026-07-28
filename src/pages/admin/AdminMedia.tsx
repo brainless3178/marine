@@ -22,6 +22,7 @@ import { useToast } from '../../components/admin/Toast'
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog'
 import { AdminPagination } from '../../components/admin/AdminPagination'
 import { OptimizedImage } from '../../components/ui/OptimizedImage'
+import type { ApiMediaAsset } from '../../lib/api-types'
 
 type ViewMode = 'grid' | 'list'
 type SortBy = 'name' | 'date' | 'label' | 'size'
@@ -40,7 +41,7 @@ interface MediaItem {
   createdAt: string
 }
 
-function mapApiAsset(a: any): MediaItem {
+function mapApiAsset(a: ApiMediaAsset): MediaItem {
   return {
     id: a.id,
     url: a.url || '',
@@ -93,7 +94,7 @@ export default function AdminMedia() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.media.list(params)
       setMediaList((res.assets || []).map(mapApiAsset))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load media:', err)
       toast('Failed to load media assets', 'error')
     } finally {
@@ -140,7 +141,7 @@ export default function AdminMedia() {
   // Fetch usage for a specific media asset
   const fetchUsage = useCallback(async (assetId: string) => {
     try {
-      const usage = (await admin.media.usage(assetId) || []).map((u: any) => ({
+      const usage = (await admin.media.usage(assetId) || []).map((u: { productId?: string; productName?: string; productSku?: string }) => ({
         productId: u.productId || u.product?.id || '',
         productName: u.product?.name || 'Unknown Product',
         productSku: u.product?.sku || '',
@@ -185,8 +186,8 @@ export default function AdminMedia() {
       toast('Image deleted', 'success')
       setMediaList((prev) => prev.filter((m) => m.id !== deleteTarget))
       setPreviewImage(null)
-    } catch (err: any) {
-      toast(err.message || 'Delete failed', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Delete failed', 'error')
     } finally {
       setDeleting(false)
       setDeleteTarget(null)

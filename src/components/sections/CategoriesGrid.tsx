@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
+import { useCategories } from '../../hooks/useApiQuery'
 import { SectionLabel } from '../ui/SectionLabel'
 import { Ship, Zap, Droplet, Wind, Settings, Warehouse, ArrowRight, ArrowUpFromLine, Wrench, ShieldCheck, Hammer, Compass, Droplets, Cog, Anchor, Package } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { storefront } from '../../lib/api'
 
 const iconMap: Record<string, LucideIcon> = {
   Ship, Zap, Droplet, Wind, Settings, Warehouse,
@@ -64,34 +64,33 @@ const categoryDescriptions: Record<string, { desc: string }> = {
 export function CategoriesGrid() {
   const { t } = useTranslation()
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 })
-  const [categories, setCategories] = useState<CategoryItem[]>([])
 
-  const [descriptions, setDescriptions] = useState<Record<string, { desc: string }>>(categoryDescriptions)
+  // React Query caches categories — replaces manual useEffect + fetch
+  const { data: categoriesData } = useCategories()
 
-  useEffect(() => {
-    let cancelled = false
-    storefront.categories.list()
-      .then((res) => {
-        if (!cancelled && res.categories?.length) {
-          setCategories(res.categories.map((c: any) => ({
-            id: c.slug || c.id,
-            name: c.name,
-            icon: c.icon || 'Package',
-            count: c._count?.products ?? c.productCount ?? 0,
-          })))
-          // Merge API descriptions into state so new categories get a description
-          const merged = { ...categoryDescriptions }
-          res.categories.forEach((c: any) => {
-            if (c.description) {
-              merged[c.slug || c.id] = { desc: c.description }
-            }
-          })
-          setDescriptions(merged)
+  const categories = useMemo(() => {
+    if (categoriesData?.categories?.length) {
+      return categoriesData.categories.map((c: any) => ({
+        id: c.slug || c.id,
+        name: c.name,
+        icon: c.icon || 'Package',
+        count: c._count?.products ?? c.productCount ?? 0,
+      }))
+    }
+    return []
+  }, [categoriesData])
+
+  const descriptions = useMemo(() => {
+    const merged = { ...categoryDescriptions }
+    if (categoriesData?.categories?.length) {
+      categoriesData.categories.forEach((c: any) => {
+        if (c.description) {
+          merged[c.slug || c.id] = { desc: c.description }
         }
       })
-      .catch(() => { /* API unavailable */ })
-    return () => { cancelled = true }
-  }, [])
+    }
+    return merged
+  }, [categoriesData])
 
   return (
     <section className="py-24 bg-[var(--primary-bg)]" id="categories">

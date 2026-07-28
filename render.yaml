@@ -9,7 +9,7 @@ services:
     plan: free
     rootDir: backend
     buildCommand: npm install --include=dev && npx prisma generate && npm run build
-    startCommand: node dist/server.js
+    startCommand: node dist/backend/src/server.js
     postDeployCommand: npx prisma migrate deploy
     healthCheckPath: /api/health
     autoDeploy: true

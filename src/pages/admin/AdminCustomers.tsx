@@ -20,6 +20,7 @@ import {
 import { admin } from '../../lib/api'
 import { useToast } from '../../components/admin/Toast'
 import { AdminPagination } from '../../components/admin/AdminPagination'
+import type { ApiCustomer } from '../../lib/api-types'
 
 
 // ─── Types ────────────────────────────────────────────────────────────────────────
@@ -80,7 +81,7 @@ const ITEMS_PER_PAGE = 15
 
 // ─── Component ────────────────────────────────────────────────────────────────────
 
-function mapApiCustomer(c: any): Customer {
+function mapApiCustomer(c: ApiCustomer): Customer {
   return {
     id: c.id,
     name: c.name || '',
@@ -124,7 +125,7 @@ export default function AdminCustomers() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.customers.list(params)
       setCustomers((res.customers || []).map(mapApiCustomer))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load customers:', err)
       toast('Failed to load customers', 'error')
     } finally {
@@ -184,7 +185,7 @@ export default function AdminCustomers() {
       toast('Customer created', 'success')
       fetchCustomers()
     } catch (err: any) {
-      toast(err.message || 'Failed to create customer', 'error')
+      toast(err instanceof Error ? err.message : 'Failed to create customer', 'error')
     }
   }
 
@@ -376,8 +377,8 @@ export default function AdminCustomers() {
                       setSelectedCustomer({ ...selectedCustomer, status: newStatus })
                       setCustomers((prev) => prev.map((c) => c.id === selectedCustomer.id ? { ...c, status: newStatus } : c))
                       toast('Customer status updated', 'success')
-                    } catch (err: any) {
-                      toast(err.message || 'Failed to update status', 'error')
+                    } catch (err: unknown) {
+                      toast(err instanceof Error ? err.message : 'Failed to update status', 'error')
                     }
                   }}
                   className="rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-bold outline-none focus:border-[var(--accent-gold)]"

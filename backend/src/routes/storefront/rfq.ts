@@ -6,6 +6,7 @@ import { generateRfqNumber } from '../../utils/helpers.js'
 import { logAudit } from '../../utils/audit.js'
 import { sendRfqReceived } from '../../services/email.js'
 import logger from '../../utils/logger.js'
+import { sendSuccess } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -58,11 +59,11 @@ router.post('/', validateBody(rfqSchema), asyncHandler(async (req, res) => {
     urgency: req.body.urgency,
   }).catch(err => logger.error({ err }, 'RFQ email failed'))
 
-  res.status(201).json({
+  sendSuccess(res, {
     message: 'RFQ submitted successfully',
     rfqNumber: rfq.rfqNumber,
     id: rfq.id,
-  })
+  }, 201)
 }))
 
 export default router

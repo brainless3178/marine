@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { prisma } from '../../server.js'
 import { asyncHandler } from '../../middleware/validate.js'
+import { sendSuccess } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -10,7 +11,7 @@ router.get('/', asyncHandler(async (_req, res) => {
     where: { isEnabled: true },
     orderBy: { sortOrder: 'asc' },
   })
-  res.json({ sections })
+  sendSuccess(res, { sections })
 }))
 
 export default router

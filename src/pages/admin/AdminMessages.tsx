@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useToast } from '../../components/admin/Toast'
 import { AdminPagination } from '../../components/admin/AdminPagination'
 import { admin, api } from '../../lib/api'
+import type { ApiMessage } from '../../lib/api-types'
 import {
   Search,
   Mail,
@@ -31,7 +32,7 @@ interface Message {
   attachments: string[]
 }
 
-function mapApiMessage(m: any): Message {
+function mapApiMessage(m: ApiMessage): Message {
   return {
     id: m.id,
     from: m.name || m.from || 'Unknown',
@@ -49,7 +50,7 @@ function mapApiMessage(m: any): Message {
 
 const ITEMS_PER_PAGE = 12
 
-function ComposeModal({ onClose, onSent, toast }: { onClose: () => void; onSent: () => void; toast: any }) {
+function ComposeModal({ onClose, onSent, toast }: { onClose: () => void; onSent: () => void; toast: (message: string, type: 'success' | 'error' | 'info') => void }) {
   const [to, setTo] = useState('')
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
@@ -65,8 +66,8 @@ function ComposeModal({ onClose, onSent, toast }: { onClose: () => void; onSent:
       await api.post('/admin/messages', { to, subject, message: body }, { auth: 'admin' })
       toast('Message sent', 'success')
       onSent()
-    } catch (err: any) {
-      toast(err.message || 'Failed to send message', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to send message', 'error')
     } finally {
       setSending(false)
     }
@@ -124,7 +125,7 @@ export default function AdminMessages() {
       if (folder === 'inbox' || folder === 'sent') params.folder = folder
       const res = await admin.messages.list(params)
       setMessages((res.messages || []).map(mapApiMessage))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load messages:', err)
       toast('Failed to load messages', 'error')
     } finally {
@@ -184,8 +185,8 @@ export default function AdminMessages() {
       toast('Message archived', 'success')
       setMessages((prev) => prev.filter((m) => m.id !== id))
       if (selectedMessage?.id === id) setSelectedMessage(null)
-    } catch (err: any) {
-      toast(err.message || 'Archive failed', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Archive failed', 'error')
     }
   }
 
@@ -196,8 +197,8 @@ export default function AdminMessages() {
       toast('Message deleted', 'success')
       setMessages((prev) => prev.filter((m) => m.id !== id))
       if (selectedMessage?.id === id) setSelectedMessage(null)
-    } catch (err: any) {
-      toast(err.message || 'Delete failed', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Delete failed', 'error')
     }
   }
 

@@ -1,13 +1,9 @@
 import { Router } from 'express'
-import { prisma } from '../../server.js'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler, validateBody } from '../../middleware/validate.js'
 import { z } from 'zod'
-import { logAudit } from '../../utils/audit.js'
-import { generateOrderNumber, generateOfferNumber, paginationParams, paginationResponse } from '../../utils/helpers.js'
-import { rfqInclude } from '../../utils/prisma-helpers.js'
-import { sendRfqResponse } from '../../services/email.js'
-import logger from '../../utils/logger.js'
+import * as rfqService from '../../services/rfqService.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -42,259 +38,95 @@ const convertToOrderSchema = z.object({
 
 // ─── List All RFQs ──────────────────────────────────────────
 router.get('/', asyncHandler(async (req, res) => {
-  const { page, limit, skip } = paginationParams(Number(req.query.page), Number(req.query.limit))
-
-  const where: any = {}
-  if ((req.query.status as string)) where.status = (req.query.status as string)
-  if ((req.query.urgency as string)) where.urgency = (req.query.urgency as string)
-  if ((req.query.assignedTo as string)) where.assignedTo = (req.query.assignedTo as string)
-  if ((req.query.search as string)) {
-    where.OR = [
-      { fullName: { contains: (req.query.search as string), mode: 'insensitive' } },
-      { email: { contains: (req.query.search as string), mode: 'insensitive' } },
-      { company: { contains: (req.query.search as string), mode: 'insensitive' } },
-      { rfqNumber: { contains: (req.query.search as string), mode: 'insensitive' } },
-      { productDescription: { contains: (req.query.search as string), mode: 'insensitive' } },
-      { partNumber: { contains: (req.query.search as string), mode: 'insensitive' } },
-    ]
-  }
-
-  const [rfqs, total] = await Promise.all([
-    prisma.rfq.findMany({
-      where,
-      include: rfqInclude,
-      orderBy: [
-        { urgency: 'asc' }, // emergency first
-        { createdAt: 'desc' },
-      ],
-      skip,
-      take: limit,
-    }),
-    prisma.rfq.count({ where }),
-  ])
-
-  res.json({ rfqs, pagination: paginationResponse(total, page, limit) })
+  const result = await rfqService.listRfqs({
+    status: req.query.status as string,
+    urgency: req.query.urgency as string,
+    assignedTo: req.query.assignedTo as string,
+    search: req.query.search as string,
+    page: Number(req.query.page),
+    limit: Number(req.query.limit),
+  })
+  sendSuccess(res, result)
 }))
 
 // ─── Get RFQ Detail ─────────────────────────────────────────
 router.get('/:id', asyncHandler(async (req, res) => {
-  const rfq = await prisma.rfq.findUnique({
-    where: { id: req.params.id as string },
-    include: rfqInclude,
-  })
-  if (!rfq) return res.status(404).json({ error: 'RFQ not found' })
-  res.json({ rfq })
+  try {
+    const rfq = await rfqService.getRfq(req.params.id as string)
+    res.json({ rfq })
+  } catch (err: any) {
+    res.status(err.status || 500).json({ error: err.message })
+  }
 }))
 
 // ─── Update RFQ Status ──────────────────────────────────────
 router.patch('/:id/status', requireRole('sales-agent'), validateBody(statusSchema), asyncHandler(async (req: AuthRequest, res) => {
-  const rfq = await prisma.rfq.findUnique({ where: { id: req.params.id as string } })
-  if (!rfq) return res.status(404).json({ error: 'RFQ not found' })
-
-  const updated = await prisma.rfq.update({
-    where: { id: req.params.id as string },
-    data: { status: req.body.status },
-  })
-
-  // Add timeline note if provided
-  if (req.body.note) {
-    await prisma.rfqNote.create({
-      data: {
-        rfqId: rfq.id,
-        authorId: req.user!.id,
-        note: req.body.note,
-        isInternal: true,
-      },
-    })
+  try {
+    const rfq = await rfqService.updateRfqStatus(
+      req.params.id as string, req.body.status, req.body.note, req.user!, req.ip
+    )
+    res.json({ rfq })
+  } catch (err: any) {
+    res.status(err.status || 500).json({ error: err.message })
   }
-
-  await logAudit({
-    actor: req.user!,
-    action: 'rfq.status.update',
-    entityType: 'rfq',
-    entityId: rfq.id,
-    entityName: rfq.rfqNumber,
-    previousValue: { status: rfq.status },
-    newValue: { status: req.body.status },
-    ipAddress: req.ip,
-  })
-
-  res.json({ rfq: updated })
 }))
 
 // ─── Assign RFQ ─────────────────────────────────────────────
 router.patch('/:id/assign', requireRole('store-manager'), validateBody(assignSchema), asyncHandler(async (req: AuthRequest, res) => {
-  const rfq = await prisma.rfq.findUnique({ where: { id: req.params.id as string } })
-  if (!rfq) return res.status(404).json({ error: 'RFQ not found' })
-
-  const assignee = await prisma.adminUser.findUnique({ where: { id: req.body.assignedTo } })
-  if (!assignee) return res.status(400).json({ error: 'Assignee not found' })
-
-  const updated = await prisma.rfq.update({
-    where: { id: req.params.id as string },
-    data: { assignedTo: req.body.assignedTo },
-  })
-
-  await logAudit({
-    actor: req.user!,
-    action: 'rfq.assign',
-    entityType: 'rfq',
-    entityId: rfq.id,
-    entityName: rfq.rfqNumber,
-    newValue: { assignedTo: assignee.name },
-    ipAddress: req.ip,
-  })
-
-  res.json({ rfq: updated })
+  try {
+    const rfq = await rfqService.assignRfq(
+      req.params.id as string, req.body.assignedTo, req.user!, req.ip
+    )
+    sendSuccess(res, { rfq })
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
+  }
 }))
 
 // ─── Add Internal Note ──────────────────────────────────────
 router.post('/:id/notes', requireRole('sales-agent'), validateBody(notesSchema), asyncHandler(async (req: AuthRequest, res) => {
-  const rfq = await prisma.rfq.findUnique({ where: { id: req.params.id as string } })
-  if (!rfq) return res.status(404).json({ error: 'RFQ not found' })
-
-  const note = await prisma.rfqNote.create({
-    data: {
-      rfqId: rfq.id,
-      authorId: req.user!.id,
-      note: req.body.note,
-      isInternal: req.body.isInternal ?? true,
-    },
-    include: {
-      author: { select: { id: true, name: true, email: true } },
-    },
-  })
-
-  await logAudit({
-    actor: req.user!,
-    action: 'rfq.note.add',
-    entityType: 'rfq',
-    entityId: rfq.id,
-    entityName: rfq.rfqNumber,
-    ipAddress: req.ip,
-  })
-
-  res.status(201).json({ note })
+  try {
+    const note = await rfqService.addRfqNote(
+      req.params.id as string, req.body.note, req.body.isInternal ?? true, req.user!, req.ip
+    )
+    sendSuccess(res, { note }, 201)
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
+  }
 }))
 
 // ─── Send Response to Customer ──────────────────────────────
 router.post('/:id/respond', requireRole('sales-agent'), validateBody(respondSchema), asyncHandler(async (req: AuthRequest, res) => {
-  const rfq = await prisma.rfq.findUnique({ where: { id: req.params.id as string } })
-  if (!rfq) return res.status(404).json({ error: 'RFQ not found' })
-
-  // Update status to quote-sent if currently new/reviewing
-  if (rfq.status === 'new' || rfq.status === 'reviewing') {
-    await prisma.rfq.update({ where: { id: rfq.id }, data: { status: 'quote-sent' } })
+  try {
+    await rfqService.respondToRfq(req.params.id as string, req.body.message, req.user!, req.ip)
+    sendSuccess(res, { message: 'Response sent' })
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
   }
-
-  // Add as internal note
-  await prisma.rfqNote.create({
-    data: {
-      rfqId: rfq.id,
-      authorId: req.user!.id,
-      note: `Response sent: ${req.body.message}`,
-      isInternal: false,
-    },
-  })
-
-  // Send email to customer (non-blocking)
-  sendRfqResponse({
-    to: rfq.email,
-    customerName: rfq.fullName,
-    rfqNumber: rfq.rfqNumber,
-    message: req.body.message,
-  }).catch(err => logger.error({ err }, 'RFQ response email failed'))
-
-  await logAudit({
-    actor: req.user!,
-    action: 'rfq.respond',
-    entityType: 'rfq',
-    entityId: rfq.id,
-    entityName: rfq.rfqNumber,
-    ipAddress: req.ip,
-  })
-
-  res.json({ message: 'Response sent' })
 }))
 
 // ─── Convert RFQ to Offer ──────────────────────────────────
 router.post('/:id/convert-to-offer', requireRole('store-manager'), validateBody(convertToOfferSchema), asyncHandler(async (req: AuthRequest, res) => {
-  const rfq = await prisma.rfq.findUnique({ where: { id: req.params.id as string } })
-  if (!rfq) return res.status(404).json({ error: 'RFQ not found' })
-
-  const offer = await prisma.offer.create({
-    data: {
-      offerNumber: await generateOfferNumber(),
-      customerEmail: rfq.email,
-      offeredPrice: req.body.offeredPrice,
-      quantity: rfq.quantity,
-      message: req.body.message || `Converted from RFQ ${rfq.rfqNumber}`,
-      status: 'pending',
-      rfqId: rfq.id,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    },
-  })
-
-  await prisma.rfq.update({ where: { id: rfq.id }, data: { status: 'quote-sent' } })
-
-  await logAudit({
-    actor: req.user!,
-    action: 'rfq.convert-to-offer',
-    entityType: 'rfq',
-    entityId: rfq.id,
-    entityName: rfq.rfqNumber,
-    newValue: { offerId: offer.id, offerNumber: offer.offerNumber },
-  })
-
-  res.status(201).json({ offer })
+  try {
+    const offer = await rfqService.convertRfqToOffer(
+      req.params.id as string, req.body.offeredPrice, req.body.message, req.user!, req.ip
+    )
+    sendSuccess(res, { offer }, 201)
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
+  }
 }))
 
 // ─── Convert RFQ to Order ────────────────────────────────────
 router.post('/:id/convert-to-order', requireRole('store-manager'), validateBody(convertToOrderSchema), asyncHandler(async (req: AuthRequest, res) => {
-  const rfq = await prisma.rfq.findUnique({ where: { id: req.params.id as string } })
-  if (!rfq) return res.status(404).json({ error: 'RFQ not found' })
-
-  const order = await prisma.order.create({
-    data: {
-      orderNumber: await generateOrderNumber(),
-      status: 'pending',
-      paymentMethod: 'bank-transfer',
-      paymentStatus: 'pending',
-      subtotal: req.body.total || 0,
-      shippingCost: 25,
-      tax: 0,
-      total: (req.body.total || 0) + 25,
-      currency: 'USD',
-      shippingFullName: rfq.fullName,
-      shippingCity: rfq.deliveryLocation || '',
-      shippingCountry: rfq.country || '',
-      customerNotes: `Converted from RFQ ${rfq.rfqNumber}`,
-      items: {
-        create: [{
-          productName: rfq.productDescription.slice(0, 500),
-          productSku: rfq.partNumber || '',
-          quantity: rfq.quantity,
-          unitPrice: req.body.unitPrice || 0,
-          totalPrice: (req.body.unitPrice || 0) * rfq.quantity,
-        }],
-      },
-      timeline: { create: { status: 'pending', note: `Converted from RFQ ${rfq.rfqNumber}` } },
-    },
-    include: { items: true },
-  })
-
-  await prisma.rfq.update({ where: { id: rfq.id }, data: { status: 'won' } })
-
-  await logAudit({
-    actor: req.user!,
-    action: 'rfq.convert-to-order',
-    entityType: 'rfq',
-    entityId: rfq.id,
-    entityName: rfq.rfqNumber,
-    newValue: { orderId: order.id, orderNumber: order.orderNumber },
-  })
-
-  res.status(201).json({ order })
+  try {
+    const order = await rfqService.convertRfqToOrder(
+      req.params.id as string, req.body.total, req.body.unitPrice, req.user!, req.ip
+    )
+    sendSuccess(res, { order }, 201)
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
+  }
 }))
 
 export default router

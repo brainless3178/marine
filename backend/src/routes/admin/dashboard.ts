@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { prisma } from '../../server.js'
 import { authenticateAdmin } from '../../middleware/auth.js'
 import { asyncHandler } from '../../middleware/validate.js'
+import { sendSuccess } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -42,7 +43,7 @@ router.get('/stats', asyncHandler(async (_req, res) => {
     prisma.contactMessage.count({ where: { status: 'new' } }),
   ])
 
-  res.json({
+  sendSuccess(res, {
     products: { total: totalProducts, published: publishedProducts, draft: draftProducts, outOfStock, emergency: emergencyProducts },
     orders: { total: totalOrders, pending: pendingOrders, shipped: shippedOrders },
     rfqs: { total: totalRfqs, emergency: emergencyRfqs, new: newRfqs },
@@ -68,7 +69,7 @@ router.get('/alerts', asyncHandler(async (_req, res) => {
     }),
   ])
 
-  res.json({ lowStock, overdueRfqs })
+  sendSuccess(res, { lowStock, overdueRfqs })
 }))
 
 // ─── Recent Activity ───────────────────────────────────────────
@@ -79,7 +80,7 @@ router.get('/activity', asyncHandler(async (req, res) => {
     take: limit,
     select: { id: true, actorEmail: true, action: true, entityType: true, entityName: true, createdAt: true },
   })
-  res.json({ activity: logs })
+  sendSuccess(res, { activity: logs })
 }))
 
 export default router

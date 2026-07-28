@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { brandImages } from '../data/brandImages'
 import { brands as staticBrands } from '../data/brands'
-import { storefront } from '../lib/api'
+import { useBrands } from '../hooks/useApiQuery'
 import { SEO } from '../components/seo/SEO'
 import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import { OptimizedImage } from '../components/ui/OptimizedImage'
@@ -15,30 +15,23 @@ export default function Brands() {
   const { t } = useTranslation()
   const [activeFilter, setActiveFilter] = useState<string>('All')
   const navigate = useNavigate()
-  const [brands, setBrands] = useState<Brand[]>([])
 
-  useEffect(() => {
-    let cancelled = false
-    storefront.brands.list().then((res) => {
-      if (!cancelled && res.brands?.length) {
-        setBrands(res.brands.map((b: any) => ({
-          id: b.id,
-          name: b.name,
-          slug: b.slug,
-          sectors: b.sectors || [],
-          productCount: b._count?.products ?? b.productCount ?? 0,
-          logo: b.logoUrl || undefined,
-        })))
-      } else if (!cancelled) {
-        // Fall back to static brands if API returns empty
-        setBrands(staticBrands)
-      }
-    }).catch(() => {
-      // Fall back to static brands if API is unavailable
-      if (!cancelled) setBrands(staticBrands)
-    })
-    return () => { cancelled = true }
-  }, [])
+  // React Query caches brands — no manual loading/state management needed
+  const { data: brandsData } = useBrands()
+
+  const brands: Brand[] = useMemo(() => {
+    if (brandsData?.brands?.length) {
+      return brandsData.brands.map((b: any) => ({
+        id: b.id,
+        name: b.name,
+        slug: b.slug,
+        sectors: b.sectors || [],
+        productCount: b._count?.products ?? b.productCount ?? 0,
+        logo: b.logoUrl || undefined,
+      }))
+    }
+    return staticBrands
+  }, [brandsData])
 
   const filtered = activeFilter === 'All'
     ? brands

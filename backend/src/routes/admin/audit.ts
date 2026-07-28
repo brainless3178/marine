@@ -3,6 +3,7 @@ import { prisma } from '../../server.js'
 import { authenticateAdmin } from '../../middleware/auth.js'
 import { asyncHandler } from '../../middleware/validate.js'
 import { paginationParams, paginationResponse } from '../../utils/helpers.js'
+import { sendSuccess } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -21,7 +22,7 @@ router.get('/', asyncHandler(async (req, res) => {
     prisma.auditLog.count({ where }),
   ])
 
-  res.json({ logs, pagination: paginationResponse(total, page, limit) })
+  sendSuccess(res, { logs, pagination: paginationResponse(total, page, limit) })
 }))
 
 export default router
