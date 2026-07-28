@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { prisma } from '../../server.js'
 import { asyncHandler } from '../../middleware/validate.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -11,7 +12,7 @@ router.get('/', asyncHandler(async (_req, res) => {
     include: { _count: { select: { products: { where: { status: 'published' } } } } },
     orderBy: { sortOrder: 'asc' },
   })
-  res.json({ brands })
+  sendSuccess(res, { brands })
 }))
 
 // ─── Get Brand by Slug ─────────────────────────────────────────
@@ -20,8 +21,8 @@ router.get('/:slug', asyncHandler(async (req, res) => {
     where: { slug: req.params.slug as string, isVisible: true },
     include: { _count: { select: { products: { where: { status: 'published' } } } } },
   })
-  if (!brand) return res.status(404).json({ error: 'Brand not found' })
-  res.json({ brand })
+  if (!brand) return sendError(res, 'Brand not found', 404)
+  sendSuccess(res, { brand })
 }))
 
 export default router

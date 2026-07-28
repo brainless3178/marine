@@ -6,6 +6,7 @@ import { generateOfferNumber } from '../../utils/helpers.js'
 import { logAudit } from '../../utils/audit.js'
 import { sendOfferReceived } from '../../services/email.js'
 import logger from '../../utils/logger.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -22,7 +23,7 @@ router.post('/', validateBody(offerSchema), asyncHandler(async (req, res) => {
   const { productId, ...data } = req.body
 
   const product = await prisma.product.findUnique({ where: { id: productId } })
-  if (!product) return res.status(404).json({ error: 'Product not found' })
+  if (!product) return sendError(res, 'Product not found', 404)
 
   const offer = await prisma.offer.create({
     data: {
@@ -51,11 +52,11 @@ router.post('/', validateBody(offerSchema), asyncHandler(async (req, res) => {
     customerEmail: req.body.customerEmail,
   }).catch(err => logger.error({ err }, 'Offer email failed'))
 
-  res.status(201).json({
+  sendSuccess(res, {
     message: 'Offer submitted successfully',
     offerNumber: offer.offerNumber,
     id: offer.id,
-  })
+  }, 201)
 }))
 
 export default router

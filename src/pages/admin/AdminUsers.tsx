@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useToast } from '../../components/admin/Toast'
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog'
 import { admin } from '../../lib/api'
+import type { ApiAdminUser } from '../../lib/api-types'
 import {
   Search,
   Shield,
@@ -32,8 +33,8 @@ interface AdminUser {
   active: boolean
 }
 
-function mapApiUser(u: any): AdminUser {
-  const initials = (u.name || u.email || 'U').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+function mapApiUser(u: ApiAdminUser): AdminUser {
+  const initials = (u.name || u.email || 'U').split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
   return {
     id: u.id,
     name: u.name || 'Unknown',
@@ -78,7 +79,7 @@ export default function AdminUsers() {
     try {
       const res = await admin.users.list()
       setUsers((res.users || []).map(mapApiUser))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load users:', err)
       toast('Failed to load users', 'error')
     } finally {
@@ -111,8 +112,8 @@ export default function AdminUsers() {
       await admin.users.update(id, { isActive: !user.active })
       setUsers((prev) => prev.map((u) => u.id === id ? { ...u, active: !u.active } : u))
       toast(`${user.name} ${newStatus}`, 'success')
-    } catch (err: any) {
-      toast(err.message || 'Failed to update user', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to update user', 'error')
     }
   }
 
@@ -122,8 +123,8 @@ export default function AdminUsers() {
       setUsers((prev) => prev.map((u) => u.id === id ? { ...u, role } : u))
       setEditRoleUser(null)
       toast('Role updated', 'success')
-    } catch (err: any) {
-      toast(err.message || 'Failed to change role', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to change role', 'error')
     }
   }
 
@@ -134,8 +135,8 @@ export default function AdminUsers() {
       await admin.users.deactivate(deleteTarget)
       setUsers((prev) => prev.filter((u) => u.id !== deleteTarget))
       toast(`${name} removed`, 'success')
-    } catch (err: any) {
-      toast(err.message || 'Failed to remove user', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to remove user', 'error')
     }
     setDeleteTarget(null)
   }
@@ -155,8 +156,8 @@ export default function AdminUsers() {
       setInviteForm({ email: '', name: '', role: 'viewer' })
       toast(`Invite sent to ${inviteForm.email}. Share the temporary password securely: ${tempPassword}`, 'success')
       fetchUsers()
-    } catch (err: any) {
-      toast(err.message || 'Failed to create user', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to create user', 'error')
     }
   }
 

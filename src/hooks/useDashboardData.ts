@@ -1,29 +1,50 @@
 import { useState, useEffect, useCallback } from 'react'
 import { admin } from '../lib/api'
+import type {
+  ApiDashboardStats, ApiOrder, ApiRfq, ApiOffer, ApiProduct, ApiCustomer,
+} from '../lib/api-types'
+
+export interface DashboardAlert {
+  id: string
+  type: string
+  message: string
+  severity?: string
+  [key: string]: unknown
+}
+
+export interface DashboardActivityLog {
+  id: string
+  action: string
+  actorEmail?: string
+  entityType?: string
+  entityName?: string
+  createdAt: string
+  [key: string]: unknown
+}
 
 export interface DashboardInsightData {
-  stats: any
-  alerts: any[]
-  activity: any[]
-  orders: any[]
-  rfqs: any[]
-  offers: any[]
-  products: any[]
-  customers: any[]
+  stats: ApiDashboardStats | null
+  alerts: DashboardAlert[]
+  activity: DashboardActivityLog[]
+  orders: ApiOrder[]
+  rfqs: ApiRfq[]
+  offers: ApiOffer[]
+  products: ApiProduct[]
+  customers: ApiCustomer[]
   loading: boolean
   error: string | null
   refresh: () => Promise<void>
 }
 
 export function useDashboardData(): DashboardInsightData {
-  const [stats, setStats] = useState<any>(null)
-  const [alerts, setAlerts] = useState<any[]>([])
-  const [activity, setActivity] = useState<any[]>([])
-  const [orders, setOrders] = useState<any[]>([])
-  const [rfqs, setRfqs] = useState<any[]>([])
-  const [offers, setOffers] = useState<any[]>([])
-  const [products, setProducts] = useState<any[]>([])
-  const [customers, setCustomers] = useState<any[]>([])
+  const [stats, setStats] = useState<ApiDashboardStats | null>(null)
+  const [alerts, setAlerts] = useState<DashboardAlert[]>([])
+  const [activity, setActivity] = useState<DashboardActivityLog[]>([])
+  const [orders, setOrders] = useState<ApiOrder[]>([])
+  const [rfqs, setRfqs] = useState<ApiRfq[]>([])
+  const [offers, setOffers] = useState<ApiOffer[]>([])
+  const [products, setProducts] = useState<ApiProduct[]>([])
+  const [customers, setCustomers] = useState<ApiCustomer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,16 +63,37 @@ export function useDashboardData(): DashboardInsightData {
         admin.customers.list({ limit: '200' }),
       ])
 
-      if (results[0].status === 'fulfilled') setStats(results[0].value)
-      if (results[1].status === 'fulfilled') setAlerts((results[1].value as any)?.alerts || [])
-      if (results[2].status === 'fulfilled') setActivity((results[2].value as any)?.logs || (results[2].value as any) || [])
-      if (results[3].status === 'fulfilled') setOrders((results[3].value as any)?.orders || [])
-      if (results[4].status === 'fulfilled') setRfqs((results[4].value as any)?.rfqs || [])
-      if (results[5].status === 'fulfilled') setOffers((results[5].value as any)?.offers || [])
-      if (results[6].status === 'fulfilled') setProducts((results[6].value as any)?.products || [])
-      if (results[7].status === 'fulfilled') setCustomers((results[7].value as any)?.customers || [])
-    } catch (err: any) {
-      setError(err.message || 'Failed to load dashboard data')
+      if (results[0].status === 'fulfilled') setStats(results[0].value as ApiDashboardStats)
+      if (results[1].status === 'fulfilled') {
+        const val = results[1].value as { alerts?: DashboardAlert[] }
+        setAlerts(val?.alerts || [])
+      }
+      if (results[2].status === 'fulfilled') {
+        const val = results[2].value as { logs?: DashboardActivityLog[] } | DashboardActivityLog[]
+        setActivity(Array.isArray(val) ? val : (val?.logs || []))
+      }
+      if (results[3].status === 'fulfilled') {
+        const val = results[3].value as { orders?: ApiOrder[] }
+        setOrders(val?.orders || [])
+      }
+      if (results[4].status === 'fulfilled') {
+        const val = results[4].value as { rfqs?: ApiRfq[] }
+        setRfqs(val?.rfqs || [])
+      }
+      if (results[5].status === 'fulfilled') {
+        const val = results[5].value as { offers?: ApiOffer[] }
+        setOffers(val?.offers || [])
+      }
+      if (results[6].status === 'fulfilled') {
+        const val = results[6].value as { products?: ApiProduct[] }
+        setProducts(val?.products || [])
+      }
+      if (results[7].status === 'fulfilled') {
+        const val = results[7].value as { customers?: ApiCustomer[] }
+        setCustomers(val?.customers || [])
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard data')
     } finally {
       setLoading(false)
     }

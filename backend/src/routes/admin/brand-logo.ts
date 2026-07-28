@@ -6,6 +6,7 @@ import { prisma } from '../../server.js'
 import { authenticateAdmin, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler } from '../../middleware/validate.js'
 import { logAudit } from '../../utils/audit.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -29,10 +30,10 @@ const upload = multer({
 router.post('/:id/logo', upload.single('file'), asyncHandler(async (req: AuthRequest, res) => {
   const brandId = req.params.id as string
   const brand = await prisma.brand.findUnique({ where: { id: brandId } })
-  if (!brand) return res.status(404).json({ error: 'Brand not found' })
+  if (!brand) return sendError(res, 'Brand not found', 404)
 
   const file = req.file
-  if (!file) return res.status(400).json({ error: 'No file provided' })
+  if (!file) return sendError(res, 'No file provided', 400)
 
   // Save file
   const ext = path.extname(file.originalname).toLowerCase() || '.png'
@@ -65,7 +66,7 @@ router.post('/:id/logo', upload.single('file'), asyncHandler(async (req: AuthReq
     ipAddress: req.ip,
   })
 
-  res.json({ brand: updated, url })
+  sendSuccess(res, { brand: updated, url })
 }))
 
 export default router

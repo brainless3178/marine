@@ -77,7 +77,7 @@ export default function ProductDetail() {
           return
         }
       } catch {
-        // API failed — fallback to local static product dataset
+        // API failed — fall back to local static product dataset
       }
 
       // Fallback to static catalog

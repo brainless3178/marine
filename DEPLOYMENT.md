@@ -27,7 +27,7 @@
    - **Root Directory:** `backend`
    - **Runtime:** Node
    - **Build Command:** `npm install && npx prisma generate && npm run build`
-   - **Start Command:** `node dist/server.js`
+   - **Start Command:** `node dist/backend/src/server.js`
    - **Plan:** Free
 5. Click **Advanced** → Add these **Environment Variables**:
 

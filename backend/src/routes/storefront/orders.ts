@@ -7,6 +7,7 @@ import { generateOrderNumber } from '../../utils/helpers.js'
 import { logAudit } from '../../utils/audit.js'
 import { sendOrderCancelled } from '../../services/email.js'
 import logger from '../../utils/logger.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -46,7 +47,7 @@ router.post('/', authenticateCustomer, validateBody(orderSchema), asyncHandler(a
       include: { items: true },
     })
     if (existingOrder) {
-      return res.status(200).json({ order: existingOrder })
+      return sendSuccess(res, { order: existingOrder })
     }
   }
 
@@ -56,9 +57,9 @@ router.post('/', authenticateCustomer, validateBody(orderSchema), asyncHandler(a
 
   for (const item of items) {
     const product = await prisma.product.findUnique({ where: { id: item.productId } })
-    if (!product) return res.status(400).json({ error: `Product ${item.productId} not found` })
+    if (!product) return sendError(res, `Product ${item.productId} not found`, 400)
     if (product.stockCount < item.quantity) {
-      return res.status(400).json({ error: `Insufficient stock for ${product.name}` })
+      return sendError(res, `Insufficient stock for ${product.name}`, 400)
     }
     const price = Number(product.salePrice && Number(product.salePrice) < Number(product.regularPrice) ? product.salePrice : product.regularPrice)
     orderItems.push({
@@ -123,7 +124,7 @@ router.post('/', authenticateCustomer, validateBody(orderSchema), asyncHandler(a
   // Note: Confirmation email is sent after payment is confirmed (webhook or admin status update)
   // For bank-transfer orders, the admin confirms payment which triggers the email.
 
-  res.status(201).json({ order })
+  sendSuccess(res, { order }, 201)
 }))
 
 // ─── List Own Orders ──────────────────────────────────────────
@@ -144,7 +145,7 @@ router.get('/', authenticateCustomer, asyncHandler(async (req: AuthRequest, res)
     prisma.order.count({ where }),
   ])
 
-  res.json({
+  sendSuccess(res, {
     orders,
     pagination: {
       total,
@@ -163,8 +164,8 @@ router.get('/:id', authenticateCustomer, asyncHandler(async (req: AuthRequest, r
     where: { id: req.params.id as string, customerId: req.user!.id },
     include: { items: true, timeline: { orderBy: { createdAt: 'desc' } } },
   })
-  if (!order) return res.status(404).json({ error: 'Order not found' })
-  res.json({ order })
+  if (!order) return sendError(res, 'Order not found', 404)
+  sendSuccess(res, { order })
 }))
 
 // ─── Request Cancellation ──────────────────────────────────────
@@ -172,9 +173,9 @@ router.post('/:id/cancel', authenticateCustomer, asyncHandler(async (req: AuthRe
   const order = await prisma.order.findFirst({
     where: { id: req.params.id as string, customerId: req.user!.id },
   })
-  if (!order) return res.status(404).json({ error: 'Order not found' })
+  if (!order) return sendError(res, 'Order not found', 404)
 
-  if (order.status === 'cancelled') return res.status(400).json({ error: 'Order already cancelled' })
+  if (order.status === 'cancelled') return sendError(res, 'Order already cancelled', 400)
 
   // Only set cancelRequested flag — admin must approve actual cancellation and refund
   const updated = await prisma.order.update({
@@ -201,7 +202,7 @@ router.post('/:id/cancel', authenticateCustomer, asyncHandler(async (req: AuthRe
     }).catch(err => logger.error({ err }, 'Order cancel email failed'))
   }
 
-  res.json({ order: updated })
+  sendSuccess(res, { order: updated })
 }))
 
 export default router

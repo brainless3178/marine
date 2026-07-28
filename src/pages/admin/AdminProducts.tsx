@@ -9,6 +9,7 @@ import { AdminImportModal } from '../../components/admin/AdminImportModal'
 import { Plus, Upload } from 'lucide-react'
 import Papa from 'papaparse'
 import { admin } from '../../lib/api'
+import type { ApiBrand, ApiCategory, ApiProduct } from '../../lib/api-types'
 
 const ITEMS_PER_PAGE = 20
 
@@ -68,12 +69,12 @@ export default function AdminProducts() {
       admin.categories.list(),
     ]).then(([brandsRes, catsRes]) => {
       if (brandsRes.status === 'fulfilled') {
-        const b = (brandsRes.value as any).brands || []
-        setBrandIdMap(new Map(b.map((x: any) => [x.name, x.id])))
+        const val = brandsRes.value as { brands?: ApiBrand[] }
+        setBrandIdMap(new Map((val?.brands || []).map((x) => [x.name, x.id])))
       }
       if (catsRes.status === 'fulfilled') {
-        const c = (catsRes.value as any).categories || []
-        setCategoryIdMap(new Map(c.map((x: any) => [x.name, x.id])))
+        const val = catsRes.value as { categories?: ApiCategory[] }
+        setCategoryIdMap(new Map((val?.categories || []).map((x) => [x.name, x.id])))
       }
     })
   }, [])
@@ -104,7 +105,7 @@ export default function AdminProducts() {
       params.limit = String(ITEMS_PER_PAGE)
 
       const res = await admin.products.list(params)
-      setProductList((res.products || []).map((p: any) => ({
+      setProductList((res.products || []).map((p) => ({
         id: p.id,
         name: p.name || '',
         sku: p.sku || '',
@@ -120,7 +121,7 @@ export default function AdminProducts() {
         images: p.images || [],
         customLabel: p.customLabel || '',
       })))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load products:', err)
       toast('Failed to load products from API', 'error')
     } finally {
@@ -214,8 +215,8 @@ export default function AdminProducts() {
       await admin.products.bulk(ids, action)
       toast(`${ids.length} product${ids.length > 1 ? 's' : ''} ${action}`, 'success')
       fetchProducts()
-    } catch (err: any) {
-      toast(err.message || 'Bulk action failed', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Bulk action failed', 'error')
     }
     setSelectedIds(new Set())
   }
@@ -227,8 +228,8 @@ export default function AdminProducts() {
       await admin.products.delete(deleteTarget)
       toast('Product deleted', 'success')
       fetchProducts()
-    } catch (err: any) {
-      toast(err.message || 'Delete failed', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Delete failed', 'error')
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -246,8 +247,8 @@ export default function AdminProducts() {
       await admin.products.duplicate(productId)
       toast('Product duplicated as draft', 'success')
       fetchProducts()
-    } catch (err: any) {
-      toast(err.message || 'Failed to duplicate product', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to duplicate product', 'error')
     } finally {
       setDuplicating(null)
     }
@@ -293,8 +294,8 @@ export default function AdminProducts() {
       setImportResult(importResult)
       toast(`Imported ${importResult.created} products (${importResult.skipped} skipped)`, 'success')
       fetchProducts()
-    } catch (err: any) {
-      toast(err.message || 'Import failed', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Import failed', 'error')
     } finally {
       setImporting(false)
     }

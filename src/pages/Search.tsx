@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Search as SearchIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { storefront } from '../lib/api'
+import { useCategories } from '../hooks/useApiQuery'
 import { SEO } from '../components/seo/SEO'
 import { SearchInput, SearchResultsList } from '../components/search'
 import type { SearchResult } from '../components/search'
@@ -31,17 +32,17 @@ export default function SearchPage() {
   const navigate = useNavigate()
   const addRecentSearch = useStore((s) => s.addRecentSearch)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const [productCategories, setProductCategories] = useState<{id: string; name: string; count: number}[]>([])
+  // React Query caches categories — replaces manual useEffect + state
+  const { data: categoriesData } = useCategories()
 
-  useEffect(() => {
-    storefront.categories.list().then((res) => {
-      if (res.categories?.length) {
-        setProductCategories(res.categories.map((c: any) => ({
-          id: c.slug || c.id, name: c.name, count: c._count?.products ?? c.productCount ?? 0,
-        })))
-      }
-    }).catch(() => {})
-  }, [])
+  const productCategories: {id: string; name: string; count: number}[] = useMemo(() => {
+    if (categoriesData?.categories?.length) {
+      return categoriesData.categories.map((c: any) => ({
+        id: c.slug || c.id, name: c.name, count: c._count?.products ?? c.productCount ?? 0,
+      }))
+    }
+    return []
+  }, [categoriesData])
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -92,7 +93,7 @@ export default function SearchPage() {
 
       setResults([...apiResults.slice(0, 5), ...pageResults, ...categoryResults])
     } catch {
-      // Fallback: no API search available, show only static results
+      // API search unavailable — fall back to static page/category results only
       setResults([...pageResults, ...categoryResults])
     } finally {
       setLoading(false)

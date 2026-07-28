@@ -1,13 +1,15 @@
 import { Router } from 'express'
 import { prisma } from '../../server.js'
 import { asyncHandler } from '../../middleware/validate.js'
+import { sendSuccess } from '../../middleware/response.js'
+import type { SearchResult } from '../../../../shared/types.js'
 
 const router = Router()
 
 // ─── Full-Text Search ──────────────────────────────────────────
 router.get('/', asyncHandler(async (req, res) => {
   const q = (req.query.q as string) || ''
-  if (!q.trim()) return res.json({ results: [], total: 0 })
+  if (!q.trim()) return sendSuccess(res, { results: [], total: 0 })
 
   const search = q.trim()
 
@@ -41,7 +43,7 @@ router.get('/', asyncHandler(async (req, res) => {
     }),
   ])
 
-  const results = [
+  const results: SearchResult[] = [
     ...products.map(p => ({
       id: p.id,
       type: 'product' as const,
@@ -68,7 +70,7 @@ router.get('/', asyncHandler(async (req, res) => {
     })),
   ]
 
-  res.json({ results, total: results.length, query: search })
+  sendSuccess(res, { results, total: results.length, query: search })
 }))
 
 export default router

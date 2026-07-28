@@ -4,6 +4,7 @@ import { logAudit } from '../../utils/audit.js'
 import { sendOrderConfirmation } from '../../services/email.js'
 import logger from '../../utils/logger.js'
 import { getPaypalAccessToken, PAYPAL_BASE, PAYPAL_WEBHOOK_ID, PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } from '../../utils/paypal.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 const hookLog = logger.child({ context: 'paypal-webhook' })
@@ -73,14 +74,14 @@ async function verifyPayPalWebhook(req: any): Promise<boolean> {
 // ─── PayPal Webhook Handler ──────────────────────────────────
 router.post('/', async (req, res) => {
   if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-    return res.status(503).json({ error: 'PayPal not configured' })
+    return sendError(res, 'PayPal not configured', 503)
   }
 
   // Verify webhook signature before processing
   const isValid = await verifyPayPalWebhook(req)
   if (!isValid) {
     hookLog.warn('PayPal webhook signature verification failed — rejecting webhook')
-    return res.status(401).json({ error: 'Invalid webhook signature' })
+    return sendError(res, 'Invalid webhook signature', 401)
   }
 
   const event = req.body
@@ -107,7 +108,7 @@ router.post('/', async (req, res) => {
     await handleCaptureFailed(event.resource)
   }
 
-  res.json({ received: true })
+  sendSuccess(res, { received: true })
 })
 
 async function handleCaptureCompleted(resource: any) {

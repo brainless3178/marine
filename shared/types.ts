@@ -1,0 +1,449 @@
+/**
+ * Shared canonical types for Alka Traders.
+ *
+ * These are the "API contract" types that both frontend and backend agree on.
+ * They mirror the Prisma models and are the canonical source of truth for
+ * API response shapes. Use these instead of duplicating types.
+ *
+ * The frontend's own simplified UI types (src/types/index.ts) build on top
+ * of these via the adapter layer (src/lib/adapters.ts).
+ */
+
+// ─── Enum / Union Types ───────────────────────────────────────
+
+export type ProductStatus = 'draft' | 'published' | 'archived' | 'hidden'
+export type Availability = 'in-stock' | 'sourced' | 'emergency' | 'out-of-stock'
+export type ProductCondition = 'new' | 'refurbished' | 'used' | 'reconditioned' | 'unused'
+export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded'
+export type RfqStatus = 'new' | 'quoted' | 'accepted' | 'rejected' | 'closed'
+export type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'countered' | 'expired'
+export type Urgency = 'standard' | 'urgent' | 'emergency'
+export type Language = 'en' | 'ar' | 'es'
+export type AdminRole = 'owner' | 'store-manager' | 'inventory-manager' | 'sales-agent' | 'content-manager' | 'viewer'
+export type CustomerStatus = 'active' | 'inactive' | 'vip' | 'new'
+
+// ─── Product ───────────────────────────────────────────────────
+
+export interface ProductImage {
+  id: string
+  url: string
+  altText?: string | null
+  label?: string | null
+  isMain: boolean
+  sortOrder: number
+}
+
+export interface ProductSpec {
+  id?: string
+  name: string
+  value: string
+  sortOrder?: number
+  isPublic?: boolean
+}
+
+export interface Product {
+  id: string
+  slug: string
+  name: string
+  sku: string
+  brandId?: string | null
+  categoryId?: string | null
+  status: string
+  availability: string
+  condition: string
+  shortDescription?: string | null
+  description?: string | null
+  regularPrice: number
+  salePrice?: number | null
+  saleStartsAt?: string | null
+  saleEndsAt?: string | null
+  currency: string
+  showPrice: boolean
+  makeOfferEnabled: boolean
+  stockCount: number
+  lowStockThreshold: number
+  warehouseLocation?: string | null
+  publicItemLocation?: string | null
+  leadTime?: string | null
+  isNewArrival: boolean
+  isFeatured: boolean
+  customLabel?: string | null
+  customLabelColor?: string | null
+  sortPriority: number
+  seoTitle?: string | null
+  seoDescription?: string | null
+  ogImageUrl?: string | null
+  createdAt?: string | null
+  updatedAt?: string | null
+  // Relations
+  brand?: { id: string; name: string; slug: string } | null
+  category?: { id: string; name: string; slug: string } | null
+  images: ProductImage[]
+  specs: ProductSpec[]
+  industries: { industry: { id: string; name: string; slug: string } }[]
+  // Computed
+  price?: number
+  onSale?: boolean
+  inStock?: boolean
+}
+
+// ─── Brand ─────────────────────────────────────────────────────
+
+export interface Brand {
+  id: string
+  name: string
+  slug: string
+  logoUrl?: string | null
+  sectors?: string[]
+  description?: string | null
+  website?: string | null
+  country?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
+  isVisible?: boolean
+  sortOrder?: number
+  createdAt?: string | null
+  _count?: { products: number }
+  productCount?: number
+}
+
+// ─── Category ──────────────────────────────────────────────────
+
+export interface Category {
+  id: string
+  name: string
+  slug: string
+  description?: string | null
+  parentId?: string | null
+  icon?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
+  sortOrder?: number
+  isVisible?: boolean
+  createdAt?: string | null
+  _count?: { products: number }
+  productCount?: number
+}
+
+// ─── Industry ──────────────────────────────────────────────────
+
+export interface Industry {
+  id: string
+  name: string
+  slug: string
+  icon?: string | null
+  description?: string | null
+  painPoints?: string[]
+  seoTitle?: string | null
+  seoDescription?: string | null
+  sortOrder?: number
+  isVisible?: boolean
+  createdAt?: string | null
+  _count?: { products: number }
+  productCount?: number
+}
+
+// ─── Order ─────────────────────────────────────────────────────
+
+export interface OrderItem {
+  id: string
+  productId?: string | null
+  productName: string
+  productSku?: string | null
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+  price?: number
+  sku?: string
+  product?: { name: string; sku: string } | null
+}
+
+export interface OrderTimeline {
+  id: string
+  status: string
+  note?: string | null
+  createdBy?: string | null
+  createdAt: string
+}
+
+export interface Order {
+  id: string
+  orderNumber: string
+  customerId?: string | null
+  status: string
+  paymentMethod?: string | null
+  paymentStatus: string
+  subtotal: number
+  shippingCost: number
+  shipping: { fullName: string; city: string; country: string }
+  tax: number
+  total: number
+  grandTotal: number
+  currency: string
+  shippingFullName?: string | null
+  shippingAddressLine1?: string | null
+  shippingAddressLine2?: string | null
+  shippingCity?: string | null
+  shippingState?: string | null
+  shippingPostalCode?: string | null
+  shippingCountry?: string | null
+  trackingNumber?: string | null
+  courier?: string | null
+  customerNotes?: string | null
+  cancelRequested?: boolean
+  cancelReason?: string | null
+  paymentIntentId?: string | null
+  createdAt: string
+  updatedAt?: string | null
+  // Relations
+  items: OrderItem[]
+  orderItems?: OrderItem[]
+  timeline?: OrderTimeline[]
+  customer?: { id: string; name: string; email: string } | null
+}
+
+// ─── RFQ ───────────────────────────────────────────────────────
+
+export interface Rfq {
+  id: string
+  rfqNumber: string
+  fullName: string
+  company?: string | null
+  email: string
+  phone?: string | null
+  country?: string | null
+  role?: string | null
+  productDescription: string
+  partNumber?: string | null
+  brand?: string | null
+  quantity?: number | null
+  deliveryLocation?: string | null
+  urgency: string
+  notes?: string | null
+  source?: string | null
+  consent?: boolean
+  status: string
+  assignedTo?: string | null
+  responseDeadline?: string | null
+  createdAt: string
+  updatedAt?: string | null
+}
+
+export interface RfqNote {
+  id: string
+  rfqId: string
+  note: string
+  isInternal: boolean
+  createdBy?: string | null
+  createdAt: string
+}
+
+// ─── Offer ─────────────────────────────────────────────────────
+
+export interface OfferItem {
+  id: string
+  productId?: string | null
+  productName?: string | null
+  quantity?: number | null
+  unitPrice?: number | null
+  price?: number | null
+}
+
+export interface Offer {
+  id: string
+  offerNumber?: string | null
+  productId?: string | null
+  customerEmail: string
+  offeredPrice: number
+  counterPrice?: number | null
+  message?: string | null
+  status: string
+  createdAt: string
+  updatedAt?: string | null
+  product?: { name: string; sku: string; regularPrice: number } | null
+  items?: OfferItem[]
+}
+
+// ─── Customer ──────────────────────────────────────────────────
+
+export interface Customer {
+  id: string
+  name: string
+  email: string
+  phone?: string | null
+  company?: string | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  website?: string | null
+  status?: string
+  lastLoginAt?: string | null
+  createdAt: string
+  _count?: {
+    orders?: number
+    rfqs?: number
+  }
+}
+
+// ─── Message (Contact Form) ────────────────────────────────────
+
+export interface Message {
+  id: string
+  name: string
+  email: string
+  subject?: string | null
+  message: string
+  status?: string
+  internalNotes?: string | null
+  createdAt: string
+  updatedAt?: string | null
+}
+
+// ─── Media Asset ───────────────────────────────────────────────
+
+export interface MediaAsset {
+  id: string
+  filename: string
+  originalName?: string | null
+  url: string
+  mimeType?: string | null
+  size?: number | null
+  width?: number | null
+  height?: number | null
+  altText?: string | null
+  label?: string | null
+  createdAt: string
+}
+
+// ─── Admin User ────────────────────────────────────────────────
+
+export interface AdminUser {
+  id: string
+  name: string
+  email: string
+  role: string
+  avatarUrl?: string | null
+  isActive: boolean
+  lastLoginAt?: string | null
+  createdAt: string
+}
+
+// ─── Audit Log ─────────────────────────────────────────────────
+
+export interface AuditLog {
+  id: string
+  action: string
+  entityType?: string | null
+  entityId?: string | null
+  entityName?: string | null
+  actorId?: string | null
+  actorName?: string | null
+  actorEmail?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
+  newValue?: Record<string, unknown>
+  oldValue?: Record<string, unknown>
+  metadata?: Record<string, unknown>
+  createdAt: string
+}
+
+// ─── Dashboard ─────────────────────────────────────────────────
+
+export interface DashboardStats {
+  totalProducts: number
+  publishedProducts: number
+  draftProducts: number
+  hiddenProducts: number
+  outOfStockProducts: number
+  emergencyProducts: number
+  totalOrders: number
+  pendingOrders: number
+  totalRevenue: number
+  totalCustomers: number
+  totalRfqs: number
+  newRfqs: number
+  urgentRfqs: number
+  emergencyRfqs: number
+  totalOffers: number
+  newOffers: number
+  lowStockProducts?: { id: string; name: string; sku: string; stockCount: number }[]
+  missingImageProducts?: { id: string; name: string; sku: string }[]
+  categoryBreakdown?: { name: string; count: number }[]
+  brandBreakdown?: { name: string; count: number }[]
+  conditionBreakdown?: { name: string; count: number }[]
+}
+
+// ─── Settings ──────────────────────────────────────────────────
+
+export interface StoreSettings {
+  [key: string]: string | number | boolean
+}
+
+// ─── Homepage Section ──────────────────────────────────────────
+
+export interface HomepageSection {
+  id: string
+  type: string
+  title?: string | null
+  content?: Record<string, unknown>
+  sortOrder?: number
+  isVisible?: boolean
+}
+
+// ─── Testimonial ───────────────────────────────────────────────
+
+export interface Testimonial {
+  id: string
+  name: string
+  role?: string | null
+  company?: string | null
+  avatarUrl?: string | null
+  text: string
+  rating?: number | null
+  sortOrder?: number
+  isVisible?: boolean
+}
+
+// ─── Office ────────────────────────────────────────────────────
+
+export interface Office {
+  id?: string
+  city: string
+  country: string
+  address?: string | null
+  timezone?: string | null
+  phone?: string | null
+  email?: string | null
+  coordinatesLat?: number | null
+  coordinatesLng?: number | null
+  sortOrder?: number
+  isVisible?: boolean
+}
+
+// ─── User Profile (API response shape, differs from middleware AuthUser which is the JWT payload)
+
+export interface UserProfile {
+  id: string
+  name: string
+  email: string
+  role: string
+  avatarUrl?: string | null
+  isActive?: boolean
+  lastLoginAt?: string | null
+  createdAt: string
+}
+
+// ─── Search ────────────────────────────────────────────────────
+
+export interface SearchResult {
+  type: 'product' | 'brand' | 'category' | 'page'
+  id: string
+  name?: string
+  title?: string
+  slug?: string
+  sku?: string
+  brand?: string
+  description?: string
+  productCount?: number
+}

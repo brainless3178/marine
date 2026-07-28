@@ -4,6 +4,7 @@ import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/au
 import { asyncHandler, validateBody } from '../../middleware/validate.js'
 import { z } from 'zod'
 import { logAudit } from '../../utils/audit.js'
+import { sendSuccess } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -27,7 +28,7 @@ router.get('/', asyncHandler(async (_req, res) => {
   const testimonials = await prisma.testimonial.findMany({
     orderBy: { sortOrder: 'asc' },
   })
-  res.json({ testimonials })
+  sendSuccess(res, { testimonials })
 }))
 
 // ─── Update All Testimonials ──────────────────────────────────
@@ -57,7 +58,7 @@ router.put('/', requireRole('content-manager'), validateBody(testimonialSchema),
     ipAddress: req.ip,
   })
 
-  res.json({ testimonials: result })
+  sendSuccess(res, { testimonials: result })
 }))
 
 export default router

@@ -6,6 +6,7 @@ import { generateRfqNumber } from '../../utils/helpers.js'
 import { logAudit } from '../../utils/audit.js'
 import { sendContactNotification, sendEmergencyAlert } from '../../services/email.js'
 import logger from '../../utils/logger.js'
+import { sendSuccess } from '../../middleware/response.js'
 
 const router = Router()
 
@@ -42,7 +43,7 @@ router.post('/', validateBody(contactSchema), asyncHandler(async (req, res) => {
     message: req.body.message,
   }).catch(err => logger.error({ err }, 'Contact email failed'))
 
-  res.status(201).json({ message: 'Message sent successfully', id: message.id })
+  sendSuccess(res, { message: 'Message sent successfully', id: message.id }, 201)
 }))
 
 // ─── Submit Emergency Request ──────────────────────────────────
@@ -89,11 +90,11 @@ router.post('/emergency', validateBody(emergencySchema), asyncHandler(async (req
     vesselName: req.body.vesselName,
   }).catch(err => logger.error({ err }, 'Emergency email failed'))
 
-  res.status(201).json({
+  sendSuccess(res, {
     message: 'Emergency request submitted. Our team will contact you within 30 minutes.',
     id: emergency.id,
     rfqNumber: rfq.rfqNumber,
-  })
+  }, 201)
 }))
 
 export default router

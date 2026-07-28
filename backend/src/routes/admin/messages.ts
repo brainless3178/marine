@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { logAudit } from '../../utils/audit.js'
 import { paginationParams, paginationResponse } from '../../utils/helpers.js'
 import logger from '../../utils/logger.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -50,7 +51,7 @@ router.get('/', asyncHandler(async (req, res) => {
     prisma.contactMessage.count({ where }),
   ])
 
-  res.json({ messages, pagination: paginationResponse(total, page, limit) })
+  sendSuccess(res, { messages, pagination: paginationResponse(total, page, limit) })
 }))
 
 // ─── Get Message Detail ───────────────────────────────────────
@@ -61,7 +62,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
       assignee: { select: { id: true, name: true, email: true } },
     },
   })
-  if (!message) return res.status(404).json({ error: 'Message not found' })
+  if (!message) return sendError(res, 'Message not found', 404)
 
   // Auto-mark as read if new
   if (message.status === 'new') {
@@ -72,7 +73,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
     message.status = 'read'
   }
 
-  res.json({ message })
+  sendSuccess(res, { message })
 }))
 
 // ─── Compose / Send Message ──────────────────────────────────
@@ -97,13 +98,13 @@ router.post('/', requireRole('store-manager'), validateBody(composeSchema), asyn
     ipAddress: req.ip,
   })
 
-  res.status(201).json({ message })
+  sendSuccess(res, { message }, 201)
 }))
 
 // ─── Mark as Read ─────────────────────────────────────────────
 router.patch('/:id/read', asyncHandler(async (req: AuthRequest, res) => {
   const message = await prisma.contactMessage.findUnique({ where: { id: req.params.id as string } })
-  if (!message) return res.status(404).json({ error: 'Message not found' })
+  if (!message) return sendError(res, 'Message not found', 404)
 
   const updated = await prisma.contactMessage.update({
     where: { id: req.params.id as string },
@@ -118,13 +119,13 @@ router.patch('/:id/read', asyncHandler(async (req: AuthRequest, res) => {
     ipAddress: req.ip,
   })
 
-  res.json({ message: updated })
+  sendSuccess(res, { message: updated })
 }))
 
 // ─── Archive Message ──────────────────────────────────────────
 router.patch('/:id/archive', asyncHandler(async (req: AuthRequest, res) => {
   const message = await prisma.contactMessage.findUnique({ where: { id: req.params.id as string } })
-  if (!message) return res.status(404).json({ error: 'Message not found' })
+  if (!message) return sendError(res, 'Message not found', 404)
 
   const updated = await prisma.contactMessage.update({
     where: { id: req.params.id as string },
@@ -139,7 +140,7 @@ router.patch('/:id/archive', asyncHandler(async (req: AuthRequest, res) => {
     ipAddress: req.ip,
   })
 
-  res.json({ message: updated })
+  sendSuccess(res, { message: updated })
 }))
 
 // ─── Delete Message ───────────────────────────────────────────
@@ -158,13 +159,13 @@ router.delete('/:id', requireRole('store-manager'), asyncHandler(async (req: Aut
     ipAddress: req.ip,
   })
 
-  res.json({ message: 'Message deleted' })
+  sendSuccess(res, { message: 'Message deleted' })
 }))
 
 // ─── Reply to Message ────────────────────────────────────────
 router.post('/:id/reply', requireRole('store-manager'), validateBody(replySchema), asyncHandler(async (req: AuthRequest, res) => {
   const message = await prisma.contactMessage.findUnique({ where: { id: req.params.id as string } })
-  if (!message) return res.status(404).json({ error: 'Message not found' })
+  if (!message) return sendError(res, 'Message not found', 404)
 
   // Update status to replied
   await prisma.contactMessage.update({
@@ -190,7 +191,7 @@ router.post('/:id/reply', requireRole('store-manager'), validateBody(replySchema
     html,
   }).catch(err => logger.error({ err }, 'Reply email failed'))
 
-  res.json({ message: 'Reply sent' })
+  sendSuccess(res, { message: 'Reply sent' })
 }))
 
 export default router

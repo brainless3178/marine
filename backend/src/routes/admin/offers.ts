@@ -7,6 +7,7 @@ import { paginationParams, paginationResponse, generateOrderNumber } from '../..
 import { logAudit } from '../../utils/audit.js'
 import { sendOfferDecision } from '../../services/email.js'
 import logger from '../../utils/logger.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -34,7 +35,7 @@ router.get('/', asyncHandler(async (req, res) => {
     prisma.offer.count({ where }),
   ])
 
-  res.json({ offers, pagination: paginationResponse(total, page, limit) })
+  sendSuccess(res, { offers, pagination: paginationResponse(total, page, limit) })
 }))
 
 // ─── Get Offer Detail ──────────────────────────────────────────
@@ -46,8 +47,8 @@ router.get('/:id', asyncHandler(async (req, res) => {
       rfq: { select: { id: true, rfqNumber: true } },
     },
   })
-  if (!offer) return res.status(404).json({ error: 'Offer not found' })
-  res.json({ offer })
+  if (!offer) return sendError(res, 'Offer not found', 404)
+  sendSuccess(res, { offer })
 }))
 
 // ─── Accept Offer ──────────────────────────────────────────────
@@ -59,7 +60,7 @@ router.patch('/:id/accept', requireRole('sales-agent'), asyncHandler(async (req:
   })
   await logAudit({ actor: req.user!, action: 'offer.accept', entityType: 'offer', entityId: offer.id })
   sendOfferDecision({ to: offer.customerEmail, offerNumber: offer.offerNumber, productName: offer.product?.name || 'Unknown', decision: 'accepted' }).catch(err => logger.error({ err }, 'Offer email failed'))
-  res.json({ offer })
+  sendSuccess(res, { offer })
 }))
 
 // ─── Reject Offer ──────────────────────────────────────────────
@@ -71,7 +72,7 @@ router.patch('/:id/reject', requireRole('sales-agent'), asyncHandler(async (req:
   })
   await logAudit({ actor: req.user!, action: 'offer.reject', entityType: 'offer', entityId: offer.id })
   sendOfferDecision({ to: offer.customerEmail, offerNumber: offer.offerNumber, productName: offer.product?.name || 'Unknown', decision: 'rejected' }).catch(err => logger.error({ err }, 'Offer email failed'))
-  res.json({ offer })
+  sendSuccess(res, { offer })
 }))
 
 // ─── Counter Offer ─────────────────────────────────────────────
@@ -83,7 +84,7 @@ router.patch('/:id/counter', requireRole('sales-agent'), validateBody(counterSch
   })
   await logAudit({ actor: req.user!, action: 'offer.counter', entityType: 'offer', entityId: offer.id })
   sendOfferDecision({ to: offer.customerEmail, offerNumber: offer.offerNumber, productName: offer.product?.name || 'Unknown', decision: 'countered', counterPrice: req.body.counterPrice }).catch(err => logger.error({ err }, 'Offer email failed'))
-  res.json({ offer })
+  sendSuccess(res, { offer })
 }))
 
 // ─── Convert Offer to Order ──────────────────────────────────
@@ -92,8 +93,8 @@ router.post('/:id/convert-to-order', requireRole('store-manager'), asyncHandler(
     where: { id: req.params.id as string },
     include: { product: { select: { id: true, name: true, sku: true, regularPrice: true, salePrice: true } } },
   })
-  if (!offer) return res.status(404).json({ error: 'Offer not found' })
-  if (offer.status !== 'accepted') return res.status(400).json({ error: 'Only accepted offers can be converted to orders' })
+  if (!offer) return sendError(res, 'Offer not found', 404)
+  if (offer.status !== 'accepted') return sendError(res, 'Only accepted offers can be converted to orders', 400)
 
   const price = Number(offer.counterPrice || offer.offeredPrice)
 
@@ -136,7 +137,7 @@ router.post('/:id/convert-to-order', requireRole('store-manager'), asyncHandler(
     newValue: { orderId: order.id, orderNumber: order.orderNumber },
   })
 
-  res.status(201).json({ order })
+  sendSuccess(res, { order }, 201)
 }))
 
 export default router

@@ -1,29 +1,24 @@
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SectionLabel } from '../ui/SectionLabel'
 import { Marquee } from '../ui/Marquee'
-import { storefront } from '../../lib/api'
+import { useBrands } from '../../hooks/useApiQuery'
 import { brandMarqueeItems, brandMarqueeItems2 } from '../../data/brands'
 
 export function BrandsMarquee() {
   const { t } = useTranslation()
-  const [row1, setRow1] = useState<string[]>(brandMarqueeItems)
-  const [row2, setRow2] = useState<string[]>(brandMarqueeItems2)
 
-  useEffect(() => {
-    let cancelled = false
-    storefront.brands.list()
-      .then((res) => {
-        if (!cancelled && res.brands?.length) {
-          const names = res.brands.map((b: any) => b.name).filter(Boolean)
-          const mid = Math.ceil(names.length / 2)
-          setRow1(names.slice(0, mid))
-          setRow2(names.slice(mid))
-        }
-      })
-      .catch(() => { /* API unavailable — keep static fallback */ })
-    return () => { cancelled = true }
-  }, [])
+  // React Query caches brands — replaces manual useEffect + fetch
+  const { data: brandsData } = useBrands()
+
+  const { row1, row2 } = useMemo(() => {
+    if (brandsData?.brands?.length) {
+      const names = brandsData.brands.map((b: any) => b.name).filter(Boolean)
+      const mid = Math.ceil(names.length / 2)
+      return { row1: names.slice(0, mid), row2: names.slice(mid) }
+    }
+    return { row1: brandMarqueeItems, row2: brandMarqueeItems2 }
+  }, [brandsData])
 
   if (row1.length === 0 && row2.length === 0) return null
 

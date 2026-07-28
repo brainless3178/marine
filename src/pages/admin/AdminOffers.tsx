@@ -20,6 +20,7 @@ import { admin } from '../../lib/api'
 import { useToast } from '../../components/admin/Toast'
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog'
 import { AdminPagination } from '../../components/admin/AdminPagination'
+import type { ApiOffer, ApiOfferItem } from '../../lib/api-types'
 
 type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'expired'
 
@@ -49,8 +50,8 @@ interface Offer {
   terms: string
 }
 
-function mapApiOffer(o: any): Offer {
-  const items: OfferItem[] = (o.items || []).map((item: any) => ({
+function mapApiOffer(o: ApiOffer): Offer {
+  const items: OfferItem[] = (o.items || []).map((item: ApiOfferItem) => ({
     productName: item.productName || 'Unknown',
     sku: item.sku || '',
     quantity: item.quantity || 1,
@@ -106,7 +107,7 @@ export default function AdminOffers() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.offers.list(params)
       setOffers((res.offers || []).map(mapApiOffer))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load offers:', err)
       toast('Failed to load offers', 'error')
     } finally {
@@ -142,8 +143,8 @@ export default function AdminOffers() {
       await admin.offers.accept(offerId)
       toast(`Offer ${offerId} accepted`, 'success')
       fetchOffers()
-    } catch (err: any) {
-      toast(err.message || 'Failed to accept offer', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to accept offer', 'error')
     }
   }
 
@@ -152,8 +153,8 @@ export default function AdminOffers() {
       await admin.offers.reject(offerId)
       toast(`Offer ${offerId} rejected`, 'info')
       fetchOffers()
-    } catch (err: any) {
-      toast(err.message || 'Failed to reject offer', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to reject offer', 'error')
     }
   }
 
@@ -164,8 +165,8 @@ export default function AdminOffers() {
       toast(`Order ${result.order?.orderNumber || ''} created from offer`, 'success')
       fetchOffers()
       setSelectedOffer(null)
-    } catch (err: any) {
-      toast(err.message || 'Failed to convert offer to order', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to convert offer to order', 'error')
     } finally {
       setConvertingOffer(null)
     }

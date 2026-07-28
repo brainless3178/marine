@@ -3,6 +3,7 @@ import { prisma } from '../../server.js'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler, validateBody } from '../../middleware/validate.js'
 import { logAudit } from '../../utils/audit.js'
+import { sendSuccess, sendError } from '../../middleware/response.js'
 import { z } from 'zod'
 import { generateSlug } from '../../utils/helpers.js'
 
@@ -26,7 +27,7 @@ router.get('/', asyncHandler(async (_req, res) => {
     include: { _count: { select: { products: true } } },
     orderBy: { sortOrder: 'asc' },
   })
-  res.json({ industries })
+  sendSuccess(res, { industries })
 }))
 
 // ─── Create Industry ───────────────────────────────────────────
@@ -34,7 +35,7 @@ router.post('/', requireRole('inventory-manager'), validateBody(industrySchema),
   const slug = generateSlug(req.body.name)
   const existing = await prisma.industry.findUnique({ where: { slug } })
   if (existing) {
-    return res.status(400).json({ error: 'Industry with this name already exists' })
+    return sendError(res, 'Industry with this name already exists', 400)
   }
 
   const industry = await prisma.industry.create({
@@ -42,14 +43,14 @@ router.post('/', requireRole('inventory-manager'), validateBody(industrySchema),
   })
 
   await logAudit({ actor: req.user, action: 'industry.create', entityType: 'industry', entityId: industry.id, entityName: industry.name, newValue: industry, ipAddress: req.ip })
-  res.status(201).json({ industry })
+  sendSuccess(res, { industry }, 201)
 }))
 
 // ─── Update Industry ───────────────────────────────────────────
 router.put('/:id', requireRole('inventory-manager'), validateBody(industrySchema.partial()), asyncHandler(async (req: AuthRequest, res) => {
   const existing = await prisma.industry.findUnique({ where: { id: req.params.id as string } })
   if (!existing) {
-    return res.status(404).json({ error: 'Industry not found' })
+    return sendError(res, 'Industry not found', 404)
   }
 
   let slug = existing.slug
@@ -65,7 +66,7 @@ router.put('/:id', requireRole('inventory-manager'), validateBody(industrySchema
   })
 
   await logAudit({ actor: req.user, action: 'industry.update', entityType: 'industry', entityId: industry.id, entityName: industry.name, previousValue: existing, newValue: industry, ipAddress: req.ip })
-  res.json({ industry })
+  sendSuccess(res, { industry })
 }))
 
 // ─── Delete Industry ───────────────────────────────────────────
@@ -76,16 +77,16 @@ router.delete('/:id', requireRole('store-manager'), asyncHandler(async (req: Aut
   })
 
   if (!existing) {
-    return res.status(404).json({ error: 'Industry not found' })
+    return sendError(res, 'Industry not found', 404)
   }
 
   if (existing._count.products > 0) {
-    return res.status(400).json({ error: 'Cannot delete industry with products.' })
+    return sendError(res, 'Cannot delete industry with products.', 400)
   }
 
   await prisma.industry.delete({ where: { id: req.params.id as string } })
   await logAudit({ actor: req.user, action: 'industry.delete', entityType: 'industry', entityId: existing.id, entityName: existing.name, previousValue: existing, ipAddress: req.ip })
-  res.json({ message: 'Industry deleted' })
+  sendSuccess(res, { message: 'Industry deleted' })
 }))
 
 export default router

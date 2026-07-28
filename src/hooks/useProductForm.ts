@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { admin } from '../lib/api'
 import { useToast } from '../components/admin/Toast'
+import type { ApiProduct, ApiBrand, ApiCategory, ApiIndustry } from '../lib/api-types'
 
 export interface SpecRow {
   name: string
@@ -97,21 +98,21 @@ export function getEmptyForm(): ProductFormData {
   }
 }
 
-export function getFormFromProduct(product: any): ProductFormData {
+export function getFormFromProduct(product: ApiProduct): ProductFormData {
   return {
     name: product.name || '',
     sku: product.sku || '',
     brand: product.brandId || (typeof product.brand === 'object' ? product.brand?.id || '' : product.brand || ''),
     category: product.categoryId || (typeof product.category === 'object' ? product.category?.id || '' : product.category || ''),
     industries: Array.isArray(product.industries)
-      ? product.industries.map((i: any) => typeof i === 'object' ? (i.industryId || i.industry?.id || i.id || '') : i)
+      ? product.industries.map((i) => typeof i === 'object' ? (i.industryId || i.industry?.id || i.id || '') : i)
       : (Array.isArray(product.industryIds) ? product.industryIds : []),
     condition: product.condition || 'used',
     availability: product.availability || 'in-stock',
     shortDescription: product.shortDescription || product.description?.split('—')[0]?.trim() || '',
     description: product.description || '',
     images: Array.isArray(product.images) && product.images.length > 0
-      ? product.images.map((img: any) => ({
+      ? product.images.map((img) => ({
           url: img.url || '',
           alt: img.altText || img.alt || '',
           label: img.label || '',
@@ -127,7 +128,7 @@ export function getFormFromProduct(product: any): ProductFormData {
     warehouseLocation: product.warehouseLocation || '',
     leadTime: product.leadTime || '',
     specs: Array.isArray(product.specs)
-      ? product.specs.map((s: any) => ({ name: s.name || '', value: String(s.value || '') }))
+      ? product.specs.map((s) => ({ name: s.name || '', value: String(s.value || '') }))
       : (product.specs && typeof product.specs === 'object'
           ? Object.entries(product.specs).map(([name, value]) => ({ name, value: String(value) }))
           : []),
@@ -181,16 +182,16 @@ export function useProductForm() {
     ]).then(([brandsRes, catsRes, indsRes]) => {
       if (cancelled) return
       if (brandsRes.status === 'fulfilled') {
-        const b = (brandsRes.value as any).brands || []
-        setBrandList(b.map((x: any) => ({ id: x.id, name: x.name })))
+        const val = brandsRes.value as { brands?: ApiBrand[] }
+        setBrandList((val?.brands || []).map((x) => ({ id: x.id, name: x.name })))
       }
       if (catsRes.status === 'fulfilled') {
-        const c = (catsRes.value as any).categories || []
-        setCategoryList(c.map((x: any) => ({ id: x.id || x.slug, name: x.name })))
+        const val = catsRes.value as { categories?: ApiCategory[] }
+        setCategoryList((val?.categories || []).map((x) => ({ id: x.id || x.slug, name: x.name })))
       }
       if (indsRes.status === 'fulfilled') {
-        const ind = (indsRes.value as any).industries || []
-        setIndustryList(ind.map((x: any) => ({ id: x.id, name: x.name })))
+        const val = indsRes.value as { industries?: ApiIndustry[] }
+        setIndustryList((val?.industries || []).map((x) => ({ id: x.id, name: x.name })))
       }
     })
     return () => { cancelled = true }
@@ -255,18 +256,20 @@ export function useProductForm() {
     updateField('specs', specs)
   }, [form.specs, updateField])
 
-  const addArrayItem = useCallback((field: 'keyFeatures' | 'includedItems' | 'excludedItems') => {
-    updateField(field, [...form[field], ''] as any)
+  type ArrayField = 'keyFeatures' | 'includedItems' | 'excludedItems'
+
+  const addArrayItem = useCallback((field: ArrayField) => {
+    updateField(field, [...form[field], ''] as string[])
   }, [form, updateField])
 
-  const removeArrayItem = useCallback((field: 'keyFeatures' | 'includedItems' | 'excludedItems', i: number) => {
-    updateField(field, form[field].filter((_: string, idx: number) => idx !== i) as any)
+  const removeArrayItem = useCallback((field: ArrayField, i: number) => {
+    updateField(field, form[field].filter((_: string, idx: number) => idx !== i) as string[])
   }, [form, updateField])
 
-  const updateArrayItem = useCallback((field: 'keyFeatures' | 'includedItems' | 'excludedItems', i: number, value: string) => {
+  const updateArrayItem = useCallback((field: ArrayField, i: number, value: string) => {
     const arr = [...form[field]]
     arr[i] = value
-    updateField(field, arr as any)
+    updateField(field, arr as string[])
   }, [form, updateField])
 
   const addImage = useCallback(() => updateField('images', [...form.images, { url: '', alt: '', label: '' }]), [form.images, updateField])
@@ -359,7 +362,7 @@ export function useProductForm() {
 
     setSaving(true)
     try {
-      const payload: any = {
+      const payload: Partial<ApiProduct> = {
         name: form.name,
         sku: form.sku,
         brandId: form.brand || null,
@@ -411,11 +414,12 @@ export function useProductForm() {
       isDirtyRef.current = false
       setSaved(true)
       setTimeout(() => { setSaved(false); navigate('/admin/products') }, 1500)
-    } catch (err: any) {
-      const msg = err.message || 'Failed to save product'
-      if (err.details && Array.isArray(err.details)) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save product'
+      if (err instanceof Error && 'details' in err && Array.isArray((err as { details?: unknown }).details)) {
+        const details = (err as { details: { field: string; message: string }[] }).details
         const fieldErrors: Record<string, string> = {}
-        err.details.forEach((d: any) => { fieldErrors[d.field] = d.message })
+        details.forEach((d) => { fieldErrors[d.field] = d.message })
         setErrors(fieldErrors)
         setActiveTab('basics')
         toast('Please fix the highlighted field errors', 'error')
