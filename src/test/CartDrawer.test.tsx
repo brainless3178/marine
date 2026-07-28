@@ -60,11 +60,11 @@ vi.mock('../components/ui/OptimizedImage', () => ({
 
 // Mock lucide icons
 vi.mock('lucide-react', () => ({
-  X: ({ size, className, ...props }: any) => <span data-testid="icon-x" className={className}>X</span>,
-  Trash2: ({ size, className, ...props }: any) => <span data-testid="icon-trash" className={className}>🗑</span>,
-  ShoppingBag: ({ size, strokeWidth, className, ...props }: any) => <span data-testid="icon-bag" className={className}>🛍</span>,
-  Plus: ({ size, className, ...props }: any) => <span data-testid="icon-plus" className={className}>+</span>,
-  Minus: ({ size, className, ...props }: any) => <span data-testid="icon-minus" className={className}>-</span>,
+  X: ({ className }: any) => <span data-testid="icon-x" className={className}>X</span>,
+  Trash2: ({ className }: any) => <span data-testid="icon-trash" className={className}>🗑</span>,
+  ShoppingBag: ({ className }: any) => <span data-testid="icon-bag" className={className}>🛍</span>,
+  Plus: ({ className }: any) => <span data-testid="icon-plus" className={className}>+</span>,
+  Minus: ({ className }: any) => <span data-testid="icon-minus" className={className}>-</span>,
 }))
 
 function renderCartDrawer() {

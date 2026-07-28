@@ -9,7 +9,7 @@ import { AdminImportModal } from '../../components/admin/AdminImportModal'
 import { Plus, Upload } from 'lucide-react'
 import Papa from 'papaparse'
 import { admin } from '../../lib/api'
-import type { ApiBrand, ApiCategory, ApiProduct } from '../../lib/api-types'
+import type { ApiBrand, ApiCategory } from '../../lib/api-types'
 
 const ITEMS_PER_PAGE = 20
 

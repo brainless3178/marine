@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Building, Globe, Calendar, ShoppingCart, DollarSign, FileText, Star, X } from 'lucide-react'
+import { Mail, Phone, MapPin, Building, Globe, Calendar, ShoppingCart, DollarSign, FileText, X } from 'lucide-react'
 import type { CustomerStatus, CustomerOrder, CustomerType } from './types'
 
 const statusConfig: Record<CustomerStatus, { label: string; color: string; bg: string }> = {

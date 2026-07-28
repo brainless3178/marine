@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, ChevronRight, Target, Activity, DollarSign, ShoppingCart, Package, Users, BarChart3, Map, TrendingUp, Shield, Settings, Layers, type LucideIcon } from 'lucide-react'
+import { X, ChevronRight, Target, Activity, DollarSign, ShoppingCart, Package, Users, BarChart3, Map, TrendingUp, Shield, Settings, Layers } from 'lucide-react'
 
 interface Section {
   id: string

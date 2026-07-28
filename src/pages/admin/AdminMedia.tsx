@@ -50,7 +50,7 @@ function mapApiAsset(a: ApiMediaAsset): MediaItem {
     filename: a.filename || '',
     originalName: a.originalName || a.filename || '',
     mimeType: a.mimeType || 'image/webp',
-    fileSize: a.fileSize || 0,
+    fileSize: a.size || 0,
     width: a.width || null,
     height: a.height || null,
     createdAt: a.createdAt || new Date().toISOString(),

@@ -23,7 +23,7 @@ const DEFAULT_DESCRIPTION = 'Marine & industrial equipment supplier — ship spa
 const DEFAULT_OG_IMAGE = `${BASE_URL}/images/alka-traders-logo.jpeg`
 
 /** Build absolute hreflang links for all supported locales. */
-function buildHreflangLinks(locale: Language, pathWithoutLocale: string): Array<{ hreflang: string; href: string }> {
+function buildHreflangLinks(_locale: Language, pathWithoutLocale: string): Array<{ hreflang: string; href: string }> {
   const links: Array<{ hreflang: string; href: string }> = []
 
   for (const lang of VALID_LOCALES) {

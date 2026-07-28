@@ -12,8 +12,6 @@ const iconMap: Record<string, LucideIcon> = {
   ArrowUpFromLine, Wrench, ShieldCheck, Hammer, Compass, Droplets, Cog, Anchor, Package,
 }
 
-interface CategoryItem { id: string; name: string; icon: string; count: number }
-
 interface TiltCardProps { children: React.ReactNode; className?: string; style?: React.CSSProperties }
 
 function TiltCard({ children, className = '', style }: TiltCardProps) {

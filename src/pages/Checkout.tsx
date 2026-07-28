@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { usePayPalScriptReducer } from '@paypal/react-paypal-js'
-import type { CreateOrderActions } from '@paypal/react-paypal-js'
+
 import { Truck, Shield } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { storefront } from '../lib/api'

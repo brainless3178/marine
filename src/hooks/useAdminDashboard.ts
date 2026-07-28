@@ -97,7 +97,7 @@ export function useAdminDashboard() {
           totalCategories: s.totalCategories || 0,
           totalIndustries: s.totalIndustries || 0,
           totalStockUnits: s.totalStockUnits || 0,
-          lowStockProducts: (s.lowStockProducts || []).map((p) => {
+          lowStockProducts: (s.lowStockProducts || []).map((p: any) => {
             return {
               id: p.id,
               name: p.name,
@@ -109,7 +109,7 @@ export function useAdminDashboard() {
               hasImage: !!(p.images?.length && p.images[0]?.url),
             }
           }),
-          missingImageProducts: (s.missingImageProducts || []).map((p) => {
+          missingImageProducts: (s.missingImageProducts || []).map((p: any) => {
             return {
               id: p.id,
               name: p.name,
@@ -121,22 +121,22 @@ export function useAdminDashboard() {
               hasImage: false,
             }
           }),
-          categoryBreakdown: (s.categoryBreakdown || []).map((c, i) => {
+          categoryBreakdown: (s.categoryBreakdown || []).map((c: any, i) => {
             return {
               id: c.id || `cat-${i}`,
               name: c.name || c.category || 'Unknown',
-              count: c.count || c._count || 0,
-              percentage: total > 0 ? Math.round(((c.count || c._count || 0) / total) * 100) : 0,
+              count: c.count || c._count?.products || c._count || 0,
+              percentage: total > 0 ? Math.round(((c.count || c._count?.products || c._count || 0) / total) * 100) : 0,
             }
           }).sort((a: CategoryBreakdown, b: CategoryBreakdown) => b.count - a.count),
-          brandBreakdown: (s.brandBreakdown || []).map((b) => {
+          brandBreakdown: (s.brandBreakdown || []).map((b: any) => {
             return {
               name: b.name || 'Unknown',
-              count: b.count || b._count || 0,
-              percentage: total > 0 ? Math.round(((b.count || b._count || 0) / total) * 100) : 0,
+              count: b.count || b._count?.products || b._count || 0,
+              percentage: total > 0 ? Math.round(((b.count || b._count?.products || b._count || 0) / total) * 100) : 0,
             }
           }).sort((a: BrandBreakdown, b: BrandBreakdown) => b.count - a.count).slice(0, 15),
-          conditionBreakdown: (s.conditionBreakdown || []).map((c) => {
+          conditionBreakdown: (s.conditionBreakdown || []).map((c: any) => {
             return {
               condition: c.condition || 'unknown',
               count: c.count || 0,

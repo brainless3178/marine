@@ -27,7 +27,7 @@ interface Category {
   description: string
   parentId: string | null
   sortOrder: number
-  visible: boolean
+  isVisible: boolean
 }
 
 
@@ -90,7 +90,7 @@ export default function AdminCategories() {
         description: c.description || '',
         parentId: c.parentId || null,
         sortOrder: c.sortOrder ?? 0,
-        visible: c.visible ?? true,
+        isVisible: c.isVisible ?? true,
         productCount: c._count?.products ?? c.productCount ?? 0,
       }))
       setCategories(cats)
@@ -163,7 +163,7 @@ export default function AdminCategories() {
   }
 
   const handleToggleVisibility = (catId: string) => {
-    setCategories((prev) => prev.map((c) => c.id === catId ? { ...c, visible: !c.visible } : c))
+    setCategories((prev) => prev.map((c) => c.id === catId ? { ...c, isVisible: !c.isVisible } : c))
   }
 
   const handleMoveCategory = async (catId: string, direction: 'up' | 'down') => {
@@ -207,7 +207,7 @@ export default function AdminCategories() {
         <div
           className={`group flex items-center gap-2 rounded-xl px-3 py-2.5 transition-all hover:bg-[var(--surface-soft)] ${
             isEditing ? 'bg-[var(--surface-soft)]' : ''
-          } ${!node.visible ? 'opacity-50' : ''}`}
+          } ${!node.isVisible ? 'opacity-50' : ''}`}
           style={{ paddingLeft: `${depth * 24 + 12}px` }}
         >
           {/* Expand/Collapse */}
@@ -245,7 +245,7 @@ export default function AdminCategories() {
           </span>
 
           {/* Visibility Dot */}
-          <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${node.visible ? 'bg-[var(--success)]' : 'bg-[var(--text-muted)]'}`} title={node.visible ? 'Visible' : 'Hidden'} />
+          <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${node.isVisible ? 'bg-[var(--success)]' : 'bg-[var(--text-muted)]'}`} title={node.isVisible ? 'Visible' : 'Hidden'} />
 
           {/* Actions */}
           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
@@ -280,7 +280,7 @@ export default function AdminCategories() {
             <button
               onClick={() => handleToggleVisibility(node.id)}
               className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 transition-colors"
-              title={node.visible ? 'Hide' : 'Show'}
+              title={node.isVisible ? 'Hide' : 'Show'}
             >
               <Eye size={10} />
             </button>
