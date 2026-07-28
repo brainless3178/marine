@@ -1,6 +1,6 @@
 import { prisma } from '../server.js'
-import { generateSlug, paginationParams, paginationResponse } from '../utils/helpers.js'
-import { productAdminInclude } from '../utils/prisma-helpers.js'
+import { getEffectivePrice, isOnSale, generateSlug, paginationParams, paginationResponse } from '../utils/helpers.js'
+import { productAdminInclude, productInclude } from '../utils/prisma-helpers.js'
 import { logAudit } from '../utils/audit.js'
 import type { AuthUser } from '../middleware/auth.js'
 
@@ -11,15 +11,23 @@ export interface ProductFilters {
   availability?: string
   condition?: string
   brandId?: string
+  brand?: string
   categoryId?: string
+  category?: string
+  industry?: string
   search?: string
+  onSale?: boolean
   isNewArrival?: boolean
   isFeatured?: boolean
+  makeOffer?: boolean
+  priceMin?: number
+  priceMax?: number
+  sort?: string
   page?: number
   limit?: number
 }
 
-// ─── Queries ──────────────────────────────────────────────────
+// ─── Queries (Admin) ──────────────────────────────────────────
 
 export async function listProducts(params: ProductFilters) {
   const { page, limit, skip } = paginationParams(params.page, params.limit)
@@ -51,6 +59,134 @@ export async function listProducts(params: ProductFilters) {
   ])
 
   return { products, pagination: paginationResponse(total, page, limit) }
+}
+
+// ─── Queries (Storefront) ──────────────────────────────────────
+
+export async function listStorefrontProducts(params: ProductFilters) {
+  const { page, limit, skip } = paginationParams(params.page, params.limit)
+
+  const where: any = { status: 'published' }
+  if (params.category) where.category = { slug: params.category }
+  if (params.brand) where.brand = { slug: params.brand }
+  if (params.industry) where.industries = { some: { industry: { slug: params.industry } } }
+  if (params.condition) where.condition = params.condition
+  if (params.availability) where.availability = params.availability
+  if (params.onSale) where.salePrice = { not: null }
+  if (params.isNewArrival) where.isNewArrival = true
+  if (params.isFeatured) where.isFeatured = true
+  if (params.makeOffer) where.makeOfferEnabled = true
+  if (params.priceMin !== undefined || params.priceMax !== undefined) {
+    where.regularPrice = {}
+    if (params.priceMin !== undefined) where.regularPrice.gte = params.priceMin
+    if (params.priceMax !== undefined) where.regularPrice.lte = params.priceMax
+  }
+  if (params.search) {
+    where.OR = [
+      { name: { contains: params.search, mode: 'insensitive' } },
+      { sku: { contains: params.search, mode: 'insensitive' } },
+      { brand: { name: { contains: params.search, mode: 'insensitive' } } },
+    ]
+  }
+
+  let orderBy: any = { createdAt: 'desc' }
+  if (params.sort === 'price-asc') orderBy = { regularPrice: 'asc' }
+  else if (params.sort === 'price-desc') orderBy = { regularPrice: 'desc' }
+  else if (params.sort === 'name-asc') orderBy = { name: 'asc' }
+  else if (params.sort === 'name-desc') orderBy = { name: 'desc' }
+  else if (params.sort === 'newest') orderBy = { createdAt: 'desc' }
+  else if (params.sort === 'oldest') orderBy = { createdAt: 'asc' }
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({ where, include: productInclude, orderBy, skip, take: limit }),
+    prisma.product.count({ where }),
+  ])
+
+  return {
+    products: products.map(p => ({ ...p, price: getEffectivePrice(p), onSale: isOnSale(p), inStock: p.stockCount > 0 })),
+    pagination: paginationResponse(total, page, limit),
+  }
+}
+
+export async function getStorefrontProduct(id: string) {
+  const product = await prisma.product.findFirst({
+    where: { OR: [{ id }, { slug: id }], status: 'published' },
+    include: productInclude,
+  })
+  if (!product) return null
+  return { ...product, price: getEffectivePrice(product), onSale: isOnSale(product), inStock: product.stockCount > 0 }
+}
+
+export async function getRelatedProducts(id: string, categoryId: string | null, brandId: string | null, take = 4) {
+  const related = await prisma.product.findMany({
+    where: {
+      status: 'published',
+      id: { not: id },
+      OR: [
+        ...(categoryId ? [{ categoryId }] : []),
+        ...(brandId ? [{ brandId }] : []),
+      ],
+    },
+    include: productInclude,
+    take,
+    orderBy: { createdAt: 'desc' },
+  })
+  return related.map(p => ({ ...p, price: getEffectivePrice(p), onSale: isOnSale(p), inStock: p.stockCount > 0 }))
+}
+
+export async function getFeaturedProducts(take = 8) {
+  return prisma.product.findMany({
+    where: { status: 'published', isFeatured: true },
+    include: productInclude,
+    take,
+    orderBy: { sortPriority: 'desc' },
+  })
+}
+
+export async function getNewArrivals(take = 8) {
+  return prisma.product.findMany({
+    where: { status: 'published', isNewArrival: true },
+    include: productInclude,
+    take,
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function getEmergencyProducts(take = 12) {
+  return prisma.product.findMany({
+    where: { status: 'published', availability: 'emergency' },
+    include: productInclude,
+    take,
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function getProductCategoryAndBrand(id: string) {
+  return prisma.product.findUnique({ where: { id }, select: { categoryId: true, brandId: true } })
+}
+
+export async function getFilterCounts() {
+  const publishedWhere: any = { status: 'published' }
+
+  const [categories, brands, priceAgg] = await Promise.all([
+    prisma.category.findMany({
+      where: { isVisible: true },
+      include: { _count: { select: { products: { where: { status: 'published' } } } } },
+      orderBy: { sortOrder: 'asc' },
+    }),
+    prisma.brand.findMany({
+      where: { isVisible: true },
+      include: { _count: { select: { products: { where: { status: 'published' } } } } },
+      orderBy: { sortOrder: 'asc' },
+    }),
+    prisma.product.aggregate({ where: { status: 'published' }, _min: { regularPrice: true }, _max: { regularPrice: true } }),
+  ])
+
+  return {
+    categories: categories.map(c => ({ id: c.slug, name: c.name, count: c._count.products })),
+    brands: brands.map(b => ({ id: b.slug, name: b.name, count: b._count.products })),
+    priceRange: { min: Number(priceAgg._min.regularPrice) || 0, max: Number(priceAgg._max.regularPrice) || 1000 },
+  }
 }
 
 export async function getProduct(id: string) {

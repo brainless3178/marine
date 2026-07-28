@@ -1,8 +1,8 @@
 import { prisma } from '../server.js'
-import { generateOrderNumber, generateOfferNumber, paginationParams, paginationResponse } from '../utils/helpers.js'
+import { generateRfqNumber, generateOrderNumber, generateOfferNumber, paginationParams, paginationResponse } from '../utils/helpers.js'
 import { rfqInclude } from '../utils/prisma-helpers.js'
 import { logAudit } from '../utils/audit.js'
-import { sendRfqResponse } from './email.js'
+import { sendRfqReceived, sendRfqResponse } from './email.js'
 import logger from '../utils/logger.js'
 import type { AuthUser } from '../middleware/auth.js'
 
@@ -15,6 +15,49 @@ export interface RfqFilters {
   search?: string
   page?: number
   limit?: number
+}
+
+// ─── Storefront ───────────────────────────────────────────────
+
+export async function createRfq(data: {
+  fullName: string; company?: string; email: string; phone?: string
+  country?: string; role?: string; productDescription: string
+  partNumber?: string; brand?: string; quantity?: number
+  deliveryLocation?: string; urgency?: string; notes?: string
+  source?: string; consent: boolean
+}) {
+  const { notes, ...dbFields } = data
+  const rfq = await prisma.rfq.create({
+    data: {
+      rfqNumber: await generateRfqNumber(),
+      ...dbFields,
+      internalNotes: notes || null,
+      status: 'new',
+      responseDeadline: data.urgency === 'emergency'
+        ? new Date(Date.now() + 2 * 60 * 60 * 1000) // 2 hours
+        : data.urgency === 'urgent'
+          ? new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+          : null,
+    },
+  })
+
+  await logAudit({
+    action: 'rfq.create',
+    entityType: 'rfq',
+    entityId: rfq.id,
+    entityName: rfq.rfqNumber,
+    newValue: rfq,
+  })
+
+  // Notify admin team (non-blocking)
+  sendRfqReceived({
+    rfqNumber: rfq.rfqNumber,
+    customerName: data.fullName,
+    productDescription: data.productDescription,
+    urgency: data.urgency || 'standard',
+  }).catch(err => logger.error({ err }, 'RFQ email failed'))
+
+  return rfq
 }
 
 // ─── Queries ──────────────────────────────────────────────────
