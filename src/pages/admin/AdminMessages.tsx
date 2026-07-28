@@ -172,8 +172,8 @@ export default function AdminMessages() {
       try {
         await admin.messages.markRead(msg.id)
         setMessages((prev) => prev.map((m) => m.id === msg.id ? { ...m, read: true } : m))
-      } catch {
-        // Optimistic update already done
+      } catch (err) {
+        console.warn('[AdminMessages] Mark read failed (optimistic update applied):', err)
       }
     }
   }

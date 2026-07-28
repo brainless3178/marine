@@ -11,8 +11,8 @@ export function useLiveOrders(intervalMs = 30000) {
     try {
       const res = await admin.orders.list({ limit: '20', sort: 'newest' })
       setOrders(res?.orders || [])
-    } catch {
-      // Retry on next polling interval
+    } catch (err) {
+      console.warn('[useLiveOrders] Fetch failed, will retry on next interval:', err)
     }
     setLoading(false)
   }, [])
