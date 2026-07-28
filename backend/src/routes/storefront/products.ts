@@ -1,12 +1,35 @@
 import { Router } from 'express'
-import { asyncHandler } from '../../middleware/validate.js'
+import { asyncHandler, validateQuery, validateParams } from '../../middleware/validate.js'
 import * as productService from '../../services/productService.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
+import { z } from 'zod'
 
 const router = Router()
 
+const productQuerySchema = z.object({
+  category: z.string().optional(),
+  brand: z.string().optional(),
+  industry: z.string().optional(),
+  condition: z.string().optional(),
+  availability: z.string().optional(),
+  onSale: z.enum(['true', 'false']).optional(),
+  isNewArrival: z.enum(['true', 'false']).optional(),
+  isFeatured: z.enum(['true', 'false']).optional(),
+  makeOffer: z.enum(['true', 'false']).optional(),
+  priceMin: z.string().optional(),
+  priceMax: z.string().optional(),
+  search: z.string().optional(),
+  sort: z.string().optional(),
+  page: z.string().optional(),
+  limit: z.string().optional(),
+})
+
+const idParamsSchema = z.object({
+  id: z.string().min(1).max(100),
+})
+
 // ─── List Products (Storefront) ────────────────────────────────
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/', validateQuery(productQuerySchema), asyncHandler(async (req, res) => {
   const filters = {
     category: req.query.category as string | undefined,
     brand: req.query.brand as string | undefined,
@@ -56,7 +79,7 @@ router.get('/emergency', asyncHandler(async (_req, res) => {
 }))
 
 // ─── Get Single Product ────────────────────────────────────────
-router.get('/:id', asyncHandler(async (req, res) => {
+router.get('/:id', validateParams(idParamsSchema), asyncHandler(async (req, res) => {
   const id = req.params.id as string
   const product = await productService.getStorefrontProduct(id)
   if (!product) return sendError(res, 'Product not found', 404)
@@ -69,7 +92,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }))
 
 // ─── Get Related Products ──────────────────────────────────────
-router.get('/:id/related', asyncHandler(async (req, res) => {
+router.get('/:id/related', validateParams(idParamsSchema), asyncHandler(async (req, res) => {
   const id = req.params.id as string
   const info = await productService.getProductCategoryAndBrand(id)
   if (!info) return sendError(res, 'Product not found', 404)

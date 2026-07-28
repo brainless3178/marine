@@ -1,9 +1,14 @@
 import { Router } from 'express'
 import { prisma } from '../../server.js'
-import { asyncHandler } from '../../middleware/validate.js'
+import { asyncHandler, validateParams } from '../../middleware/validate.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
+import { z } from 'zod'
 
 const router = Router()
+
+const slugParamsSchema = z.object({
+  slug: z.string().min(1).max(200),
+})
 
 // ─── List Visible Categories ───────────────────────────────────
 router.get('/', asyncHandler(async (_req, res) => {
@@ -23,7 +28,7 @@ router.get('/', asyncHandler(async (_req, res) => {
 }))
 
 // ─── Get Category by Slug ──────────────────────────────────────
-router.get('/:slug', asyncHandler(async (req, res) => {
+router.get('/:slug', validateParams(slugParamsSchema), asyncHandler(async (req, res) => {
   const category = await prisma.category.findFirst({
     where: { slug: req.params.slug as string, isVisible: true },
     include: {
