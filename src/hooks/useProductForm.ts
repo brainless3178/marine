@@ -105,7 +105,7 @@ export function getFormFromProduct(product: ApiProduct): ProductFormData {
     brand: product.brandId || (typeof product.brand === 'object' ? product.brand?.id || '' : product.brand || ''),
     category: product.categoryId || (typeof product.category === 'object' ? product.category?.id || '' : product.category || ''),
     industries: Array.isArray(product.industries)
-      ? product.industries.map((i) => typeof i === 'object' ? (i.industryId || i.industry?.id || i.id || '') : i)
+      ? product.industries.map((i) => typeof i === 'object' ? ((i as any).industryId || (i as any).industry?.id || '') : i)
       : (Array.isArray(product.industryIds) ? product.industryIds : []),
     condition: product.condition || 'used',
     availability: product.availability || 'in-stock',
@@ -140,7 +140,7 @@ export function getFormFromProduct(product: ApiProduct): ProductFormData {
     excludedItems: Array.isArray(product.excludedItems) && product.excludedItems.length > 0 ? product.excludedItems : [''],
     seoTitle: product.seoTitle || product.name || '',
     seoDescription: product.seoDescription || product.description?.slice(0, 160) || '',
-    searchKeywords: product.seoKeywords || product.searchKeywords || '',
+    searchKeywords: (Array.isArray(product.seoKeywords) ? product.seoKeywords.join(', ') : (product.seoKeywords || product.searchKeywords || '')) as string,
     internalNotes: product.internalNotes || '',
     isNewArrival: product.isNewArrival ?? false,
     isFeatured: product.isFeatured ?? false,
@@ -377,6 +377,8 @@ export function useProductForm() {
           altText: img.alt,
           label: img.label,
           isMain: i === 0,
+          id: `img-${Date.now()}-${i}`,
+          sortOrder: i,
         })),
         regularPrice: Number(form.regularPrice) || 0,
         salePrice: form.salePrice ? Number(form.salePrice) : null,
@@ -396,7 +398,7 @@ export function useProductForm() {
         conditionNotes: form.conditionNotes,
         includedItems: form.includedItems.filter((i: string) => i.trim()),
         excludedItems: form.excludedItems.filter((i: string) => i.trim()),
-        seoKeywords: form.searchKeywords,
+        seoKeywords: form.searchKeywords ? form.searchKeywords.split(',').map(s => s.trim()).filter(Boolean) : [],
         showPrice: (Number(form.regularPrice) || 0) > 0,
         internalNotes: form.internalNotes,
         isNewArrival: form.isNewArrival,

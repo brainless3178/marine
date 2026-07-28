@@ -29,6 +29,7 @@ export interface ProductImage {
   id: string
   url: string
   altText?: string | null
+  alt?: string | null
   label?: string | null
   isMain: boolean
   sortOrder: number
@@ -94,8 +95,6 @@ export interface Product {
   specs: ProductSpec[]
   industries: { industry: { id: string; name: string; slug: string } }[]
   industryIds?: string[]
-  brandId?: string
-  categoryId?: string
   // Computed
   price?: number
   onSale?: boolean
@@ -234,10 +233,12 @@ export interface Rfq {
   quantity?: number | null
   deliveryLocation?: string | null
   urgency: string
+  subject?: string | null
   notes?: string | null
   source?: string | null
   consent?: boolean
   status: string
+  customer?: { id: string; name: string; email: string; phone?: string | null } | null
   assignedTo?: string | null
   responseDeadline?: string | null
   createdAt: string

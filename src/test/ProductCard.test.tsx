@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { ProductCard } from '../components/ui/ProductCard'
@@ -27,40 +27,39 @@ vi.mock('lucide-react', () => ({
 const baseProduct: Product = {
   id: 'prod-1',
   name: 'Hydraulic Pump HP-200',
-  slug: 'hydraulic-pump-hp-200',
   sku: 'HP-200',
   description: 'High-pressure hydraulic pump',
   price: 1200,
-  salePrice: null,
+  salePrice: undefined,
   onSale: false,
   inStock: true,
   stockCount: 15,
   brand: 'Yokohama',
-  category: 'Pumps',
+  category: 'Pumps' as any,
   condition: 'new',
   availability: 'in-stock',
   makeOffer: false,
-  customLabel: null,
-  customLabelColor: null,
+  customLabel: undefined,
+  customLabelColor: undefined,
   filename: 'pump.jpg',
   images: [],
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  industry: [],
+  specs: {},
 }
 
 function renderProductCard(product = baseProduct, options?: { added?: boolean; onAddToCart?: any; compact?: boolean }) {
-  const t = (key: string, _vars?: any) => {
+  const t = ((key: string, _vars?: any) => {
     const translations: Record<string, string> = {
       'product.emergency': 'EMERGENCY',
       'product.inStock': 'In Stock',
-      'product.inStockCount': `${vars?.count || 0} in stock`,
+      'product.inStockCount': `${(_vars as any)?.count || 0} in stock`,
       'product.outOfStock': 'Out of Stock',
       'product.outOfStockCount': 'Out of stock',
       'product.addToCart': 'Add to Cart',
       'product.added': 'Added',
     }
     return translations[key] || key
-  }
+  }) as any
 
   return render(
     <BrowserRouter>

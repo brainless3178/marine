@@ -105,7 +105,7 @@ export default function AdminProducts() {
       params.limit = String(ITEMS_PER_PAGE)
 
       const res = await admin.products.list(params)
-      setProductList((res.products || []).map((p) => ({
+      setProductList((res.products || []).map((p: any) => ({
         id: p.id,
         name: p.name || '',
         sku: p.sku || '',
