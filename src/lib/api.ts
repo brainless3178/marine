@@ -51,7 +51,7 @@ async function getCsrfToken(): Promise<string | null> {
       return csrfToken
     } catch {
       // If fetch fails, reset promise so next caller retries
-      // Silently fail — CSRF token is optional; the server will reject if needed
+      console.warn('[api] CSRF token fetch failed — continuing without CSRF protection')
       csrfTokenPromise = null
       return null
     } finally {
@@ -187,6 +187,7 @@ async function handleResponse<T>(res: Response): Promise<T> {
       details = json.details
     } catch {
       // Response body is not JSON — use default message
+      console.warn('[api] Non-JSON error response:', res.status, res.statusText)
     }
 
     throw new ApiError(res.status, message, details)
@@ -224,7 +225,7 @@ async function tryRefreshAdmin(): Promise<boolean> {
     adminAccessToken = data.accessToken
     return true
   } catch {
-    // Admin token refresh failed silently — caller will handle expired session
+    console.warn('[api] Admin token refresh failed — session may expire soon')
     adminAccessToken = null
     return false
   }
@@ -245,7 +246,7 @@ async function tryRefreshCustomer(): Promise<boolean> {
     customerAccessToken = data.accessToken
     return true
   } catch {
-    // Customer token refresh failed silently — caller will handle expired session
+    console.warn('[api] Customer token refresh failed — session may expire soon')
     customerAccessToken = null
     return false
   }

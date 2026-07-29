@@ -30,7 +30,7 @@ export interface Order {
 export const STATUS_FLOW: OrderStatus[] = ['pending', 'confirmed', 'paid', 'processing', 'packed', 'shipped', 'delivered']
 
 export function mapApiOrder(o: ApiOrder): Order {
-  const oAny = o as any
+  const oAny = o as Record<string, unknown>
   const items = (o.items || o.orderItems || []).map((item: ApiOrderItem) => ({
     productName: item.product?.name || item.productName || 'Unknown Product',
     sku: item.product?.sku || item.sku || '',
@@ -39,10 +39,10 @@ export function mapApiOrder(o: ApiOrder): Order {
   }))
   return {
     id: o.orderNumber || o.id,
-    customerName: (o.customer as any)?.name || oAny.customerName || (o.customer as any)?.email || '',
-    customerEmail: (o.customer as any)?.email || oAny.customerEmail || '',
-    company: oAny.company || '',
-    country: oAny.shippingCountry || oAny.country || '',
+    customerName: o.customer?.name || (oAny.customerName as string) || o.customer?.email || '',
+    customerEmail: o.customer?.email || (oAny.customerEmail as string) || '',
+    company: (oAny.company as string) || '',
+    country: (oAny.shippingCountry as string) || (oAny.country as string) || '',
     items,
     subtotal: o.subtotal ?? 0,
     shipping: o.shippingCost ?? 0,
@@ -51,14 +51,14 @@ export function mapApiOrder(o: ApiOrder): Order {
     status: (o.status || 'pending') as OrderStatus,
     paymentMethod: o.paymentMethod || 'Bank Transfer',
     paymentStatus: (o.paymentStatus || 'pending') as 'pending' | 'paid' | 'refunded',
-    shippingAddress: oAny.shippingAddress || '',
+    shippingAddress: (oAny.shippingAddress as string) || '',
     trackingNumber: o.trackingNumber || '',
     courier: o.courier || '',
     createdAt: o.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
-    notes: oAny.notes || '',
+    notes: (oAny.notes as string) || '',
     timeline: (o.timeline || []).map((t: ApiOrderTimeline) => ({
       status: (t.status || 'pending') as OrderStatus,
-      date: (t as any).date || t.createdAt || new Date().toISOString(),
+      date: t.createdAt || new Date().toISOString(),
       note: t.note || '',
     })),
   }

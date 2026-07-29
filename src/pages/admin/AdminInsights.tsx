@@ -66,7 +66,7 @@ export default function AdminInsights() {
     try {
       const saved = localStorage.getItem('alka-insights-collapsed')
       return saved ? new Set(JSON.parse(saved)) : new Set()
-    } catch { return new Set() }
+    } catch { console.warn('[Insights] Failed to parse unique values set'); return new Set() }
   })
 
   const toggleSection = useCallback((id: string) => {

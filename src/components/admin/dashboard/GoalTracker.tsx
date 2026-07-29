@@ -24,11 +24,11 @@ const categoryConfig = {
 }
 
 function loadGoals(): Goal[] {
-  try { return JSON.parse(localStorage.getItem(GOALS_KEY) || '[]') } catch { return [] }
+  try { return JSON.parse(localStorage.getItem(GOALS_KEY) || '[]') } catch { console.warn('[GoalTracker] Failed to parse goals from localStorage'); return [] }
 }
 
 function saveGoals(goals: Goal[]) {
-  try { localStorage.setItem(GOALS_KEY, JSON.stringify(goals)) } catch { /* quota exceeded */ }
+  try { localStorage.setItem(GOALS_KEY, JSON.stringify(goals)) } catch { /* quota exceeded, expected */ }
 }
 
 export function GoalTracker({ orders, products }: Props) {

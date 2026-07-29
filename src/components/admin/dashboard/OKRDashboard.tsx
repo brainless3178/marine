@@ -29,7 +29,7 @@ function loadOKRs(): Objective[] {
   try {
     const data = localStorage.getItem(STORAGE_KEY)
     return data ? JSON.parse(data) : []
-  } catch { return [] }
+  } catch { console.warn('[OKR] Failed to load OKRs from localStorage'); return [] }
 }
 
 function saveOKRs(okrs: Objective[]) {

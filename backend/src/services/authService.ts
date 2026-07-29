@@ -128,6 +128,7 @@ export async function refreshCustomerToken(refreshToken: string | undefined) {
 
     return { accessToken, refreshToken: newRefreshToken, cookieOptions: generateCookieOptions(14) }
   } catch {
+    logger.warn({ err: new Error('Invalid customer refresh token') }, 'Customer token refresh failed')
     throw Object.assign(new Error('Invalid refresh token'), { status: 401 })
   }
 }
@@ -169,6 +170,7 @@ export async function resetPassword(token: string, newPassword: string) {
   try {
     jwt.verify(token, JWT_SECRET + customer.passwordHash)
   } catch {
+    logger.warn({ err: new Error('Invalid reset token') }, 'Password reset token verification failed')
     throw Object.assign(new Error('Invalid or expired reset token'), { status: 400 })
   }
 
@@ -234,6 +236,7 @@ export async function refreshAdminToken(refreshToken: string | undefined) {
 
     return { accessToken, refreshToken: newRefreshToken, cookieOptions: generateCookieOptions(7) }
   } catch {
+    logger.warn({ err: new Error('Invalid customer refresh token') }, 'Customer token refresh failed')
     throw Object.assign(new Error('Invalid refresh token'), { status: 401 })
   }
 }

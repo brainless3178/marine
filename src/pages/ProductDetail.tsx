@@ -77,7 +77,7 @@ export default function ProductDetail() {
           return
         }
       } catch {
-        // API failed — fall back to local static product dataset
+        console.warn('[ProductDetail] API fetch failed — falling back to static product data')
       }
 
       // Fallback to static catalog
