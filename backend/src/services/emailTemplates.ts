@@ -1,0 +1,213 @@
+import { escapeHtml } from '../utils/html-escape.js'
+
+const WHATSAPP = process.env.WHATSAPP_NUMBER || '919726900547'
+const COMPANY = process.env.COMPANY_EMAIL || 'info@alkatraders.com'
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+const RFQ_EMAIL = process.env.RFQ_EMAIL || 'rfq@alkatraders.com'
+const EMERGENCY_EMAIL = process.env.EMERGENCY_EMAIL || 'emergency@alkatraders.com'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alkatraders.com'
+
+// ─── Template Helpers ──────────────────────────────────────────
+
+function baseLayout(title: string, body: string): string {
+  const whatsapp = WHATSAPP
+  const company = COMPANY
+  const frontendUrl = FRONTEND_URL
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f4f6f9;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;padding:32px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <tr><td style="background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 100%);padding:24px 32px;text-align:center;">
+          <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;">⚓ Alka Traders</h1>
+          <p style="margin:4px 0 0;color:#94a3b8;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Marine & Industrial Equipment</p>
+        </td></tr>
+        <tr><td style="padding:32px;">${body}</td></tr>
+        <tr><td style="background:#f8fafc;padding:24px 32px;text-align:center;border-top:1px solid #e2e8f0;">
+          <p style="margin:0;color:#64748b;font-size:12px;">Alka Traders — Marine & Industrial Equipment</p>
+          <p style="margin:4px 0 0;color:#94a3b8;font-size:11px;">
+            <a href="https://wa.me/${whatsapp}" style="color:#25d366;">WhatsApp</a> ·
+            <a href="mailto:${company}" style="color:#0ea5e9;">Email</a> ·
+            <a href="${frontendUrl}" style="color:#0ea5e9;">Website</a>
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+}
+
+function btn(href: string, text: string, color = '#0ea5e9'): string {
+  return `<a href="${href}" style="display:inline-block;background:${color};color:#ffffff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;margin:16px 0;">${text}</a>`
+}
+
+function infoRow(label: string, value: string): string {
+  return `<tr><td style="padding:6px 0;color:#64748b;font-size:13px;width:140px;vertical-align:top;">${label}</td><td style="padding:6px 0;color:#1e293b;font-size:13px;font-weight:500;">${value}</td></tr>`
+}
+
+interface QueueEmail {
+  to: string
+  toName?: string
+  subject: string
+  html: string
+  text?: string
+  template?: string
+  templateData?: Record<string, unknown>
+}
+
+// ─── Email Templates ───────────────────────────────────────────
+
+export const emailTemplates = {
+  orderConfirmation(data: {
+    orderNumber: string
+    customerName: string
+    items: { name: string; quantity: number; price: number }[]
+    subtotal: number
+    shippingCost: number
+    tax: number
+    total: number
+    shippingAddress: string
+  }): QueueEmail {
+    const itemRows = data.items.map(i =>
+      `<tr><td style="padding:8px 0;border-bottom:1px solid #f1f5f9;color:#1e293b;">${i.name}</td><td style="padding:8px 0;border-bottom:1px solid #f1f5f9;text-align:center;color:#64748b;">${i.quantity}</td><td style="padding:8px 0;border-bottom:1px solid #f1f5f9;text-align:right;color:#1e293b;">$${i.price.toFixed(2)}</td></tr>`
+    ).join('')
+
+    const html = baseLayout('Order Confirmation', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Order Confirmed ✅</h2>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Thank you for your order, ${escapeHtml(data.customerName)}!</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;">
+        <tr><td>${infoRow('Order Number', `<span style="color:#0ea5e9;font-weight:700;">${data.orderNumber}</span>`)}</td></tr>
+      </table>
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+        <tr style="background:#f8fafc;"><th style="padding:10px 8px;text-align:left;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Product</th><th style="padding:10px 8px;text-align:center;font-size:12px;color:#64748b;">Qty</th><th style="padding:10px 8px;text-align:right;font-size:12px;color:#64748b;">Price</th></tr>
+        ${itemRows}
+      </table>
+      ${infoRow('Subtotal', `$${data.subtotal.toFixed(2)}`)}
+      ${infoRow('Shipping', `$${data.shippingCost.toFixed(2)}`)}
+      ${infoRow('Tax', `$${data.tax.toFixed(2)}`)}
+      <p style="font-size:18px;font-weight:bold;border-top:2px solid #e2e8f0;padding-top:8px;">Total: <span style="color:#0ea5e9;">$${data.total.toFixed(2)}</span></p>
+      <p style="color:#64748b;font-size:13px;text-align:center;">We'll send you tracking information once your order ships.</p>
+    `)
+    return { to: '', subject: `Order ${data.orderNumber} Confirmed — Alka Traders`, html, template: 'order-confirmation', templateData: data as Record<string, unknown> }
+  },
+
+  orderShipped(data: { orderNumber: string; customerName: string; trackingNumber: string; courier: string }): QueueEmail {
+    const html = baseLayout('Order Shipped', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Your Order Has Shipped 🚚</h2>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${escapeHtml(data.customerName)}, your order is on its way!</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin-bottom:24px;">
+        <tr><td>${infoRow('Order', `<span style="font-weight:700;">${escapeHtml(data.orderNumber)}</span>`)}${infoRow('Courier', escapeHtml(data.courier))}${infoRow('Tracking', `<span style="color:#0ea5e9;font-weight:600;">${escapeHtml(data.trackingNumber)}</span>`)}</td></tr>
+      </table>
+      <p style="color:#64748b;font-size:13px;">Track your shipment with ${escapeHtml(data.courier)} using tracking number <strong>${escapeHtml(data.trackingNumber)}</strong>.</p>
+    `)
+    return { to: '', subject: `Order ${data.orderNumber} Shipped — Tracking: ${escapeHtml(data.trackingNumber)}`, html, template: 'order-shipped', templateData: data as Record<string, unknown> }
+  },
+
+  orderCancelled(data: { orderNumber: string; customerName: string; reason: string }): QueueEmail {
+    const html = baseLayout('Order Cancelled', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Order Cancelled</h2>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${escapeHtml(data.customerName)}, your order <strong>${escapeHtml(data.orderNumber)}</strong> has been cancelled.</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin-bottom:24px;">
+        <tr><td style="color:#991b1b;font-size:13px;"><strong>Reason:</strong> ${escapeHtml(data.reason)}</td></tr>
+      </table>
+      <p style="color:#64748b;font-size:13px;">If you have questions, contact us at <a href="mailto:${COMPANY}" style="color:#0ea5e9;">${COMPANY}</a>.</p>
+    `)
+    return { to: '', subject: `Order ${data.orderNumber} Cancelled — Alka Traders`, html, template: 'order-cancelled', templateData: data as Record<string, unknown> }
+  },
+
+  rfqReceived(data: { rfqNumber: string; customerName: string; productDescription: string; urgency: string }): QueueEmail {
+    const urgencyColor = data.urgency === 'emergency' ? '#dc2626' : data.urgency === 'urgent' ? '#f59e0b' : '#0ea5e9'
+    const html = baseLayout('New RFQ Received', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">New RFQ Received 📋</h2>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;">
+        <tr><td>${infoRow('RFQ Number', `<span style="color:#0ea5e9;font-weight:700;">${data.rfqNumber}</span>`)}${infoRow('Customer', data.customerName)}${infoRow('Urgency', `<span style="display:inline-block;background:${urgencyColor};color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;text-transform:uppercase;">${data.urgency}</span>`)}${infoRow('Description', escapeHtml(data.productDescription))}</td></tr>
+      </table>
+      ${btn(`${FRONTEND_URL}/admin/rfqs`, 'View RFQ in Admin Panel', urgencyColor)}
+    `)
+    return { to: RFQ_EMAIL, subject: `[RFQ ${data.urgency.toUpperCase()}] ${data.rfqNumber} — ${escapeHtml(data.customerName)}`, html, template: 'rfq-received', templateData: data as Record<string, unknown> }
+  },
+
+  rfqResponse(data: { rfqNumber: string; customerName: string; message: string }): QueueEmail {
+    const html = baseLayout('RFQ Response', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Response to Your RFQ</h2>
+      <p style="color:#64748b;font-size:14px;margin:0 0 16px;">Hi ${data.customerName}, we've received your RFQ <strong>${data.rfqNumber}</strong> and our team is working on it.</p>
+      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;color:#1e293b;font-size:14px;line-height:1.6;">${escapeHtml(data.message)}</div>
+      <p style="color:#64748b;font-size:13px;">Need immediate help? <a href="https://wa.me/${WHATSAPP}" style="color:#25d366;font-weight:600;">WhatsApp us</a></p>
+    `)
+    return { to: '', subject: `RE: RFQ ${data.rfqNumber} — Alka Traders`, html, template: 'rfq-response', templateData: data as Record<string, unknown> }
+  },
+
+  emergencyAlert(data: { rfqNumber: string; customerName: string; phone: string; partDescription: string; vesselName?: string }): QueueEmail {
+    const html = baseLayout('🚨 EMERGENCY RFQ', `
+      <div style="background:#fef2f2;border:2px solid #dc2626;border-radius:8px;padding:20px;margin-bottom:24px;">
+        <h2 style="margin:0 0 8px;color:#dc2626;font-size:22px;">🚨 EMERGENCY RFQ — RESPOND WITHIN 2 HOURS</h2>
+        <p style="color:#991b1b;font-size:14px;margin:0;">This requires immediate attention.</p>
+      </div>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:16px;margin-bottom:24px;">
+        <tr><td>${infoRow('RFQ Number', `<span style="color:#dc2626;font-weight:700;">${data.rfqNumber}</span>`)}${infoRow('Customer', data.customerName)}${infoRow('Phone', `<a href="tel:${data.phone}" style="color:#0ea5e9;">${data.phone}</a>`)}${infoRow('Part Needed', data.partDescription)}${data.vesselName ? infoRow('Vessel', data.vesselName) : ''}</td></tr>
+      </table>
+      ${btn(`tel:${data.phone}`, '📞 Call Customer Now', '#dc2626')}
+      ${btn(`https://wa.me/${data.phone.replace(/[^0-9]/g, '')}`, '💬 WhatsApp Now', '#25d366')}
+    `)
+    return { to: EMERGENCY_EMAIL, subject: `🚨 EMERGENCY RFQ ${data.rfqNumber} — ${data.customerName} — ${data.vesselName || 'Vessel Unknown'}`, html, template: 'emergency-rfq', templateData: data as Record<string, unknown> }
+  },
+
+  offerReceived(data: { offerNumber: string; productName: string; offeredPrice: number; customerEmail: string }): QueueEmail {
+    const html = baseLayout('New Offer Received', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">New Make-Offer Request 💰</h2>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;">
+        <tr><td>${infoRow('Offer Number', `<span style="color:#0ea5e9;font-weight:700;">${data.offerNumber}</span>`)}${infoRow('Product', data.productName)}${infoRow('Offered Price', `<span style="color:#059669;font-weight:700;font-size:16px;">$${data.offeredPrice.toFixed(2)}</span>`)}${infoRow('Customer', data.customerEmail)}</td></tr>
+      </table>
+      ${btn(`${FRONTEND_URL}/admin/offers`, 'Review Offer in Admin', '#059669')}
+    `)
+    return { to: ADMIN_EMAIL, subject: `[OFFER] ${data.offerNumber} — $${data.offeredPrice.toFixed(2)} — ${data.productName}`, html, template: 'offer-received', templateData: data as Record<string, unknown> }
+  },
+
+  offerDecision(data: { offerNumber: string; productName: string; decision: 'accepted' | 'rejected' | 'countered'; counterPrice?: number }): QueueEmail {
+    const colors = { accepted: '#059669', rejected: '#dc2626', countered: '#f59e0b' }
+    const labels = { accepted: 'Accepted ✅', rejected: 'Rejected ❌', countered: `Countered at $${data.counterPrice?.toFixed(2)}` }
+    const html = baseLayout(`Offer ${labels[data.decision]}`, `
+      <h2 style="margin:0 0 8px;color:${colors[data.decision]};font-size:22px;">Offer ${labels[data.decision]}</h2>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Your offer for <strong>${data.productName}</strong> has been ${data.decision}.</p>
+      ${infoRow('Offer', data.offerNumber)}
+      ${infoRow('Product', data.productName)}
+      ${infoRow('Status', `<span style="color:${colors[data.decision]};font-weight:700;">${labels[data.decision]}</span>`)}
+      ${data.decision === 'countered' ? `<p style="color:#1e293b;font-size:14px;">We've countered with <strong>$${data.counterPrice?.toFixed(2)}</strong>. Reply to this email or <a href="https://wa.me/${WHATSAPP}" style="color:#25d366;">WhatsApp us</a> to continue.</p>` : ''}
+    `)
+    return { to: '', subject: `Offer ${data.offerNumber} ${labels[data.decision]} — Alka Traders`, html, template: 'offer-decision', templateData: data as Record<string, unknown> }
+  },
+
+  contactNotification(data: { name: string; email: string; subject: string; message: string }): QueueEmail {
+    const html = baseLayout('New Contact Message', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">New Contact Message 📩</h2>
+      ${infoRow('From', `${escapeHtml(data.name)} &lt;${escapeHtml(data.email)}&gt;`)}
+      ${infoRow('Subject', escapeHtml(data.subject) || '(no subject)')}
+      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;color:#1e293b;font-size:14px;line-height:1.6;">${escapeHtml(data.message)}</div>
+      ${btn(`mailto:${data.email}?subject=Re: ${data.subject || 'Your Message'}`, 'Reply via Email', '#0ea5e9')}
+    `)
+    return { to: ADMIN_EMAIL, subject: `[CONTACT] ${data.subject || 'New message from ' + data.name}`, html, template: 'contact-notification', templateData: data as Record<string, unknown> }
+  },
+
+  passwordReset(data: { name: string; resetUrl: string; isAdmin?: boolean }): QueueEmail {
+    const html = baseLayout('Password Reset', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Reset Your Password</h2>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${data.name}, we received a password reset request for your ${data.isAdmin ? 'admin' : 'customer'} account.</p>
+      ${btn(data.resetUrl, 'Reset Password', '#0ea5e9')}
+      <p style="color:#94a3b8;font-size:12px;margin:24px 0 0;">This link expires in 1 hour. If you didn't request this, ignore this email.</p>
+    `)
+    return { to: '', subject: 'Password Reset — Alka Traders', html, template: 'password-reset', templateData: data as Record<string, unknown> }
+  },
+
+  welcome(data: { name: string; email: string }): QueueEmail {
+    const html = baseLayout('Welcome to Alka Traders', `
+      <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Welcome aboard! 🎉</h2>
+      <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${data.name}, your account has been created successfully.</p>
+      <p style="color:#1e293b;font-size:14px;">You can now browse our marine & industrial equipment catalog, place orders, submit RFQs, and make offers on products.</p>
+      ${btn(`${FRONTEND_URL}/products`, 'Browse Products', '#0ea5e9')}
+    `)
+    return { to: data.email, subject: 'Welcome to Alka Traders! 🎉', html, template: 'welcome', templateData: data as Record<string, unknown> }
+  },
+}

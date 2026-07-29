@@ -1,0 +1,83 @@
+import { prisma } from '../server.js'
+import { paginationParams, paginationResponse } from '../utils/helpers.js'
+import { orderInclude } from '../utils/prisma-helpers.js'
+
+export interface OrderFilters {
+  status?: string
+  paymentStatus?: string
+  search?: string
+  page?: number
+  limit?: number
+}
+
+// ─── Queries (Admin) ──────────────────────────────────────────
+
+export async function listOrders(params: OrderFilters) {
+  const { page, limit, skip } = paginationParams(params.page, params.limit)
+
+  const where: any = {}
+  if (params.status) where.status = params.status
+  if (params.paymentStatus) where.paymentStatus = params.paymentStatus
+  if (params.search) {
+    where.OR = [
+      { orderNumber: { contains: params.search, mode: 'insensitive' } },
+      { customer: { name: { contains: params.search, mode: 'insensitive' } } },
+      { customer: { email: { contains: params.search, mode: 'insensitive' } } },
+    ]
+  }
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where, include: orderInclude,
+      orderBy: { createdAt: 'desc' }, skip, take: limit,
+    }),
+    prisma.order.count({ where }),
+  ])
+
+  return { orders, pagination: paginationResponse(total, page, limit) }
+}
+
+export async function getOrder(id: string) {
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: orderInclude,
+  })
+  if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
+  return order
+}
+
+// ─── Queries (Storefront — customer's own orders) ──────────────
+
+export async function listCustomerOrders(customerId: string, page = 1, limit = 20) {
+  const skip = (page - 1) * limit
+  const where = { customerId }
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: { items: true },
+      orderBy: { createdAt: 'desc' },
+      skip, take: limit,
+    }),
+    prisma.order.count({ where }),
+  ])
+
+  return {
+    orders,
+    pagination: {
+      total, page, limit,
+      totalPages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    },
+  }
+}
+
+export async function getCustomerOrder(id: string, customerId: string) {
+  const order = await prisma.order.findFirst({
+    where: { id, customerId },
+    include: { items: true, timeline: { orderBy: { createdAt: 'desc' } } },
+  })
+  if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
+  return order
+}
