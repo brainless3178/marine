@@ -1,0 +1,213 @@
+/**
+ * Admin (authenticated) API endpoints.
+ *
+ * Every call uses the core `api` convenience methods with
+ * `auth: 'admin'` to inject the Bearer token automatically.
+ */
+
+import { API_BASE, api, apiFetch, ApiError, getAdminToken } from './core'
+import type {
+  ApiProduct, ApiCategory, ApiBrand, ApiIndustry,
+  ApiOrder, ApiRfq, ApiOffer, ApiCustomer, ApiMessage,
+  ApiMediaAsset, ApiAdminUser, ApiAuditLog,
+  ApiStoreSettings, ApiHomepageSection, Pagination,
+} from '../api-types'
+
+export const admin = {
+  // Dashboard
+  dashboard: {
+    stats: () => api.get<any>('/admin/dashboard/stats', { auth: 'admin' }),
+    alerts: () => api.get<any>('/admin/dashboard/alerts', { auth: 'admin' }),
+    activity: (limit?: number) =>
+      api.get<any>(`/admin/dashboard/activity${limit ? `?limit=${limit}` : ''}`, { auth: 'admin' }),
+  },
+
+  // Products
+  products: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ products: ApiProduct[]; pagination: Pagination }>(`/admin/products${qs}`, { auth: 'admin' })
+    },
+    get: (id: string) =>
+      api.get<{ product: ApiProduct }>(`/admin/products/${id}`, { auth: 'admin' }),
+    create: (data: Partial<ApiProduct>) =>
+      api.post<{ product: ApiProduct }>('/admin/products', data, { auth: 'admin' }),
+    update: (id: string, data: Partial<ApiProduct>) =>
+      api.put<{ product: ApiProduct }>(`/admin/products/${id}`, data, { auth: 'admin' }),
+    delete: (id: string) =>
+      api.del<{ message: string }>(`/admin/products/${id}`, { auth: 'admin' }),
+    bulk: (ids: string[], action: string, value?: string) =>
+      api.patch<{ updated: number }>('/admin/products/bulk', { ids, action, value }, { auth: 'admin' }),
+    duplicate: (id: string) =>
+      api.post<{ product: ApiProduct }>(`/admin/products/${id}/duplicate`, undefined, { auth: 'admin' }),
+    importCsv: (rows: any[]) =>
+      api.post<{ created: number; skipped: number; errors: string[] }>('/admin/products/import/csv', { rows }, { auth: 'admin' }),
+    exportCsv: async () => {
+      const res = await fetch(`${API_BASE}/admin/products/export/csv`, {
+        headers: getAdminToken() ? { Authorization: `Bearer ${getAdminToken()}` } : undefined,
+        credentials: 'include',
+      })
+      if (!res.ok) throw new ApiError(res.status, 'Export failed')
+      return res.text()
+    },
+  },
+
+  // Categories
+  categories: {
+    list: () => api.get<{ categories: ApiCategory[] }>('/admin/categories', { auth: 'admin' }),
+    create: (data: Partial<ApiCategory>) => api.post<{ category: ApiCategory }>('/admin/categories', data, { auth: 'admin' }),
+    update: (id: string, data: Partial<ApiCategory>) => api.put<{ category: ApiCategory }>(`/admin/categories/${id}`, data, { auth: 'admin' }),
+    delete: (id: string) => api.del<{ message: string }>(`/admin/categories/${id}`, { auth: 'admin' }),
+    reorder: (id: string, sortOrder: number) =>
+      api.patch<{ category: ApiCategory }>(`/admin/categories/${id}/reorder`, { sortOrder }, { auth: 'admin' }),
+  },
+
+  // Brands
+  brands: {
+    list: () => api.get<{ brands: ApiBrand[] }>('/admin/brands', { auth: 'admin' }),
+    create: (data: Partial<ApiBrand>) => api.post<{ brand: ApiBrand }>('/admin/brands', data, { auth: 'admin' }),
+    update: (id: string, data: Partial<ApiBrand>) => api.put<{ brand: ApiBrand }>(`/admin/brands/${id}`, data, { auth: 'admin' }),
+    delete: (id: string) => api.del<{ message: string }>(`/admin/brands/${id}`, { auth: 'admin' }),
+  },
+
+  // Industries
+  industries: {
+    list: () => api.get<{ industries: ApiIndustry[] }>('/admin/industries', { auth: 'admin' }),
+    create: (data: Partial<ApiIndustry>) => api.post<{ industry: ApiIndustry }>('/admin/industries', data, { auth: 'admin' }),
+    update: (id: string, data: Partial<ApiIndustry>) => api.put<{ industry: ApiIndustry }>(`/admin/industries/${id}`, data, { auth: 'admin' }),
+    delete: (id: string) => api.del<{ message: string }>(`/admin/industries/${id}`, { auth: 'admin' }),
+  },
+
+  // Orders
+  orders: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ orders: ApiOrder[]; pagination: Pagination }>(`/admin/orders${qs}`, { auth: 'admin' })
+    },
+    get: (id: string) => api.get<{ order: ApiOrder }>(`/admin/orders/${id}`, { auth: 'admin' }),
+    updateStatus: (id: string, status: string, note?: string) =>
+      api.patch<{ order: ApiOrder }>(`/admin/orders/${id}/status`, { status, note }, { auth: 'admin' }),
+    updateTracking: (id: string, trackingNumber: string, courier: string) =>
+      api.patch<{ order: ApiOrder }>(`/admin/orders/${id}/tracking`, { trackingNumber, courier }, { auth: 'admin' }),
+    cancel: (id: string, reason?: string) =>
+      api.post<{ order: ApiOrder }>(`/admin/orders/${id}/cancel`, { reason }, { auth: 'admin' }),
+    exportCsv: async () => {
+      const res = await fetch(`${API_BASE}/admin/orders/export/csv`, {
+        headers: getAdminToken() ? { Authorization: `Bearer ${getAdminToken()}` } : undefined,
+        credentials: 'include',
+      })
+      if (!res.ok) throw new ApiError(res.status, 'Export failed')
+      return res.text()
+    },
+  },
+
+  // RFQs
+  rfqs: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ rfqs: ApiRfq[]; pagination: Pagination }>(`/admin/rfqs${qs}`, { auth: 'admin' })
+    },
+    get: (id: string) => api.get<{ rfq: ApiRfq }>(`/admin/rfqs/${id}`, { auth: 'admin' }),
+    updateStatus: (id: string, status: string) =>
+      api.patch<{ rfq: ApiRfq }>(`/admin/rfqs/${id}/status`, { status }, { auth: 'admin' }),
+    assign: (id: string, assignedTo: string) =>
+      api.patch<{ rfq: ApiRfq }>(`/admin/rfqs/${id}/assign`, { assignedTo }, { auth: 'admin' }),
+    addNote: (id: string, note: string, isInternal = true) =>
+      api.post<{ note: { id: string; note: string; isInternal: boolean } }>(`/admin/rfqs/${id}/notes`, { note, isInternal }, { auth: 'admin' }),
+    respond: (id: string, message?: string) =>
+      api.patch<{ rfq: ApiRfq }>(`/admin/rfqs/${id}/respond`, { message }, { auth: 'admin' }),
+  },
+
+  // Offers
+  offers: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ offers: ApiOffer[]; pagination: Pagination }>(`/admin/offers${qs}`, { auth: 'admin' })
+    },
+    get: (id: string) => api.get<{ offer: ApiOffer }>(`/admin/offers/${id}`, { auth: 'admin' }),
+    accept: (id: string) => api.patch<{ offer: ApiOffer }>(`/admin/offers/${id}/accept`, undefined, { auth: 'admin' }),
+    reject: (id: string) => api.patch<{ offer: ApiOffer }>(`/admin/offers/${id}/reject`, undefined, { auth: 'admin' }),
+    counter: (id: string, counterPrice: number) =>
+      api.patch<{ offer: ApiOffer }>(`/admin/offers/${id}/counter`, { counterPrice }, { auth: 'admin' }),
+    convertToOrder: (id: string) =>
+      api.post<{ order: ApiOrder }>(`/admin/offers/${id}/convert-to-order`, undefined, { auth: 'admin' }),
+  },
+
+  // Customers
+  customers: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ customers: ApiCustomer[]; pagination: Pagination }>(`/admin/customers${qs}`, { auth: 'admin' })
+    },
+    get: (id: string) => api.get<{ customer: ApiCustomer }>(`/admin/customers/${id}`, { auth: 'admin' }),
+    create: (data: { name: string; email: string; phone?: string; company?: string; country?: string; city?: string }) =>
+      api.post<{ customer: ApiCustomer }>('/admin/customers', data, { auth: 'admin' }),
+    updateStatus: (id: string, status: string) =>
+      api.patch<{ customer: ApiCustomer }>(`/admin/customers/${id}/status`, { status }, { auth: 'admin' }),
+  },
+
+  // Messages
+  messages: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ messages: ApiMessage[]; pagination: Pagination }>(`/admin/messages${qs}`, { auth: 'admin' })
+    },
+    get: (id: string) => api.get<{ message: ApiMessage }>(`/admin/messages/${id}`, { auth: 'admin' }),
+    markRead: (id: string) => api.patch<{ message: ApiMessage }>(`/admin/messages/${id}/read`, undefined, { auth: 'admin' }),
+    archive: (id: string) => api.patch<{ message: ApiMessage }>(`/admin/messages/${id}/archive`, undefined, { auth: 'admin' }),
+    delete: (id: string) => api.del<{ message: string }>(`/admin/messages/${id}`, { auth: 'admin' }),
+  },
+
+  // Media
+  media: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ assets: ApiMediaAsset[]; pagination: Pagination }>(`/admin/media${qs}`, { auth: 'admin' })
+    },
+    usage: (id: string) => api.get<{ id: string; productName: string }[]>(`/admin/media/${id}/usage`, { auth: 'admin' }),
+    delete: (id: string) => api.del<{ message: string }>(`/admin/media/${id}`, { auth: 'admin' }),
+    upload: (file: File) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      return apiFetch<{ asset: any }>('/admin/media/upload', {
+        method: 'POST',
+        body: formData,
+        auth: 'admin',
+      })
+    },
+  },
+
+  // Settings
+  settings: {
+    get: () => api.get<{ settings: ApiStoreSettings; flat: { key: string; value: string; category: string }[] }>('/admin/settings', { auth: 'admin' }),
+    update: (settings: ApiStoreSettings) =>
+      api.put<{ message: string; count: number }>('/admin/settings', { settings }, { auth: 'admin' }),
+  },
+
+  // Homepage
+  homepage: {
+    get: () => api.get<{ sections: ApiHomepageSection[] }>('/admin/homepage', { auth: 'admin' }),
+    update: (sections: ApiHomepageSection[]) =>
+      api.put<{ sections: ApiHomepageSection[] }>('/admin/homepage', { sections }, { auth: 'admin' }),
+  },
+
+  // Users (owner only)
+  users: {
+    list: () => api.get<{ users: ApiAdminUser[] }>('/admin/users', { auth: 'admin' }),
+    create: (data: { name: string; email: string; password: string; role: string; avatarUrl?: string }) =>
+      api.post<{ user: ApiAdminUser }>('/admin/users', data, { auth: 'admin' }),
+    update: (id: string, data: { name?: string; email?: string; avatarUrl?: string; isActive?: boolean }) =>
+      api.put<{ user: ApiAdminUser }>(`/admin/users/${id}`, data, { auth: 'admin' }),
+    deactivate: (id: string) => api.del<{ message: string }>(`/admin/users/${id}`, { auth: 'admin' }),
+    changeRole: (id: string, role: string) =>
+      api.patch<{ user: ApiAdminUser }>(`/admin/users/${id}/role`, { role }, { auth: 'admin' }),
+  },
+
+  // Audit
+  audit: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ logs: ApiAuditLog[]; pagination: Pagination }>(`/admin/audit${qs}`, { auth: 'admin' })
+    },
+  },
+}

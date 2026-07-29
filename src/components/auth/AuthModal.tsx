@@ -1,16 +1,40 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useStore } from '../../store/useStore'
+import { LoginForm } from './LoginForm'
+import { RegisterForm } from './RegisterForm'
 
-type AuthTab = 'signin' | 'signup'
+export type AuthTab = 'signin' | 'signup'
 
-interface FieldErrors {
+export interface FieldErrors {
   name?: string
   email?: string
   password?: string
   confirmPassword?: string
 }
+
+const backdropVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
+} as const
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: 'spring' as const, damping: 25, stiffness: 350, delay: 0.05 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.92,
+    y: 16,
+    transition: { duration: 0.18, ease: 'easeIn' as const },
+  },
+} as const
 
 export function AuthModal() {
   const showAuthModal = useStore((s) => s.showAuthModal)
@@ -18,18 +42,17 @@ export function AuthModal() {
   const login = useStore((s) => s.login)
   const register = useStore((s) => s.register)
   const authError = useStore((s) => s.authError)
+  const clearAuthErrors = useStore((s) => s.clearAuthErrors)
 
   const [activeTab, setActiveTab] = useState<AuthTab>('signin')
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  // Sign In fields
   const [signInEmail, setSignInEmail] = useState('')
   const [signInPassword, setSignInPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
 
-  // Sign Up fields
   const [signUpName, setSignUpName] = useState('')
   const [signUpEmail, setSignUpEmail] = useState('')
   const [signUpPassword, setSignUpPassword] = useState('')
@@ -37,20 +60,12 @@ export function AuthModal() {
 
   const [errors, setErrors] = useState<FieldErrors>({})
 
-  const clearAuthErrors = useStore((s) => s.clearAuthErrors)
-
   // Reset form state when modal opens or tab changes
   useEffect(() => {
     if (showAuthModal) {
-      // Restore remembered email if available
       const remembered = localStorage.getItem('alka-remembered-email')
-      if (remembered) {
-        setSignInEmail(remembered)
-        setRememberMe(true)
-      } else {
-        setSignInEmail('')
-        setRememberMe(false)
-      }
+      setSignInEmail(remembered || '')
+      setRememberMe(!!remembered)
       setSignInPassword('')
       setSignUpName('')
       setSignUpEmail('')
@@ -84,7 +99,6 @@ export function AuthModal() {
     }
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-      // Only clear overflow if no other modal is open
       if (!document.querySelector('[role="dialog"], [role="alertdialog"]')) {
         document.body.style.overflow = ''
       }
@@ -99,15 +113,10 @@ export function AuthModal() {
     const newErrors: FieldErrors = {}
     if (!signInEmail.trim()) newErrors.email = 'Email is required'
     if (!signInPassword.trim()) newErrors.password = 'Password is required'
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
-    }
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return }
 
     setSubmitting(true)
     await login(signInEmail.trim(), signInPassword)
-    // Persist email if Remember Me is checked
     if (rememberMe) {
       localStorage.setItem('alka-remembered-email', signInEmail.trim())
     } else {
@@ -130,11 +139,7 @@ export function AuthModal() {
     } else if (signUpPassword !== signUpConfirm) {
       newErrors.confirmPassword = 'Passwords do not match'
     }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
-    }
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return }
 
     setSubmitting(true)
     await register(signUpName.trim(), signUpEmail.trim(), signUpPassword)
@@ -147,30 +152,9 @@ export function AuthModal() {
     else handleSignUp()
   }
 
-  const inputClass =
-    'w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] outline-none transition-all duration-200 rounded-xl'
-
-  const backdropVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 },
-  } as const
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9, y: 20 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { type: 'spring' as const, damping: 25, stiffness: 350, delay: 0.05 },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.92,
-      y: 16,
-      transition: { duration: 0.18, ease: 'easeIn' as const },
-    },
-  } as const
+  const clearError = (field: keyof FieldErrors) => {
+    setErrors((prev) => ({ ...prev, [field]: undefined }))
+  }
 
   return (
     <AnimatePresence>
@@ -185,7 +169,6 @@ export function AuthModal() {
           transition={{ duration: 0.22 }}
           onClick={closeModal}
         >
-          {/* Card */}
           <motion.div
             key="auth-card"
             className="relative w-full max-w-[420px] p-8 bg-[var(--surface)] border border-[var(--border)] shadow-2xl rounded-2xl"
@@ -224,7 +207,6 @@ export function AuthModal() {
 
             {/* Tabs */}
             <div className="relative flex mb-7 bg-[var(--primary-bg)] rounded-xl p-1">
-              {/* Sliding indicator */}
               <motion.div
                 className="absolute top-1 bottom-1 rounded-lg bg-[var(--surface)] shadow-sm"
                 style={{ width: 'calc(50% - 4px)' }}
@@ -250,239 +232,40 @@ export function AuthModal() {
             <form onSubmit={handleSubmit} noValidate>
               <AnimatePresence mode="wait">
                 {activeTab === 'signin' ? (
-                  <motion.div
-                    key="signin-form"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-4"
-                  >
-                    {/* Email */}
-                    <div>
-                      <div className="relative">
-                        <Mail
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
-                        />
-                        <input
-                          type="email"
-                          placeholder="Email address"
-                          value={signInEmail}
-                          onChange={(e) => {
-                            setSignInEmail(e.target.value)
-                            if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }))
-                          }}
-                          className={`${inputClass} pl-10`}
-                          aria-label="Email address"
-                        />
-                      </div>
-                      {errors.email && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1.5 text-xs text-danger"
-                        >
-                          {errors.email}
-                        </motion.p>
-                      )}
-                    </div>
-
-                    {/* Password */}
-                    <div>
-                      <div className="relative">
-                        <Lock
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
-                        />
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          placeholder="Password"
-                          value={signInPassword}
-                          onChange={(e) => {
-                            setSignInPassword(e.target.value)
-                            if (errors.password)
-                              setErrors((prev) => ({ ...prev, password: undefined }))
-                          }}
-                          className={`${inputClass} pl-10 pr-10`}
-                          aria-label="Password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          aria-label={showPassword ? 'Hide password' : 'Show password'}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-                      {errors.password && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1.5 text-xs text-danger"
-                        >
-                          {errors.password}
-                        </motion.p>
-                      )}
-                      <div className="flex items-center justify-between mt-2">
-                        <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] cursor-pointer">
-                          <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="accent-[var(--accent-primary)] w-3.5 h-3.5 rounded" />
-                          Remember me
-                        </label>
-                        <a href="/forgot-password" className="text-xs text-[var(--accent-primary)] hover:underline" onClick={(e) => { e.stopPropagation(); setShowAuthModal(false) }}>
-                          Forgot password?
-                        </a>
-                      </div>
-                    </div>
-                  </motion.div>
+                  <LoginForm
+                    email={signInEmail}
+                    onEmailChange={setSignInEmail}
+                    password={signInPassword}
+                    onPasswordChange={setSignInPassword}
+                    rememberMe={rememberMe}
+                    onRememberMeChange={setRememberMe}
+                    showPassword={showPassword}
+                    onTogglePassword={() => setShowPassword(!showPassword)}
+                    errors={errors}
+                    onClearError={clearError}
+                    submitting={submitting}
+                    onSubmit={handleSignIn}
+                    onForgotPassword={() => setShowAuthModal(false)}
+                  />
                 ) : (
-                  <motion.div
-                    key="signup-form"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-4"
-                  >
-                    {/* Full Name */}
-                    <div>
-                      <div className="relative">
-                        <User
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Full name"
-                          value={signUpName}
-                          onChange={(e) => {
-                            setSignUpName(e.target.value)
-                            if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }))
-                          }}
-                          className={`${inputClass} pl-10`}
-                          aria-label="Full name"
-                        />
-                      </div>
-                      {errors.name && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1.5 text-xs text-danger"
-                        >
-                          {errors.name}
-                        </motion.p>
-                      )}
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <div className="relative">
-                        <Mail
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
-                        />
-                        <input
-                          type="email"
-                          placeholder="Email address"
-                          value={signUpEmail}
-                          onChange={(e) => {
-                            setSignUpEmail(e.target.value)
-                            if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }))
-                          }}
-                          className={`${inputClass} pl-10`}
-                          aria-label="Email address"
-                        />
-                      </div>
-                      {errors.email && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1.5 text-xs text-danger"
-                        >
-                          {errors.email}
-                        </motion.p>
-                      )}
-                    </div>
-
-                    {/* Password */}
-                    <div>
-                      <div className="relative">
-                        <Lock
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
-                        />
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          placeholder="Password (min. 8 characters)"
-                          value={signUpPassword}
-                          onChange={(e) => {
-                            setSignUpPassword(e.target.value)
-                            if (errors.password)
-                              setErrors((prev) => ({ ...prev, password: undefined }))
-                          }}
-                          className={`${inputClass} pl-10 pr-10`}
-                          aria-label="Password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          aria-label={showPassword ? 'Hide password' : 'Show password'}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-                      {errors.password && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1.5 text-xs text-danger"
-                        >
-                          {errors.password}
-                        </motion.p>
-                      )}
-                    </div>
-
-                    {/* Confirm Password */}
-                    <div>
-                      <div className="relative">
-                        <Lock
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
-                        />
-                        <input
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          placeholder="Confirm password"
-                          value={signUpConfirm}
-                          onChange={(e) => {
-                            setSignUpConfirm(e.target.value)
-                            if (errors.confirmPassword)
-                              setErrors((prev) => ({ ...prev, confirmPassword: undefined }))
-                          }}
-                          className={`${inputClass} pl-10 pr-10`}
-                          aria-label="Confirm password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-                        >
-                          {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-                      {errors.confirmPassword && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1.5 text-xs text-danger"
-                        >
-                          {errors.confirmPassword}
-                        </motion.p>
-                      )}
-                    </div>
-                  </motion.div>
+                  <RegisterForm
+                    name={signUpName}
+                    onNameChange={setSignUpName}
+                    email={signUpEmail}
+                    onEmailChange={setSignUpEmail}
+                    password={signUpPassword}
+                    onPasswordChange={setSignUpPassword}
+                    confirm={signUpConfirm}
+                    onConfirmChange={setSignUpConfirm}
+                    showPassword={showPassword}
+                    onTogglePassword={() => setShowPassword(!showPassword)}
+                    showConfirmPassword={showConfirmPassword}
+                    onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
+                    errors={errors}
+                    onClearError={clearError}
+                    submitting={submitting}
+                    onSubmit={handleSignUp}
+                  />
                 )}
               </AnimatePresence>
 

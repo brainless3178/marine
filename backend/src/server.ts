@@ -263,8 +263,8 @@ app.use((_req, res) => {
 })
 
 // ─── Error Handler ─────────────────────────────────────────────
-app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  logger.error({ err }, 'Unhandled error')
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  logger.error({ err, method: req.method, path: req.path, originalUrl: req.originalUrl }, 'Unhandled error')
   sendError(res, 'Internal server error', 500)
 })
 
