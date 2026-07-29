@@ -1,0 +1,81 @@
+import { emailTemplates } from './emailTemplates.js'
+import { queueEmail } from './email.js'
+
+export async function sendOrderConfirmation(params: {
+  to: string; customerName: string; orderNumber: string
+  items: { name: string; quantity: number; price: number }[]
+  subtotal: number; shippingCost: number; tax: number; total: number; shippingAddress: string
+}) {
+  const tpl = emailTemplates.orderConfirmation(params)
+  await queueEmail({ ...tpl, to: params.to })
+}
+
+export async function sendOrderShipped(params: {
+  to: string; customerName: string; orderNumber: string; trackingNumber: string; courier: string
+}) {
+  const tpl = emailTemplates.orderShipped(params)
+  await queueEmail({ ...tpl, to: params.to })
+}
+
+export async function sendOrderCancelled(params: {
+  to: string; customerName: string; orderNumber: string; reason: string
+}) {
+  const tpl = emailTemplates.orderCancelled(params)
+  await queueEmail({ ...tpl, to: params.to })
+}
+
+export async function sendRfqReceived(params: {
+  rfqNumber: string; customerName: string; productDescription: string; urgency: string
+}) {
+  const tpl = emailTemplates.rfqReceived(params)
+  await queueEmail(tpl)
+}
+
+export async function sendRfqResponse(params: {
+  to: string; customerName: string; rfqNumber: string; message: string
+}) {
+  const tpl = emailTemplates.rfqResponse(params)
+  await queueEmail({ ...tpl, to: params.to })
+}
+
+export async function sendEmergencyAlert(params: {
+  rfqNumber: string; customerName: string; phone: string; partDescription: string; vesselName?: string
+}) {
+  const tpl = emailTemplates.emergencyAlert(params)
+  await queueEmail(tpl)
+}
+
+export async function sendOfferReceived(params: {
+  offerNumber: string; productName: string; offeredPrice: number; customerEmail: string
+}) {
+  const tpl = emailTemplates.offerReceived(params)
+  await queueEmail(tpl)
+}
+
+export async function sendOfferDecision(params: {
+  to: string; offerNumber: string; productName: string; decision: 'accepted' | 'rejected' | 'countered'; counterPrice?: number
+}) {
+  const tpl = emailTemplates.offerDecision(params)
+  await queueEmail({ ...tpl, to: params.to })
+}
+
+export async function sendContactNotification(params: {
+  name: string; email: string; subject: string; message: string
+}) {
+  const tpl = emailTemplates.contactNotification(params)
+  await queueEmail(tpl)
+}
+
+export async function sendPasswordReset(params: {
+  to: string; name: string; resetUrl: string; isAdmin?: boolean
+}) {
+  const tpl = emailTemplates.passwordReset(params)
+  await queueEmail({ ...tpl, to: params.to })
+}
+
+export async function sendWelcome(params: {
+  to: string; name: string; email: string
+}) {
+  const tpl = emailTemplates.welcome(params)
+  await queueEmail({ ...tpl, to: params.to })
+}
