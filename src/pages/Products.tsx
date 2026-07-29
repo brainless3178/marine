@@ -1,17 +1,18 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, ShoppingCart, Check, SlidersHorizontal, X as XIcon } from 'lucide-react'
+import { Search, X as XIcon } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { useProducts } from '../hooks/useProducts'
 import { useAddToCart } from '../hooks/useAddToCart'
-import { OptimizedImage } from '../components/ui/OptimizedImage'
 import { useProductList } from '../hooks/useApiQuery'
-import { isLightColor, getProductImageUrl } from '../lib/utils'
-import { SEO } from '../components/seo/SEO'
-import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import { apiProductsToFrontend } from '../lib/adapters'
 import { products as staticProducts } from '../data/products'
+import { ProductFilters } from '../components/product/ProductFilters'
+import { ProductGrid } from '../components/product/ProductGrid'
+import { ProductPagination } from '../components/product/ProductPagination'
+import { SEO } from '../components/seo/SEO'
+import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import type { Product } from '../types'
 
 export default function Products() {
@@ -44,9 +45,7 @@ export default function Products() {
   const apiLoaded = !isLoading
 
   const finalProducts: Product[] = useMemo(() => {
-    if (productListData?.products?.length) {
-      return apiProducts
-    }
+    if (productListData?.products?.length) return apiProducts
     if (!isLoading) return staticProducts
     return []
   }, [apiProducts, productListData, isLoading])
@@ -122,6 +121,9 @@ export default function Products() {
     return acc
   }, [])
 
+  // Active filter chips
+  const hasActiveFilters = searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0 || showOnSale || urgencyFilter === 'emergency'
+
   return (
     <div>
       <SEO
@@ -159,103 +161,33 @@ export default function Products() {
       <section className="py-12 bg-[var(--primary-bg)]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 items-start">
-            {/* Mobile filter toggle */}
-            <div className="lg:hidden flex justify-between items-center mb-2">
-              <span className="text-xs text-[var(--text-muted)] font-mono uppercase tracking-widest">
-                {finalCount} {finalCount === 1 ? t('products.product') : t('products.products')}
-              </span>
-              <button
-                onClick={() => setShowFiltersMobile((v) => !v)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] transition-colors hover:border-[var(--accent-primary)]"
-              >
-                {showFiltersMobile ? <XIcon size={14} /> : <SlidersHorizontal size={14} />}
-                {showFiltersMobile ? t('products.hideFilters') : t('products.showFilters')}
-              </button>
-            </div>
-
-            {/* Sidebar */}
-            <aside className={`lg:sticky lg:top-20 ${showFiltersMobile ? 'block' : 'hidden'} lg:block`}>
-              <div className="commerce-card p-6">
-                {/* Categories */}
-                <div className="mb-6">
-                  <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
-                    {t('products.category')}
-                  </span>
-                  {derivedCategories.map((cat) => (
-                    <label key={cat.id} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-                      <input
-                        type="checkbox"
-                        checked={selectedCategories.includes(cat.id)}
-                        onChange={() => toggleCategory(cat.id)}
-                        className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
-                      />
-                      <span className="flex-1">{cat.name}</span>
-                      <span className="text-xs text-[var(--text-muted)]">{cat.count}</span>
-                    </label>
-                  ))}
-                </div>
-
-                {/* Price Range Filter */}
-                <div className="mb-6">
-                  <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
-                    {t('products.priceRange')}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <input type="number" min={0} max={1000} value={localMinPrice} onChange={(e) => setLocalMinPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMin')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)]" />
-                    <span className="text-[var(--text-muted)] text-xs">—</span>
-                    <input type="number" min={0} max={1000} value={localMaxPrice} onChange={(e) => setLocalMaxPrice(e.target.value)} onBlur={applyPriceFilter} onKeyDown={(e) => e.key === 'Enter' && applyPriceFilter()} placeholder={t('products.priceMax')} className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)]" />
-                  </div>
-                  <button onClick={applyPriceFilter} className="w-full mt-2 py-2 text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border border-[var(--border)] rounded-lg">
-                    {t('products.applyPrice')}
-                  </button>
-                </div>
-
-                {/* On Sale Filter */}
-                <div className="mb-6">
-                  <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-                    <input type="checkbox" checked={showOnSale} onChange={() => setShowOnSale(!showOnSale)} className="accent-[var(--accent-gold)] w-4 h-4 cursor-pointer" />
-                    <span className="font-bold text-[var(--danger)]">{t('products.onSaleOnly')}</span>
-                  </label>
-                </div>
-
-                {/* Brands */}
-                <div className="mb-6">
-                  <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
-                    {t('products.brand')}
-                  </span>
-                  {derivedBrands.map((brand) => (
-                      <label key={brand.slug} className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-                        <input type="checkbox" checked={selectedBrands.includes(brand.slug)} onChange={() => toggleBrand(brand.slug)} className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer" />
-                        {brand.name}
-                      </label>
-                  ))}
-                </div>
-
-                {/* Availability */}
-                <div className="mb-6">
-                  <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
-                    {t('products.availability')}
-                  </span>
-                  <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-                    <input type="radio" name="urgency" checked={urgencyFilter === 'all'} onChange={() => setUrgencyFilter('all')} className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer" />
-                    {t('products.allItems')}
-                  </label>
-                  <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-                    <input type="radio" name="urgency" checked={urgencyFilter === 'emergency'} onChange={() => setUrgencyFilter('emergency')} className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer" />
-                    {t('products.emergencyAvailable')}
-                  </label>
-                </div>
-
-                <button onClick={clearFilters} className="w-full text-right text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border-none cursor-pointer py-2">
-                  {t('products.clearFilters')}
-                </button>
-              </div>
-            </aside>
+            {/* Sidebar Filters */}
+            <ProductFilters
+              derivedCategories={derivedCategories}
+              selectedCategories={selectedCategories}
+              onToggleCategory={toggleCategory}
+              derivedBrands={derivedBrands}
+              selectedBrands={selectedBrands}
+              onToggleBrand={toggleBrand}
+              localMinPrice={localMinPrice}
+              localMaxPrice={localMaxPrice}
+              onMinPriceChange={setLocalMinPrice}
+              onMaxPriceChange={setLocalMaxPrice}
+              onApplyPrice={applyPriceFilter}
+              showOnSale={showOnSale}
+              onToggleOnSale={() => setShowOnSale(!showOnSale)}
+              urgencyFilter={urgencyFilter}
+              onSetUrgencyFilter={setUrgencyFilter}
+              onClearFilters={clearFilters}
+              showFiltersMobile={showFiltersMobile}
+              onToggleMobile={() => setShowFiltersMobile((v) => !v)}
+              totalCount={finalCount}
+            />
 
             {/* Main content */}
             <main>
               {/* Active filter chips */}
-              {(searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0 || showOnSale || urgencyFilter === 'emergency') && (
+              {hasActiveFilters && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {searchQuery && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-primary)] bg-[var(--accent-primary)]/5 text-[var(--accent-primary)]">
@@ -324,10 +256,7 @@ export default function Products() {
               </div>
 
               {!apiLoaded ? (
-                <div className="text-center py-20">
-                  <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin mx-auto mb-4" />
-                  <p className="text-sm text-[var(--text-muted)]">Loading products...</p>
-                </div>
+                <ProductGrid products={[]} addedIds={addedIds} onAddToCart={handleAddToCart} isLoading />
               ) : finalCount === 0 ? (
                 <div className="text-center py-20">
                   <p className="text-sm text-[var(--text-muted)]">{t('products.noResults')}</p>
@@ -338,80 +267,8 @@ export default function Products() {
                 </div>
               ) : (
                 <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
-                  {paginatedProducts.map((product) => {
-                    const effPrice = product.onSale && product.salePrice ? product.salePrice : product.price
-                    return (
-                      <div key={product.id} className="commerce-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-primary)] group">
-                        <Link to={`/product/${product.id}`} className="block relative overflow-hidden bg-[var(--surface-soft)]">
-                            <OptimizedImage
-                            src={getProductImageUrl(product.filename)}
-                            alt={product.name}
-                            width={400}
-                            height={400}
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            className="w-full aspect-square object-cover border-b border-[var(--border)] transition-transform duration-500 group-hover:scale-105"
-                            loading="lazy"
-                            onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
-                          />
-                          {product.customLabel && (
-                            <span className="absolute top-2 left-2 z-10 px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider rounded" style={{ backgroundColor: product.customLabelColor || '#159a67', color: isLightColor(product.customLabelColor || '#159a67') ? '#1a1a1a' : '#ffffff' }}>
-                              {product.customLabel}
-                            </span>
-                          )}
-                          {product.availability === 'emergency' && (
-                            <span className="absolute top-2 right-2 z-10 px-2 py-1 rounded-full text-xs font-mono border border-[var(--danger)]/20 text-[var(--danger)] bg-white">{t('product.emergency')}</span>
-                          )}
-                          {!product.inStock && (
-                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                              <span className="text-white font-bold text-sm bg-black/70 px-4 py-2 rounded-lg">{t('product.outOfStock')}</span>
-                            </div>
-                          )}
-                        </Link>
-                        <div className="p-4">
-                          <span className="inline-block font-mono text-xs px-2 py-1 rounded-full border text-[var(--accent-primary)] border-[var(--accent-primary)]/15 bg-[var(--accent-primary)]/5 mb-2">{product.brand}</span>
-                          <h4 className="text-label leading-tight hover:text-[var(--accent-primary)] transition-colors min-h-[40px]">
-                            <Link to={`/product/${product.id}`}>{product.name}</Link>
-                          </h4>
-                          <span className="font-mono text-xs text-[var(--text-muted)] block mt-1">{t('product.skuPrefix', { sku: product.sku })}</span>
-                          <div className="mt-3 flex items-end justify-between gap-2">
-                            <div>
-                              {product.onSale && product.salePrice ? (
-                                <div className="flex items-center gap-2">
-                                  <span className="font-display font-bold text-xl tracking-tight tabular-nums text-[var(--danger)]">${product.salePrice.toFixed(2)}</span>
-                                  <span className="font-display font-bold text-sm text-[var(--text-muted)] line-through">${product.price.toFixed(2)}</span>
-                                </div>
-                              ) : (
-                                <span className="font-display font-bold text-xl tracking-tight tabular-nums text-[var(--text-primary)]">${effPrice.toFixed(2)}</span>
-                              )}
-                            </div>
-                            <span className={`text-xs font-bold ${product.inStock ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
-                              {product.inStock ? t('product.inStockCount', { count: product.stockCount }) : t('product.outOfStockCount')}
-                            </span>
-                          </div>
-                          <button
-                            onClick={() => { if (!product.inStock) return; handleAddToCart(product) }}
-                            disabled={!product.inStock}
-                            className={`inline-flex items-center justify-center w-full gap-2 text-xs font-bold px-[18px] py-[11px] mt-3 transition-all duration-300 border cursor-pointer rounded-lg ${!product.inStock ? 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed' : addedIds.has(product.id) ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]' : 'commerce-button'}`}
-                          >
-                            {!product.inStock ? t('product.outOfStock') : addedIds.has(product.id) ? <><Check size={14} /> {t('product.added')}</> : <><ShoppingCart size={14} /> {t('product.addToCart')}</>}
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-8">
-                    <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-2 text-xs font-bold border border-[var(--border)] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--accent-primary)] transition-colors bg-[var(--surface)] text-[var(--text-primary)]">← Prev</button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2).reduce<(number | string)[]>((acc, p, i, arr) => { if (i > 0 && (arr[i - 1] as number) < p - 1) acc.push('...'); acc.push(p); return acc }, []).map((p, i) =>
-                      typeof p === 'string' ? <span key={`dots-${i}`} className="px-1 text-xs text-[var(--text-muted)]">…</span> : (
-                        <button key={p} onClick={() => setCurrentPage(p)} className={`w-8 h-8 text-xs font-bold rounded-lg transition-colors ${p === currentPage ? 'bg-[var(--accent-primary)] text-white border border-[var(--accent-primary)]' : 'border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[var(--accent-primary)]'}`}>{p}</button>
-                      )
-                    )}
-                    <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-2 text-xs font-bold border border-[var(--border)] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--accent-primary)] transition-colors bg-[var(--surface)] text-[var(--text-primary)]">Next →</button>
-                  </div>
-                )}
+                  <ProductGrid products={paginatedProducts} addedIds={addedIds} onAddToCart={handleAddToCart} />
+                  <ProductPagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                 </>
               )}
             </main>

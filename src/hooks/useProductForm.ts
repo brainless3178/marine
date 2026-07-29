@@ -349,6 +349,13 @@ export function useProductForm() {
     }
   }, [form.images, updateField, updateImage, toast])
 
+  // ── Helpers ──
+
+  /** Check if a string is a UUID (existing brand) vs plain text (new brand) */
+  function isUuid(str: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
+  }
+
   // ── Save ──
 
   const handleSave = useCallback(async () => {
@@ -362,10 +369,28 @@ export function useProductForm() {
 
     setSaving(true)
     try {
+      // Auto-create brand if it's a new name (not a UUID)
+      let brandId = form.brand
+      if (brandId && !isUuid(brandId)) {
+        try {
+          const res = await admin.brands.create({ name: brandId })
+          brandId = res.brand.id
+          // Update the brand list so it appears in future suggestions
+          setBrandList((prev) => { const exists = prev.find(b => b.id === brandId); return exists ? prev : [...prev, { id: brandId, name: form.brand }] })
+          // Update form with the new brand ID
+          updateField('brand', brandId)
+        } catch (err: unknown) {
+          const msg = (err as { message?: string }).message || 'Failed to create brand'
+          setErrors((prev) => ({ ...prev, brand: msg }))
+          setSaving(false)
+          return
+        }
+      }
+
       const payload: Partial<ApiProduct> = {
         name: form.name,
         sku: form.sku,
-        brandId: form.brand || null,
+        brandId: brandId || null,
         categoryId: form.category || null,
         industryIds: form.industries,
         condition: form.condition,

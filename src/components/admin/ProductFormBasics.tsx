@@ -1,5 +1,6 @@
 import { AlertCircle } from 'lucide-react'
 import { isLightColor } from '../../lib/utils'
+import { BrandCombobox } from './BrandCombobox'
 import type { ProductFormData } from '../../hooks/useProductForm'
 
 interface ProductFormBasicsProps {
@@ -55,18 +56,13 @@ export function ProductFormBasics({
         </div>
         <div>
           <label className={labelClass}>Brand *</label>
-          <select
+          <BrandCombobox
             value={form.brand}
-            onChange={(e) => updateField('brand', e.target.value)}
+            brands={brandList}
+            onChange={(value) => updateField('brand', value)}
             onBlur={() => markTouched('brand')}
-            className={getSelectClass('brand')}
-          >
-            <option value="">Select brand</option>
-            {brandList.map((b) => (
-              <option key={b.id} value={b.id}>{b.name}</option>
-            ))}
-          </select>
-          {showError('brand') && <p className={errorClass}><AlertCircle size={10} />{errors.brand}</p>}
+            error={showError('brand') ? errors.brand : undefined}
+          />
         </div>
       </div>
 

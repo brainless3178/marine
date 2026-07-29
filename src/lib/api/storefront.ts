@@ -1,0 +1,136 @@
+/**
+ * Storefront (public) API endpoints.
+ *
+ * Every call goes through the core `api` convenience methods
+ * defined in core.ts.
+ */
+
+import { api } from './core'
+import type {
+  ApiProduct, ApiBrand, ApiCategory, ApiIndustry,
+  ApiOrder, ApiStoreSettings, ApiHomepageSection,
+  ApiTestimonial, ApiSearchResult, Pagination, ProductListResponse,
+} from '../api-types'
+
+export const storefront = {
+  // Products
+  products: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<ProductListResponse>(`/storefront/products${qs}`)
+    },
+    featured: () =>
+      api.get<{ products: ApiProduct[] }>('/storefront/products/featured'),
+    newArrivals: () =>
+      api.get<{ products: ApiProduct[] }>('/storefront/products/new-arrivals'),
+    emergency: () =>
+      api.get<{ products: ApiProduct[] }>('/storefront/products/emergency'),
+    get: (id: string) =>
+      api.get<{ product: ApiProduct; related: ApiProduct[] }>(`/storefront/products/${id}`),
+    related: (id: string) =>
+      api.get<{ products: ApiProduct[] }>(`/storefront/products/${id}/related`),
+  },
+
+  // Categories
+  categories: {
+    list: () =>
+      api.get<{ categories: ApiCategory[] }>('/storefront/categories'),
+    get: (slug: string) =>
+      api.get<{ category: ApiCategory }>(`/storefront/categories/${slug}`),
+  },
+
+  // Brands
+  brands: {
+    list: () =>
+      api.get<{ brands: ApiBrand[] }>('/storefront/brands'),
+    get: (slug: string) =>
+      api.get<{ brand: ApiBrand }>(`/storefront/brands/${slug}`),
+  },
+
+  // Industries
+  industries: {
+    list: () =>
+      api.get<{ industries: ApiIndustry[] }>('/storefront/industries'),
+    get: (slug: string) =>
+      api.get<{ industry: ApiIndustry }>(`/storefront/industries/${slug}`),
+  },
+
+  // Search
+  search: (q: string) =>
+    api.get<{ results: ApiSearchResult[]; total: number; query: string }>(
+      `/storefront/search?q=${encodeURIComponent(q)}`
+    ),
+
+  // Settings
+  settings: () =>
+    api.get<{ settings: ApiStoreSettings }>('/storefront/settings'),
+
+  // Testimonials
+  testimonials: () =>
+    api.get<{ testimonials: ApiTestimonial[] }>('/storefront/testimonials'),
+
+  // Homepage
+  homepage: () =>
+    api.get<{ sections: ApiHomepageSection[] }>('/storefront/homepage'),
+
+  // RFQ
+  rfq: {
+    submit: (data: {
+      fullName: string; company?: string; email: string; phone?: string
+      country?: string; role?: string; productDescription: string
+      partNumber?: string; brand?: string; quantity?: number
+      deliveryLocation?: string; urgency?: string; notes?: string
+      source?: string; consent: boolean
+    }) => api.post<{ message: string; rfqNumber: string; id: string }>('/storefront/rfq', data),
+  },
+
+  // Payments
+  payments: {
+    clientId: () => api.get<{ clientId: string }>('/storefront/payments/client-id'),
+    createPaypalOrder: (data: { orderId: string }) =>
+      api.post<{ paypalOrderId: string }>('/storefront/payments/create-order', data, { auth: 'customer' }),
+    capturePaypalOrder: (data: { paypalOrderId: string; orderId: string }) =>
+      api.post<{ status: string; orderId: string }>('/storefront/payments/capture-order', data, { auth: 'customer' }),
+  },
+
+  // Offers
+  offers: {
+    submit: (data: {
+      productId: string; customerEmail: string; offeredPrice: number
+      quantity?: number; message?: string
+    }) => api.post<{ message: string; offerNumber: string; id: string }>('/storefront/offers', data),
+  },
+
+  // Contact
+  contact: {
+    submit: (data: { name: string; email: string; subject?: string; message: string }) =>
+      api.post<{ message: string; id: string }>('/storefront/contact', data),
+    emergency: (data: {
+      name: string; phone: string; partDescription: string; vesselName?: string
+    }) => api.post<{ message: string; id: string; rfqNumber: string }>('/storefront/contact/emergency', data),
+  },
+
+  // Orders (customer auth required)
+  orders: {
+    create: (data: {
+      items: { productId: string; quantity: number; price?: number }[]
+      shipping: {
+        fullName: string; addressLine1: string; addressLine2?: string
+        city: string; state?: string; postalCode?: string; country: string
+      }
+      paymentMethod: string; customerNotes?: string
+      subtotal?: number; tax?: number; total?: number
+    }) => api.post<{ order: ApiOrder }>('/storefront/orders', data, { auth: 'customer' }),
+
+    get: (id: string) =>
+      api.get<{ order: ApiOrder }>(`/storefront/orders/${id}`, { auth: 'customer' }),
+
+    list: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+      return api.get<{ orders: ApiOrder[]; pagination: Pagination }>(`/storefront/orders${qs}`, { auth: 'customer' })
+    },
+
+    cancel: (id: string, reason?: string) =>
+      api.post<{ order: ApiOrder }>(`/storefront/orders/${id}/cancel`, { reason }, { auth: 'customer' }),
+  },
+}
