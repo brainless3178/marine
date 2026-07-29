@@ -60,6 +60,7 @@ export function ApiStatusMonitor() {
             history: [] as Array<{ time: number; ok: boolean; responseTime: number }>,
           }
         } catch {
+          console.warn('[ApiStatusMonitor] Check failed:', ep.name, ep.path)
           return {
             id: ep.id, name: ep.name, path: ep.path,
             status: 'error' as const, responseTime: Math.round(performance.now() - start),

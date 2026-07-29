@@ -12,7 +12,6 @@ import type { ApiCustomer } from '../../lib/api-types'
 const ITEMS_PER_PAGE = 15
 
 function mapApiCustomer(c: ApiCustomer): CustomerType {
-  const cAny = c as any
   return {
     id: c.id,
     name: c.name || '',
@@ -25,13 +24,13 @@ function mapApiCustomer(c: ApiCustomer): CustomerType {
     website: c.website || '',
     status: (c.status || 'active') as CustomerStatus,
     joinedDate: c.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
-    lastOrderDate: cAny.lastOrderAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+    lastOrderDate: c.lastOrderAt?.split('T')[0] || new Date().toISOString().split('T')[0],
     totalOrders: c._count?.orders ?? 0,
-    totalSpent: cAny.totalSpent ?? 0,
-    avgOrderValue: c._count?.orders ? Math.round((cAny.totalSpent ?? 0) / c._count.orders) : 0,
+    totalSpent: c.totalSpent ?? 0,
+    avgOrderValue: c._count?.orders ? Math.round((c.totalSpent ?? 0) / c._count.orders) : 0,
     orders: [],
-    tags: cAny.tags || [],
-    notes: cAny.notes || '',
+    tags: c.tags || [],
+    notes: c.notes || '',
   }
 }
 

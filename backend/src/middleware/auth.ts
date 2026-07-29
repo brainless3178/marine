@@ -32,6 +32,7 @@ export function authenticateAdmin(req: AuthRequest, res: Response, next: NextFun
     req.user = decoded
     next()
   } catch {
+    console.warn('[auth] Admin JWT verification failed')
     return res.status(401).json({ error: 'Invalid or expired token' })
   }
 }
@@ -52,6 +53,7 @@ export function authenticateCustomer(req: AuthRequest, res: Response, next: Next
     req.user = decoded
     next()
   } catch {
+    console.warn('[auth] Customer JWT verification failed')
     return res.status(401).json({ error: 'Invalid or expired token' })
   }
 }

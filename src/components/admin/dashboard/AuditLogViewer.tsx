@@ -31,6 +31,7 @@ export function AuditLogViewer() {
       setLogs(res?.data?.logs || res?.logs || [])
       setTotalPages(res.data?.pagination?.totalPages || 1)
     } catch {
+      console.warn('[AuditLogViewer] Failed to fetch audit logs')
       setLogs([])
     } finally {
       setLoading(false)

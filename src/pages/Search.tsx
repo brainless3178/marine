@@ -93,7 +93,7 @@ export default function SearchPage() {
 
       setResults([...apiResults.slice(0, 5), ...pageResults, ...categoryResults])
     } catch {
-      // API search unavailable — fall back to static page/category results only
+      console.warn('[Search] API search unavailable — falling back to static results')
       setResults([...pageResults, ...categoryResults])
     } finally {
       setLoading(false)

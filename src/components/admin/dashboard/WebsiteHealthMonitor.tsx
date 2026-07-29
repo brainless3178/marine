@@ -55,6 +55,7 @@ export function WebsiteHealthMonitor() {
             statusCode: response.status,
           }
         } catch {
+          console.warn('[HealthMonitor] Endpoint check failed:', ep.name, ep.url)
           return {
             id: ep.id, name: ep.name, url: ep.url,
             status: 'error' as const,

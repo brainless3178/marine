@@ -105,7 +105,7 @@ export function getFormFromProduct(product: ApiProduct): ProductFormData {
     brand: product.brandId || (typeof product.brand === 'object' ? product.brand?.id || '' : product.brand || ''),
     category: product.categoryId || (typeof product.category === 'object' ? product.category?.id || '' : product.category || ''),
     industries: Array.isArray(product.industries)
-      ? product.industries.map((i) => typeof i === 'object' ? ((i as any).industryId || (i as any).industry?.id || '') : i)
+      ? product.industries.map((i) => typeof i === 'object' ? (i.industry?.id || '') : i)
       : (Array.isArray(product.industryIds) ? product.industryIds : []),
     condition: product.condition || 'used',
     availability: product.availability || 'in-stock',

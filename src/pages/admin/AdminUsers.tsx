@@ -41,7 +41,7 @@ function mapApiUser(u: ApiAdminUser): AdminUser {
     email: u.email || '',
     role: (u.role || 'viewer') as UserRole,
     avatar: initials,
-    lastLogin: u.lastLoginAt || (u as any).last_login_at || new Date().toISOString(),
+    lastLogin: u.lastLoginAt || new Date().toISOString(),
     createdAt: u.createdAt || new Date().toISOString(),
     active: u.isActive ?? true,
   }

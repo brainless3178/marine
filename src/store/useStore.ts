@@ -113,6 +113,7 @@ function loadState<T>(key: string, fallback: T): T {
     return raw ? JSON.parse(raw) : fallback
   } catch {
     // Corrupted JSON in localStorage — fall back to default
+    console.warn('[store] Corrupted localStorage data for key:', `alka-${key}`)
     return fallback
   }
 }
@@ -120,7 +121,7 @@ function loadState<T>(key: string, fallback: T): T {
 function saveState(key: string, value: unknown) {
   try {
     localStorage.setItem(`alka-${key}`, JSON.stringify(value))
-  } catch { /* quota exceeded, ignore */ }
+  } catch { /* quota exceeded, expected behavior for full localStorage */ }
 }
 
 function computeCartTotals(cart: CartItem[]) {
@@ -168,7 +169,7 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
   adminLogout: async () => {
-    try { await adminAuth.logout() } catch { /* ignore */ }
+    try { await adminAuth.logout() } catch { console.warn('[store] Admin logout API call failed') }
     setAdminToken(null)
     set({ adminUser: null, isAdminLoggedIn: false })
     localStorage.removeItem('alka-admin-auth')
@@ -185,7 +186,7 @@ export const useStore = create<AppState>((set, get) => ({
         localStorage.removeItem('alka-admin-auth')
       }
     } catch {
-      // Token expired or invalid — clear admin state
+      console.warn('[store] Admin session token expired or invalid — clearing session')
       localStorage.removeItem('alka-admin-auth')
       set({ adminUser: null, isAdminLoggedIn: false })
     }
@@ -291,7 +292,7 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
   logout: async () => {
-    try { await customerAuth.logout() } catch { /* ignore */ }
+    try { await customerAuth.logout() } catch { console.warn('[store] Customer logout API call failed') }
     setCustomerToken(null)
     set({ isLoggedIn: false, user: null, cart: [], showCartDrawer: false, cartTotal: 0, cartCount: 0 })
     saveState('auth', false)
@@ -308,7 +309,7 @@ export const useStore = create<AppState>((set, get) => ({
       const { user } = await customerAuth.me()
       set({ isLoggedIn: true, user, isSessionLoading: false })
     } catch {
-      // Token expired or invalid — clear auth state
+      console.warn('[store] Customer session token expired or invalid — clearing session')
       set({ isLoggedIn: false, user: null, isSessionLoading: false })
       localStorage.removeItem('alka-auth')
     }
