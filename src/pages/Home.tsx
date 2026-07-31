@@ -135,7 +135,7 @@ export default function Home() {
             </div>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-6 py-3 rounded-xl hover:bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:text-white transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-6 py-3 rounded-xl hover:bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
             >
               {t('shop.cta')} <ArrowRight size={16} />
             </Link>

@@ -189,7 +189,7 @@ export default function Shop() {
             </div>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:text-white transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
             >
               {t('shop.fullCatalog')} <ArrowRight size={16} />
             </Link>

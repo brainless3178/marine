@@ -61,7 +61,7 @@ export function IndustriesTabs() {
                 onClick={() => setActive(ind.id)}
                 className={`flex-shrink-0 px-6 py-3 rounded-xl font-body font-semibold text-xs tracking-wide transition-all duration-300 border ${
                   isActive
-                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white shadow-[0_4px_16px_var(--focus-ring)]'
+                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-[var(--btn-blue-text)] shadow-[0_4px_16px_var(--focus-ring)]'
                     : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -90,7 +90,7 @@ export function IndustriesTabs() {
             </div>
             <a
               href={`/products?industry=${current.id}`}
-              className="inline-flex items-center gap-2 text-xs font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-xs font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-primary)] hover:text-[var(--btn-blue-text)] transition-all duration-300 no-underline"
             >
               {t('industries.viewProducts')} <ArrowRight size={14} />
             </a>
