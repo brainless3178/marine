@@ -23,7 +23,7 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-[var(--accent-primary)] text-white border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] hover:border-[var(--accent-primary-hover)] hover:-translate-y-0.5 rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2',
+      'bg-[var(--accent-primary)] text-[var(--btn-blue-text)] border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] hover:border-[var(--accent-primary-hover)] hover:-translate-y-0.5 rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2',
     outline:
       'bg-transparent text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--surface-soft)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] hover:-translate-y-0.5 rounded-xl',
     danger:

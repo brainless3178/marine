@@ -113,7 +113,7 @@ export function CheckoutShipping({ shipping, errors, updateShipping, goToStep }:
       <button
         type="button"
         onClick={() => goToStep(2)}
-        className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all mt-6 rounded-xl cursor-pointer"
+        className="w-full flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all mt-6 rounded-xl cursor-pointer"
       >
         {t('checkout.continuePayment')}
       </button>

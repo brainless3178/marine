@@ -100,7 +100,7 @@ export function CheckoutSuccess({
         <div className="flex gap-4 flex-wrap justify-center mt-4">
           <button
             onClick={handleContinueShopping}
-            className="inline-flex items-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all rounded-xl cursor-pointer"
+            className="inline-flex items-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all rounded-xl cursor-pointer"
           >
             {t('checkout.continueShopping')}
           </button>

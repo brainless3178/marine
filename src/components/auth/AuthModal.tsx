@@ -286,7 +286,7 @@ export function AuthModal() {
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.975 }}
                 disabled={submitting}
-                className="w-full py-3.5 mt-7 bg-[var(--accent-primary)] text-white font-semibold rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all duration-200 text-sm tracking-wide shadow-md shadow-[var(--focus-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 mt-7 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all duration-200 text-sm tracking-wide shadow-md shadow-[var(--focus-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <div className="h-5 w-5 mx-auto rounded-full border-2 border-white border-t-transparent animate-spin" />
