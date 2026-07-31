@@ -20,8 +20,8 @@ interface ProductFiltersProps {
   showOnSale: boolean
   onToggleOnSale: () => void
   // Availability
-  urgencyFilter: string
-  onSetUrgencyFilter: (v: string) => void
+  urgencyFilter: 'all' | 'emergency'
+  onSetUrgencyFilter: (v: 'all' | 'emergency') => void
   // Actions
   onClearFilters: () => void
   // Mobile

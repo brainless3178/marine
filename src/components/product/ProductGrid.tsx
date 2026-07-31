@@ -104,7 +104,6 @@ function ProductCard({ product, addedIds, onAddToCart }: { product: Product; add
 }
 
 export function ProductGrid({ products, addedIds, onAddToCart, isLoading }: ProductGridProps) {
-  const { t } = useTranslation()
 
   if (isLoading) {
     return (

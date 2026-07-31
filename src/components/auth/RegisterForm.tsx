@@ -20,7 +20,6 @@ interface RegisterFormProps {
   onToggleConfirmPassword: () => void
   errors: FieldErrors
   onClearError: (field: keyof FieldErrors) => void
-  onSubmit: () => void
 }
 
 export function RegisterForm({
@@ -38,7 +37,6 @@ export function RegisterForm({
   onToggleConfirmPassword,
   errors,
   onClearError,
-  onSubmit,
 }: RegisterFormProps) {
   return (
     <motion.div

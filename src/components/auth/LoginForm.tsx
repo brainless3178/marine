@@ -16,7 +16,6 @@ interface LoginFormProps {
   onTogglePassword: () => void
   errors: FieldErrors
   onClearError: (field: keyof FieldErrors) => void
-  onSubmit: () => void
   onForgotPassword?: () => void
 }
 
@@ -31,8 +30,7 @@ export function LoginForm({
   onTogglePassword,
   errors,
   onClearError,
-  submitting,
-  onSubmit,
+  onForgotPassword,
 }: LoginFormProps) {
   return (
     <motion.div
