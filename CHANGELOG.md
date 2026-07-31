@@ -76,12 +76,21 @@ Added documentation comments on critical tokens:
 - **Batches:** 7 sequential batches (global tokens → auth/forms → search → landing sections → navigation/footer → admin panel → final sweep)
 - **Verification:** Automated contrast ratio computation, manual code review, build validation
 
+### Hero CTA Token Promotion
+
+Promoted hardcoded Hero CTA orange values to CSS variables for reusability:
+- `--hero-cta-orange: #c45200` (4.61:1 white on orange)
+- `--hero-cta-orange-hover: #a84400`
+- `--hero-cta-orange-shadow: rgba(196, 82, 0, 0.28)`
+
+**Files changed:** `src/index.css` (token definitions), `src/components/sections/Hero.tsx` (usage)
+
 ### Stats
 
 | Metric | Value |
 |--------|-------|
-| Files changed | 127 |
-| Token fixes | 4 |
+| Files changed | 129 |
+| Token fixes | 7 |
 | Component fixes | 30+ |
 | Dead tokens removed | 2 |
 | WCAG AA checks | 25/25 pass |
