@@ -92,10 +92,7 @@
 
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
-  --card-maritime-shadow: rgba(17, 24, 39, 0.08);
   --btn-gold-shadow: rgba(200, 135, 10, 0.20);
-  --btn-secondary-border: rgba(255, 255, 255, 0.25);
-  --btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
   --btn-secondary-hover-border: rgba(255, 255, 255, 0.4);
   --shadow-heavy-color: rgba(0, 0, 0, 0.18);
   /* ⚠️ Must pair with --accent-primary (#1a6eda in light). #fff on #1a6eda = 4.65:1 */
@@ -223,10 +220,7 @@ html.light {
 
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
-  --card-maritime-shadow: rgba(17, 24, 39, 0.08);
   --btn-gold-shadow: rgba(200, 135, 10, 0.20);
-  --btn-secondary-border: rgba(255, 255, 255, 0.25);
-  --btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
   --btn-secondary-hover-border: rgba(255, 255, 255, 0.4);
   --shadow-heavy-color: rgba(0, 0, 0, 0.18);
   --admin-table-head-text: #5c6a7e;
@@ -315,10 +309,7 @@ html:not(.light) {
 
   --shimmer-white: rgba(255, 255, 255, 0.12);
   --card-hover-shadow: rgba(0, 0, 0, 0.28);
-  --card-maritime-shadow: rgba(0, 0, 0, 0.10);
   --btn-gold-shadow: rgba(232, 184, 74, 0.20);
-  --btn-secondary-border: rgba(255, 255, 255, 0.20);
-  --btn-secondary-hover-bg: rgba(255, 255, 255, 0.08);
   --btn-secondary-hover-border: rgba(255, 255, 255, 0.32);
   --shadow-heavy-color: rgba(0, 0, 0, 0.40);
   /* ⚠️ Must pair with --accent-primary (#5ea3f8). #0f1419 on #5ea3f8 = 6.41:1. */
