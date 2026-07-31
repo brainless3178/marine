@@ -156,7 +156,7 @@ export function OKRDashboard({ orders, products, customers }: Props) {
         <div className="flex gap-2 mb-4 p-3 rounded-xl bg-[var(--surface-soft)]">
           <input value={newTitle} onChange={e => setNewTitle(e.target.value)}
             placeholder="Objective title..."
-            className="flex-1 rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-gold)]"
+            className="flex-1 rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)]  focus:border-[var(--accent-gold)]"
             onKeyDown={e => e.key === 'Enter' && handleAdd()} />
           <button onClick={handleAdd}
             className="rounded-lg bg-[var(--accent-gold)] px-3 py-1.5 text-[0.625rem] font-bold text-navy-deep">Save</button>
@@ -208,7 +208,7 @@ export function OKRDashboard({ orders, products, customers }: Props) {
                             onChange={e => setEditValue(e.target.value)}
                             onBlur={() => handleKRUpdate(obj.id, kr.id, editValue)}
                             onKeyDown={e => e.key === 'Enter' && handleKRUpdate(obj.id, kr.id, editValue)}
-                            className="w-16 rounded bg-[var(--surface)] border border-[var(--accent-gold)] px-1.5 py-0.5 text-[0.625rem] text-[var(--text-primary)] font-mono focus:outline-none" />
+                            className="w-16 rounded bg-[var(--surface)] border border-[var(--accent-gold)] px-1.5 py-0.5 text-[0.625rem] text-[var(--text-primary)] font-mono " />
                         ) : (
                           <button onClick={() => { setEditingKR(kr.id); setEditValue(kr.current.toString()) }}
                             className="flex items-center gap-1 hover:bg-[var(--surface-soft)] rounded px-1 py-0.5 transition-colors">

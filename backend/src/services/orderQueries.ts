@@ -81,3 +81,12 @@ export async function getCustomerOrder(id: string, customerId: string) {
   if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
   return order
 }
+
+// ─── Export ─────────────────────────────────────────────────
+
+export async function exportOrdersCsv(): Promise<string> {
+  const orders = await prisma.order.findMany({ include: { items: true }, orderBy: { createdAt: 'desc' }, take: 10000 })
+  const headers = ['Order Number', 'Status', 'Payment Status', 'Total', 'Created At']
+  const rows = orders.map(o => [o.orderNumber, o.status, o.paymentStatus, o.total.toString(), o.createdAt.toISOString()])
+  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+}

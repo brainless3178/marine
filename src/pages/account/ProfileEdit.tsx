@@ -49,7 +49,7 @@ export default function ProfileEdit() {
     }
   }
 
-  const inputClass = 'w-full pl-10 pr-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all placeholder:text-[var(--input-placeholder)]'
+  const inputClass = 'w-full pl-10 pr-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] transition-all placeholder:text-[var(--input-placeholder)]'
 
   return (
     <div className="min-h-screen bg-[var(--primary-bg)]">

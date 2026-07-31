@@ -263,8 +263,9 @@ describe('emailTemplates.welcome', () => {
       email: 'newuser@test.com',
     })
     expect(result.html).toContain('Browse our marine')
-    expect(result.html).toContain('Place orders')
-    expect(result.html).toContain('Submit RFQs')
+    expect(result.html).toContain('Browse our marine')
+    expect(result.html).toContain('place orders')
+    expect(result.html).toContain('submit RFQs')
   })
 })
 

@@ -139,7 +139,7 @@ export default function Brands() {
                 aria-pressed={activeFilter === f}
                 className={`px-5 py-2.5 font-body font-medium text-xs border transition-all duration-300 ${
                   activeFilter === f
-                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white rounded-xl'
+                    ? 'bg-[var(--accent-primary)] text-[var(--btn-blue-text)] border-[var(--accent-primary)] rounded-xl'
                     : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)] rounded-xl'
                 }`}
               >

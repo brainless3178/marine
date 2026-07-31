@@ -30,13 +30,13 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
   const { whatsappNumber } = useStoreSettings()
   const whatsappText = encodeURIComponent('Hi, I need a quote for ' + product.name + ' (SKU: ' + product.sku + ').')
   const imageClassName = 'w-full ' + (compact ? 'aspect-[4/3]' : 'aspect-square') + ' object-cover transition duration-700 group-hover:scale-[1.06]'
-  const stockClassName = 'rounded-full px-2.5 py-1 text-[11px] font-black ' + (product.inStock ? 'bg-success text-white' : 'bg-[var(--navy-deep)] text-white')
+  const stockClassName = 'rounded-full px-2.5 py-1 text-[11px] font-black ' + (product.inStock ? 'bg-success text-[var(--btn-success-text)]' : 'bg-[var(--navy-deep)] text-white')
   const buttonClassName = 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-xs font-black uppercase tracking-[0.08em] transition ' + (
     !product.inStock
       ? 'cursor-not-allowed border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)]'
       : added
       ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
-      : 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-white shadow-[0_4px_16px_var(--focus-ring)] hover:-translate-y-0.5 hover:bg-[var(--accent-primary-hover)]'
+      : 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--btn-blue-text)] shadow-[0_4px_16px_var(--focus-ring)] hover:-translate-y-0.5 hover:bg-[var(--accent-primary-hover)]'
   )
 
   return (

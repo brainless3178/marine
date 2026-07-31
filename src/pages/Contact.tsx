@@ -79,21 +79,21 @@ export default function Contact() {
               {error && <p className="text-xs text-[var(--danger)] mb-4">{error}</p>}
               <div className="mb-5">
                 <label htmlFor="contact-name" className="sr-only">{t('contact.formName')}</label>
-                <input id="contact-name" type="text" placeholder={t('contact.formName')} required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none" />
+                <input id="contact-name" type="text" placeholder={t('contact.formName')} required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-all" />
               </div>
               <div className="mb-5">
                 <label htmlFor="contact-email" className="sr-only">{t('contact.formEmail')}</label>
-                <input id="contact-email" type="email" placeholder={t('contact.formEmail')} required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none" />
+                <input id="contact-email" type="email" placeholder={t('contact.formEmail')} required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-all" />
               </div>
               <div className="mb-5">
                 <label htmlFor="contact-subject" className="sr-only">{t('contact.formSubject')}</label>
-                <input id="contact-subject" type="text" placeholder={t('contact.formSubject')} value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none" />
+                <input id="contact-subject" type="text" placeholder={t('contact.formSubject')} value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-all" />
               </div>
               <div className="mb-6">
                 <label htmlFor="contact-message" className="sr-only">{t('contact.formMessage')}</label>
-                <textarea id="contact-message" rows={4} placeholder={t('contact.formMessage')} required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none resize-vertical min-h-[100px]" />
+                <textarea id="contact-message" rows={4} placeholder={t('contact.formMessage')} required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-all resize-vertical min-h-[100px]" />
               </div>
-              <button type="submit" disabled={submitted || loading} aria-label={t('contact.formSubmit')} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] text-white rounded-xl' : 'bg-[var(--accent-primary)] text-white border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] rounded-xl'}`} onClick={() => submitted && setSubmitted(false)}>
+              <button type="submit" disabled={submitted || loading} aria-label={t('contact.formSubmit')} className={`w-full flex items-center justify-center gap-2 px-7 py-3.5 font-semibold text-sm transition-all ${submitted ? 'bg-[var(--success)] border-[var(--success)] rounded-xl' : 'bg-[var(--accent-primary)] text-[var(--btn-blue-text)] border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] rounded-xl'}`} onClick={() => submitted && setSubmitted(false)}>
                 {loading ? <><Loader2 size={16} className="animate-spin" /> Sending...</> : submitted ? <><Check size={16} /> Message Sent!</> : <><Send size={16} /> {t('contact.formSubmit')}</>}
               </button>
             </form>

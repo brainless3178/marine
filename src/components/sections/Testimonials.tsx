@@ -63,7 +63,7 @@ export function Testimonials() {
               </div>
               <p className="text-body-sm text-[var(--text-secondary)] leading-relaxed italic mb-6">&ldquo;{review.text}&rdquo;</p>
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-[var(--accent-primary)]/[0.08] border border-[var(--accent-primary)]/15 flex items-center justify-center font-display font-bold text-sm text-[var(--accent-primary)] flex-shrink-0">{review.avatar}</div>
+                <div className="w-12 h-12 rounded-xl bg-[var(--accent-primary)]/[0.08] border border-[var(--accent-primary)]/15 flex items-center justify-center font-display font-bold text-sm text-[var(--accent-primary-hover)] flex-shrink-0">{review.avatar}</div>
                 <div>
                   <strong className="text-label block text-[var(--text-primary)]">{review.name}</strong>
                   <span className="font-mono text-xs text-[var(--text-secondary)] block">{review.role}</span>

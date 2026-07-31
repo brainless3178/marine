@@ -27,11 +27,11 @@ export function TrackingModal({ order, onClose, onSaved }: TrackingModalProps) {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">Tracking Number</label>
-            <input type="text" value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} placeholder="e.g. 1234567890" className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-teal)] font-mono" />
+            <input type="text" value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} placeholder="e.g. 1234567890" className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-teal)] font-mono" />
           </div>
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">Courier</label>
-            <select value={courier} onChange={(e) => setCourier(e.target.value)} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-teal)]">
+            <select value={courier} onChange={(e) => setCourier(e.target.value)} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-teal)]">
               <option value="DHL">DHL</option>
               <option value="FedEx">FedEx</option>
               <option value="UPS">UPS</option>

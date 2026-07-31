@@ -13,7 +13,7 @@ export function CreateCustomerModal({ open, onClose, onCreated, onToast, onCreat
   const [newCustomer, setNewCustomer] = useState({ name: '', email: '', phone: '', company: '', country: '', city: '' })
   const [loading, setLoading] = useState(false)
 
-  const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]'
+  const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all focus:border-[var(--accent-gold)]'
 
   const handleSubmit = async () => {
     if (!newCustomer.name.trim() || !newCustomer.email.trim()) {

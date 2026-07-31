@@ -95,13 +95,13 @@ export default function TrackOrder() {
                 onChange={(e) => setOrderNumber(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleTrack()}
                 placeholder="Enter order number (e.g. AT-12345)"
-                className="w-full pl-10 pr-4 py-3.5 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all placeholder:text-[var(--input-placeholder)]"
+                className="w-full pl-10 pr-4 py-3.5 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] rounded-xl outline-none focus:border-[var(--accent-primary)] transition-all placeholder:text-[var(--input-placeholder)]"
               />
             </div>
             <button
               onClick={() => handleTrack()}
               disabled={loading}
-              className="px-6 py-3.5 bg-[var(--accent-primary)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all disabled:opacity-50 whitespace-nowrap"
+              className="px-6 py-3.5 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all disabled:opacity-50 whitespace-nowrap"
             >
               {loading ? <div className="h-5 w-5 border-2 border-white border-t-transparent animate-spin" /> : 'Track'}
             </button>
@@ -152,7 +152,7 @@ export default function TrackOrder() {
                     {/* Connection line */}
                     <div className="absolute top-5 left-0 right-0 h-0.5 bg-[var(--border)]" />
                     <div
-                      className="absolute top-5 left-0 h-0.5 bg-[var(--accent-primary)] transition-all duration-500"
+                      className="absolute top-5 left-0 h-0.5 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] transition-all duration-500"
                       style={{ width: `${Math.min(100, (currentStep / (statusSteps.length - 1)) * 100)}%` }}
                     />
 
@@ -164,7 +164,7 @@ export default function TrackOrder() {
                         <div key={step.key} className="relative flex flex-col items-center z-10" style={{ width: `${100 / statusSteps.length}%` }}>
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                             isCompleted
-                              ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white'
+                              ? 'bg-[var(--accent-primary)] text-[var(--btn-blue-text)] border-[var(--accent-primary)]'
                               : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-muted)]'
                           } ${isCurrent ? 'ring-4 ring-[var(--focus-ring)]' : ''}`}>
                             <StepIcon size={16} />

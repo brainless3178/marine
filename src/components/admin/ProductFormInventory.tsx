@@ -50,7 +50,7 @@ export function ProductFormInventory({ form, updateField, getFieldClass, labelCl
           <select
             value={form.availability}
             onChange={(e) => updateField('availability', e.target.value)}
-            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
           >
             <option value="in-stock">In Stock</option>
             <option value="sourced">Sourced on Request</option>

@@ -3,12 +3,12 @@
 
 /* ── Sidebar ─────────────────────────────────────────────── */
 .admin-sidebar {
-  background: linear-gradient(180deg, #061522 0%, #0a2a43 100%);
+  background: linear-gradient(180deg, var(--admin-sidebar-gradient-start) 0%, var(--admin-sidebar-gradient-end) 100%);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html.light .admin-sidebar {
-  background: linear-gradient(180deg, #0a2a43 0%, #0d3352 100%);
+  background: linear-gradient(180deg, var(--admin-sidebar-gradient-light-start) 0%, var(--admin-sidebar-gradient-light-end) 100%);
 }
 
 .admin-sidebar .nav-item {
@@ -47,9 +47,9 @@ html.light .admin-sidebar {
 }
 
 .admin-sidebar .nav-item.active {
-  color: #e8aa24;
+  color: var(--admin-sidebar-active-text);
   background: var(--gold-subtle);
-  box-shadow: inset 3px 0 0 #e8aa24, 0 2px 12px var(--gold-muted-light);
+  box-shadow: inset 3px 0 0 var(--admin-sidebar-active-text), 0 2px 12px var(--gold-muted-light);
   transform: translateX(2px);
 }
 
@@ -76,18 +76,18 @@ html.light .admin-sidebar {
 }
 
 .nav-badge.badge-gold {
-  background: #e8aa24;
-  color: #061522;
+  background: var(--admin-badge-gold-bg);
+  color: var(--admin-badge-gold-text);
 }
 
 .nav-badge.badge-danger {
-  background: #dc2626;
-  color: #fff;
+  background: var(--admin-badge-danger-bg-solid);
+  color: var(--admin-badge-danger-text-solid);
 }
 
 .nav-badge.badge-teal {
-  background: #008c8c;
-  color: #fff;
+  background: var(--admin-badge-teal-bg-solid);
+  color: var(--admin-badge-teal-text-solid);
 }
 
 @keyframes navBadgePulse {
@@ -194,7 +194,7 @@ html:not(.light) .admin-stat-card:hover {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--admin-table-head-text);
   padding: 0.75rem 1rem;
   text-align: left;
   border-bottom: 1px solid var(--border);
@@ -232,47 +232,27 @@ html:not(.light) .admin-stat-card:hover {
 
 .admin-badge-published {
   background: var(--badge-published-bg);
-  color: var(--success);
+  color: var(--admin-badge-published-text);
 }
 
 .admin-badge-draft {
   background: var(--gold-subtle);
-  color: var(--accent-gold);
+  color: var(--admin-badge-draft-text);
 }
 
 .admin-badge-hidden {
   background: var(--badge-hidden-bg);
-  color: var(--text-muted);
+  color: var(--admin-badge-hidden-text);
 }
 
 .admin-badge-danger {
   background: var(--badge-danger-bg);
-  color: var(--danger);
+  color: var(--admin-badge-danger-text);
 }
 
 .admin-badge-info {
   background: var(--badge-info-bg);
-  color: var(--accent-blue);
-}
-
-html:not(.light) .admin-badge-published {
-  background: var(--badge-published-bg);
-}
-
-html:not(.light) .admin-badge-draft {
-  background: var(--gold-subtle);
-}
-
-html:not(.light) .admin-badge-hidden {
-  background: var(--badge-hidden-bg);
-}
-
-html:not(.light) .admin-badge-danger {
-  background: var(--badge-danger-bg);
-}
-
-html:not(.light) .admin-badge-info {
-  background: var(--badge-info-bg);
+  color: var(--admin-badge-info-text);
 }
 
 /* ── Admin Login ─────────────────────────────────────────── */
@@ -280,7 +260,7 @@ html:not(.light) .admin-badge-info {
   background:
     radial-gradient(circle at 20% 30%, var(--gold-muted-light), transparent 30rem),
     radial-gradient(circle at 80% 70%, var(--login-teal), transparent 30rem),
-    linear-gradient(135deg, #061522 0%, #0a2a43 50%, #0e4d72 100%);
+    linear-gradient(135deg, var(--admin-login-gradient-start) 0%, var(--admin-login-gradient-mid) 50%, var(--admin-login-gradient-end) 100%);
   min-height: 100vh;
 }
 
@@ -288,7 +268,7 @@ html.light .admin-login-bg {
   background:
     radial-gradient(circle at 20% 30%, var(--gold-muted-light), transparent 30rem),
     radial-gradient(circle at 80% 70%, var(--login-teal), transparent 30rem),
-    linear-gradient(135deg, #f3f7fb 0%, #eaf1f7 50%, #dde8f0 100%);
+    linear-gradient(135deg, var(--admin-login-gradient-light-start) 0%, var(--admin-login-gradient-light-mid) 50%, var(--admin-login-gradient-light-end) 100%);
 }
 
 /* ── Quick action button ─────────────────────────────────── */
@@ -310,7 +290,7 @@ html.light .admin-login-bg {
 
 .admin-quick-action:hover {
   border-color: var(--accent-gold);
-  color: var(--accent-gold);
+  color: var(--admin-quick-action-hover-text);
   background: var(--gold-muted);
 }
 

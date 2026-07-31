@@ -54,7 +54,7 @@ export function AdminProductFilters({
             placeholder="Search by name, SKU, brand, category..."
             value={search}
             onChange={(e) => { onSearchChange(e.target.value); onPageReset() }}
-            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]"
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all focus:border-[var(--accent-gold)]"
           />
         </div>
         <button
@@ -88,7 +88,7 @@ export function AdminProductFilters({
             <select
               value={filterCategory}
               onChange={(e) => { onFilterCategoryChange(e.target.value); onPageReset() }}
-              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
             >
               <option value="">All Categories</option>
               {uniqueCategories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
@@ -99,7 +99,7 @@ export function AdminProductFilters({
             <select
               value={filterBrand}
               onChange={(e) => { onFilterBrandChange(e.target.value); onPageReset() }}
-              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
             >
               <option value="">All Brands</option>
               {uniqueBrands.map((b) => <option key={b} value={b}>{b}</option>)}
@@ -110,7 +110,7 @@ export function AdminProductFilters({
             <select
               value={filterCondition}
               onChange={(e) => { onFilterConditionChange(e.target.value); onPageReset() }}
-              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
             >
               <option value="">All Conditions</option>
               <option value="new">New</option><option value="unused">Unused</option><option value="used">Used</option><option value="refurbished">Refurbished</option><option value="reconditioned">Reconditioned</option>
@@ -121,7 +121,7 @@ export function AdminProductFilters({
             <select
               value={filterAvailability}
               onChange={(e) => { onFilterAvailabilityChange(e.target.value); onPageReset() }}
-              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
             >
               <option value="">All</option><option value="in-stock">In Stock</option><option value="emergency">Emergency</option><option value="sourced">Sourced</option><option value="out-of-stock">Out of Stock</option>
             </select>

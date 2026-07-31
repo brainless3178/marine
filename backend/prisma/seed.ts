@@ -216,9 +216,6 @@ async function main() {
 
   // ─── Create Testimonials ───────────────────────────────────
   const testimonialData = [
-    { name: 'Capt. R. Krishnamurthy', role: 'Chief Engineer, MV Pacific Fortune', company: 'Pacific Bulk Carriers', text: 'Critical hydraulic pump failure mid-voyage. Alka Traders delivered in 26 hours.', rating: 5 },
-    { name: 'Sarah J. Hoffmann', role: 'Global Procurement Manager', company: 'Rheinstahl Industrial GmbH', text: 'Consolidated invoicing, better pricing, faster delivery. ROI was immediate.', rating: 5 },
-    { name: 'Dinesh Patel', role: 'Head of Sourcing', company: 'Reliance Engineering Works', text: 'Emergency ABB drive delivered within 18 hours. No substitutes, no compromise.', rating: 5 },
     { name: 'noraedward', role: 'Verified Buyer', company: '', text: 'Item: ROTHENBERGER ROLeak PRO LEAK DETECTOR GAS SNIFFER. Very helpful seller. They investigated the issue when the delivery company delivered my parcel to the wrong person. Quick to address the situation, kept me informed and got the parcel delivered to me. Would recommend.', rating: 5 },
     { name: 'b2esurplus', role: 'Verified Buyer — B2E Surplus', company: 'Back to Earth Surplus', text: 'Item: RIDGID D223 PIPE THREADER RATCHET 1 INCH SQUARE DRIVE. Five star transaction. Good shipping. Good packaging. Item as described. Good quality product in good condition. Thank you! At B2E Surplus, we buy and sell similar merchandise and are always interested in bulk lots and good deals on industrial supplies.', rating: 5 },
     { name: 'fuegocat77', role: 'Verified Buyer', company: '', text: 'RECORD 91 1/2 C Pipe Vise received as pictured. Shipping was very fast and FREE with unexpectedly quick delivery from India. Item was well wrapped in bubble wrap but box padding could have been better on the bottom. Nothing broken, so not an issue.', rating: 5 },

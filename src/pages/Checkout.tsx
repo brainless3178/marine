@@ -286,9 +286,9 @@ export default function Checkout() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-sm border-2 transition-all ${
                       step === checkoutStep
-                        ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-white'
+                        ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]'
                         : step < checkoutStep
-                        ? 'border-[var(--success)] bg-[var(--success)] text-white'
+                        ? 'border-[var(--success)] bg-[var(--success)]'
                         : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]'
                     }`}
                   >

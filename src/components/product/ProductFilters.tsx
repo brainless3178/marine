@@ -98,7 +98,7 @@ export function ProductFilters({
                 onBlur={onApplyPrice}
                 onKeyDown={(e) => e.key === 'Enter' && onApplyPrice()}
                 placeholder={t('products.priceMin')}
-                className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)]"
+                className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:border-[var(--accent-primary)]"
               />
               <span className="text-[var(--text-muted)] text-xs">—</span>
               <input
@@ -109,7 +109,7 @@ export function ProductFilters({
                 onBlur={onApplyPrice}
                 onKeyDown={(e) => e.key === 'Enter' && onApplyPrice()}
                 placeholder={t('products.priceMax')}
-                className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)]"
+                className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:border-[var(--accent-primary)]"
               />
             </div>
             <button

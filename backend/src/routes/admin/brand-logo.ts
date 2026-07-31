@@ -1,20 +1,14 @@
 import { Router } from 'express'
-import { z } from 'zod'
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
-import { prisma } from '../../server.js'
 import { authenticateAdmin, AuthRequest } from '../../middleware/auth.js'
-import { asyncHandler, validateParams } from '../../middleware/validate.js'
-import { logAudit } from '../../utils/audit.js'
+import { asyncHandler } from '../../middleware/validate.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
+import * as brandLogoService from '../../services/brandLogoService.js'
 
 const router = Router()
 router.use(authenticateAdmin)
-
-const uuidParamSchema = z.object({
-  id: z.string().uuid(),
-})
 
 // ─── Multer Config ────────────────────────────────────────────
 const UPLOAD_DIR = path.resolve('uploads')
@@ -32,45 +26,18 @@ const upload = multer({
 })
 
 // ─── Upload Brand Logo ─────────────────────────────────────
-router.post('/:id/logo', validateParams(uuidParamSchema), upload.single('file'), asyncHandler(async (req: AuthRequest, res) => {
-  const brandId = req.params.id as string
-  const brand = await prisma.brand.findUnique({ where: { id: brandId } })
-  if (!brand) return sendError(res, 'Brand not found', 404)
-
-  const file = req.file
-  if (!file) return sendError(res, 'No file provided', 400)
-
-  // Save file
-  const ext = path.extname(file.originalname).toLowerCase() || '.png'
-  const filename = `brand-${brandId.slice(0, 8)}-${Date.now()}${ext}`
-  const filepath = path.join(UPLOAD_DIR, filename)
-  fs.writeFileSync(filepath, file.buffer)
-  const url = `/uploads/${filename}`
-
-  // Delete old logo file if it exists
-  if (brand.logoUrl && brand.logoUrl.startsWith('/uploads/')) {
-    const oldPath = path.resolve(brand.logoUrl.slice(1))
-    if (fs.existsSync(oldPath)) {
-      fs.unlinkSync(oldPath)
-    }
+router.post('/:id/logo', upload.single('file'), asyncHandler(async (req: AuthRequest, res) => {
+  try {
+    const result = await brandLogoService.uploadBrandLogo(
+      req.params.id as string,
+      req.file!,
+      req.user!,
+      req.ip
+    )
+    sendSuccess(res, result)
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
   }
-
-  const updated = await prisma.brand.update({
-    where: { id: brandId },
-    data: { logoUrl: url },
-  })
-
-  await logAudit({
-    actor: req.user,
-    action: 'brand.logo.upload',
-    entityType: 'brand',
-    entityId: brand.id,
-    entityName: brand.name,
-    newValue: { logoUrl: url },
-    ipAddress: req.ip,
-  })
-
-  sendSuccess(res, { brand: updated, url })
 }))
 
 export default router

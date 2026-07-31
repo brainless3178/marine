@@ -109,8 +109,8 @@ export default function Home() {
                     <Icon size={20} className="text-[var(--accent-primary)]" />
                   </div>
                   <div>
-                    <span className="block text-sm font-bold text-white">{item.label}</span>
-                    <span className="text-xs text-white/60">{item.desc}</span>
+                    <span className="block text-sm font-bold">{item.label}</span>
+                    <span className="text-xs/60">{item.desc}</span>
                   </div>
                 </div>
               )
@@ -135,7 +135,7 @@ export default function Home() {
             </div>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-6 py-3 rounded-xl hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-6 py-3 rounded-xl hover:bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:text-white transition-all duration-300 no-underline"
             >
               {t('shop.cta')} <ArrowRight size={16} />
             </Link>
@@ -175,13 +175,11 @@ export default function Home() {
               <p><strong className="text-[var(--text-primary)]">Export support:</strong> DHL, FedEx, air freight, sea freight, and buyer-arranged shipping from India.</p>
             </div>
           </div>
-          <div className="rounded-[28px] bg-[var(--navy-deep)] p-8 text-white shadow-[var(--shadow-soft)]">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--accent-primary)]">Urgent vessel procurement</p>
+          <div className="rounded-[28px] bg-[var(--navy-deep)] p-8 shadow-[var(--shadow-soft)]">
+            <p className="text-xs font-black uppercase tracking-[0.22em]">Urgent vessel procurement</p>
             <h3 className="mt-3 font-display text-3xl font-bold leading-tight">Need a rare ship spare?</h3>
-            <p className="mt-3 text-sm leading-relaxed text-white/68">Send the part number, photo, maker name, vessel details, and delivery port. We will confirm stock or source an alternative.</p>
-            <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--accent-primary)] px-5 py-3 text-xs font-black uppercase tracking-[0.1em] text-white no-underline hover:bg-[var(--accent-primary-hover)]">
-              <MessageCircle size={16} /> WhatsApp RFQ
-            </a>
+            <p className="mt-3 text-sm leading-relaxed/68">Send the part number, photo, maker name, vessel details, and delivery port. We will confirm stock or source an alternative.</p>
+            <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--accent-primary)] text-[var(--btn-blue-text)] px-5 py-3 text-xs font-black uppercase tracking-[0.1em] text-[var(--btn-blue-text)] no-underline hover:bg-[var(--accent-primary-hover)]"><MessageCircle size={16} /> WhatsApp RFQ</a>
           </div>
         </div>
       </section>

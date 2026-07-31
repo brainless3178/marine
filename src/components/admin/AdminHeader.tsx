@@ -227,7 +227,7 @@ export function AdminHeader() {
                 if (e.key === 'ArrowUp') { e.preventDefault(); setCmdIndex((i) => Math.max(i - 1, 0)) }
                 if (e.key === 'Enter' && filteredCommands[cmdIndex]) { cmdSelect(filteredCommands[cmdIndex].path) }
               }}
-              className="flex-1 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none font-medium"
+              className="flex-1 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] font-medium"
             />
             <button onClick={() => setCmdOpen(false)} className="flex h-6 w-6 items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)]"><X size={14} /></button>
           </div>

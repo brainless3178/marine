@@ -112,11 +112,11 @@ export function Navbar() {
             </a>
           </div>
           <div className="flex items-center gap-3 text-[11px] font-medium">
-            <span className="hidden md:inline text-[var(--text-muted)]">{t('topbar.freeShipping')}</span>
+            <span className="hidden md:inline text-[var(--text-secondary)]">{t('topbar.freeShipping')}</span>
             <span className="hidden md:inline text-[var(--border)]">|</span>
-            <span className="hidden md:inline text-[var(--text-muted)]">{t('topbar.timelyDelivery')}</span>
+            <span className="hidden md:inline text-[var(--text-secondary)]">{t('topbar.timelyDelivery')}</span>
             <span className="hidden md:inline text-[var(--border)]">|</span>
-            <span className="hidden md:inline text-[var(--text-muted)]">{t('topbar.securePayment')}</span>
+            <span className="hidden md:inline text-[var(--text-secondary)]">{t('topbar.securePayment')}</span>
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@ export function Navbar() {
             >
               <ShoppingCart size={18} />
               {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--accent-primary)] px-1 text-xs font-bold leading-none text-white">
+                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--accent-primary)] px-1 text-xs font-bold leading-none text-[var(--btn-blue-text)]">
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               )}
@@ -211,7 +211,7 @@ export function Navbar() {
 
             <Link
               to={localizedPath('/rfq')}
-              className="hidden items-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-extrabold text-white no-underline transition-colors hover:bg-[var(--accent-primary-hover)] lg:inline-flex"
+              className="hidden items-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-extrabold text-[var(--btn-blue-text)] no-underline transition-colors hover:bg-[var(--accent-primary-hover)] lg:inline-flex"
             >
               {t('nav.requestQuote')}
             </Link>
@@ -235,7 +235,7 @@ export function Navbar() {
                     <>
                       <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-soft)]">
                         <p className="text-xs font-bold text-[var(--text-primary)] truncate">{user?.name || 'My Account'}</p>
-                        <p className="text-[11px] text-[var(--text-muted)] truncate mt-0.5">{user?.email || ''}</p>
+                        <p className="text-[11px] text-[var(--text-secondary)] truncate mt-0.5">{user?.email || ''}</p>
                       </div>
                       <Link
                         to={localizedPath('/account/profile')}

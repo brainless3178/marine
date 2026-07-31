@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { prisma } from '../../server.js'
 import { asyncHandler, validateParams } from '../../middleware/validate.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
 import { z } from 'zod'
+import * as categoryService from '../../services/categoryService.js'
 
 const router = Router()
 
@@ -12,35 +12,16 @@ const slugParamsSchema = z.object({
 
 // ─── List Visible Categories ───────────────────────────────────
 router.get('/', asyncHandler(async (_req, res) => {
-  const categories = await prisma.category.findMany({
-    where: { isVisible: true, parentId: null },
-    include: {
-      children: {
-        where: { isVisible: true },
-        orderBy: { sortOrder: 'asc' },
-        include: { _count: { select: { products: { where: { status: 'published' } } } } },
-      },
-      _count: { select: { products: { where: { status: 'published' } } } },
-    },
-    orderBy: { sortOrder: 'asc' },
-  })
-  sendSuccess(res, { categories })
+  sendSuccess(res, await categoryService.listStorefrontCategories())
 }))
 
 // ─── Get Category by Slug ──────────────────────────────────────
 router.get('/:slug', validateParams(slugParamsSchema), asyncHandler(async (req, res) => {
-  const category = await prisma.category.findFirst({
-    where: { slug: req.params.slug as string, isVisible: true },
-    include: {
-      children: {
-        where: { isVisible: true },
-        include: { _count: { select: { products: { where: { status: 'published' } } } } },
-      },
-      _count: { select: { products: { where: { status: 'published' } } } },
-    },
-  })
-  if (!category) return sendError(res, 'Category not found', 404)
-  sendSuccess(res, { category })
+  try {
+    sendSuccess(res, await categoryService.getCategoryBySlug(req.params.slug as string))
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
+  }
 }))
 
 export default router

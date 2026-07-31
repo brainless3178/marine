@@ -89,6 +89,7 @@ export const emailTemplates = {
       ${infoRow('Shipping', `$${data.shippingCost.toFixed(2)}`)}
       ${infoRow('Tax', `$${data.tax.toFixed(2)}`)}
       <p style="font-size:18px;font-weight:bold;border-top:2px solid #e2e8f0;padding-top:8px;">Total: <span style="color:#0ea5e9;">$${data.total.toFixed(2)}</span></p>
+      ${infoRow('Shipping Address', escapeHtml(data.shippingAddress))}
       <p style="color:#64748b;font-size:13px;text-align:center;">We'll send you tracking information once your order ships.</p>
     `)
     return { to: '', subject: `Order ${data.orderNumber} Confirmed — Alka Traders`, html, template: 'order-confirmation', templateData: data as Record<string, unknown> }
@@ -205,7 +206,7 @@ export const emailTemplates = {
     const html = baseLayout('Welcome to Alka Traders', `
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Welcome aboard! 🎉</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${data.name}, your account has been created successfully.</p>
-      <p style="color:#1e293b;font-size:14px;">You can now browse our marine & industrial equipment catalog, place orders, submit RFQs, and make offers on products.</p>
+      <p style="color:#1e293b;font-size:14px;">Browse our marine & industrial equipment catalog, place orders, submit RFQs, and make offers on products.</p>
       ${btn(`${FRONTEND_URL}/products`, 'Browse Products', '#0ea5e9')}
     `)
     return { to: data.email, subject: 'Welcome to Alka Traders! 🎉', html, template: 'welcome', templateData: data as Record<string, unknown> }

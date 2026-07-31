@@ -1,0 +1,288 @@
+import { prisma } from '../server.js'
+import { logAudit } from '../utils/audit.js'
+import { sendOrderConfirmation } from './emailSenders.js'
+import logger from '../utils/logger.js'
+import { getPaypalAccessToken, PAYPAL_BASE, PAYPAL_WEBHOOK_ID } from '../utils/paypal.js'
+import type { Prisma } from '@prisma/client'
+
+const hookLog = logger.child({ context: 'paypal-service' })
+
+// ─── Webhook Validation ──────────────────────────────────────
+
+const ALLOWED_CERT_URL_PATTERNS = [
+  /^https:\/\/api[.]paypal\.com\/v1\/notifications\/cert\/.*$/i,
+  /^https:\/\/api-m[.]paypal\.com\/v1\/notifications\/cert\/.*$/i,
+  /^https:\/\/api[.]sandbox[.]paypal\.com\/v1\/notifications\/cert\/.*$/i,
+  /^https:\/\/api-m[.]sandbox[.]paypal\.com\/v1\/notifications\/cert\/.*$/i,
+]
+
+function isValidPaypalCertUrl(url: string): boolean {
+  if (!url || typeof url !== 'string') return false
+  return ALLOWED_CERT_URL_PATTERNS.some(pattern => pattern.test(url))
+}
+
+export async function verifyPayPalWebhook(req: { headers: Record<string, string>; body: unknown }): Promise<boolean> {
+  if (!PAYPAL_WEBHOOK_ID) {
+    if (process.env.NODE_ENV === 'production') {
+      hookLog.fatal('PAYPAL_WEBHOOK_ID not configured in production — rejecting webhook')
+      return false
+    }
+    hookLog.warn('PAYPAL_WEBHOOK_ID not configured — skipping signature verification (dev mode)')
+    return true
+  }
+
+  const certUrl = req.headers['paypal-cert-url']
+  if (!isValidPaypalCertUrl(certUrl)) {
+    hookLog.warn({ certUrl }, 'Invalid PayPal cert_url — possible SSRF attempt')
+    return false
+  }
+
+  try {
+    const accessToken = await getPaypalAccessToken()
+    if (!accessToken) return false
+
+    const verificationPayload = {
+      auth_algo: req.headers['paypal-auth-algo'],
+      cert_url: certUrl,
+      transmission_id: req.headers['paypal-transmission-id'],
+      transmission_sig: req.headers['paypal-transmission-sig'],
+      transmission_time: req.headers['paypal-transmission-time'],
+      webhook_id: PAYPAL_WEBHOOK_ID,
+      webhook_event: req.body,
+    }
+
+    const response = await fetch(`${PAYPAL_BASE}/v1/notifications/verify-webhook-signature`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+      body: JSON.stringify(verificationPayload),
+    })
+
+    const data = await response.json() as { verification_status: string }
+    return data.verification_status === 'SUCCESS'
+  } catch (err) {
+    hookLog.error({ err }, 'Webhook signature verification failed')
+    return false
+  }
+}
+
+// ─── Webhook Event Logging ──────────────────────────────────
+
+export async function logWebhookEvent(eventType: string, payload: unknown) {
+  try {
+    await prisma.webhookLog.create({
+      data: { source: 'paypal', eventType: eventType || 'unknown', payload: payload as unknown as Prisma.InputJsonValue, status: 'received' },
+    })
+  } catch (err) {
+    hookLog.error({ err }, 'Failed to log webhook')
+  }
+}
+
+// ─── Capture Completed Handler ───────────────────────────────
+
+export async function handleCaptureCompleted(resource: Record<string, unknown>) {
+  try {
+    const supplementaryData = resource?.supplementary_data as Record<string, unknown> | undefined
+    const relatedIds = supplementaryData?.related_ids as Record<string, unknown> | undefined
+    const referenceId = (relatedIds?.order_id || resource?.custom_id) as string | undefined
+    if (!referenceId) return
+
+    // Find order by paymentIntentId (paypalOrderId) first, then by orderNumber
+    let order = await prisma.order.findFirst({ where: { paymentIntentId: referenceId }, include: { items: true } })
+    if (!order) order = await prisma.order.findFirst({ where: { orderNumber: referenceId }, include: { items: true } })
+    if (!order || order.paymentStatus === 'paid') return
+
+    // Atomic guard: only transition to paid if not already paid
+    const updated = await prisma.order.updateMany({
+      where: { id: order.id, paymentStatus: { not: 'paid' } },
+      data: { paymentStatus: 'paid', status: 'confirmed' },
+    })
+    if (updated.count === 0) return
+
+    await prisma.orderTimeline.create({
+      data: { orderId: order.id, status: 'confirmed', note: 'Payment confirmed via PayPal webhook' },
+    })
+
+    // Reduce stock — atomic guard prevents negative stock
+    for (const item of order.items) {
+      if (item.productId) {
+        const affected = await prisma.$executeRawUnsafe(
+          'UPDATE products SET stock_count = stock_count - $1 WHERE id = $2::uuid AND stock_count >= $1',
+          item.quantity, item.productId
+        )
+        if (affected === 0) {
+          hookLog.warn({ productId: item.productId, quantity: item.quantity, orderId: order.id }, 'Stock insufficient during webhook capture')
+        }
+      }
+    }
+
+    await logAudit({
+      action: 'order.payment.confirmed', entityType: 'order', entityId: order.id, entityName: order.orderNumber,
+      newValue: { paymentStatus: 'paid', status: 'confirmed' },
+    })
+
+    // Send confirmation email
+    const customer = order.customerId
+      ? await prisma.customer.findUnique({ where: { id: order.customerId }, select: { email: true, name: true } })
+      : null
+    if (customer) {
+      const shippingAddr = [
+        order.shippingAddressLine1, order.shippingAddressLine2,
+        order.shippingCity, order.shippingState, order.shippingPostalCode, order.shippingCountry,
+      ].filter(Boolean).join(', ')
+
+      sendOrderConfirmation({
+        to: customer.email, customerName: customer.name, orderNumber: order.orderNumber,
+        items: order.items.map(i => ({ name: i.productName, quantity: i.quantity, price: Number(i.unitPrice) })),
+        subtotal: Number(order.subtotal), shippingCost: Number(order.shippingCost), tax: Number(order.tax), total: Number(order.total),
+        shippingAddress: shippingAddr,
+      }).catch(err => hookLog.error({ err }, 'Webhook order email failed'))
+    }
+
+    hookLog.info({ orderId: order.id, orderNumber: order.orderNumber }, 'Order paid via PayPal webhook')
+  } catch (err) {
+    hookLog.error({ err }, 'Error handling PayPal capture completed')
+  }
+}
+
+export async function handleCaptureFailed(resource: Record<string, unknown>) {
+  try {
+    const supplementaryData = resource?.supplementary_data as Record<string, unknown> | undefined
+    const relatedIds = supplementaryData?.related_ids as Record<string, unknown> | undefined
+    const referenceId = (relatedIds?.order_id || resource?.custom_id) as string | undefined
+    if (!referenceId) return
+
+    const order = await prisma.order.findFirst({ where: { paymentIntentId: referenceId } })
+    if (!order) return
+
+    await prisma.order.update({ where: { id: order.id }, data: { paymentStatus: 'pending' } })
+    await prisma.orderTimeline.create({ data: { orderId: order.id, status: order.status, note: 'PayPal payment capture denied' } })
+
+    hookLog.warn({ orderId: order.id }, 'PayPal capture denied')
+  } catch (err) {
+    hookLog.error({ err }, 'Error handling PayPal capture failed')
+  }
+}
+
+// ─── Storefront Payment Flow ─────────────────────────────────
+
+export async function createPaypalOrder(orderId: string, userId: string) {
+  const order = await prisma.order.findFirst({ where: { id: orderId, customerId: userId } })
+  if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
+  if (order.paymentStatus === 'paid') throw Object.assign(new Error('Order already paid'), { status: 400 })
+
+  const accessToken = await getPaypalAccessToken()
+  if (!accessToken) throw Object.assign(new Error('Failed to connect to PayPal'), { status: 502 })
+
+  const paypalOrderRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+    body: JSON.stringify({
+      intent: 'CAPTURE',
+      purchase_units: [{
+        reference_id: order.orderNumber,
+        description: `Order ${order.orderNumber} — Alka Traders`,
+        amount: {
+          currency_code: order.currency || 'USD',
+          value: Number(order.total).toFixed(2),
+          breakdown: {
+            item_total: { currency_code: order.currency || 'USD', value: Number(order.subtotal).toFixed(2) },
+            shipping: { currency_code: order.currency || 'USD', value: Number(order.shippingCost).toFixed(2) },
+            tax_total: { currency_code: order.currency || 'USD', value: Number(order.tax).toFixed(2) },
+          },
+        },
+      }],
+      application_context: {
+        brand_name: 'Alka Traders',
+        landing_page: 'BILLING',
+        user_action: 'PAY_NOW',
+        return_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout?paypal=success&orderId=${orderId}`,
+        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout?paypal=cancelled`,
+      },
+    }),
+  })
+
+  if (!paypalOrderRes.ok) {
+    const err: Record<string, unknown> = await paypalOrderRes.json() as Record<string, unknown>
+    hookLog.error({ err, orderId }, 'PayPal create order failed')
+    throw Object.assign(new Error('PayPal order creation failed'), { status: 502 })
+  }
+
+  const paypalData = await paypalOrderRes.json() as { id: string }
+  hookLog.info({ orderId, paypalOrderId: paypalData.id }, 'PayPal order created')
+
+  await prisma.order.update({ where: { id: orderId }, data: { paymentIntentId: paypalData.id } })
+
+  return { paypalOrderId: paypalData.id }
+}
+
+export async function capturePaypalOrder(paypalOrderId: string, orderId: string, userId: string) {
+  const order = await prisma.order.findFirst({ where: { id: orderId, customerId: userId }, include: { items: true } })
+  if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
+  if (order.paymentStatus === 'paid') throw Object.assign(new Error('Order already paid'), { status: 400 })
+
+  const accessToken = await getPaypalAccessToken()
+  if (!accessToken) throw Object.assign(new Error('Failed to connect to PayPal'), { status: 502 })
+
+  const captureRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${paypalOrderId}/capture`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+  })
+
+  if (!captureRes.ok) {
+    const err: Record<string, unknown> = await captureRes.json() as Record<string, unknown>
+    hookLog.error({ err, orderId, paypalOrderId }, 'PayPal capture failed')
+    throw Object.assign(new Error('Payment capture failed'), { status: 502 })
+  }
+
+  const captureData = await captureRes.json() as { status: string }
+  if (captureData.status !== 'COMPLETED') {
+    hookLog.warn({ status: captureData.status, orderId }, 'PayPal capture not completed')
+    throw Object.assign(new Error('Payment not completed'), { status: 400 })
+  }
+
+  // Atomic idempotency guard
+  const updated = await prisma.order.updateMany({
+    where: { id: orderId, paymentStatus: { not: 'paid' } },
+    data: { paymentStatus: 'paid', status: 'confirmed' },
+  })
+  if (updated.count === 0) return { status: 'completed' as const, orderId }
+
+  await prisma.orderTimeline.create({ data: { orderId, status: 'confirmed', note: 'Payment confirmed via PayPal' } })
+
+  // Reduce stock
+  for (const item of order.items) {
+    if (item.productId) {
+      const affected = await prisma.$executeRawUnsafe(
+        'UPDATE products SET stock_count = stock_count - $1 WHERE id = $2::uuid AND stock_count >= $1',
+        item.quantity, item.productId
+      )
+      if (affected === 0) {
+        hookLog.warn({ productId: item.productId, quantity: item.quantity, orderId }, 'Stock insufficient during PayPal capture')
+      }
+    }
+  }
+
+  await logAudit({
+    action: 'order.payment.confirmed', entityType: 'order', entityId: orderId, entityName: order.orderNumber,
+    newValue: { paymentStatus: 'paid', status: 'confirmed', paypalOrderId },
+  })
+
+  // Send confirmation email (non-blocking)
+  const customer = await prisma.customer.findUnique({ where: { id: userId }, select: { email: true, name: true } })
+  if (customer) {
+    const shippingAddr = [
+      order.shippingAddressLine1, order.shippingAddressLine2,
+      order.shippingCity, order.shippingState, order.shippingPostalCode, order.shippingCountry,
+    ].filter(Boolean).join(', ')
+
+    sendOrderConfirmation({
+      to: customer.email, customerName: customer.name, orderNumber: order.orderNumber,
+      items: order.items.map(i => ({ name: i.productName, quantity: i.quantity, price: Number(i.unitPrice) })),
+      subtotal: Number(order.subtotal), shippingCost: Number(order.shippingCost), tax: Number(order.tax), total: Number(order.total),
+      shippingAddress: shippingAddr,
+    }).catch(err => hookLog.error({ err }, 'Order confirmation email failed'))
+  }
+
+  hookLog.info({ orderId, orderNumber: order.orderNumber, paypalOrderId }, 'PayPal payment captured')
+  return { status: 'completed' as const, orderId }
+}

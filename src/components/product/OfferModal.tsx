@@ -107,7 +107,7 @@ export function OfferModal({ product, onClose }: OfferModalProps) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 bg-[var(--accent-primary)] text-white font-semibold text-xs border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all rounded-xl cursor-pointer disabled:opacity-50"
+                className="w-full py-3 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-xs border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all rounded-xl cursor-pointer disabled:opacity-50"
               >
                 {submitting ? 'Submitting...' : t('product.submitOffer')}
               </button>

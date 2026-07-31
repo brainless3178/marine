@@ -145,13 +145,13 @@ export default function Products() {
             {t('products.description')}
           </p>
           <div className="relative max-w-[640px] mx-auto mt-8">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
               type="text"
               value={localSearch}
               onChange={(e) => debouncedSetSearch(e.target.value)}
               placeholder={t('products.searchPlaceholder')}
-              className="w-full pl-11 pr-4 py-4 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none"
+              className="w-full pl-11 pr-4 py-4 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-all"
             />
           </div>
         </div>

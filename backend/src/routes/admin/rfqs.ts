@@ -53,9 +53,9 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/:id', asyncHandler(async (req, res) => {
   try {
     const rfq = await rfqService.getRfq(req.params.id as string)
-    res.json({ rfq })
+    sendSuccess(res, { rfq })
   } catch (err: any) {
-    res.status(err.status || 500).json({ error: err.message })
+    sendError(res, err.message, err.status || 500)
   }
 }))
 
@@ -65,9 +65,9 @@ router.patch('/:id/status', requireRole('sales-agent'), validateBody(statusSchem
     const rfq = await rfqService.updateRfqStatus(
       req.params.id as string, req.body.status, req.body.note, req.user!, req.ip
     )
-    res.json({ rfq })
+    sendSuccess(res, { rfq })
   } catch (err: any) {
-    res.status(err.status || 500).json({ error: err.message })
+    sendError(res, err.message, err.status || 500)
   }
 }))
 

@@ -208,7 +208,7 @@ export function AuthModal() {
             {/* Tabs */}
             <div className="relative flex mb-7 bg-[var(--primary-bg)] rounded-xl p-1">
               <motion.div
-                className="absolute top-1 bottom-1 rounded-lg bg-[var(--surface)] shadow-sm"
+                className="absolute top-1 bottom-1 rounded-lg bg-[var(--surface)] shadow-sm ring-1 ring-[var(--accent-primary)]"
                 style={{ width: 'calc(50% - 4px)' }}
                 animate={{ x: activeTab === 'signin' ? 4 : 'calc(100% + 4px)' }}
                 transition={{ type: 'spring', damping: 28, stiffness: 380 }}

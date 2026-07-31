@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { prisma } from '../../server.js'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler, validateBody } from '../../middleware/validate.js'
 import { z } from 'zod'
@@ -37,9 +36,9 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/:id', asyncHandler(async (req, res) => {
   try {
     const order = await orderService.getOrder(req.params.id as string)
-    res.json({ order })
+    sendSuccess(res, { order })
   } catch (err: any) {
-    res.status(err.status || 500).json({ error: err.message })
+    sendError(res, err.message, err.status || 500)
   }
 }))
 
@@ -90,12 +89,7 @@ router.get('/:id/invoice', requireRole('store-manager'), asyncHandler(async (req
 
 // ─── Export CSV ────────────────────────────────────────────────
 router.get('/export/csv', requireRole('store-manager'), asyncHandler(async (_req, res) => {
-  const orders = await prisma.order.findMany({ include: { items: true }, orderBy: { createdAt: 'desc' }, take: 10000 })
-
-  const headers = ['Order Number', 'Status', 'Payment Status', 'Total', 'Created At']
-  const rows = orders.map(o => [o.orderNumber, o.status, o.paymentStatus, o.total.toString(), o.createdAt.toISOString()])
-
-  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+  const csv = await orderService.exportOrdersCsv()
   res.setHeader('Content-Type', 'text/csv')
   res.setHeader('Content-Disposition', 'attachment; filename=orders.csv')
   res.send(csv)

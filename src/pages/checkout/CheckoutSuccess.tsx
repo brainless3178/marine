@@ -81,7 +81,7 @@ export function CheckoutSuccess({
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               placeholder={t('checkout.cancelPlaceholder')}
-              className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg outline-none focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] min-h-[80px] mb-3"
+              className="w-full px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] text-sm text-[var(--text-primary)] rounded-lg focus:border-[var(--accent-primary)] min-h-[80px] mb-3"
             />
             <button
               onClick={() => {
