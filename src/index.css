@@ -83,6 +83,12 @@
   --hero-cta-orange: #c45200;
   --hero-cta-orange-hover: #a84400;
   --hero-cta-orange-shadow: rgba(196, 82, 0, 0.28);
+  --hero-bg-deep: #0a0e17;
+  --hero-bg-mid: #1a2332;
+  --hero-bg-light: #0f172a;
+  --hero-overlay: #06111f;
+  --hero-accent-gold: #ffb547;
+  --hero-accent-orange: #ff6b00;
 
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
@@ -208,6 +214,12 @@ html.light {
   --hero-cta-orange: #c45200;
   --hero-cta-orange-hover: #a84400;
   --hero-cta-orange-shadow: rgba(196, 82, 0, 0.28);
+  --hero-bg-deep: #0a0e17;
+  --hero-bg-mid: #1a2332;
+  --hero-bg-light: #0f172a;
+  --hero-overlay: #06111f;
+  --hero-accent-gold: #ffb547;
+  --hero-accent-orange: #ff6b00;
 
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);

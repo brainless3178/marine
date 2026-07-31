@@ -62,7 +62,7 @@ export function ShopByCategory() {
                     img.style.display = 'none'
                     const parent = img.parentElement
                     if (parent) {
-                      parent.style.background = 'linear-gradient(135deg, #1a2332 0%, #0f172a 100%)'
+                      parent.style.background = 'linear-gradient(135deg, var(--hero-bg-mid) 0%, var(--hero-bg-light) 100%)'
                     }
                   }}
                 />
