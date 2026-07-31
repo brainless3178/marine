@@ -376,7 +376,7 @@ export function Navbar() {
               </div>
               <Link
                 to={localizedPath('/rfq')}
-                className="inline-flex items-center justify-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-extrabold text-white no-underline hover:bg-[var(--accent-primary-hover)] transition-colors"
+                className="inline-flex items-center justify-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-extrabold text-[var(--btn-blue-text)] no-underline hover:bg-[var(--accent-primary-hover)] transition-colors"
               >
                 {t('nav.requestQuote')}
               </Link>

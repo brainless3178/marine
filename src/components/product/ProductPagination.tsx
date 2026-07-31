@@ -34,7 +34,7 @@ export function ProductPagination({ currentPage, totalPages, onPageChange }: Pro
             onClick={() => onPageChange(p)}
             className={`w-8 h-8 text-xs font-bold rounded-lg transition-colors ${
               p === currentPage
-                ? 'bg-[var(--accent-primary)] text-white border border-[var(--accent-primary)]'
+                ? 'bg-[var(--accent-primary)] text-[var(--btn-blue-text)] border border-[var(--accent-primary)]'
                 : 'border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[var(--accent-primary)]'
             }`}
           >
