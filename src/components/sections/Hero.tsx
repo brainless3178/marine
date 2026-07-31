@@ -79,7 +79,7 @@ export function Hero() {
           <img
             src={slide.src}
             alt={slide.alt}
-            className={`h-full w-full ${index === 0 || index === 1 ? 'object-cover object-[15%_18%]' : 'object-cover'}`}
+            className="h-full w-full object-cover object-[65%_50%]"
             loading={index === 0 ? 'eager' : 'lazy'}
             decoding="async"
             onError={(e) => {
@@ -91,7 +91,6 @@ export function Hero() {
         </div>
       ))}
 
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[var(--hero-overlay)]/90 via-[var(--hero-overlay)]/62 to-[var(--hero-overlay)]/18" />
 
 
 
