@@ -630,17 +630,29 @@ html:not(.light) {
     box-shadow: 0 4px 24px var(--shadow-heavy-color);
   }
 
-  .commerce-button {
-    border-color: var(--accent-primary);
+  /* ── Unified primary button (replaces .commerce-button + .maritime-btn-primary) ── */
+  .btn-primary {
     background: var(--accent-primary);
     color: var(--btn-blue-text);
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 14px 28px;
     box-shadow: 0 4px 16px var(--focus-ring);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
   }
 
-  .commerce-button:hover {
+  .btn-primary:hover {
     background: var(--accent-primary-hover);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--focus-ring);
   }
+
+
 
   .marine-section {
     background:
@@ -658,26 +670,7 @@ html:not(.light) {
     box-shadow: 0 12px 40px var(--shadow-heavy-color);
   }
 
-  /* Premium button — primary action */
-  .maritime-btn-primary {
-    background: var(--accent-primary);
-    color: var(--btn-blue-text);
-    border: none;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 14px 28px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-  }
 
-  .maritime-btn-primary:hover {
-    background: var(--accent-primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px var(--focus-ring);
-  }
 
   /* Accent bar */
   .gold-accent-bar {
