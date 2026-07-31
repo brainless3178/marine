@@ -55,7 +55,7 @@ export function Testimonials() {
         <div className="gold-accent-bar mt-0 mb-12" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
           {testimonials.map((review, i) => (
-            <div key={review.id} className="maritime-card p-8 border-l-[4px] border-l-transparent hover:border-l-[var(--accent-primary)]" style={{ animationDelay: `${i * 100}ms` }}>
+            <div key={review.id} className="card p-8 border-l-[4px] border-l-transparent hover:border-l-[var(--accent-primary)]" style={{ animationDelay: `${i * 100}ms` }}>
               <div className="flex gap-1 mb-5">
                 {Array.from({ length: review.rating }).map((_, j) => (
                   <Star key={j} size={16} className="fill-[var(--accent-gold)] text-[var(--accent-gold)]" />

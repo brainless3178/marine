@@ -18,7 +18,7 @@ function ProductCard({ product, addedIds, onAddToCart }: { product: Product; add
   const isAdded = addedIds.has(product.id)
 
   return (
-    <div className="commerce-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-primary)] group">
+    <div className="card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-primary)] group">
       <Link to={`/product/${product.id}`} className="block relative overflow-hidden bg-[var(--surface-soft)]">
         <OptimizedImage
           src={getProductImageUrl(product.filename)}

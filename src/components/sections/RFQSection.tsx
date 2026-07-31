@@ -106,7 +106,7 @@ export function RFQSection() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="maritime-card p-7 md:p-9">
+        <form onSubmit={handleSubmit} className="card p-7 md:p-9">
           <div className="mb-5">
             <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2">Full Name *</label>
             <input
