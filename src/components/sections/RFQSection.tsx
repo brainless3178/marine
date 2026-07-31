@@ -189,7 +189,7 @@ export function RFQSection() {
           </div>
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2.5 maritime-btn-primary text-sm maritime-shimmer"
+            className="w-full flex items-center justify-center gap-2.5 btn-primary text-sm maritime-shimmer"
           >
             <Send size={14} />
             Submit RFQ

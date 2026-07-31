@@ -88,7 +88,7 @@ function ProductCard({ product, addedIds, onAddToCart }: { product: Product; add
               ? 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed'
               : isAdded
                 ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
-                : 'commerce-button'
+                : 'btn-primary border-none'
           }`}
         >
           {!product.inStock
