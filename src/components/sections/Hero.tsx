@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, MessageCircle, Search } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getStaticImageUrl } from '@/lib/utils'
 
 const heroSlides = [
@@ -94,51 +93,7 @@ export function Hero() {
 
       <div className="absolute inset-0 z-10 bg-gradient-to-r from-[var(--hero-overlay)]/90 via-[var(--hero-overlay)]/62 to-[var(--hero-overlay)]/18" />
 
-      <div className="absolute inset-0 z-20 flex items-center">
-        <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6">
-          <div className="max-w-3xl">
-            <p className="mb-4 text-xs font-black uppercase tracking-[0.22em] text-[var(--hero-accent-gold)]">
-              Bhavnagar and Alang ship spares supplier
-            </p>
-            <h1 className="font-display text-4xl font-extrabold leading-tight tracking-normal text-white sm:text-5xl lg:text-6xl">
-              Tested marine spare parts and industrial equipment, sourced fast for vessels and plants.
-            </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/78 sm:text-base">
-              Alka Traders supplies ship automation, engine spares, hydraulic pumps, electrical drives, navigation equipment, and surplus machinery from India to buyers worldwide.
-            </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
-                to="/rfq"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[var(--hero-cta-orange)] px-6 py-3 text-sm font-extrabold text-white no-underline shadow-[0_14px_36px_var(--hero-cta-orange-shadow)] transition-all hover:bg-[var(--hero-cta-orange-hover)]"
-              >
-                <MessageCircle size={18} />
-                Request Ship Spare Quote
-              </Link>
-              <Link
-                to="/products"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/35 bg-white/10 px-6 py-3 text-sm font-extrabold text-white no-underline backdrop-blur transition-all hover:bg-white/18"
-              >
-                <Search size={18} />
-                Browse Marine Parts
-              </Link>
-            </div>
-            <dl className="mt-7 grid max-w-xl grid-cols-3 gap-3 text-white">
-              <div>
-                <dt className="text-2xl font-black">10k+</dt>
-                <dd className="text-xs font-semibold text-white/62">parts sourced</dd>
-              </div>
-              <div>
-                <dt className="text-2xl font-black">50+</dt>
-                <dd className="text-xs font-semibold text-white/62">countries served</dd>
-              </div>
-              <div>
-                <dt className="text-2xl font-black">4 hr</dt>
-                <dd className="text-xs font-semibold text-white/62">RFQ response</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-      </div>
+
 
       {/* ── Left Arrow ── */}
       <button
