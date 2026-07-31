@@ -54,7 +54,7 @@ export function Hero() {
 
   return (
     <section
-      className="relative w-full h-[620px] min-h-[620px] overflow-hidden bg-[#0a0e17] select-none sm:h-[640px] lg:h-[660px]"
+      className="relative w-full h-[620px] min-h-[620px] overflow-hidden bg-[var(--hero-bg-deep)] select-none sm:h-[640px] lg:h-[660px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onKeyDown={handleKeyDown}
@@ -86,18 +86,18 @@ export function Hero() {
             onError={(e) => {
               const img = e.target as HTMLImageElement
               img.style.background =
-                'linear-gradient(135deg, #1a2332 0%, #0f172a 50%, #0a0e17 100%)'
+                'linear-gradient(135deg, var(--hero-bg-mid) 0%, var(--hero-bg-light) 50%, var(--hero-bg-deep) 100%)'
             }}
           />
         </div>
       ))}
 
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#06111f]/90 via-[#06111f]/62 to-[#06111f]/18" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[var(--hero-overlay)]/90 via-[var(--hero-overlay)]/62 to-[var(--hero-overlay)]/18" />
 
       <div className="absolute inset-0 z-20 flex items-center">
         <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6">
           <div className="max-w-3xl">
-            <p className="mb-4 text-xs font-black uppercase tracking-[0.22em] text-[#ffb547]">
+            <p className="mb-4 text-xs font-black uppercase tracking-[0.22em] text-[var(--hero-accent-gold)]">
               Bhavnagar and Alang ship spares supplier
             </p>
             <h1 className="font-display text-4xl font-extrabold leading-tight tracking-normal text-white sm:text-5xl lg:text-6xl">
@@ -143,7 +143,7 @@ export function Hero() {
       {/* ── Left Arrow ── */}
       <button
         onClick={prev}
-        className="absolute left-3 top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/16 text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all duration-300 hover:border-[#ff6b00] hover:bg-[#ff6b00] focus-visible:outline-2 focus-visible:outline-white/60 md:flex"
+        className="absolute left-3 top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/16 text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all duration-300 hover:border-[var(--hero-accent-orange)] hover:bg-[var(--hero-accent-orange)] focus-visible:outline-2 focus-visible:outline-white/60 md:flex"
         aria-label="Previous slide"
       >
         <ChevronLeft size={24} strokeWidth={2.5} />
@@ -152,7 +152,7 @@ export function Hero() {
       {/* ── Right Arrow ── */}
       <button
         onClick={next}
-        className="absolute right-3 top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/16 text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all duration-300 hover:border-[#ff6b00] hover:bg-[#ff6b00] focus-visible:outline-2 focus-visible:outline-white/60 md:flex"
+        className="absolute right-3 top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/16 text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all duration-300 hover:border-[var(--hero-accent-orange)] hover:bg-[var(--hero-accent-orange)] focus-visible:outline-2 focus-visible:outline-white/60 md:flex"
         aria-label="Next slide"
       >
         <ChevronRight size={24} strokeWidth={2.5} />
@@ -166,7 +166,7 @@ export function Hero() {
             onClick={() => goTo(index)}
             className={`rounded-full transition-all duration-300 focus-visible:outline-2 focus-visible:outline-white/60 ${
               index === current
-                ? 'h-2.5 w-9 bg-[#ff6b00] shadow-[0_0_16px_rgba(255,107,0,0.5)]'
+                ? 'h-2.5 w-9 bg-[var(--hero-accent-orange)] shadow-[0_0_16px_rgba(255,107,0,0.5)]'
                 : 'h-2.5 w-2.5 bg-white/30 hover:bg-white/60'
             }`}
             aria-label={`Go to slide ${index + 1}`}
