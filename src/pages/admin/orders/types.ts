@@ -30,7 +30,7 @@ export interface Order {
 export const STATUS_FLOW: OrderStatus[] = ['pending', 'confirmed', 'paid', 'processing', 'packed', 'shipped', 'delivered']
 
 export function mapApiOrder(o: ApiOrder): Order {
-  const oAny = o as Record<string, unknown>
+  const oAny = o as unknown as Record<string, unknown>
   const items = (o.items || o.orderItems || []).map((item: ApiOrderItem) => ({
     productName: item.product?.name || item.productName || 'Unknown Product',
     sku: item.product?.sku || item.sku || '',

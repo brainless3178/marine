@@ -5,7 +5,6 @@ interface ProductPaginationProps {
 }
 
 export function ProductPagination({ currentPage, totalPages, onPageChange }: ProductPaginationProps) {
-  const { t } = useTranslation()
 
   if (totalPages <= 1) return null
 

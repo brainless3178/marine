@@ -243,8 +243,6 @@ export function AuthModal() {
                     onTogglePassword={() => setShowPassword(!showPassword)}
                     errors={errors}
                     onClearError={clearError}
-                    submitting={submitting}
-                    onSubmit={handleSignIn}
                     onForgotPassword={() => setShowAuthModal(false)}
                   />
                 ) : (
@@ -263,8 +261,6 @@ export function AuthModal() {
                     onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
                     errors={errors}
                     onClearError={clearError}
-                    submitting={submitting}
-                    onSubmit={handleSignUp}
                   />
                 )}
               </AnimatePresence>
