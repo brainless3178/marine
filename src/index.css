@@ -33,14 +33,11 @@
   --navy-light: #374151;
   --gold-light: #d4990e;
   --gold-dark: #a16f08;
-  --btn-gold-bg: #c8870a;
   --gold-muted: rgba(200, 135, 10, 0.10);
   --teal-soft: rgba(13, 148, 136, 0.06);
   --btn-hover-gold: #a16f08;
   --focus-ring: rgba(26, 115, 232, 0.24);
   --focus-ring-gold: rgba(200, 135, 10, 0.24);
-  --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.18);
-  --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.12);
   --overlay-dark: rgba(17, 24, 39, 0.60);
   --overlay-medium: rgba(17, 24, 39, 0.48);
   --danger-border: rgba(220, 38, 38, 0.24);
@@ -52,11 +49,7 @@
   --info-border: rgba(26, 115, 232, 0.24);
   --info-subtle: rgba(26, 115, 232, 0.06);
   --gold-glow: rgba(200, 135, 10, 0.04);
-  --teal-glow: rgba(13, 148, 136, 0.30);
   --selection-bg: rgba(26, 115, 232, 0.16);
-  --tap-highlight: rgba(26, 115, 232, 0.10);
-  --glass-bg: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.1);
   --sidebar-text: rgba(255, 255, 255, 0.74);
   --sidebar-text-hover: rgba(255, 255, 255, 0.96);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
@@ -77,9 +70,6 @@
   --overlay-sidebar: rgba(0, 0, 0, 0.5);
   --shadow-card-hover-dark: rgba(0, 0, 0, 0.12);
   --shadow-nav-hover: rgba(0, 0, 0, 0.08);
-  --hero-gradient-start: rgba(17, 24, 39, 0.96);
-  --hero-gradient-mid: rgba(31, 41, 55, 0.94);
-  --hero-gold-glow: rgba(200, 135, 10, 0.18);
   --hero-cta-orange: #c45200;
   --hero-cta-orange-hover: #a84400;
   --hero-cta-orange-shadow: rgba(196, 82, 0, 0.28);
@@ -92,8 +82,6 @@
 
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
-  --btn-gold-shadow: rgba(200, 135, 10, 0.20);
-  --btn-secondary-hover-border: rgba(255, 255, 255, 0.4);
   --shadow-heavy-color: rgba(0, 0, 0, 0.18);
   /* ⚠️ Must pair with --accent-primary (#1a6eda in light). #fff on #1a6eda = 4.65:1 */
   --btn-blue-text: #ffffff;
@@ -128,7 +116,6 @@
   --login-teal: rgba(13, 148, 136, 0.04);
   --brick-ember: #1a73e8;
   --honeydew: #ffffff;
-  --brick-border: rgba(26, 115, 232, 0.24);
 }
 
 html.light {
@@ -160,14 +147,11 @@ html.light {
   --navy-light: #374151;
   --gold-light: #d4990e;
   --gold-dark: #a16f08;
-  --btn-gold-bg: #c8870a;
   --gold-muted: rgba(200, 135, 10, 0.10);
   --teal-soft: rgba(13, 148, 136, 0.06);
   --btn-hover-gold: #a16f08;
   --focus-ring: rgba(26, 115, 232, 0.24);
   --focus-ring-gold: rgba(200, 135, 10, 0.24);
-  --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.18);
-  --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.12);
   --overlay-dark: rgba(17, 24, 39, 0.60);
   --overlay-medium: rgba(17, 24, 39, 0.48);
   --danger-border: rgba(220, 38, 38, 0.24);
@@ -179,11 +163,7 @@ html.light {
   --info-border: rgba(26, 115, 232, 0.24);
   --info-subtle: rgba(26, 115, 232, 0.06);
   --gold-glow: rgba(200, 135, 10, 0.04);
-  --teal-glow: rgba(13, 148, 136, 0.30);
   --selection-bg: rgba(26, 115, 232, 0.16);
-  --tap-highlight: rgba(26, 115, 232, 0.10);
-  --glass-bg: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.1);
   --sidebar-text: rgba(255, 255, 255, 0.74);
   --sidebar-text-hover: rgba(255, 255, 255, 0.96);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
@@ -205,9 +185,6 @@ html.light {
   --shadow-card-hover-dark: rgba(0, 0, 0, 0.12);
   --shadow-nav-hover: rgba(0, 0, 0, 0.08);
   --login-teal: rgba(13, 148, 136, 0.04);
-  --hero-gradient-start: rgba(17, 24, 39, 0.96);
-  --hero-gradient-mid: rgba(31, 41, 55, 0.94);
-  --hero-gold-glow: rgba(200, 135, 10, 0.18);
   --hero-cta-orange: #c45200;
   --hero-cta-orange-hover: #a84400;
   --hero-cta-orange-shadow: rgba(196, 82, 0, 0.28);
@@ -220,14 +197,11 @@ html.light {
 
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
-  --btn-gold-shadow: rgba(200, 135, 10, 0.20);
-  --btn-secondary-hover-border: rgba(255, 255, 255, 0.4);
   --shadow-heavy-color: rgba(0, 0, 0, 0.18);
   --admin-table-head-text: #5c6a7e;
   --admin-badge-hidden-text: #546174;
   --brick-ember: #1a73e8;
   --honeydew: #ffffff;
-  --brick-border: rgba(26, 115, 232, 0.24);
 }
 
 html:not(.light) {
@@ -240,7 +214,6 @@ html:not(.light) {
   --accent-primary-hover: #7db8ff;
   --accent-blue: #5ea3f8;
   --accent-gold: #e8b84a;
-  --btn-gold-bg: #e8b84a;
   --accent-teal: #2dd4bf;
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
@@ -264,8 +237,6 @@ html:not(.light) {
   --btn-hover-gold: #f0c95c;
   --focus-ring: rgba(94, 163, 248, 0.28);
   --focus-ring-gold: rgba(232, 184, 74, 0.28);
-  --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.4);
-  --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.3);
   --overlay-dark: rgba(0, 0, 0, 0.72);
   --overlay-medium: rgba(0, 0, 0, 0.56);
   --danger-border: rgba(248, 113, 113, 0.28);
@@ -277,11 +248,7 @@ html:not(.light) {
   --info-border: rgba(94, 163, 248, 0.28);
   --info-subtle: rgba(94, 163, 248, 0.06);
   --gold-glow: rgba(232, 184, 74, 0.04);
-  --teal-glow: rgba(45, 212, 191, 0.30);
   --selection-bg: rgba(94, 163, 248, 0.18);
-  --tap-highlight: rgba(94, 163, 248, 0.12);
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.08);
   --sidebar-text: rgba(255, 255, 255, 0.74);
   --sidebar-text-hover: rgba(255, 255, 255, 0.96);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
@@ -303,14 +270,9 @@ html:not(.light) {
   --shadow-card-hover-dark: rgba(0, 0, 0, 0.20);
   --shadow-nav-hover: rgba(0, 0, 0, 0.12);
   --login-teal: rgba(45, 212, 191, 0.04);
-  --hero-gradient-start: rgba(15, 20, 25, 0.96);
-  --hero-gradient-mid: rgba(26, 35, 50, 0.94);
-  --hero-gold-glow: rgba(232, 184, 74, 0.18);
 
   --shimmer-white: rgba(255, 255, 255, 0.12);
   --card-hover-shadow: rgba(0, 0, 0, 0.28);
-  --btn-gold-shadow: rgba(232, 184, 74, 0.20);
-  --btn-secondary-hover-border: rgba(255, 255, 255, 0.32);
   --shadow-heavy-color: rgba(0, 0, 0, 0.40);
   /* ⚠️ Must pair with --accent-primary (#5ea3f8). #0f1419 on #5ea3f8 = 6.41:1. */
   --btn-blue-text: #0f1419;
@@ -344,7 +306,6 @@ html:not(.light) {
   --admin-login-gradient-light-end: #dde8f0;
   --brick-ember: #5ea3f8;
   --honeydew: #0f1419;
-  --brick-border: rgba(94, 163, 248, 0.28);
 }
 
 @layer base {
