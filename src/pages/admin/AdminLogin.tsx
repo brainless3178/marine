@@ -118,7 +118,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] py-3.5 text-sm font-extrabold text-white transition-all hover:bg-[var(--accent-primary-hover)] hover:shadow-[0_8px_30px_var(--focus-ring)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] py-3.5 text-sm font-extrabold text-[var(--btn-blue-text)] transition-all hover:bg-[var(--accent-primary-hover)] hover:shadow-[0_8px_30px_var(--focus-ring)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {loading ? (
                 <div className="h-5 w-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
