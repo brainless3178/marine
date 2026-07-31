@@ -43,7 +43,7 @@ export function Footer() {
               <a href="https://www.linkedin.com/company/alka-traders" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-white/80 hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all">
                 <LinkedInIcon size={16} />
               </a>
-              <a href={`https://wa.me/${settings.whatsappNumber}`} aria-label="WhatsApp" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-[var(--success)] hover:border-[var(--accent-primary)] transition-all">
+              <a href={`https://wa.me/${settings.whatsappNumber}`} aria-label="WhatsApp" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-[#4ade80] hover:border-[var(--accent-primary)] transition-all">
                 <MessageCircle size={16} />
               </a>
               <a href={`mailto:${settings.rfqEmail}`} aria-label="Email" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-white/80 hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all">

@@ -10,21 +10,21 @@
   --surface: #ffffff;
   --surface-soft: #f1f4f8;
   --surface-raised: #ffffff;
-  --accent-primary: #1a73e8;
+  --accent-primary: #1a6eda;
   --accent-primary-hover: #1557b0;
-  --accent-blue: #1a73e8;
-  --accent-gold: #c8870a;
+  --accent-blue: #1a6eda;
+  --accent-gold: #966508;
   --accent-teal: #0d9488;
   --text-primary: #0f172a;
   --text-secondary: #334155;
-  --text-muted: #64748b;
+  --text-muted: #5b6b80;
   --border: #cbd5e1;
   --input-bg: #f1f5f9;
-  --input-border: #cbd5e1;
+  --input-border: #7d8e9f;
   --input-text: #0f172a;
-  --input-placeholder: #64748b;
+  --input-placeholder: #5f6c80;
   --danger: #dc2626;
-  --success: #16a34a;
+  --success: #15803d;
   --shadow-soft: 0 24px 70px rgba(17, 24, 39, 0.08);
   --shadow-card: 0 4px 24px rgba(17, 24, 39, 0.06);
   --navy-deep: #111827;
@@ -38,7 +38,6 @@
   --btn-hover-gold: #a16f08;
   --focus-ring: rgba(26, 115, 232, 0.24);
   --focus-ring-gold: rgba(200, 135, 10, 0.24);
-  --focus-ring-blue: rgba(26, 115, 232, 0.24);
   --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.18);
   --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.12);
   --overlay-dark: rgba(17, 24, 39, 0.60);
@@ -80,7 +79,7 @@
   --hero-gradient-start: rgba(17, 24, 39, 0.96);
   --hero-gradient-mid: rgba(31, 41, 55, 0.94);
   --hero-gold-glow: rgba(200, 135, 10, 0.18);
-  --hero-pseudo-teal: rgba(13, 148, 136, 0.04);
+
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
   --card-maritime-shadow: rgba(17, 24, 39, 0.08);
@@ -92,6 +91,32 @@
   --btn-blue-text: #ffffff;
   --btn-danger-text: #ffffff;
   --btn-success-text: #ffffff;
+  --link-underline-offset: 0.18em;
+  --link-underline-thickness: 0.08em;
+  --admin-sidebar-gradient-start: #061522;
+  --admin-sidebar-gradient-end: #0a2a43;
+  --admin-sidebar-gradient-light-start: #0a2a43;
+  --admin-sidebar-gradient-light-end: #0d3352;
+  --admin-sidebar-active-text: #e8aa24;
+  --admin-badge-gold-bg: #e8aa24;
+  --admin-badge-gold-text: #061522;
+  --admin-badge-danger-bg-solid: #dc2626;
+  --admin-badge-danger-text-solid: #ffffff;
+  --admin-badge-teal-bg-solid: #007f7f;
+  --admin-badge-teal-text-solid: #ffffff;
+  --admin-table-head-text: #5c6a7e;
+  --admin-badge-published-text: #127838;
+  --admin-badge-draft-text: #965f07;
+  --admin-badge-hidden-text: #546174;
+  --admin-badge-danger-text: #cf2020;
+  --admin-badge-info-text: #1668d4;
+  --admin-quick-action-hover-text: #965f07;
+  --admin-login-gradient-start: #061522;
+  --admin-login-gradient-mid: #0a2a43;
+  --admin-login-gradient-end: #0e4d72;
+  --admin-login-gradient-light-start: #f3f7fb;
+  --admin-login-gradient-light-mid: #eaf1f7;
+  --admin-login-gradient-light-end: #dde8f0;
   --login-teal: rgba(13, 148, 136, 0.04);
   --brick-ember: #1a73e8;
   --honeydew: #ffffff;
@@ -104,21 +129,21 @@ html.light {
   --surface: #ffffff;
   --surface-soft: #f1f4f8;
   --surface-raised: #ffffff;
-  --accent-primary: #1a73e8;
+  --accent-primary: #1a6eda;
   --accent-primary-hover: #1557b0;
-  --accent-blue: #1a73e8;
-  --accent-gold: #c8870a;
+  --accent-blue: #1a6eda;
+  --accent-gold: #966508;
   --accent-teal: #0d9488;
   --text-primary: #0f172a;
   --text-secondary: #334155;
-  --text-muted: #64748b;
+  --text-muted: #5b6b80;
   --border: #cbd5e1;
   --input-bg: #f1f5f9;
-  --input-border: #cbd5e1;
+  --input-border: #7d8e9f;
   --input-text: #0f172a;
-  --input-placeholder: #64748b;
+  --input-placeholder: #5f6c80;
   --danger: #dc2626;
-  --success: #16a34a;
+  --success: #15803d;
   --shadow-soft: 0 24px 70px rgba(17, 24, 39, 0.08);
   --shadow-card: 0 4px 24px rgba(17, 24, 39, 0.06);
   --navy-deep: #111827;
@@ -132,7 +157,6 @@ html.light {
   --btn-hover-gold: #a16f08;
   --focus-ring: rgba(26, 115, 232, 0.24);
   --focus-ring-gold: rgba(200, 135, 10, 0.24);
-  --focus-ring-blue: rgba(26, 115, 232, 0.24);
   --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.18);
   --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.12);
   --overlay-dark: rgba(17, 24, 39, 0.60);
@@ -175,7 +199,7 @@ html.light {
   --hero-gradient-start: rgba(17, 24, 39, 0.96);
   --hero-gradient-mid: rgba(31, 41, 55, 0.94);
   --hero-gold-glow: rgba(200, 135, 10, 0.18);
-  --hero-pseudo-teal: rgba(13, 148, 136, 0.04);
+
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
   --card-maritime-shadow: rgba(17, 24, 39, 0.08);
@@ -184,6 +208,8 @@ html.light {
   --btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
   --btn-secondary-hover-border: rgba(255, 255, 255, 0.4);
   --shadow-heavy-color: rgba(0, 0, 0, 0.18);
+  --admin-table-head-text: #5c6a7e;
+  --admin-badge-hidden-text: #546174;
   --brick-ember: #1a73e8;
   --honeydew: #ffffff;
   --brick-border: rgba(26, 115, 232, 0.24);
@@ -223,7 +249,6 @@ html:not(.light) {
   --btn-hover-gold: #f0c95c;
   --focus-ring: rgba(94, 163, 248, 0.28);
   --focus-ring-gold: rgba(232, 184, 74, 0.28);
-  --focus-ring-blue: rgba(94, 163, 248, 0.28);
   --shadow-heavy: 0 0 40px 15px rgba(0, 0, 0, 0.4);
   --shadow-medium: 0 22px 60px rgba(0, 0, 0, 0.3);
   --overlay-dark: rgba(0, 0, 0, 0.72);
@@ -266,7 +291,7 @@ html:not(.light) {
   --hero-gradient-start: rgba(15, 20, 25, 0.96);
   --hero-gradient-mid: rgba(26, 35, 50, 0.94);
   --hero-gold-glow: rgba(232, 184, 74, 0.18);
-  --hero-pseudo-teal: rgba(13, 148, 136, 0.04);
+
   --shimmer-white: rgba(255, 255, 255, 0.12);
   --card-hover-shadow: rgba(0, 0, 0, 0.28);
   --card-maritime-shadow: rgba(0, 0, 0, 0.10);
@@ -278,6 +303,32 @@ html:not(.light) {
   --btn-blue-text: #0f1419;
   --btn-danger-text: #0f1419;
   --btn-success-text: #0f1419;
+  --link-underline-offset: 0.18em;
+  --link-underline-thickness: 0.08em;
+  --admin-sidebar-gradient-start: #061522;
+  --admin-sidebar-gradient-end: #0a2a43;
+  --admin-sidebar-gradient-light-start: #0a2a43;
+  --admin-sidebar-gradient-light-end: #0d3352;
+  --admin-sidebar-active-text: #e8aa24;
+  --admin-badge-gold-bg: #e8aa24;
+  --admin-badge-gold-text: #061522;
+  --admin-badge-danger-bg-solid: #dc2626;
+  --admin-badge-danger-text-solid: #ffffff;
+  --admin-badge-teal-bg-solid: #007f7f;
+  --admin-badge-teal-text-solid: #ffffff;
+  --admin-table-head-text: var(--text-muted);
+  --admin-badge-published-text: var(--success);
+  --admin-badge-draft-text: var(--accent-gold);
+  --admin-badge-hidden-text: var(--text-muted);
+  --admin-badge-danger-text: var(--danger);
+  --admin-badge-info-text: var(--accent-blue);
+  --admin-quick-action-hover-text: var(--accent-gold);
+  --admin-login-gradient-start: #061522;
+  --admin-login-gradient-mid: #0a2a43;
+  --admin-login-gradient-end: #0e4d72;
+  --admin-login-gradient-light-start: #f3f7fb;
+  --admin-login-gradient-light-mid: #eaf1f7;
+  --admin-login-gradient-light-end: #dde8f0;
   --brick-ember: #5ea3f8;
   --honeydew: #0f1419;
   --brick-border: rgba(94, 163, 248, 0.28);
@@ -325,7 +376,7 @@ html:not(.light) {
 
   h1 {
     font-size: clamp(30px, 4.5vw, 48px);
-    line-height: 1.16;
+    line-height: 1.25;
     letter-spacing: -0.02em;
     font-weight: 700;
   }
@@ -384,7 +435,11 @@ html:not(.light) {
 
   a {
     color: inherit;
-    text-decoration: none;
+    text-decoration-line: underline;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: var(--link-underline-thickness);
+    text-underline-offset: var(--link-underline-offset);
+    text-decoration-skip-ink: auto;
     transition: color 0.3s ease;
   }
 
@@ -568,7 +623,7 @@ html:not(.light) {
   .commerce-button {
     border-color: var(--accent-primary);
     background: var(--accent-primary);
-    color: white;
+    color: var(--btn-blue-text);
     box-shadow: 0 4px 16px var(--focus-ring);
   }
 
@@ -596,7 +651,7 @@ html:not(.light) {
   /* Premium button — primary action */
   .maritime-btn-primary {
     background: var(--accent-primary);
-    color: white;
+    color: var(--btn-blue-text);
     border: none;
     border-radius: 12px;
     font-weight: 700;
@@ -618,13 +673,13 @@ html:not(.light) {
   .gold-accent-bar {
     width: 48px;
     height: 3px;
-    background: linear-gradient(90deg, var(--accent-primary), #38bdf8);
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue));
     border-radius: 2px;
   }
 
   /* Gradient text for About page */
   .gradient-text {
-    background: linear-gradient(135deg, var(--accent-primary) 0%, #38bdf8 100%);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-blue) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -761,6 +816,22 @@ html:not(.light) {
 :focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
+}
+
+/* ── Form element focus ring (overrides Tailwind outline-none) ── */
+input:focus-visible:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-color: var(--accent-primary);
+}
+
+/* ── Dark mode button text: override text-white on accent-primary buttons ── */
+html:not(.light) a.text-white,
+html:not(.light) button.text-white,
+html:not(.light) [class*="bg-[var(--accent-primary)]"].text-white {
+  color: var(--btn-blue-text) !important;
 }
 
 /* ── Safe area padding for notched phones ───────────────── */

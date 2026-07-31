@@ -60,10 +60,10 @@ export function AuditLogViewer() {
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
           <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
             placeholder="Search audit logs..."
-            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2 pl-9 pr-3 text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]" />
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2 pl-9 pr-3 text-xs text-[var(--text-primary)] focus:border-[var(--accent-gold)]" />
         </div>
         <select value={entityFilter} onChange={e => { setEntityFilter(e.target.value); setPage(1) }}
-          className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs text-[var(--text-primary)] outline-none">
+          className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs text-[var(--text-primary)]">
           <option value="">All entities</option>
           <option value="product">Products</option>
           <option value="order">Orders</option>

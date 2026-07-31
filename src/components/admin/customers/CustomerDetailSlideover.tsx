@@ -60,7 +60,7 @@ export function CustomerDetailSlideover({ customer, onClose, onStatusChange, onT
                   onToast(err instanceof Error ? err.message : 'Failed to update status', 'error')
                 }
               }}
-              className="rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-bold outline-none focus:border-[var(--accent-gold)]"
+              className="rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-bold focus:border-[var(--accent-gold)]"
             >
               {(Object.keys(statusConfig) as CustomerStatus[]).map((s) => (
                 <option key={s} value={s}>{statusConfig[s].label}</option>

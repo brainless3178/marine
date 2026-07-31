@@ -2,33 +2,6 @@ import type { Testimonial, Office, TimelineEvent, FAQItem } from '../types'
 
 export const testimonials: Testimonial[] = [
   {
-    id: 't1',
-    name: 'Capt. R. Krishnamurthy',
-    role: 'Chief Engineer, MV Pacific Fortune',
-    company: 'Pacific Bulk Carriers',
-    avatar: 'CK',
-    text: 'We had a critical hydraulic pump failure mid-voyage. Alka Traders located an OEM-equivalent unit, cleared customs, and had it at our next port in 26 hours. That\'s not service — that\'s operational capability.',
-    rating: 5,
-  },
-  {
-    id: 't2',
-    name: 'Sarah J. Hoffmann',
-    role: 'Global Procurement Manager',
-    company: 'Rheinstahl Industrial GmbH',
-    avatar: 'SH',
-    text: 'Our previous supplier managed 3 vendors. Alka Traders replaced all three. Consolidated invoicing, better pricing, faster delivery, and a single point of accountability. The ROI was immediate.',
-    rating: 5,
-  },
-  {
-    id: 't3',
-    name: 'Dinesh Patel',
-    role: 'Head of Sourcing',
-    company: 'Reliance Engineering Works',
-    avatar: 'DP',
-    text: 'When our ABB drive failed during a critical production run, Alka Traders\'s emergency procurement team had a genuine OEM replacement delivered within 18 hours. No substitutes, no compromise.',
-    rating: 5,
-  },
-  {
     id: 't4',
     name: 'noraedward',
     role: 'Verified Buyer',

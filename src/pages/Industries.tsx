@@ -88,7 +88,7 @@ export default function Industries() {
                 aria-pressed={active === ind.id}
                 className={`px-5 py-2.5 font-body font-medium text-xs border transition-all duration-300 ${
                   active === ind.id
-                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white rounded-xl'
+                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-[var(--btn-blue-text)] rounded-xl'
                     : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)] rounded-xl'
                 }`}
               >

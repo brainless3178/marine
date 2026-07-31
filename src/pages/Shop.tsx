@@ -76,16 +76,16 @@ export default function Shop() {
       />
       <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'Shop', url: '/shop' }]} />
       {/* ── SHOP HERO ── */}
-      <section className="relative overflow-hidden bg-[var(--navy-deep)] py-16 text-white border-b border-white/10">
+      <section className="relative overflow-hidden bg-[var(--navy-deep)] py-16 border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,var(--gold-muted),transparent_28rem),radial-gradient(circle_at_85%_20%,var(--teal-soft),transparent_30rem)]" />
         <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="max-w-[640px]">
               <SectionLabel>{t('shop.categories')}</SectionLabel>
-              <h1 className="font-display font-bold text-display-xl tracking-tight mt-2 text-white">
+              <h1 className="font-display font-bold text-display-xl tracking-tight mt-2">
                 {t('shop.title')}
               </h1>
-              <p className="mt-4 text-body text-white/70">
+              <p className="mt-4 text-body/70">
                 {t('shop.sub')}
               </p>
               <div className="flex flex-wrap gap-6 mt-8">
@@ -102,8 +102,8 @@ export default function Shop() {
                         <Icon size={20} className="text-[var(--accent-primary)]" />
                       </div>
                       <div>
-                        <span className="block text-xs font-bold text-white">{item.label}</span>
-                        <span className="text-xs text-white/72">{item.sub}</span>
+                        <span className="block text-xs font-bold">{item.label}</span>
+                        <span className="text-xs/72">{item.sub}</span>
                       </div>
                     </div>
                   )
@@ -113,7 +113,7 @@ export default function Shop() {
             <div className="hidden lg:block">
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-6 py-3 rounded-xl hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-300 no-underline"
+                className="inline-flex items-center gap-2 text-sm font-bold bg-[var(--accent-primary)] text-[var(--btn-blue-text)] border-2 border-[var(--accent-primary)] px-6 py-3 rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all duration-300 no-underline"
               >
                 {t('shop.viewFullCatalog')} <ArrowRight size={16} />
               </Link>
@@ -189,7 +189,7 @@ export default function Shop() {
             </div>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-300 no-underline"
+              className="inline-flex items-center gap-2 text-sm font-bold border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] px-5 py-2.5 rounded-xl hover:bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:text-white transition-all duration-300 no-underline"
             >
               {t('shop.fullCatalog')} <ArrowRight size={16} />
             </Link>
@@ -212,7 +212,7 @@ export default function Shop() {
       <section className="py-16 bg-[var(--secondary-bg)]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="rounded-2xl bg-gradient-to-br from-[var(--navy-deep)] to-[var(--navy-mid)] p-8 md:p-12 text-center">
-            <h2 className="font-display font-bold text-section text-white mb-3">
+            <h2 className="font-display font-bold text-section mb-3">
               {t('shop.cantFind')}
             </h2>
             <p className="text-white/70 max-w-[560px] mx-auto mb-6 text-sm">
@@ -220,7 +220,7 @@ export default function Shop() {
             </p>
             <Link
               to="/rfq"
-              className="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-white font-bold px-8 py-3.5 rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all no-underline"
+              className="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-bold px-8 py-3.5 rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all no-underline"
             >
               {t('shop.submitRfq')} <ArrowRight size={16} />
             </Link>

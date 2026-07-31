@@ -87,7 +87,7 @@ export function ProductFormBasics({
           <select
             value={form.condition}
             onChange={(e) => updateField('condition', e.target.value)}
-            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
           >
             <option value="new">New</option>
             <option value="unused">Unused / New Old Stock</option>

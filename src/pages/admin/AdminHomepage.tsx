@@ -192,9 +192,9 @@ export default function AdminHomepage() {
                       <div key={key}>
                         <label className="block text-[0.625rem] font-bold text-[var(--text-secondary)] mb-1">{key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}</label>
                         {value.length > 60 ? (
-                          <textarea value={value} onChange={(e) => updateConfig(section.id, key, e.target.value)} rows={2} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] py-2 px-3 text-xs outline-none focus:border-[var(--accent-gold)] resize-y" />
+                          <textarea value={value} onChange={(e) => updateConfig(section.id, key, e.target.value)} rows={2} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] py-2 px-3 text-xs focus:border-[var(--accent-gold)] resize-y" />
                         ) : (
-                          <input value={value} onChange={(e) => updateConfig(section.id, key, e.target.value)} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] py-2 px-3 text-xs outline-none focus:border-[var(--accent-gold)]" />
+                          <input value={value} onChange={(e) => updateConfig(section.id, key, e.target.value)} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] py-2 px-3 text-xs focus:border-[var(--accent-gold)]" />
                         )}
                       </div>
                     ))}

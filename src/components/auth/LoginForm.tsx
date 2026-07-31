@@ -3,7 +3,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import type { FieldErrors } from './AuthModal'
 
 const inputClass =
-  'w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] outline-none transition-all duration-200 rounded-xl'
+  'w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] focus:border-[var(--accent-primary)] transition-all duration-200 rounded-xl'
 
 interface LoginFormProps {
   email: string
@@ -46,7 +46,7 @@ export function LoginForm({
       {/* Email */}
       <div>
         <div className="relative">
-          <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input
             type="email"
             placeholder="Email address"
@@ -69,7 +69,7 @@ export function LoginForm({
       {/* Password */}
       <div>
         <div className="relative">
-          <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input
             type={showPassword ? 'text' : 'password'}
             placeholder="Password"
@@ -85,7 +85,7 @@ export function LoginForm({
             type="button"
             onClick={onTogglePassword}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>

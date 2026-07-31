@@ -74,7 +74,7 @@ export default function AdminLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@alkatraders.com"
-                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/55 outline-none transition-all focus:border-[var(--accent-primary)] focus:bg-white/10 focus:shadow-[0_0_0_3px_var(--focus-ring)]"
+                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/55 transition-all focus:border-[var(--accent-primary)] focus:bg-white/10 "
                 />
               </div>
             </div>
@@ -94,7 +94,7 @@ export default function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-11 text-sm text-white placeholder:text-white/55 outline-none transition-all focus:border-[var(--accent-primary)] focus:bg-white/10 focus:shadow-[0_0_0_3px_var(--focus-ring)]"
+                  className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-11 text-sm text-white placeholder:text-white/55 transition-all focus:border-[var(--accent-primary)] focus:bg-white/10 "
                 />
                 <button
                   type="button"

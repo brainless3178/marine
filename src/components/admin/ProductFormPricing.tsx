@@ -50,7 +50,7 @@ export function ProductFormPricing({ form, updateField, getFieldClass, labelClas
           <select
             value={form.currency}
             onChange={(e) => updateField('currency', e.target.value)}
-            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
           >
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>

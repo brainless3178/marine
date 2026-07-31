@@ -107,8 +107,8 @@ export const defaultNotifications: NotificationPrefs = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────────
 
-export const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]'
-export const selectClass = 'rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm text-[var(--text-primary)] outline-none transition-all focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]'
+export const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all focus:border-[var(--accent-gold)]'
+export const selectClass = 'rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm text-[var(--text-primary)] transition-all focus:border-[var(--accent-gold)]'
 export const labelClass = 'block text-xs font-bold text-[var(--text-secondary)] mb-1.5'
 
 export const currencies = ['USD', 'EUR', 'GBP', 'AED', 'INR', 'SGD', 'JPY']

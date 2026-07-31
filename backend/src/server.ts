@@ -56,6 +56,7 @@ import { verifyCsrf, issueCsrfToken } from './middleware/csrf.js'
 import { loginLimiter, registerLimiter, passwordResetLimiter } from './middleware/rateLimit.js'
 import { createUserAwareLimiter } from './middleware/perUserRateLimit.js'
 import { sendSuccess, sendError } from './middleware/response.js'
+import { apiDeprecationMiddleware, API_VERSION } from './middleware/api-version.js'
 
 // ─── Database ──────────────────────────────────────────────────
 export const prisma = new PrismaClient({
@@ -181,6 +182,7 @@ app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '1y', immutable: true, 
 
 // ─── CSRF Protection (after cookies are parsed) ──────────────
 app.get('/api/csrf-token', issueCsrfToken as unknown as express.RequestHandler)
+app.get('/api/v1/csrf-token', issueCsrfToken as unknown as express.RequestHandler)
 app.use(verifyCsrf)
 
 // ─── Request ID (for log correlation) ──────────────────────────
@@ -208,6 +210,20 @@ const userAwareAdminLimiter = createUserAwareLimiter({
   max: 100,
   message: 'Too many requests. Slow down.',
 })
+
+// ─── API Version Info ──────────────────────────────────────────
+app.get('/api/v1/info', (_req, res) => {
+  sendSuccess(res, {
+    version: API_VERSION.version,
+    released: API_VERSION.released,
+    deprecated: API_VERSION.deprecated,
+    sunset: API_VERSION.sunset,
+    docs: 'https://alkatraders.co/api/v1/info',
+  })
+})
+
+// ─── API Deprecation Middleware ─────────────────────────────────
+app.use(apiDeprecationMiddleware)
 
 // ─── Admin Routes ──────────────────────────────────────────────
 // ─── API Versioning ─────────────────────────────────────────────

@@ -306,20 +306,20 @@ export function useProductForm() {
   const markTouched = useCallback((field: string) => setTouched((prev) => ({ ...prev, [field]: true })), [])
   const showError = useCallback((field: string) => (attempted || touched[field]) && errors[field], [attempted, touched, errors])
 
-  const inputBaseClass = 'w-full rounded-xl border bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all'
+  const inputBaseClass = 'w-full rounded-xl border bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all'
 
   const getFieldClass = useCallback((field: string, extra = '') => {
     const hasError = showError(field)
     return `${inputBaseClass} ${extra} ${
       hasError
         ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]'
-        : 'border-[var(--border)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]'
+        : 'border-[var(--border)] focus:border-[var(--accent-gold)]'
     }`
   }, [showError])
 
   const getSelectClass = useCallback((field: string) => {
     const hasError = showError(field)
-    return `w-full rounded-xl border bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none ${
+    return `w-full rounded-xl border bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] ${
       hasError
         ? 'border-[var(--danger)] focus:border-[var(--danger)]'
         : 'border-[var(--border)] focus:border-[var(--accent-gold)]'

@@ -125,7 +125,7 @@ export function GoalTracker({ orders, products }: Props) {
               placeholder="Goal name..."
               value={newLabel}
               onChange={e => setNewLabel(e.target.value)}
-              className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+              className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
               onKeyDown={e => e.key === 'Enter' && handleAdd()}
             />
           </div>
@@ -133,7 +133,7 @@ export function GoalTracker({ orders, products }: Props) {
             <select
               value={newCategory}
               onChange={e => setNewCategory(e.target.value as Goal['category'])}
-              className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-xs text-[var(--text-primary)] outline-none"
+              className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-xs text-[var(--text-primary)]"
             >
               <option value="revenue">Revenue ($)</option>
               <option value="orders">Orders</option>
@@ -145,7 +145,7 @@ export function GoalTracker({ orders, products }: Props) {
               placeholder="Target..."
               value={newTarget}
               onChange={e => setNewTarget(e.target.value)}
-              className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+              className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
               onKeyDown={e => e.key === 'Enter' && handleAdd()}
             />
             <button onClick={handleAdd}
@@ -188,7 +188,7 @@ export function GoalTracker({ orders, products }: Props) {
                           type="number"
                           value={editTarget}
                           onChange={e => setEditTarget(e.target.value)}
-                          className="w-20 rounded border border-[var(--accent-gold)] bg-[var(--surface)] px-2 py-0.5 text-xs text-[var(--text-primary)] outline-none"
+                          className="w-20 rounded border border-[var(--accent-gold)] bg-[var(--surface)] px-2 py-0.5 text-xs text-[var(--text-primary)]"
                           onKeyDown={e => e.key === 'Enter' && handleSaveEdit(goal.id)}
                           autoFocus
                         />

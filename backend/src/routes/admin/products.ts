@@ -100,9 +100,9 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/:id', asyncHandler(async (req, res) => {
   try {
     const product = await productService.getProduct(req.params.id as string)
-    res.json({ product })
+    sendSuccess(res, { product })
   } catch (err: any) {
-    res.status(err.status || 500).json({ error: err.message })
+    sendError(res, err.message, err.status || 500)
   }
 }))
 
@@ -110,9 +110,9 @@ router.get('/:id', asyncHandler(async (req, res) => {
 router.post('/', requireRole('inventory-manager'), validateBody(productSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const product = await productService.createProduct(req.body, req.user!, req.ip)
-    res.status(201).json({ product })
+    sendSuccess(res, { product }, 201)
   } catch (err: any) {
-    res.status(err.status || 500).json({ error: err.message })
+    sendError(res, err.message, err.status || 500)
   }
 }))
 

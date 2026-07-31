@@ -83,15 +83,15 @@ function ComposeModal({ onClose, onSent, toast }: { onClose: () => void; onSent:
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">To</label>
-            <input type="text" value={to} onChange={(e) => setTo(e.target.value)} placeholder="Recipient name or email" className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm outline-none focus:border-[var(--accent-gold)]" />
+            <input type="text" value={to} onChange={(e) => setTo(e.target.value)} placeholder="Recipient name or email" className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm focus:border-[var(--accent-gold)]" />
           </div>
           <div>
             <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">Subject</label>
-            <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Message subject" className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm outline-none focus:border-[var(--accent-gold)]" />
+            <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Message subject" className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm focus:border-[var(--accent-gold)]" />
           </div>
           <div>
             <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">Message</label>
-            <textarea rows={6} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Type your message..." className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm outline-none focus:border-[var(--accent-gold)] resize-y" />
+            <textarea rows={6} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Type your message..." className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-4 text-sm focus:border-[var(--accent-gold)] resize-y" />
           </div>
         </div>
         <div className="flex gap-2">
@@ -243,7 +243,7 @@ export default function AdminMessages() {
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
         <div className="relative">
           <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-          <input type="text" placeholder="Search messages..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]" />
+          <input type="text" placeholder="Search messages..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all focus:border-[var(--accent-gold)]" />
         </div>
       </div>
 

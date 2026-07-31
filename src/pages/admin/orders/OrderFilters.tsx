@@ -65,7 +65,7 @@ export function OrderFilters({
               placeholder="Search by order ID, customer, company, or SKU..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all focus:border-[var(--accent-gold)]"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -75,7 +75,7 @@ export function OrderFilters({
               value={dateFrom}
               onChange={(e) => { setDateFrom(e.target.value); setPage(1) }}
               placeholder="From"
-              className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-3 text-xs text-[var(--text-primary)] outline-none transition-all focus:border-[var(--accent-gold)]"
+              className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-3 text-xs text-[var(--text-primary)] transition-all focus:border-[var(--accent-gold)]"
             />
             <span className="text-xs text-[var(--text-muted)]">to</span>
             <input
@@ -83,7 +83,7 @@ export function OrderFilters({
               value={dateTo}
               onChange={(e) => { setDateTo(e.target.value); setPage(1) }}
               placeholder="To"
-              className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-3 text-xs text-[var(--text-primary)] outline-none transition-all focus:border-[var(--accent-gold)]"
+              className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] py-2.5 px-3 text-xs text-[var(--text-primary)] transition-all focus:border-[var(--accent-gold)]"
             />
             {hasActiveFilters && (
               <button

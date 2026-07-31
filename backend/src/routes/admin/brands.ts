@@ -1,11 +1,9 @@
 import { Router } from 'express'
-import { prisma } from '../../server.js'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler, validateBody } from '../../middleware/validate.js'
-import { logAudit } from '../../utils/audit.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
 import { z } from 'zod'
-import { generateSlug } from '../../utils/helpers.js'
+import * as brandService from '../../services/brandService.js'
 
 const router = Router()
 router.use(authenticateAdmin)
@@ -25,72 +23,34 @@ const brandSchema = z.object({
 
 // ─── List All Brands ───────────────────────────────────────────
 router.get('/', asyncHandler(async (_req, res) => {
-  const brands = await prisma.brand.findMany({
-    include: {
-      _count: { select: { products: { where: { status: 'published' } } } },
-    },
-    orderBy: { sortOrder: 'asc' },
-  })
-  sendSuccess(res, { brands })
+  sendSuccess(res, await brandService.listAdminBrands())
 }))
 
 // ─── Create Brand ──────────────────────────────────────────────
 router.post('/', requireRole('inventory-manager'), validateBody(brandSchema), asyncHandler(async (req: AuthRequest, res) => {
-  const slug = generateSlug(req.body.name)
-  const existing = await prisma.brand.findUnique({ where: { slug } })
-  if (existing) {
-    return sendError(res, 'Brand with this name already exists', 400)
+  try {
+    sendSuccess(res, await brandService.createBrand(req.body, req.user!, req.ip), 201)
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
   }
-
-  const brand = await prisma.brand.create({
-    data: { ...req.body, slug },
-  })
-
-  await logAudit({ actor: req.user, action: 'brand.create', entityType: 'brand', entityId: brand.id, entityName: brand.name, newValue: brand, ipAddress: req.ip })
-  sendSuccess(res, { brand }, 201)
 }))
 
 // ─── Update Brand ──────────────────────────────────────────────
 router.put('/:id', requireRole('inventory-manager'), validateBody(brandSchema.partial()), asyncHandler(async (req: AuthRequest, res) => {
-  const existing = await prisma.brand.findUnique({ where: { id: req.params.id as string } })
-  if (!existing) {
-    return sendError(res, 'Brand not found', 404)
+  try {
+    sendSuccess(res, await brandService.updateBrand(req.params.id as string, req.body, req.user!, req.ip))
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
   }
-
-  let slug = existing.slug
-  if (req.body.name && req.body.name !== existing.name) {
-    slug = generateSlug(req.body.name)
-    const slugExists = await prisma.brand.findFirst({ where: { slug, id: { not: req.params.id as string } } })
-    if (slugExists) slug = `${slug}-${Date.now()}`
-  }
-
-  const brand = await prisma.brand.update({
-    where: { id: req.params.id as string },
-    data: { ...req.body, slug },
-  })
-
-  await logAudit({ actor: req.user, action: 'brand.update', entityType: 'brand', entityId: brand.id, entityName: brand.name, previousValue: existing, newValue: brand, ipAddress: req.ip })
-  sendSuccess(res, { brand })
 }))
 
 // ─── Delete Brand ──────────────────────────────────────────────
 router.delete('/:id', requireRole('store-manager'), asyncHandler(async (req: AuthRequest, res) => {
-  const existing = await prisma.brand.findUnique({
-    where: { id: req.params.id as string },
-    include: { _count: { select: { products: true } } },
-  })
-
-  if (!existing) {
-    return sendError(res, 'Brand not found', 404)
+  try {
+    sendSuccess(res, await brandService.deleteBrand(req.params.id as string, req.user!, req.ip))
+  } catch (err: any) {
+    sendError(res, err.message, err.status || 500)
   }
-
-  if (existing._count.products > 0) {
-    return sendError(res, 'Cannot delete brand with products. Reassign products first.', 400)
-  }
-
-  await prisma.brand.delete({ where: { id: req.params.id as string } })
-  await logAudit({ actor: req.user, action: 'brand.delete', entityType: 'brand', entityId: existing.id, entityName: existing.name, previousValue: existing, ipAddress: req.ip })
-  sendSuccess(res, { message: 'Brand deleted' })
 }))
 
 export default router

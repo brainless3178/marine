@@ -10,7 +10,7 @@
  * - Convenience methods (get/post/put/patch/del)
  */
 
-const API_BASE = '/api'
+const API_BASE = '/api/v1'
 
 // ─── Token Storage (in-memory, NOT localStorage for security) ───
 

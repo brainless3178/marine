@@ -109,7 +109,7 @@ export function Hero() {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
                 to="/rfq"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#ff6b00] px-6 py-3 text-sm font-extrabold text-white no-underline shadow-[0_14px_36px_rgba(255,107,0,0.28)] transition-all hover:bg-[#e85f00]"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#c45200] px-6 py-3 text-sm font-extrabold text-white no-underline shadow-[0_14px_36px_rgba(196,82,0,0.28)] transition-all hover:bg-[#a84400]"
               >
                 <MessageCircle size={18} />
                 Request Ship Spare Quote

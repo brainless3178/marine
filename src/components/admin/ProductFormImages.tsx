@@ -109,7 +109,7 @@ export function ProductFormImages({
               <select
                 value={img.label}
                 onChange={(e) => updateImage(i, 'label', e.target.value)}
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
               >
                 <option value="Main">Main</option>
                 <option value="Side">Side View</option>

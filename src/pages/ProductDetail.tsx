@@ -112,7 +112,7 @@ export default function ProductDetail() {
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-24 text-center">
         <h2 className="text-2xl font-bold mb-2">{t('product.productNotFound')}</h2>
         <p className="text-body-sm text-[var(--text-secondary)] mb-6">{t('product.productNotFoundDesc')}</p>
-        <Link to="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-primary)] text-white font-semibold rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all">
+        <Link to="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold rounded-xl hover:bg-[var(--accent-primary-hover)] transition-all">
           <ArrowLeft size={16} /> {t('product.backToProducts')}
         </Link>
       </div>
@@ -274,14 +274,14 @@ export default function ProductDetail() {
                     className={`w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-xl transition-all duration-300 border cursor-pointer ${
                       added
                         ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
-                        : 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary-hover)]'
+                        : 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:bg-[var(--accent-primary-hover)]'
                     }`}
                   >
                     {added ? <><Check size={14} /> {t('product.added')}</> : <><ShoppingCart size={14} /> {t('product.addToCartUpper')}</>}
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-xl bg-transparent border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white transition-all cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-xl bg-transparent border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:text-white transition-all cursor-pointer"
                   >
                     {t('product.buyNow')}
                   </button>
@@ -307,7 +307,7 @@ export default function ProductDetail() {
                   href={`https://wa.me/${whatsappNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all hover:bg-[var(--accent-primary-hover)] no-underline"
+                  className="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-bold px-6 py-2.5 rounded-xl text-xs transition-all hover:bg-[var(--accent-primary-hover)] no-underline"
                 >
                   <MessageCircle size={14} /> {t('product.inquireWhatsApp')}
                 </a>

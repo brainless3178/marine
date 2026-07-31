@@ -116,11 +116,11 @@ export function BrandCombobox({ value, brands, onChange, onBlur, error, classNam
   }
 
   const inputBaseClass =
-    'w-full rounded-xl border bg-[var(--surface-soft)] px-4 py-2.5 pr-16 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all'
+    'w-full rounded-xl border bg-[var(--surface-soft)] px-4 py-2.5 pr-16 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all'
 
   const borderClass = error
     ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]'
-    : 'border-[var(--border)] focus:border-[var(--accent-gold)] focus:shadow-[0_0_0_3px_rgba(232,170,36,0.1)]'
+    : 'border-[var(--border)] focus:border-[var(--accent-gold)]'
 
   return (
     <div className="relative">

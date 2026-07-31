@@ -23,7 +23,7 @@ export function CheckoutShipping({ shipping, errors, updateShipping, goToStep }:
   const { t } = useTranslation()
 
   const inputClass = (field: string) =>
-    `w-full px-4 py-3 bg-[var(--input-bg)] border text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] focus:border-[var(--accent-primary)] focus:shadow-[0_0_0_3px_var(--focus-ring)] transition-all outline-none rounded-xl ${
+    `w-full px-4 py-3 bg-[var(--input-bg)] border text-sm text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] focus:border-[var(--accent-primary)] transition-all rounded-xl ${
       errors[field] ? 'border-[var(--danger)] focus:border-[var(--danger)]' : 'border-[var(--input-border)]'
     }`
 

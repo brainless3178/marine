@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 
 // ─── Set required env vars BEFORE any imports ──────────────────
-process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-for-integration-tests-32ch'
-process.env.CSRF_SECRET = process.env.CSRF_SECRET || 'test-csrf-secret-for-integration-tests-32c'
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/test'
+vi.hoisted(() => {
+  process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-for-integration-tests-32ch'
+  process.env.CSRF_SECRET = process.env.CSRF_SECRET || 'test-csrf-secret-for-integration-tests-32c'
+  process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/test'
+})
 
 import express from 'express'
 import cookieParser from 'cookie-parser'
@@ -134,7 +136,7 @@ describe('Integration: CSRF Protection', () => {
   })
 
   it('should skip CSRF for webhook routes', () => {
-    const req = { method: 'POST', path: '/api/webhooks/paypal', cookies: { 'csrf-token': 'fake' } } as any
+    const req = { method: 'POST', path: '/api/webhooks/paypal', originalUrl: '/api/webhooks/paypal', cookies: { 'csrf-token': 'fake' } } as any
     const res = {} as any
     const next = vi.fn()
 
@@ -144,7 +146,7 @@ describe('Integration: CSRF Protection', () => {
   })
 
   it('should skip CSRF when no cookie is set (non-browser client)', () => {
-    const req = { method: 'POST', path: '/api/storefront/rfq', cookies: {}, headers: {} } as any
+    const req = { method: 'POST', path: '/api/storefront/rfq', originalUrl: '/api/storefront/rfq', cookies: {}, headers: {} } as any
     const res = {} as any
     const next = vi.fn()
 
@@ -154,7 +156,7 @@ describe('Integration: CSRF Protection', () => {
   })
 
   it('should reject when cookie exists but header is missing', () => {
-    const req = { method: 'POST', path: '/api/storefront/rfq', cookies: { 'csrf-token': 'some-token' }, headers: {} } as any
+    const req = { method: 'POST', path: '/api/storefront/rfq', originalUrl: '/api/storefront/rfq', cookies: { 'csrf-token': 'some-token' }, headers: {} } as any
     const res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
@@ -168,7 +170,7 @@ describe('Integration: CSRF Protection', () => {
   })
 
   it('should reject when token mismatch', () => {
-    const req = { method: 'POST', path: '/api/storefront/rfq', cookies: { 'csrf-token': 'token-a' }, headers: { 'x-csrf-token': 'token-b' } } as any
+    const req = { method: 'POST', path: '/api/storefront/rfq', originalUrl: '/api/storefront/rfq', cookies: { 'csrf-token': 'token-a' }, headers: { 'x-csrf-token': 'token-b' } } as any
     const res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
