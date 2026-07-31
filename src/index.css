@@ -80,6 +80,9 @@
   --hero-gradient-start: rgba(17, 24, 39, 0.96);
   --hero-gradient-mid: rgba(31, 41, 55, 0.94);
   --hero-gold-glow: rgba(200, 135, 10, 0.18);
+  --hero-cta-orange: #c45200;
+  --hero-cta-orange-hover: #a84400;
+  --hero-cta-orange-shadow: rgba(196, 82, 0, 0.28);
 
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
@@ -202,6 +205,9 @@ html.light {
   --hero-gradient-start: rgba(17, 24, 39, 0.96);
   --hero-gradient-mid: rgba(31, 41, 55, 0.94);
   --hero-gold-glow: rgba(200, 135, 10, 0.18);
+  --hero-cta-orange: #c45200;
+  --hero-cta-orange-hover: #a84400;
+  --hero-cta-orange-shadow: rgba(196, 82, 0, 0.28);
 
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
