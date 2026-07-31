@@ -61,7 +61,7 @@ export function ProductFilters({
 
       {/* Sidebar */}
       <aside className={`lg:sticky lg:top-20 ${showFiltersMobile ? 'block' : 'hidden'} lg:block`}>
-        <div className="commerce-card p-6">
+        <div className="card p-6">
           {/* Categories */}
           <div className="mb-6">
             <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">

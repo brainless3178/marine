@@ -40,7 +40,7 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
   )
 
   return (
-    <article className="group product-card relative flex h-full flex-col overflow-hidden">
+    <article className="group card relative flex h-full flex-col overflow-hidden">
       <Link to={'/product/' + product.id} className="relative block overflow-hidden bg-[var(--surface-raised)] no-underline">
         <OptimizedImage
           src={getProductImageUrl(product.filename)}

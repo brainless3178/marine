@@ -597,8 +597,8 @@ html:not(.light) {
     animation: shimmerSweep 2.5s ease-in-out infinite;
   }
 
-  /* Premium card styling */
-  .maritime-card {
+  /* ── Unified card (replaces .commerce-card + .maritime-card + .product-card) ── */
+  .card {
     background: var(--surface);
     color: var(--text-primary);
     border: 1px solid var(--border);
@@ -607,28 +607,21 @@ html:not(.light) {
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   }
 
-  .commerce-card,
-  .product-card {
-    background: var(--surface);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    box-shadow: var(--shadow-card);
-    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
-  }
-
-  .commerce-card:hover,
-  .product-card:hover {
+  .card:hover {
     transform: translateY(-4px);
     border-color: var(--accent-primary);
     box-shadow: 0 12px 40px var(--card-hover-shadow);
   }
 
-  html:not(.light) .commerce-card,
-  html:not(.light) .product-card {
-    background: var(--surface);
+  html:not(.light) .card {
     box-shadow: 0 4px 24px var(--shadow-heavy-color);
   }
+
+  html:not(.light) .card:hover {
+    box-shadow: 0 12px 40px var(--shadow-heavy-color);
+  }
+
+
 
   /* ── Unified primary button (replaces .commerce-button + .maritime-btn-primary) ── */
   .btn-primary {
@@ -660,15 +653,7 @@ html:not(.light) {
       radial-gradient(circle at 10% 10%, var(--teal-soft), transparent 28rem);
   }
 
-  .maritime-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px var(--card-maritime-shadow);
-    border-color: var(--accent-primary);
-  }
 
-  html:not(.light) .maritime-card:hover {
-    box-shadow: 0 12px 40px var(--shadow-heavy-color);
-  }
 
 
 
@@ -747,9 +732,7 @@ html:not(.light) {
   }
 
   /* Reduce animations on mobile for performance */
-  .maritime-card:hover,
-  .commerce-card:hover,
-  .product-card:hover {
+  .card:hover {
     transform: none;
   }
 

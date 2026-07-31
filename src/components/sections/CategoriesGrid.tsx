@@ -107,7 +107,7 @@ export function CategoriesGrid() {
             const info = descriptions[cat.id] || { desc: 'Browse our selection.' }
             const isGold = ['surplus', 'safety', 'rigging'].includes(cat.id)
             return (
-              <TiltCard key={cat.id} className={`group maritime-card p-7 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[30px]'}`} style={{ transitionDelay: `${i * 80}ms`, transitionProperty: 'opacity, transform', transitionDuration: '0.5s' }}>
+              <TiltCard key={cat.id} className={`group card p-7 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[30px]'}`} style={{ transitionDelay: `${i * 80}ms`, transitionProperty: 'opacity, transform', transitionDuration: '0.5s' }}>
                 <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl ${isGold ? 'bg-[var(--accent-gold)]/[0.1] text-[var(--accent-gold)]' : 'bg-[var(--accent-primary)]/[0.08] text-[var(--accent-primary)]'}`}><Icon size={28} /></div>
                 <h3 className="heading-xl mb-3">{cat.name}</h3>
                 <p className="text-body-sm text-[var(--text-secondary)] leading-relaxed mb-4">{info.desc}</p>
