@@ -76,7 +76,6 @@ export function CheckoutReview({
                   sizes="56px"
                   className="w-14 h-14 object-cover rounded border border-[var(--border)]"
                   loading="lazy"
-                  onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
                 />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold truncate">{item.product.name}</h4>

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { getImageFallbackUrl, applyImageFallback } from '../lib/utils'
 
 // Test any utility functions that might exist
 // Since the project may not have a dedicated utils file, we test inline utilities
@@ -188,5 +189,65 @@ describe('URL utilities', () => {
 
     expect(parseQueryString('?page=1&search=test')).toEqual({ page: '1', search: 'test' })
     expect(parseQueryString('')).toEqual({})
+  })
+})
+
+describe('Image fallback helpers', () => {
+  describe('getImageFallbackUrl', () => {
+    it('maps a Cloudinary product URL to the local deployed copy', () => {
+      expect(getImageFallbackUrl('https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/products/product-106'))
+        .toBe('/images/products/product-106.jpg')
+    })
+
+    it('preserves the category suffix for products 001-100', () => {
+      expect(getImageFallbackUrl('https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/products/product-001_electrical'))
+        .toBe('/images/products/product-001_electrical.jpg')
+    })
+
+    it('handles versioned Cloudinary URLs', () => {
+      expect(getImageFallbackUrl('https://res.cloudinary.com/y7up4zti/image/upload/v1785148282/alka/products/product-220'))
+        .toBe('/images/products/product-220.jpg')
+    })
+
+    it('falls back to the generic placeholder for non-product URLs', () => {
+      expect(getImageFallbackUrl('https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/categories/marine'))
+        .toBe('/images/placeholder.jpg')
+      expect(getImageFallbackUrl('/uploads/some-file.png'))
+        .toBe('/images/placeholder.jpg')
+      expect(getImageFallbackUrl('https://example.com/other.png'))
+        .toBe('/images/placeholder.jpg')
+    })
+  })
+
+  describe('applyImageFallback', () => {
+    it('swaps a failed Cloudinary product src to the local copy', () => {
+      const img = document.createElement('img')
+      img.src = 'https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/products/product-106'
+      applyImageFallback(img)
+      expect(img.src).toContain('/images/products/product-106.jpg')
+    })
+
+    it('swaps a failed local product src to the placeholder', () => {
+      const img = document.createElement('img')
+      img.src = '/images/products/product-106.jpg'
+      applyImageFallback(img)
+      expect(img.src).toContain('/images/placeholder.jpg')
+    })
+
+    it('stops the chain after the placeholder fails', () => {
+      const img = document.createElement('img')
+      img.src = '/images/placeholder.jpg'
+      applyImageFallback(img)
+      expect(img.onerror).toBeNull()
+    })
+
+    it('leaves non-product images untouched', () => {
+      const img = document.createElement('img')
+      img.src = 'https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/brands/logo'
+      img.onerror = () => { /* caller handler */ }
+      applyImageFallback(img)
+      expect(img.getAttribute('src')).toBe('https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/brands/logo')
+      expect(img.onerror).not.toBeNull()
+    })
   })
 })

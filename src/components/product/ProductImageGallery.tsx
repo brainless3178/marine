@@ -56,7 +56,6 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
             sizes="(max-width: 768px) 100vw, 55vw"
             className={`w-full h-full object-contain p-2 transition-transform duration-200 ${showZoom ? 'scale-150' : 'scale-100'}`}
             style={showZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined}
-            onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
           />
           <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-xs text-white px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 opacity-0 group-hover:opacity-80 transition-opacity">
             <ZoomIn size={12} /> {t('product.hoverToZoom')}

@@ -28,7 +28,6 @@ function ProductCard({ product, addedIds, onAddToCart }: { product: Product; add
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="w-full aspect-square object-cover border-b border-[var(--border)] transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
         />
         {product.customLabel && (
           <span

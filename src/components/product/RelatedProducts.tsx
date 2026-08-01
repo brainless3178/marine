@@ -33,7 +33,6 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                   loading="lazy"
                   sizes="(max-width: 1024px) 50vw, 25vw"
                   className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110"
-                  onError={(e) => { const img = e.target as HTMLImageElement; img.src = '/images/placeholder.jpg'; img.onerror = null; }}
                 />
                 {item.customLabel && (
                   <span
