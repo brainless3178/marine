@@ -35,9 +35,10 @@ const CATEGORIES_DIR = join(ROOT, 'public', 'images', 'categories')
 const BRAND_DIR = join(ROOT, 'public', 'brand')
 const STATIC_DIR = join(ROOT, 'public', 'images')
 const OUTPUT_BRAND_TS = join(ROOT, 'src', 'data', 'brandImages.ts')
+const VIDEO_DIR = join(ROOT, 'public')
 
 // Track upload results for summary
-const results = { products: 0, categories: 0, brands: 0, static: 0, skipped: 0, failed: 0 }
+const results = { products: 0, categories: 0, brands: 0, static: 0, videos: 0, skipped: 0, failed: 0 }
 const cloudinaryUrls = {}
 
 // ─── Helper: upload a single file to Cloudinary ──────────────
@@ -61,8 +62,29 @@ async function uploadFile(filePath, publicId) {
 
 function getMimeType(filePath) {
   const ext = extname(filePath).toLowerCase()
-  const map = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.avif': 'image/avif', '.svg': 'image/svg+xml' }
+  const map = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.avif': 'image/avif', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime' }
   return map[ext] || 'image/jpeg'
+}
+
+// ─── Helper: upload a video to Cloudinary ─────────────────────
+async function uploadVideo(filePath, publicId) {
+  try {
+    const result = await cloudinary.uploader.upload(filePath, {
+      public_id: publicId,
+      resource_type: 'video',
+      overwrite: true,
+      invalidate: true,
+      eager_async: false,
+      transformation: [
+        { width: 1280, crop: 'limit', quality: 'auto' },
+      ],
+    })
+    return result.secure_url
+  } catch (err) {
+    console.error(`  ✗ Failed: ${publicId} — ${err.message}`)
+    results.failed++
+    return null
+  }
 }
 
 // ─── Upload Product Images ──────────────────────────────────
@@ -143,6 +165,29 @@ async function uploadStatic() {
   console.log(`  ✓ ${results.static} static images uploaded`)
 }
 
+// ─── Upload Videos ──────────────────────────────────────────
+async function uploadVideos() {
+  console.log('\n🎬 Uploading videos...')
+  const videoFiles = readdirSync(VIDEO_DIR).filter(f => /\.(mp4|webm|mov)$/i.test(f))
+  
+  if (videoFiles.length === 0) {
+    console.log('  ⚠️  No video files found in public/, skipping')
+    return
+  }
+
+  for (const file of videoFiles) {
+    const name = file.replace(extname(file), '')
+    const publicId = `alka/static/${name}`
+    const url = await uploadVideo(join(VIDEO_DIR, file), publicId)
+    if (url) {
+      cloudinaryUrls[`static/${file}`] = url
+      results.videos++
+      console.log(`  ✓ ${file} uploaded → ${url}`)
+    }
+  }
+  console.log(`  ✓ ${results.videos} video(s) uploaded`)
+}
+
 // ─── Generate TypeScript mapping files ──────────────────────
 async function generateBrandImages() {
   console.log('\n📝 Generating brandImages.ts with Cloudinary URLs...')
@@ -174,6 +219,7 @@ async function main() {
   await uploadCategories()
   await uploadBrands()
   await uploadStatic()
+  await uploadVideos()
   
   await generateBrandImages()
   
@@ -183,6 +229,7 @@ async function main() {
   console.log(`  Categories: ${results.categories}`)
   console.log(`  Brands:     ${results.brands}`)
   console.log(`  Static:     ${results.static}`)
+  console.log(`  Videos:     ${results.videos}`)
   console.log(`  Failed:     ${results.failed}`)
   console.log('═'.repeat(60))
 }
