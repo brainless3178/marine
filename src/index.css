@@ -821,6 +821,23 @@ html:not(.light) [class*="bg-[var(--accent-primary)]"].text-white {
   color: var(--btn-blue-text) !important;
 }
 
+/* ── Hero section: force white text over dark video background ── */
+section[aria-label="Shop marine spare parts online"] h1,
+section[aria-label="Shop marine spare parts online"] p,
+section[aria-label="Shop marine spare parts online"] span {
+  color: white !important;
+}
+
+/* ── Hero CTA buttons: keep teal-button text readable ── */
+section[aria-label="Shop marine spare parts online"] [class*="bg-[var(--accent-primary)]"] {
+  color: var(--btn-blue-text) !important;
+}
+
+/* ── Hero search button: white text on glass background ── */
+section[aria-label="Shop marine spare parts online"] a.bg-white\/12 {
+  color: white !important;
+}
+
 /* ── Safe area padding for notched phones ───────────────── */
 @supports (padding: env(safe-area-inset-bottom)) {
   /* Only apply to fixed/sticky elements, NOT to body (to avoid layout gaps) */
