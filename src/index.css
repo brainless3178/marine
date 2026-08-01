@@ -823,8 +823,7 @@ html:not(.light) [class*="bg-[var(--accent-primary)]"].text-white {
 
 /* ── Hero section: force white text over dark video background ── */
 section[aria-label="Shop marine spare parts online"] h1,
-section[aria-label="Shop marine spare parts online"] p,
-section[aria-label="Shop marine spare parts online"] span {
+section[aria-label="Shop marine spare parts online"] p {
   color: white !important;
 }
 
