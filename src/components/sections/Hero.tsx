@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Search, ShieldCheck, ShoppingCart } from 'lucide-react'
-import { getStaticImageUrl } from '@/lib/utils'
+import { getStaticImageUrl, getStaticVideoUrl } from '@/lib/utils'
 
 const heroSlides = [
   {
@@ -98,7 +98,7 @@ export function Hero() {
           poster={heroSlides[0].src}
           aria-hidden="true"
         >
-          <source src="/hero.mp4" type="video/mp4" />
+          <source src={getStaticVideoUrl('hero')} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-black/48" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/74 to-black/48" />
