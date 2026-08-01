@@ -39,15 +39,16 @@ async function main() {
 
   const startTime = Date.now()
 
+  // NOTE: this public_id must match src/lib/cloudinaryVideo.ts
+  // (HERO_VIDEO_PUBLIC_ID). All sizing/quality/codec/audio work is done via
+  // on-the-fly delivery transformations (q_auto, f_auto, vc_auto, adu, w_…),
+  // so we upload the original, full-resolution file untouched.
   const result = await cloudinary.uploader.upload(VIDEO_PATH, {
-    public_id: 'alka/static/hero',
+    public_id: 'hero_apy76l',
     resource_type: 'video',
     overwrite: true,
     invalidate: true,
     eager_async: false,
-    transformation: [
-      { width: 1280, crop: 'limit', quality: 'auto' },
-    ],
   })
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
