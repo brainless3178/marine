@@ -27,7 +27,22 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,avif,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https?:\/\/res\.cloudinary\.com\/.*/i,
+            // Hero poster is delivered via Cloudinary's /video/upload/ path but
+            // is an image — cache it so the above-the-fold frame is available
+            // offline and instantly on repeat visits.
+            urlPattern: /^https?:\/\/res\.cloudinary\.com\/[^/]+\/video\/upload\/.*\.(webp|jpg|png)/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'cloudinary-posters',
+              expiration: { maxEntries: 10, maxAgeSeconds: 30 * 24 * 60 * 60 },
+            },
+          },
+          {
+            // Images only — hero video URLs (/video/upload/…, .mp4/.m3u8) are
+            // deliberately excluded: caching multi-MB videos would evict image
+            // entries and blow the Cache Storage quota. The HTTP cache handles
+            // videos.
+            urlPattern: /^https?:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/.*/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'cloudinary-images',
