@@ -833,7 +833,7 @@ section[aria-label="Shop marine spare parts online"] [class*="bg-[var(--accent-p
 }
 
 /* ── Hero search button: white text on glass background ── */
-section[aria-label="Shop marine spare parts online"] a.bg-white\/12 {
+section[aria-label="Shop marine spare parts online"] a[class*="bg-white/12"] {
   color: white !important;
 }
 
