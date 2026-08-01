@@ -57,6 +57,44 @@ export function getProductImageUrl(pathOrFilename?: string): string {
 }
 
 /**
+ * Build a fallback URL when a Cloudinary image fails to load.
+ *
+ * Product images are served from Cloudinary at /alka/products/<name>.
+ * The same files are deployed locally at /images/products/<name>.jpg, so
+ * we fall back to the local copy (e.g. when a product image was never
+ * uploaded to Cloudinary) instead of showing a blank placeholder.
+ */
+export function getImageFallbackUrl(failedSrc: string): string {
+  const match = failedSrc.match(/\/alka\/products\/([^/?]+)/)
+  if (match) return `/images/products/${match[1]}.jpg`
+  return '/images/placeholder.jpg'
+}
+
+/**
+ * Apply a graceful image fallback chain when an <img> fails to load:
+ *   Cloudinary product URL → locally deployed copy → placeholder → stop.
+ * Only manages paths owned by this chain (product images); any other src
+ * is left untouched so the caller's own onError handler keeps full control.
+ */
+export function applyImageFallback(img: HTMLImageElement): void {
+  const current = img.getAttribute('src') || img.src
+  // Cloudinary product URL failed → try the local deployed copy
+  if (current.includes('/alka/products/')) {
+    img.src = getImageFallbackUrl(current)
+    return
+  }
+  // Local copy failed → generic placeholder
+  if (current.includes('/images/products/')) {
+    img.src = '/images/placeholder.jpg'
+    return
+  }
+  // Placeholder failed → stop retrying to avoid infinite loops
+  if (current.includes('/images/placeholder.jpg')) {
+    img.onerror = null
+  }
+}
+
+/**
  * Get Cloudinary URL for a category image.
  */
 export function getCategoryImageUrl(categoryFile: string): string {

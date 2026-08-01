@@ -9,11 +9,15 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   optimized?: boolean
 }
 
+import { applyImageFallback } from '../../lib/utils'
+
 /**
  * OptimizedImage renders a clean, high-performance <img> element.
  * Bypasses fragile <picture> type negotiation that can break in browsers or Netlify header edge cases.
  *
- * On error: replaces src directly on the DOM element (avoids React state re-render flicker).
+ * On error: applies a graceful fallback chain directly on the DOM element
+ * (avoids React state re-render flicker):
+ *   Cloudinary product URL → local deployed copy → placeholder → stop.
  */
 export function OptimizedImage({
   src,
@@ -36,10 +40,7 @@ export function OptimizedImage({
       decoding={decoding}
       className={className}
       onError={(e) => {
-        const img = e.currentTarget
-        if (!img.src.includes('/images/placeholder.jpg')) {
-          img.src = '/images/placeholder.jpg'
-        }
+        applyImageFallback(e.currentTarget)
         if (onError) onError(e)
       }}
       {...rest}
