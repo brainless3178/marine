@@ -15,10 +15,9 @@ import en from './locales/en.json'
 import ar from './locales/ar.json'
 import es from './locales/es.json'
 
-// Detect initial theme preference
-const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches
+// Keep the storefront bright by default; buyers can still switch to dark mode.
 const storedTheme = localStorage.getItem('alka-theme')
-if (storedTheme === 'dark' || (!storedTheme && !prefersLight)) {
+if (storedTheme === 'dark') {
   document.documentElement.classList.remove('light')
   document.documentElement.classList.add('dark')
   localStorage.setItem('alka-theme', 'dark')

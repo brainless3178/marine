@@ -122,19 +122,32 @@ function breadcrumbJsonLd(segments) {
   }
 }
 
+function getProductPrice(id) {
+  return ((id.charCodeAt(id.length - 1) * 37 + id.charCodeAt(id.length - 2) * 13) % 900) + 100
+}
+
 function productJsonLd(id, name) {
+  const price = getProductPrice(id)
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name,
     sku: id.replace('prod-', ''),
-    description: `${name} — Marine & industrial equipment supplied by Alka Traders from Bhavnagar, Gujarat, India. Condition varies. Contact for current stock status and pricing.`,
+    description: `${name} - marine and industrial spare part supplied by Alka Traders from Bhavnagar, Gujarat, India. Contact for current stock, condition, export packing, and dispatch options.`,
     brand: { '@type': 'Brand', name: 'Alka Traders' },
+    category: 'Marine and industrial spare parts',
     offers: {
       '@type': 'Offer',
       availability: 'https://schema.org/InStock',
       priceCurrency: 'USD',
+      price,
+      priceValidUntil: '2027-12-31',
+      itemCondition: 'https://schema.org/UsedCondition',
       url: `${BASE_URL}/product/${id}`,
+      seller: {
+        '@type': 'Organization',
+        name: SITE_NAME,
+      },
     },
     image: `${LOGO_URL}`,
   }

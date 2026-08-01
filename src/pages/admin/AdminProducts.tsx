@@ -9,7 +9,7 @@ import { AdminImportModal } from '../../components/admin/AdminImportModal'
 import { Plus, Upload } from 'lucide-react'
 import Papa from 'papaparse'
 import { admin } from '../../lib/api'
-import type { ApiBrand, ApiCategory } from '../../lib/api-types'
+import type { ApiBrand, ApiCategory, Pagination } from '../../lib/api-types'
 
 const ITEMS_PER_PAGE = 20
 
@@ -42,6 +42,7 @@ export default function AdminProducts() {
   const { toast } = useToast()
   const [searchParams, setSearchParams] = useSearchParams()
   const [productList, setProductList] = useState<AdminProduct[]>([])
+  const [pagination, setPagination] = useState<Pagination | null>(null)
   const [loading, setLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -57,7 +58,7 @@ export default function AdminProducts() {
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(Math.max(1, Number(searchParams.get('page')) || 1))
 
   // Load brand/category ID mappings for server-side filtering
   const [brandIdMap, setBrandIdMap] = useState<Map<string, string>>(new Map())
@@ -105,6 +106,7 @@ export default function AdminProducts() {
       params.limit = String(ITEMS_PER_PAGE)
 
       const res = await admin.products.list(params)
+      setPagination(res.pagination || null)
       setProductList((res.products || []).map((p: any) => ({
         id: p.id,
         name: p.name || '',
@@ -123,11 +125,12 @@ export default function AdminProducts() {
       })))
     } catch (err: unknown) {
       console.error('Failed to load products:', err)
+      setPagination(null)
       toast('Failed to load products from API', 'error')
     } finally {
       setLoading(false)
     }
-  }, [search, filterCategory, filterBrand, filterCondition, filterAvailability, filterOnSale, filterNewArrival, sortKey, sortDir, page, toast])
+  }, [search, filterCategory, filterBrand, categoryIdMap, brandIdMap, filterCondition, filterAvailability, filterOnSale, filterNewArrival, sortKey, sortDir, page, toast])
 
   useEffect(() => {
     const timer = setTimeout(() => fetchProducts(), 300)
@@ -164,18 +167,42 @@ export default function AdminProducts() {
     return result
   }, [productList, search, filterCategory, filterBrand, filterCondition, filterAvailability, filterOnSale, filterNewArrival, sortKey, sortDir])
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
-  const paginatedProducts = filteredProducts.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  const totalPages = pagination?.totalPages || Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
+  const totalItems = pagination?.total ?? filteredProducts.length
+  const paginatedProducts = filteredProducts
 
   const uniqueBrands = useMemo(() => {
-    const brandSet = new Set(productList.map((p) => getBrandName(p.brand)))
+    const brandSet = new Set([
+      ...Array.from(brandIdMap.keys()),
+      ...productList.map((p) => getBrandName(p.brand)),
+    ])
     return Array.from(brandSet).sort()
-  }, [productList])
+  }, [brandIdMap, productList])
 
   const uniqueCategories = useMemo(() => {
-    const catSet = new Set(productList.map((p) => getCategoryName(p.category)))
+    const catSet = new Set([
+      ...Array.from(categoryIdMap.keys()),
+      ...productList.map((p) => getCategoryName(p.category)),
+    ])
     return Array.from(catSet).sort()
-  }, [productList])
+  }, [categoryIdMap, productList])
+
+  useEffect(() => {
+    const params: Record<string, string> = {}
+    if (search.trim()) params.q = search.trim()
+    if (filterCategory) params.category = filterCategory
+    if (filterBrand) params.brand = filterBrand
+    if (filterCondition) params.condition = filterCondition
+    if (filterAvailability) params.availability = filterAvailability
+    if (filterOnSale) params.sale = 'true'
+    if (filterNewArrival) params.new = 'true'
+    if (page > 1) params.page = String(page)
+    setSearchParams(params, { replace: true })
+  }, [search, filterCategory, filterBrand, filterCondition, filterAvailability, filterOnSale, filterNewArrival, page, setSearchParams])
+
+  useEffect(() => {
+    setSelectedIds(new Set())
+  }, [search, filterCategory, filterBrand, filterCondition, filterAvailability, filterOnSale, filterNewArrival, page])
 
   const toggleSelectAll = () => {
     if (selectedIds.size === paginatedProducts.length) {
@@ -321,7 +348,7 @@ export default function AdminProducts() {
         <div>
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Products</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">
-            {filteredProducts.length} products
+            {totalItems} products
             {selectedIds.size > 0 && ` · ${selectedIds.size} selected`}
           </p>
         </div>
@@ -385,7 +412,7 @@ export default function AdminProducts() {
         onClearSelection={() => setSelectedIds(new Set())}
         page={page}
         totalPages={totalPages}
-        totalItems={filteredProducts.length}
+        totalItems={totalItems}
         onPageChange={setPage}
       />
     </div>

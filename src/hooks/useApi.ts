@@ -23,12 +23,13 @@ export function useApi<T>(
     error: null,
   })
   const mountedRef = useRef(true)
+  const fetcherRef = useRef(fetcher)
+  useEffect(() => { fetcherRef.current = fetcher }, [fetcher])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const execute = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }))
     try {
-      const data = await fetcher()
+      const data = await fetcherRef.current()
       if (mountedRef.current) {
         setState({ data, loading: false, error: null })
       }
@@ -37,6 +38,7 @@ export function useApi<T>(
         setState({ data: null, loading: false, error: err.message || 'Unknown error' })
       }
     }
+    // eslint-disable-next-line react-hooks/use-memo, react-hooks/exhaustive-deps
   }, deps)
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export function useMutation<TInput, TOutput>(
     error: null,
   })
   const mutatorRef = useRef(mutator)
-  mutatorRef.current = mutator
+  useEffect(() => { mutatorRef.current = mutator }, [mutator])
 
   // Stable execute that always reads the latest mutator via ref
   const execute = useCallback(async (input: TInput) => {

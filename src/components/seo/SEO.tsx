@@ -13,7 +13,12 @@ interface SEOProps {
   productPrice?: number
   productCurrency?: string
   productAvailability?: string
+  productSku?: string
+  productBrand?: string
+  productCategory?: string
+  productCondition?: string
   ogImageAlt?: string
+  keywords?: string
   jsonLd?: Record<string, any>[]
 }
 
@@ -51,7 +56,12 @@ export function SEO({
   productPrice,
   productCurrency = 'USD',
   productAvailability,
+  productSku,
+  productBrand,
+  productCategory,
+  productCondition,
   ogImageAlt,
+  keywords,
   jsonLd,
 }: SEOProps) {
   const { pathname } = useLocation()
@@ -145,20 +155,45 @@ export function SEO({
         '@type': 'Product',
         name: title,
         description: description,
+        ...(productSku ? { sku: productSku } : {}),
+        ...(productCategory ? { category: productCategory } : {}),
         image: ogImageUrl,
         brand: {
           '@type': 'Brand',
-          name: 'Alka Traders',
+          name: productBrand || 'Alka Traders',
         },
+        ...(productCondition ? { itemCondition: productCondition } : {}),
         offers: {
           '@type': 'Offer',
           url: canonicalUrl,
           priceCurrency: productCurrency,
           price: productPrice,
           availability: productAvailability || 'https://schema.org/InStock',
+          itemCondition: productCondition || 'https://schema.org/UsedCondition',
+          priceValidUntil: '2027-12-31',
           seller: {
             '@type': 'Organization',
             name: 'Alka Traders',
+          },
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            applicableCountry: 'IN',
+            returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+            merchantReturnDays: 30,
+            returnMethod: 'https://schema.org/ReturnByMail',
+            returnFees: 'https://schema.org/FreeReturn',
+          },
+          shippingDetails: {
+            '@type': 'OfferShippingDetails',
+            shippingDestination: {
+              '@type': 'DefinedRegion',
+              addressCountry: ['IN', 'AE', 'SG', 'NL', 'US', 'GB'],
+            },
+            shippingRate: {
+              '@type': 'MonetaryAmount',
+              value: 0,
+              currency: productCurrency,
+            },
           },
         },
       }
@@ -174,6 +209,7 @@ export function SEO({
     <Helmet>
       <title>{fullTitle}</title>
       <meta name="description" content={description || DEFAULT_DESCRIPTION} />
+      {keywords && <meta name="keywords" content={keywords} />}
       <link rel="canonical" href={canonicalUrl} />
 
       {/* hreflang alternate links */}

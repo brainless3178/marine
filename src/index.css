@@ -5,51 +5,51 @@
 @tailwind utilities;
 
 :root {
-  --primary-bg: #f8f9fb;
-  --secondary-bg: #ffffff;
+  --primary-bg: #f6f4ef;
+  --secondary-bg: #fffdf8;
   --surface: #ffffff;
-  --surface-soft: #f1f4f8;
+  --surface-soft: #eeebe4;
   --surface-raised: #ffffff;
-  --accent-primary: #1a6eda;
-  --accent-primary-hover: #1557b0;
-  --accent-blue: #1a6eda;
-  --accent-gold: #966508;
-  --accent-teal: #0d9488;
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #5b6b80;
-  --border: #cbd5e1;
-  --input-bg: #f1f5f9;
+  --accent-primary: #00796b;
+  --accent-primary-hover: #005f55;
+  --accent-blue: #2f5d62;
+  --accent-gold: #7b6337;
+  --accent-teal: #00796b;
+  --text-primary: #1c211f;
+  --text-secondary: #4c5753;
+  --text-muted: #6d7772;
+  --border: #d8d2c6;
+  --input-bg: #f4f1ea;
   /* ⚠️ WCAG 3:1 ceiling — #7d8e9f on #f1f5f9 = 3.07:1. Going lighter breaks non-text contrast. */
-  --input-border: #7d8e9f;
-  --input-text: #0f172a;
-  --input-placeholder: #5f6c80;
+  --input-border: #8f9891;
+  --input-text: #1c211f;
+  --input-placeholder: #68736e;
   --danger: #dc2626;
   --success: #15803d;
   --shadow-soft: 0 24px 70px rgba(17, 24, 39, 0.08);
   --shadow-card: 0 4px 24px rgba(17, 24, 39, 0.06);
-  --navy-deep: #111827;
-  --navy-mid: #1f2937;
-  --navy-light: #374151;
-  --gold-light: #d4990e;
-  --gold-dark: #a16f08;
-  --gold-muted: rgba(200, 135, 10, 0.10);
-  --teal-soft: rgba(13, 148, 136, 0.06);
-  --btn-hover-gold: #a16f08;
-  --focus-ring: rgba(26, 115, 232, 0.24);
-  --focus-ring-gold: rgba(200, 135, 10, 0.24);
+  --navy-deep: #1d2a2a;
+  --navy-mid: #2f3c3b;
+  --navy-light: #495855;
+  --gold-light: #b0975d;
+  --gold-dark: #6f5931;
+  --gold-muted: rgba(123, 99, 55, 0.12);
+  --teal-soft: rgba(0, 121, 107, 0.08);
+  --btn-hover-gold: #6f5931;
+  --focus-ring: rgba(0, 121, 107, 0.22);
+  --focus-ring-gold: rgba(123, 99, 55, 0.22);
   --overlay-dark: rgba(17, 24, 39, 0.60);
   --overlay-medium: rgba(17, 24, 39, 0.48);
   --danger-border: rgba(220, 38, 38, 0.24);
   --danger-subtle: rgba(220, 38, 38, 0.08);
   --danger-glow: rgba(220, 38, 38, 0.06);
-  --warning-border: rgba(200, 135, 10, 0.24);
-  --warning-subtle: rgba(200, 135, 10, 0.06);
+  --warning-border: rgba(123, 99, 55, 0.24);
+  --warning-subtle: rgba(123, 99, 55, 0.07);
   --success-border: rgba(22, 163, 74, 0.24);
-  --info-border: rgba(26, 115, 232, 0.24);
-  --info-subtle: rgba(26, 115, 232, 0.06);
-  --gold-glow: rgba(200, 135, 10, 0.04);
-  --selection-bg: rgba(26, 115, 232, 0.16);
+  --info-border: rgba(47, 93, 98, 0.24);
+  --info-subtle: rgba(47, 93, 98, 0.07);
+  --gold-glow: rgba(123, 99, 55, 0.05);
+  --selection-bg: rgba(0, 121, 107, 0.16);
   --sidebar-text: rgba(255, 255, 255, 0.74);
   --sidebar-text-hover: rgba(255, 255, 255, 0.96);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
@@ -59,14 +59,14 @@
   --header-glass-dark: rgba(17, 24, 39, 0.92);
   --scrollbar-thumb: rgba(0, 0, 0, 0.12);
   --scrollbar-thumb-hover: rgba(0, 0, 0, 0.20);
-  --gold-glow-strong: rgba(200, 135, 10, 0.28);
-  --gold-glow-medium: rgba(200, 135, 10, 0.18);
-  --gold-subtle: rgba(200, 135, 10, 0.08);
-  --gold-muted-light: rgba(200, 135, 10, 0.04);
+  --gold-glow-strong: rgba(123, 99, 55, 0.26);
+  --gold-glow-medium: rgba(123, 99, 55, 0.16);
+  --gold-subtle: rgba(123, 99, 55, 0.08);
+  --gold-muted-light: rgba(123, 99, 55, 0.05);
   --badge-published-bg: rgba(22, 163, 74, 0.08);
   --badge-hidden-bg: rgba(107, 114, 128, 0.08);
   --badge-danger-bg: rgba(220, 38, 38, 0.08);
-  --badge-info-bg: rgba(26, 115, 232, 0.08);
+  --badge-info-bg: rgba(47, 93, 98, 0.08);
   --overlay-sidebar: rgba(0, 0, 0, 0.5);
   --shadow-card-hover-dark: rgba(0, 0, 0, 0.12);
   --shadow-nav-hover: rgba(0, 0, 0, 0.08);
@@ -83,7 +83,7 @@
   --shimmer-white: rgba(255, 255, 255, 0.2);
   --card-hover-shadow: rgba(17, 24, 39, 0.10);
   --shadow-heavy-color: rgba(0, 0, 0, 0.18);
-  /* ⚠️ Must pair with --accent-primary (#1a6eda in light). #fff on #1a6eda = 4.65:1 */
+  /* Must pair with --accent-primary in light mode. #fff on #00796b = 5.14:1 */
   --btn-blue-text: #ffffff;
   --btn-danger-text: #ffffff;
   --btn-success-text: #ffffff;
@@ -114,56 +114,56 @@
   --admin-login-gradient-light-mid: #eaf1f7;
   --admin-login-gradient-light-end: #dde8f0;
   --login-teal: rgba(13, 148, 136, 0.04);
-  --brick-ember: #1a73e8;
+  --brick-ember: #00796b;
   --honeydew: #ffffff;
 }
 
 html.light {
-  --primary-bg: #f8f9fb;
-  --secondary-bg: #ffffff;
+  --primary-bg: #f6f4ef;
+  --secondary-bg: #fffdf8;
   --surface: #ffffff;
-  --surface-soft: #f1f4f8;
+  --surface-soft: #eeebe4;
   --surface-raised: #ffffff;
-  --accent-primary: #1a6eda;
-  --accent-primary-hover: #1557b0;
-  --accent-blue: #1a6eda;
-  --accent-gold: #966508;
-  --accent-teal: #0d9488;
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #5b6b80;
-  --border: #cbd5e1;
-  --input-bg: #f1f5f9;
+  --accent-primary: #00796b;
+  --accent-primary-hover: #005f55;
+  --accent-blue: #2f5d62;
+  --accent-gold: #7b6337;
+  --accent-teal: #00796b;
+  --text-primary: #1c211f;
+  --text-secondary: #4c5753;
+  --text-muted: #6d7772;
+  --border: #d8d2c6;
+  --input-bg: #f4f1ea;
   /* ⚠️ WCAG 3:1 ceiling — #7d8e9f on #f1f5f9 = 3.07:1. Going lighter breaks non-text contrast. */
-  --input-border: #7d8e9f;
-  --input-text: #0f172a;
-  --input-placeholder: #5f6c80;
+  --input-border: #8f9891;
+  --input-text: #1c211f;
+  --input-placeholder: #68736e;
   --danger: #dc2626;
   --success: #15803d;
   --shadow-soft: 0 24px 70px rgba(17, 24, 39, 0.08);
   --shadow-card: 0 4px 24px rgba(17, 24, 39, 0.06);
-  --navy-deep: #111827;
-  --navy-mid: #1f2937;
-  --navy-light: #374151;
-  --gold-light: #d4990e;
-  --gold-dark: #a16f08;
-  --gold-muted: rgba(200, 135, 10, 0.10);
-  --teal-soft: rgba(13, 148, 136, 0.06);
-  --btn-hover-gold: #a16f08;
-  --focus-ring: rgba(26, 115, 232, 0.24);
-  --focus-ring-gold: rgba(200, 135, 10, 0.24);
+  --navy-deep: #1d2a2a;
+  --navy-mid: #2f3c3b;
+  --navy-light: #495855;
+  --gold-light: #b0975d;
+  --gold-dark: #6f5931;
+  --gold-muted: rgba(123, 99, 55, 0.12);
+  --teal-soft: rgba(0, 121, 107, 0.08);
+  --btn-hover-gold: #6f5931;
+  --focus-ring: rgba(0, 121, 107, 0.22);
+  --focus-ring-gold: rgba(123, 99, 55, 0.22);
   --overlay-dark: rgba(17, 24, 39, 0.60);
   --overlay-medium: rgba(17, 24, 39, 0.48);
   --danger-border: rgba(220, 38, 38, 0.24);
   --danger-subtle: rgba(220, 38, 38, 0.08);
   --danger-glow: rgba(220, 38, 38, 0.06);
-  --warning-border: rgba(200, 135, 10, 0.24);
-  --warning-subtle: rgba(200, 135, 10, 0.06);
+  --warning-border: rgba(123, 99, 55, 0.24);
+  --warning-subtle: rgba(123, 99, 55, 0.07);
   --success-border: rgba(22, 163, 74, 0.24);
-  --info-border: rgba(26, 115, 232, 0.24);
-  --info-subtle: rgba(26, 115, 232, 0.06);
-  --gold-glow: rgba(200, 135, 10, 0.04);
-  --selection-bg: rgba(26, 115, 232, 0.16);
+  --info-border: rgba(47, 93, 98, 0.24);
+  --info-subtle: rgba(47, 93, 98, 0.07);
+  --gold-glow: rgba(123, 99, 55, 0.05);
+  --selection-bg: rgba(0, 121, 107, 0.16);
   --sidebar-text: rgba(255, 255, 255, 0.74);
   --sidebar-text-hover: rgba(255, 255, 255, 0.96);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
@@ -173,14 +173,14 @@ html.light {
   --header-glass-dark: rgba(17, 24, 39, 0.92);
   --scrollbar-thumb: rgba(0, 0, 0, 0.12);
   --scrollbar-thumb-hover: rgba(0, 0, 0, 0.20);
-  --gold-glow-strong: rgba(200, 135, 10, 0.28);
-  --gold-glow-medium: rgba(200, 135, 10, 0.18);
-  --gold-subtle: rgba(200, 135, 10, 0.08);
-  --gold-muted-light: rgba(200, 135, 10, 0.04);
+  --gold-glow-strong: rgba(123, 99, 55, 0.26);
+  --gold-glow-medium: rgba(123, 99, 55, 0.16);
+  --gold-subtle: rgba(123, 99, 55, 0.08);
+  --gold-muted-light: rgba(123, 99, 55, 0.05);
   --badge-published-bg: rgba(22, 163, 74, 0.08);
   --badge-hidden-bg: rgba(107, 114, 128, 0.08);
   --badge-danger-bg: rgba(220, 38, 38, 0.08);
-  --badge-info-bg: rgba(26, 115, 232, 0.08);
+  --badge-info-bg: rgba(47, 93, 98, 0.08);
   --overlay-sidebar: rgba(0, 0, 0, 0.5);
   --shadow-card-hover-dark: rgba(0, 0, 0, 0.12);
   --shadow-nav-hover: rgba(0, 0, 0, 0.08);
@@ -200,55 +200,55 @@ html.light {
   --shadow-heavy-color: rgba(0, 0, 0, 0.18);
   --admin-table-head-text: #5c6a7e;
   --admin-badge-hidden-text: #546174;
-  --brick-ember: #1a73e8;
+  --brick-ember: #00796b;
   --honeydew: #ffffff;
 }
 
 html:not(.light) {
-  --primary-bg: #0f1419;
-  --secondary-bg: #1a2332;
-  --surface: #1e2a3a;
-  --surface-soft: #243044;
-  --surface-raised: #283848;
-  --accent-primary: #5ea3f8;
-  --accent-primary-hover: #7db8ff;
-  --accent-blue: #5ea3f8;
-  --accent-gold: #e8b84a;
-  --accent-teal: #2dd4bf;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border: rgba(148, 163, 184, 0.24);
-  --input-bg: #243044;
-  --input-border: rgba(148, 163, 184, 0.32);
-  --input-text: #f8fafc;
-  --input-placeholder: #94a3b8;
+  --primary-bg: #111816;
+  --secondary-bg: #18211f;
+  --surface: #202a27;
+  --surface-soft: #28332f;
+  --surface-raised: #2e3935;
+  --accent-primary: #5dd5bf;
+  --accent-primary-hover: #8ee4d4;
+  --accent-blue: #8ba7a0;
+  --accent-gold: #c9b27b;
+  --accent-teal: #5dd5bf;
+  --text-primary: #f7f4ed;
+  --text-secondary: #cfc8bb;
+  --text-muted: #a79f93;
+  --border: rgba(207, 200, 187, 0.20);
+  --input-bg: #28332f;
+  --input-border: rgba(207, 200, 187, 0.32);
+  --input-text: #f7f4ed;
+  --input-placeholder: #a79f93;
   --danger: #f87171;
   --success: #4ade80;
   --shadow-soft: 0 18px 48px rgba(0, 0, 0, 0.32);
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.24);
-  --navy-deep: #0f1419;
-  --navy-mid: #1a2332;
-  --navy-light: #243044;
-  --gold-light: #f0c95c;
-  --gold-dark: #c8970e;
-  --gold-muted: rgba(232, 184, 74, 0.12);
-  --teal-soft: rgba(45, 212, 191, 0.06);
-  --btn-hover-gold: #f0c95c;
-  --focus-ring: rgba(94, 163, 248, 0.28);
-  --focus-ring-gold: rgba(232, 184, 74, 0.28);
+  --navy-deep: #101614;
+  --navy-mid: #1b2623;
+  --navy-light: #2d3b36;
+  --gold-light: #d7c28d;
+  --gold-dark: #a98f58;
+  --gold-muted: rgba(201, 178, 123, 0.12);
+  --teal-soft: rgba(93, 213, 191, 0.08);
+  --btn-hover-gold: #d7c28d;
+  --focus-ring: rgba(93, 213, 191, 0.28);
+  --focus-ring-gold: rgba(201, 178, 123, 0.26);
   --overlay-dark: rgba(0, 0, 0, 0.72);
   --overlay-medium: rgba(0, 0, 0, 0.56);
   --danger-border: rgba(248, 113, 113, 0.28);
   --danger-subtle: rgba(248, 113, 113, 0.10);
   --danger-glow: rgba(248, 113, 113, 0.06);
-  --warning-border: rgba(232, 184, 74, 0.28);
-  --warning-subtle: rgba(232, 184, 74, 0.06);
+  --warning-border: rgba(201, 178, 123, 0.28);
+  --warning-subtle: rgba(201, 178, 123, 0.07);
   --success-border: rgba(74, 222, 128, 0.28);
-  --info-border: rgba(94, 163, 248, 0.28);
-  --info-subtle: rgba(94, 163, 248, 0.06);
-  --gold-glow: rgba(232, 184, 74, 0.04);
-  --selection-bg: rgba(94, 163, 248, 0.18);
+  --info-border: rgba(139, 167, 160, 0.28);
+  --info-subtle: rgba(139, 167, 160, 0.08);
+  --gold-glow: rgba(201, 178, 123, 0.05);
+  --selection-bg: rgba(93, 213, 191, 0.18);
   --sidebar-text: rgba(255, 255, 255, 0.74);
   --sidebar-text-hover: rgba(255, 255, 255, 0.96);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
@@ -258,10 +258,10 @@ html:not(.light) {
   --header-glass-dark: rgba(15, 20, 25, 0.92);
   --scrollbar-thumb: rgba(255, 255, 255, 0.12);
   --scrollbar-thumb-hover: rgba(255, 255, 255, 0.20);
-  --gold-glow-strong: rgba(232, 184, 74, 0.28);
-  --gold-glow-medium: rgba(232, 184, 74, 0.18);
-  --gold-subtle: rgba(232, 184, 74, 0.08);
-  --gold-muted-light: rgba(232, 184, 74, 0.04);
+  --gold-glow-strong: rgba(201, 178, 123, 0.28);
+  --gold-glow-medium: rgba(201, 178, 123, 0.18);
+  --gold-subtle: rgba(201, 178, 123, 0.08);
+  --gold-muted-light: rgba(201, 178, 123, 0.05);
   --badge-published-bg: rgba(74, 222, 128, 0.10);
   --badge-hidden-bg: rgba(148, 163, 184, 0.10);
   --badge-danger-bg: rgba(248, 113, 113, 0.10);
@@ -304,7 +304,7 @@ html:not(.light) {
   --admin-login-gradient-light-start: #f3f7fb;
   --admin-login-gradient-light-mid: #eaf1f7;
   --admin-login-gradient-light-end: #dde8f0;
-  --brick-ember: #5ea3f8;
+  --brick-ember: #5dd5bf;
   --honeydew: #0f1419;
 }
 
@@ -480,6 +480,42 @@ html:not(.light) {
 }
 
 @layer components {
+  .site-container {
+    width: min(100% - 2rem, 1280px);
+    margin-inline: auto;
+  }
+
+  .section-y {
+    padding-block: clamp(4.5rem, 7vw, 6rem);
+  }
+
+  .section-y-sm {
+    padding-block: clamp(3rem, 5vw, 4rem);
+  }
+
+  .section-header {
+    max-width: 760px;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+
+  .section-header-center {
+    max-width: 760px;
+    margin-inline: auto;
+    margin-bottom: clamp(2.25rem, 4vw, 3.5rem);
+    text-align: center;
+  }
+
+  .equal-card {
+    height: 100%;
+    min-height: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .site-container {
+      width: min(100% - 3rem, 1280px);
+    }
+  }
+
   /* ── Typographic utilities ─────────────────────────────── */
   .text-display-2xl {
     font-family: 'Space Grotesk', sans-serif;
@@ -613,8 +649,9 @@ html:not(.light) {
 
   .marine-section {
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--secondary-bg) 88%, transparent), color-mix(in srgb, var(--primary-bg) 92%, transparent)),
-      radial-gradient(circle at 10% 10%, var(--teal-soft), transparent 28rem);
+      linear-gradient(180deg, color-mix(in srgb, var(--secondary-bg) 94%, transparent), color-mix(in srgb, var(--primary-bg) 96%, transparent)),
+      radial-gradient(circle at 12% 14%, var(--teal-soft), transparent 30rem),
+      radial-gradient(circle at 88% 8%, var(--gold-muted-light), transparent 24rem);
   }
 
 
@@ -625,13 +662,13 @@ html:not(.light) {
   .gold-accent-bar {
     width: 48px;
     height: 3px;
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue));
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-gold));
     border-radius: 2px;
   }
 
   /* Gradient text for About page */
   .gradient-text {
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-blue) 100%);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-gold) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -639,7 +676,7 @@ html:not(.light) {
 
   /* Stats section gradient */
   .stats-gradient {
-    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%);
+    background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--surface-soft) 70%, var(--secondary-bg)) 100%);
   }
 }
 

@@ -17,18 +17,20 @@ export function HowItWorks() {
   ]
 
   return (
-    <section className="py-24 bg-[var(--secondary-bg)]" ref={sectionRef}>
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <SectionLabel>{t('process.label')}</SectionLabel>
-        <h2 className="font-display font-bold text-section tracking-tight">
-          From inquiry to dispatch
-        </h2>
-        <div className="gold-accent-bar mt-4 mb-14" />
+    <section className="section-y bg-[var(--secondary-bg)]" ref={sectionRef}>
+      <div className="site-container">
+        <div className="section-header">
+          <SectionLabel>{t('process.label')}</SectionLabel>
+          <h2 className="font-display font-bold text-section tracking-tight">
+            From inquiry to dispatch
+          </h2>
+          <div className="gold-accent-bar mt-4" />
+        </div>
 
-        <div className="flex flex-col lg:flex-row justify-between relative mt-8 px-4">
+        <div className="flex flex-col lg:flex-row justify-between relative mt-8 lg:px-4">
           {/* Timeline line */}
           <motion.div
-            className="hidden lg:block absolute top-6 left-[60px] right-[60px] h-[2px] bg-gradient-to-r from-[var(--accent-primary)]/50 via-[var(--accent-primary-hover)] to-[var(--accent-primary)]/50"
+            className="hidden lg:block absolute top-6 left-[60px] right-[60px] h-[2px] bg-gradient-to-r from-[var(--accent-primary)]/30 via-[var(--accent-gold)]/35 to-[var(--accent-primary)]/30"
             initial={{ width: '0%' }}
             animate={isInView ? { width: 'calc(100% - 120px)' } : { width: '0%' }}
             transition={{ duration: 1.2, ease: 'easeInOut' }}
@@ -43,7 +45,7 @@ export function HowItWorks() {
               transition={{ delay: i * 0.12, duration: 0.5, ease: 'easeOut' }}
             >
               <motion.div
-                className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto lg:absolute lg:-left-12 mb-5 bg-[var(--surface)] border-2 border-[var(--accent-primary)] font-display font-extrabold text-lg text-[var(--accent-primary)] relative z-10 shadow-[0_4px_20px_var(--focus-ring)]"
+                className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto lg:absolute lg:-left-12 mb-5 bg-[var(--surface)] border border-[var(--accent-primary)]/35 font-display font-extrabold text-lg text-[var(--accent-primary)] relative z-10 shadow-[0_4px_20px_var(--focus-ring)]"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={isInView ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
                 transition={{ delay: i * 0.15, duration: 0.4, ease: 'backOut' }}

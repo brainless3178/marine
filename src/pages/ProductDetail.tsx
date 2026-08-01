@@ -37,6 +37,12 @@ function getProductSpecs(product: Product): Record<string, string> {
   }
 }
 
+function getSchemaCondition(condition: Product['condition']) {
+  if (condition === 'new' || condition === 'unused') return 'https://schema.org/NewCondition'
+  if (condition === 'refurbished' || condition === 'reconditioned') return 'https://schema.org/RefurbishedCondition'
+  return 'https://schema.org/UsedCondition'
+}
+
 export default function ProductDetail() {
   const { t } = useTranslation()
   const { id } = useParams()
@@ -122,6 +128,9 @@ export default function ProductDetail() {
   const price = product.price
   const effectivePrice = product.onSale && product.salePrice ? product.salePrice : price
   const specs = getProductSpecs(product)
+  const readableCategory = product.category.replace(/-/g, ' ')
+  const productSeoTitle = `${product.name} | ${product.brand} ${readableCategory} spare`
+  const productSeoDescription = `${product.name} (${product.sku}) by ${product.brand}. ${product.condition} ${readableCategory} for marine spare parts, ship spares, industrial MRO, and export supply from Bhavnagar, India.`
 
   const handleAddToCart = () => {
     if (!isLoggedIn) { setShowAuthModal(true); return }
@@ -140,15 +149,34 @@ export default function ProductDetail() {
   return (
     <div className="py-8">
       <SEO
-        title={`${product.name} — Alka Traders`}
-        description={product.description?.slice(0, 160) || `${product.name} — ${product.brand}, ${product.condition}. SKU: ${product.sku}.`}
+        title={productSeoTitle}
+        description={productSeoDescription.slice(0, 158)}
         canonical={`/product/${id}`}
         ogImage={product ? getProductImageUrl(product.filename) : undefined}
         ogType="product"
         productPrice={effectivePrice}
         productCurrency="USD"
         productAvailability={product.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}
+        productSku={product.sku}
+        productBrand={product.brand}
+        productCategory={readableCategory}
+        productCondition={getSchemaCondition(product.condition)}
         ogImageAlt={product.name}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            name: productSeoTitle,
+            description: productSeoDescription,
+            mainEntity: {
+              '@type': 'Product',
+              name: product.name,
+              sku: product.sku,
+              category: readableCategory,
+              brand: { '@type': 'Brand', name: product.brand },
+            },
+          },
+        ]}
       />
       <BreadcrumbJsonLd items={[
         { name: 'Home', url: '/' },

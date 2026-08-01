@@ -37,13 +37,15 @@ export function IndustriesTabs() {
   const Icon = current ? (iconMap[current.icon] || Ship) : Ship
 
   return (
-    <section className="py-28 bg-[var(--primary-bg)]" id="industries">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <SectionLabel>{t('industries.label')}</SectionLabel>
-        <h2 className="font-display font-bold text-section tracking-tight mb-12">
-          {t('industries.title')}
-        </h2>
-        <div className="gold-accent-bar mt-0 mb-12" />
+    <section className="section-y bg-[var(--primary-bg)]" id="industries">
+      <div className="site-container">
+        <div className="section-header">
+          <SectionLabel>{t('industries.label')}</SectionLabel>
+          <h2 className="font-display font-bold text-section tracking-tight">
+            {t('industries.title')}
+          </h2>
+          <div className="gold-accent-bar mt-4" />
+        </div>
 
         {industries.length === 0 ? (
           <div className="text-center py-12">
@@ -52,7 +54,7 @@ export function IndustriesTabs() {
         ) : (
         <>
         {/* Tab buttons */}
-        <div className="flex gap-2.5 overflow-x-auto flex-nowrap md:flex-wrap mb-10 -mx-6 px-6 md:mx-0 md:px-0 pb-2 scrollbar-none">
+        <div className="flex gap-2.5 overflow-x-auto flex-nowrap md:flex-wrap mb-8 -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-none">
           {industries.map((ind) => {
             const isActive = active === ind.id
             return (
@@ -72,7 +74,7 @@ export function IndustriesTabs() {
         </div>
 
         {/* Active panel */}
-        <div className="flex gap-10 p-9 bg-[var(--surface)] border border-[var(--border)] rounded-2xl border-l-[4px] border-l-[var(--accent-primary)] shadow-[var(--shadow-card)]">
+        <div className="flex gap-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)] md:gap-10 md:p-9">
           <div className="hidden md:flex items-start text-[var(--accent-primary)] flex-shrink-0 mt-1">
             <div className="w-16 h-16 rounded-2xl bg-[var(--accent-primary)]/[0.1] flex items-center justify-center">
               <Icon size={32} />

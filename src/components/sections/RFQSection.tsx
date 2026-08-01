@@ -39,8 +39,8 @@ export function RFQSection() {
 
   if (rfqSubmitted) {
     return (
-      <section className="py-28 bg-[var(--secondary-bg)]">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+      <section className="section-y bg-[var(--secondary-bg)]">
+        <div className="site-container">
           <div className="text-center py-12">
             <div className="w-24 h-24 mx-auto relative mb-8">
               <div className="w-24 h-24 rounded-full border-[3px] border-[var(--success)]" />
@@ -59,16 +59,16 @@ export function RFQSection() {
 
   return (
     <section
-      className="py-28 bg-[var(--secondary-bg)]"
+      className="section-y bg-[var(--secondary-bg)]"
       style={{
-        backgroundImage: `linear-gradient(135deg, rgba(200,147,10,0.04) 0%, transparent 48%), linear-gradient(180deg, var(--secondary-bg), var(--primary-bg))`,
+        backgroundImage: `linear-gradient(135deg, var(--teal-soft) 0%, transparent 48%), linear-gradient(180deg, var(--secondary-bg), var(--primary-bg))`,
       }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <div
-        className="max-w-[1280px] mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-[42%_58%] gap-12 items-center"
+        className="site-container grid grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12"
         style={{
           background: isTouchDevice
             ? 'radial-gradient(600px at 50% 50%, var(--gold-glow) 0%, transparent 80%)'
@@ -100,13 +100,13 @@ export function RFQSection() {
             <a href={`https://wa.me/${settings.whatsappNumber}`} className="flex items-center gap-2.5 text-sm font-semibold no-underline text-[var(--text-primary)] hover:text-[var(--success)] transition-colors">
               <MessageCircle size={18} className="text-[var(--success)]" /> WhatsApp Us Now
             </a>
-            <a href={`mailto:${settings.rfqEmail}`} className="flex items-center gap-2.5 text-sm font-semibold no-underline text-[var(--text-primary)] hover:text-[var(--accent-blue)] transition-colors">
+            <a href={`mailto:${settings.rfqEmail}`} className="flex items-center gap-2.5 text-sm font-semibold no-underline text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors">
               <Mail size={18} className="text-[var(--accent-blue)]" /> {settings.rfqEmail}
             </a>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="card p-7 md:p-9">
+        <form onSubmit={handleSubmit} className="card p-6 md:p-9">
           <div className="mb-5">
             <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2">Full Name *</label>
             <input
