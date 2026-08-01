@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -791,14 +791,6 @@ html:not(.light) {
   }
 }
 
-/* ── Orientation support ────────────────────────────────── */
-@media (orientation: landscape) and (max-height: 500px) {
-  /* Compact hero slider on very short landscape screens */
-  section[aria-roledescription="carousel"] {
-    height: 180px !important;
-  }
-}
-
 /* ── Focus visible for keyboard accessibility ───────────── */
 :focus-visible {
   outline: 2px solid var(--accent-primary);
@@ -821,22 +813,6 @@ html:not(.light) [class*="bg-[var(--accent-primary)]"].text-white {
   color: var(--btn-blue-text) !important;
 }
 
-/* ── Hero section: force white text over dark video background ── */
-section[aria-label="Shop marine spare parts online"] h1,
-section[aria-label="Shop marine spare parts online"] p {
-  color: white !important;
-}
-
-/* ── Hero CTA buttons: keep teal-button text readable ── */
-section[aria-label="Shop marine spare parts online"] [class*="bg-[var(--accent-primary)]"] {
-  color: var(--btn-blue-text) !important;
-}
-
-/* ── Hero search button: white text on glass background ── */
-section[aria-label="Shop marine spare parts online"] a[class*="bg-white/12"] {
-  color: white !important;
-}
-
 /* ── Safe area padding for notched phones ───────────────── */
 @supports (padding: env(safe-area-inset-bottom)) {
   /* Only apply to fixed/sticky elements, NOT to body (to avoid layout gaps) */
@@ -845,14 +821,122 @@ section[aria-label="Shop marine spare parts online"] a[class*="bg-white/12"] {
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);
   }
-  /* Sticky header gets top safe area */
-  header.sticky {
-    padding-top: env(safe-area-inset-top);
-  }
+  /* The site header (utility bar) handles the top safe area itself — see
+     Navbar.tsx (pt-[env(safe-area-inset-top)]). */
 }
 
 /* ── Prevent overflow from long words on small screens ─── */
 p, li, h1, h2, h3, h4, h5, h6 {
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Premium hero + header (redesign)
+   Palette: #0F172A / #1E293B / rgba(15,23,42,.55) / #14B8A6 /
+            #FFFFFF / #CBD5E1 / #94A3B8 / rgba(255,255,255,.08) / #2DD4BF
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --hero-bg: #0f172a;
+  --hero-bg-secondary: #1e293b;
+  --hero-card-bg: rgba(15, 23, 42, 0.55);
+  --hero-accent: #14b8a6;
+  --hero-accent-hover: #2dd4bf;
+  --hero-text: #ffffff;
+  --hero-text-secondary: #cbd5e1;
+  --hero-text-muted: #94a3b8;
+  --hero-border: rgba(255, 255, 255, 0.08);
+  --hero-header-bg: rgba(15, 23, 42, 0.75);
+  --hero-utility-bg: rgba(15, 23, 42, 0.95);
+  /* Combined height of utility bar + main nav so the 100svh hero can
+     extend behind the translucent header. The safe-area term keeps the
+     hero aligned on notched iOS devices where the utility bar is pushed
+     down by env(safe-area-inset-top). */
+  --hero-header-offset: calc(110px + env(safe-area-inset-top, 0px));
+}
+
+@media (max-width: 639px) {
+  :root {
+    --hero-header-offset: calc(128px + env(safe-area-inset-top, 0px));
+  }
+}
+
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer components {
+  /* Subtle entrance: fade up 20px / 300ms. The global
+     prefers-reduced-motion rule collapses it to 0.01ms. */
+  .hero-reveal {
+    opacity: 0;
+    animation: heroFadeUp 0.3s ease-out forwards;
+  }
+
+  /* Feature card */
+  .hero-card {
+    background: var(--hero-card-bg);
+    border: 1px solid var(--hero-border);
+    border-radius: 16px;
+    transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  }
+  .hero-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(45, 212, 191, 0.5);
+    background: rgba(30, 41, 59, 0.65);
+  }
+
+  /* CTA buttons — 16px / 600 per design spec. Colors are re-declared on
+     :hover to out-specify the global `a:hover` recolor in @layer base. */
+  .hero-btn-primary,
+  .hero-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    border-radius: 12px;
+    font-family: 'Manrope', 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  }
+  .hero-btn-primary {
+    background: var(--hero-accent);
+    color: var(--hero-bg);
+  }
+  .hero-btn-primary:hover {
+    background: var(--hero-accent-hover);
+    color: var(--hero-bg);
+    transform: translateY(-1px);
+  }
+  .hero-btn-secondary {
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: var(--hero-text);
+  }
+  .hero-btn-secondary:hover {
+    background: var(--hero-text);
+    border-color: var(--hero-text);
+    color: var(--hero-bg);
+    transform: translateY(-1px);
+  }
+}
+
+/* Premium header: keep links clean inside the dark header. */
+.site-header a {
+  text-decoration: none;
+}
+
+/* Utility-bar links are a slim meta bar — opt out of the 48px mobile
+   touch-target minimum so the two-row mobile layout stays compact. */
+.utility-link {
+  min-height: 0;
 }

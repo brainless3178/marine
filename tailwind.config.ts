@@ -42,6 +42,7 @@ const config: Config = {
         display: ['Space Grotesk', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
         body: ['DM Sans', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+        manrope: ['Manrope', 'DM Sans', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       fontSize: {
         'hero': ['clamp(44px, 7vw, 84px)', { lineHeight: '1.0', letterSpacing: '-0.025em', fontWeight: '700' }],
