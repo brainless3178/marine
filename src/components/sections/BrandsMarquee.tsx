@@ -23,8 +23,8 @@ export function BrandsMarquee() {
   if (row1.length === 0 && row2.length === 0) return null
 
   return (
-    <section className="py-28 bg-[var(--primary-bg)]" id="brands">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 mb-12">
+    <section className="section-y bg-[var(--primary-bg)]" id="brands">
+      <div className="site-container section-header">
         <SectionLabel>{t('brands.label')}</SectionLabel>
         <h2 className="font-display font-bold text-section tracking-tight">{t('brands.title')}</h2>
         <div className="gold-accent-bar mt-4" />

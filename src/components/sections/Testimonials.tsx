@@ -48,14 +48,16 @@ export function Testimonials() {
   if (loading || testimonials.length === 0) return null
 
   return (
-    <section className="py-28 bg-[var(--secondary-bg)]" id="testimonials">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-        <SectionLabel>{t('testimonials.label')}</SectionLabel>
-        <h2 className="font-display font-bold text-section tracking-tight mb-12">{t('testimonials.title')}</h2>
-        <div className="gold-accent-bar mt-0 mb-12" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+    <section className="section-y bg-[var(--secondary-bg)]" id="testimonials">
+      <div className="site-container">
+        <div className="section-header">
+          <SectionLabel>{t('testimonials.label')}</SectionLabel>
+          <h2 className="font-display font-bold text-section tracking-tight">{t('testimonials.title')}</h2>
+          <div className="gold-accent-bar mt-4" />
+        </div>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((review, i) => (
-            <div key={review.id} className="card p-8 border-l-[4px] border-l-transparent hover:border-l-[var(--accent-primary)]" style={{ animationDelay: `${i * 100}ms` }}>
+            <div key={review.id} className="card equal-card border-l-[4px] border-l-transparent p-6 hover:border-l-[var(--accent-primary)] md:p-8" style={{ animationDelay: `${i * 100}ms` }}>
               <div className="flex gap-1 mb-5">
                 {Array.from({ length: review.rating }).map((_, j) => (
                   <Star key={j} size={16} className="fill-[var(--accent-gold)] text-[var(--accent-gold)]" />

@@ -25,14 +25,14 @@ function encodePath(name: string) {
 
 export function ShopByCategory() {
   return (
-    <section className="py-24 bg-[var(--secondary-bg)]" aria-label="Shop by category">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+    <section className="section-y bg-[var(--secondary-bg)]" aria-label="Shop by category">
+      <div className="site-container">
         {/* ── Header ── */}
-        <div className="text-center mb-14">
+        <div className="section-header-center">
           <span className="inline-block text-xs font-black uppercase tracking-[0.22em] text-[var(--accent-primary)] mb-4">
             Marine and industrial inventory
           </span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-[var(--navy-deep)]">
+          <h2 className="font-display text-section-lg font-bold tracking-tight text-[var(--text-primary)]">
             Find ship spares by equipment type
           </h2>
           <p className="mt-4 text-base leading-relaxed text-[var(--text-secondary)] max-w-2xl mx-auto">
@@ -42,12 +42,12 @@ export function ShopByCategory() {
         </div>
 
         {/* ── Category Grid ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">
           {categories.map((cat) => (
             <a
               key={cat.name}
               href={`/products?category=${cat.slug}`}
-              className="group relative block overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-card)] hover:shadow-lg transition-all duration-500 no-underline"
+              className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-card)] hover:border-[var(--accent-primary)] hover:shadow-lg transition-all duration-500 no-underline"
             >
               {/* Image */}
               <div className="relative aspect-[4/3] overflow-hidden">
@@ -62,16 +62,16 @@ export function ShopByCategory() {
                     img.style.display = 'none'
                     const parent = img.parentElement
                     if (parent) {
-                      parent.style.background = 'linear-gradient(135deg, var(--hero-bg-mid) 0%, var(--hero-bg-light) 100%)'
+                      parent.style.background = 'linear-gradient(135deg, var(--surface-soft) 0%, var(--secondary-bg) 100%)'
                     }
                   }}
                 />
                 {/* Hover overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--navy-deep)]/65 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
 
               {/* Label */}
-              <div className="px-4 py-3.5">
+              <div className="flex min-h-[70px] items-center px-4 py-4">
                 <h3 className="text-sm font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors duration-300 leading-tight">
                   {cat.name}
                 </h3>

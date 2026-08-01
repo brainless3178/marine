@@ -164,6 +164,8 @@ export function useProductForm() {
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [attempted, setAttempted] = useState(false)
   const isDirtyRef = useRef(false)
+  const hasMountedFormRef = useRef(false)
+  const suppressNextDirtyRef = useRef(false)
 
   const [brandList, setBrandList] = useState<{ id: string; name: string }[]>([])
   const [categoryList, setCategoryList] = useState<{ id: string; name: string }[]>([])
@@ -204,6 +206,7 @@ export function useProductForm() {
     admin.products.get(id)
       .then((res) => {
         if (!cancelled && res.product) {
+          suppressNextDirtyRef.current = true
           setForm(getFormFromProduct(res.product))
         }
       })
@@ -218,6 +221,15 @@ export function useProductForm() {
 
   const formJson = JSON.stringify(form)
   useEffect(() => {
+    if (!hasMountedFormRef.current) {
+      hasMountedFormRef.current = true
+      return
+    }
+    if (suppressNextDirtyRef.current) {
+      suppressNextDirtyRef.current = false
+      isDirtyRef.current = false
+      return
+    }
     isDirtyRef.current = true
   }, [formJson])
 

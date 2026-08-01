@@ -83,21 +83,18 @@ function LocaleLayout() {
 
   const isValid = locale !== undefined && VALID_LOCALES.includes(locale as Language)
 
-  // Redirect legacy non-prefixed URLs like /products → /en/products
-  // When :locale doesn't match a valid locale, the full path e.g. /products
-  // is captured as locale="products". We redirect to /en/products.
-  if (!isValid) {
-    // The entire unmatched path is `location.pathname` (e.g. /products or /some/path)
-    // We redirect to /en<pathname> — the route re-matches with locale="en"
-    return <Navigate to={`/en${location.pathname}`} replace />
-  }
-
   // Set language when locale changes
   useEffect(() => {
-    if (locale !== language) {
+    if (isValid && locale !== language) {
       setLanguage(locale as Language)
     }
-  }, [locale, setLanguage, language])
+  }, [locale, setLanguage, language, isValid])
+
+  // Redirect legacy non-prefixed URLs like /products → /en/products
+  // All hooks must be called before any early returns.
+  if (!isValid) {
+    return <Navigate to={`/en${location.pathname}`} replace />
+  }
 
   return (
     <LocaleContext.Provider value={locale as Language}>

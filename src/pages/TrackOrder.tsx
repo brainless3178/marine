@@ -29,11 +29,6 @@ export default function TrackOrder() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (initialId) handleTrack(initialId)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const handleTrack = async (num?: string) => {
     const search = num || orderNumber
     if (!search.trim()) { setError('Please enter an order number'); return }
@@ -58,6 +53,10 @@ export default function TrackOrder() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (initialId) handleTrack(initialId)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentStep = order ? (statusIndex[order.status] ?? -1) : -1
 

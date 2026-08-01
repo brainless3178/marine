@@ -78,7 +78,7 @@ export default function Products() {
     setLocalSearch(value)
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
     debounceTimerRef.current = setTimeout(() => setSearchQuery(value), 300)
-  }, [setSearchQuery])
+  }, [setSearchQuery, setLocalSearch])
 
   useEffect(() => () => { if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current) }, [])
 
@@ -123,13 +123,44 @@ export default function Products() {
 
   // Active filter chips
   const hasActiveFilters = searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0 || showOnSale || urgencyFilter === 'emergency'
+  const seoQueryLabel = searchQuery || selectedCategories[0]?.replace(/-/g, ' ') || selectedBrands[0] || ''
+  const canonicalQuery = searchParams.get('category')
+    ? `/products?category=${encodeURIComponent(searchParams.get('category') || '')}`
+    : searchParams.get('brand')
+      ? `/products?brand=${encodeURIComponent(searchParams.get('brand') || '')}`
+      : searchParams.get('search')
+        ? `/products?search=${encodeURIComponent(searchParams.get('search') || '')}`
+        : '/products'
+  const productsSeoTitle = seoQueryLabel
+    ? `${seoQueryLabel} marine spare parts and ship spares`
+    : 'Marine spare parts catalog | ship spares, engine parts and industrial equipment'
+  const productsSeoDescription = seoQueryLabel
+    ? `Browse ${seoQueryLabel} marine spare parts, ship spares, industrial MRO equipment, hydraulic, electrical, pump, safety, and surplus stock from Alka Traders.`
+    : 'Browse marine spare parts, ship spares, marine engine parts, hydraulic pumps, electrical automation, navigation equipment, safety gear, rigging, and industrial surplus stock.'
+  const productItemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: productsSeoTitle,
+    description: productsSeoDescription,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: Math.min(paginatedProducts.length, 24),
+      itemListElement: paginatedProducts.slice(0, 24).map((product, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `https://alkatraders.co/product/${product.id}`,
+        name: product.name,
+      })),
+    },
+  }
 
   return (
     <div>
       <SEO
-        title="All Products — Marine & Industrial Equipment"
-        description="Browse our full catalog of marine spares, surplus machinery, hydraulic systems, electrical automation components, and safety equipment."
-        canonical="/products"
+        title={productsSeoTitle}
+        description={productsSeoDescription.slice(0, 158)}
+        canonical={canonicalQuery}
+        jsonLd={[productItemListJsonLd]}
       />
       <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'Products', url: '/products' }]} />
       {/* Header */}
