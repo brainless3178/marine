@@ -2,10 +2,9 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "..",
     "baseUrl": ".",
     "strict": true,
     "esModuleInterop": true,
@@ -16,10 +15,9 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "zod": ["./node_modules/zod"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "../shared/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "prisma", "src/__tests__"]
 }
