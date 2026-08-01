@@ -23,7 +23,8 @@ export function isLightColor(hex: string): boolean {
 }
 
 /** Cloudinary base URL for this project */
-const CLOUDINARY_BASE = 'https://res.cloudinary.com/y7up4zti/image/upload/v1'
+const CLOUDINARY_CLOUD_NAME = 'y7up4zti'
+const CLOUDINARY_BASE = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/v1`
 
 /**
  * Safely format a product image URL.
@@ -68,4 +69,21 @@ export function getCategoryImageUrl(categoryFile: string): string {
  */
 export function getStaticImageUrl(name: string): string {
   return `${CLOUDINARY_BASE}/alka/static/${name}`
+}
+
+/**
+ * Get Cloudinary video URL for a static video (hero background, etc.).
+ * Cloudinary serves videos via the /video/upload/ path.
+ *
+ * Cloudinary URLs work without the version number, so we omit it for cache
+ * consistency. The videoMap resolves friendly names to actual Cloudinary
+ * public_ids (e.g. 'hero' → 'hero_apy76l' from manual Media Library upload).
+ */
+export function getStaticVideoUrl(name: string): string {
+  // The hero video was uploaded to Cloudinary root as 'hero_apy76l'
+  const videoMap: Record<string, string> = {
+    hero: 'hero_apy76l',
+  }
+  const publicId = videoMap[name] || name
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/upload/${publicId}`
 }
