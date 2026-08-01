@@ -50,3 +50,7 @@ NUL
 *.rar
 .netlify/
 src/nul
+
+# Large media files served from Cloudinary
+hero.mp4
+public/hero.mp4
