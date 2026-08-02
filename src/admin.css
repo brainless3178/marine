@@ -152,7 +152,7 @@ html.light .admin-header {
   background: var(--header-glass);
 }
 
-html:not(.light) .admin-header {
+html.dark .admin-header {
   background: var(--header-glass-dark);
 }
 
@@ -177,7 +177,7 @@ html:not(.light) .admin-header {
   transform: translateY(-2px);
 }
 
-html:not(.light) .admin-stat-card:hover {
+html.dark .admin-stat-card:hover {
   box-shadow: 0 8px 28px var(--shadow-card-hover-dark);
 }
 

@@ -14,6 +14,27 @@
     <meta name="description" content="Alka Traders — Trusted global supplier of marine spares, industrial equipment, surplus machinery, electrical automation, hydraulic systems, and emergency procurement. Based in Bhavnagar, Gujarat, India." />
     <meta name="keywords" content="marine equipment, industrial spares, ship parts, hydraulic systems, electrical automation, surplus machinery, emergency procurement, marine pumps, engine parts, navigation equipment, ABB drives, Siemens PLC, Parker hydraulics" />
     <meta name="theme-color" content="#0c2d48" />
+
+    <!-- Apply the saved theme before first paint to avoid a light-mode flash.
+         Falls back to the VITE_DEFAULT_THEME env var ("dark" or "light").
+         %VITE_DEFAULT_THEME% is replaced by Vite at build time. -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('alka-theme')
+          if (t !== 'dark' && t !== 'light') {
+            t = '%VITE_DEFAULT_THEME%' === 'dark' ? 'dark' : 'light'
+          }
+          if (t === 'dark') {
+            document.documentElement.classList.remove('light')
+            document.documentElement.classList.add('dark')
+          } else {
+            document.documentElement.classList.add('light')
+            document.documentElement.classList.remove('dark')
+          }
+        } catch (e) {}
+      })()
+    </script>
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
     <meta name="author" content="Alka Traders" />
     <meta name="generator" content="Alka Traders Platform" />

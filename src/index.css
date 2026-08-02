@@ -202,9 +202,23 @@ html.light {
   --admin-badge-hidden-text: #546174;
   --brick-ember: #00796b;
   --honeydew: #ffffff;
+
+  /* Header & Navigation theme tokens */
+  --header-utility-bg: rgba(246, 244, 239, 0.95);
+  --header-utility-border: rgba(0, 0, 0, 0.08);
+  --header-utility-text: #4c5753;
+  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-border: rgba(0, 0, 0, 0.08);
+  --nav-text: #1c211f;
+  --nav-text-muted: #6d7772;
+  --nav-btn-bg: rgba(0, 0, 0, 0.04);
+  --nav-btn-border: rgba(0, 0, 0, 0.12);
+  --nav-btn-hover-border: rgba(0, 121, 107, 0.4);
+  --nav-dropdown-bg: #ffffff;
+  --nav-dropdown-border: #d8d2c6;
 }
 
-html:not(.light) {
+html.dark {
   --primary-bg: #111816;
   --secondary-bg: #18211f;
   --surface: #202a27;
@@ -306,6 +320,20 @@ html:not(.light) {
   --admin-login-gradient-light-end: #dde8f0;
   --brick-ember: #5dd5bf;
   --honeydew: #0f1419;
+
+  /* Header & Navigation dark theme tokens */
+  --header-utility-bg: rgba(15, 23, 42, 0.95);
+  --header-utility-border: rgba(255, 255, 255, 0.08);
+  --header-utility-text: #cbd5e1;
+  --header-bg: rgba(15, 23, 42, 0.85);
+  --header-border: rgba(255, 255, 255, 0.08);
+  --nav-text: #f7f4ed;
+  --nav-text-muted: #cbd5e1;
+  --nav-btn-bg: rgba(255, 255, 255, 0.05);
+  --nav-btn-border: rgba(255, 255, 255, 0.12);
+  --nav-btn-hover-border: rgba(45, 212, 191, 0.5);
+  --nav-dropdown-bg: #1e293b;
+  --nav-dropdown-border: rgba(255, 255, 255, 0.12);
 }
 
 @layer base {
@@ -613,11 +641,11 @@ html:not(.light) {
     box-shadow: 0 12px 40px var(--card-hover-shadow);
   }
 
-  html:not(.light) .card {
+  html.dark .card {
     box-shadow: 0 4px 24px var(--shadow-heavy-color);
   }
 
-  html:not(.light) .card:hover {
+  html.dark .card:hover {
     box-shadow: 0 12px 40px var(--shadow-heavy-color);
   }
 
@@ -807,9 +835,9 @@ select:focus-visible {
 }
 
 /* ── Dark mode button text: override text-white on accent-primary buttons ── */
-html:not(.light) a.text-white,
-html:not(.light) button.text-white,
-html:not(.light) [class*="bg-[var(--accent-primary)]"].text-white {
+html.dark a.text-white,
+html.dark button.text-white,
+html.dark [class*="bg-[var(--accent-primary)]"].text-white {
   color: var(--btn-blue-text) !important;
 }
 
@@ -832,11 +860,34 @@ p, li, h1, h2, h3, h4, h5, h6 {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Premium hero + header (redesign)
-   Palette: #0F172A / #1E293B / rgba(15,23,42,.55) / #14B8A6 /
-            #FFFFFF / #CBD5E1 / #94A3B8 / rgba(255,255,255,.08) / #2DD4BF
+   Premium hero + header — theme-aware (light default, dark optional)
+   Light palette: #F6F4EF / #00796B / #1C211F (matches the storefront)
+   Dark palette:  #0F172A / #14B8A6 / #FFFFFF (premium navy)
    ══════════════════════════════════════════════════════════════ */
-:root {
+:root,
+html.light {
+  --hero-bg: #f6f4ef;
+  --hero-bg-secondary: #e9ece8;
+  --hero-card-bg: rgba(255, 255, 255, 0.82);
+  --hero-accent: #00796b;
+  --hero-accent-hover: #005f55;
+  --hero-text: #1c211f;
+  --hero-text-secondary: #4c5753;
+  --hero-text-muted: #6d7772;
+  --hero-border: rgba(0, 0, 0, 0.08);
+  --hero-chip-bg: rgba(0, 0, 0, 0.04);
+  --hero-icon-bg: rgba(0, 0, 0, 0.04);
+  --hero-icon-border: rgba(0, 0, 0, 0.08);
+  --hero-overlay-start: rgba(246, 244, 239, 0.9);
+  --hero-overlay-mid: rgba(246, 244, 239, 0.55);
+  --hero-card-hover-border: rgba(0, 121, 107, 0.5);
+  --hero-card-hover-bg: rgba(255, 255, 255, 0.96);
+  --hero-btn-secondary-border: rgba(0, 0, 0, 0.22);
+  --hero-header-bg: rgba(246, 244, 239, 0.75);
+  --hero-utility-bg: rgba(246, 244, 239, 0.95);
+}
+
+html.dark {
   --hero-bg: #0f172a;
   --hero-bg-secondary: #1e293b;
   --hero-card-bg: rgba(15, 23, 42, 0.55);
@@ -846,8 +897,19 @@ p, li, h1, h2, h3, h4, h5, h6 {
   --hero-text-secondary: #cbd5e1;
   --hero-text-muted: #94a3b8;
   --hero-border: rgba(255, 255, 255, 0.08);
+  --hero-chip-bg: rgba(255, 255, 255, 0.05);
+  --hero-icon-bg: rgba(255, 255, 255, 0.05);
+  --hero-icon-border: rgba(255, 255, 255, 0.1);
+  --hero-overlay-start: rgba(15, 23, 42, 0.92);
+  --hero-overlay-mid: rgba(15, 23, 42, 0.5);
+  --hero-card-hover-border: rgba(45, 212, 191, 0.5);
+  --hero-card-hover-bg: rgba(30, 41, 59, 0.65);
+  --hero-btn-secondary-border: rgba(255, 255, 255, 0.22);
   --hero-header-bg: rgba(15, 23, 42, 0.75);
   --hero-utility-bg: rgba(15, 23, 42, 0.95);
+}
+
+:root {
   /* Combined height of utility bar + main nav so the 100svh hero can
      extend behind the translucent header. The safe-area term keeps the
      hero aligned on notched iOS devices where the utility bar is pushed
@@ -889,8 +951,8 @@ p, li, h1, h2, h3, h4, h5, h6 {
   }
   .hero-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(45, 212, 191, 0.5);
-    background: rgba(30, 41, 59, 0.65);
+    border-color: var(--hero-card-hover-border);
+    background: var(--hero-card-hover-bg);
   }
 
   /* CTA buttons — 16px / 600 per design spec. Colors are re-declared on
@@ -919,7 +981,7 @@ p, li, h1, h2, h3, h4, h5, h6 {
     transform: translateY(-1px);
   }
   .hero-btn-secondary {
-    border: 1px solid rgba(255, 255, 255, 0.22);
+    border: 1px solid var(--hero-btn-secondary-border);
     color: var(--hero-text);
   }
   .hero-btn-secondary:hover {

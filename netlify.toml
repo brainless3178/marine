@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Default site theme ("light" or "dark"). Users can still toggle; choice persists.
+  VITE_DEFAULT_THEME = "light"
 
 # Enable Brotli compression for all assets
 [[headers]]

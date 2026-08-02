@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import i18n from 'i18next'
 import type { Language, CartItem, Product, User, PriceRange } from '../types'
 import { adminAuth, customerAuth, setAdminToken, setCustomerToken } from '../lib/api'
+import { resolveInitialTheme, syncThemeColor } from '../lib/theme'
 
 
 interface AdminUser {
@@ -148,6 +149,11 @@ export const useStore = create<AppState>((set, get) => ({
         document.documentElement.classList.remove('light')
         document.documentElement.classList.add('dark')
       }
+      // Persist so a reload keeps the choice (main.tsx only restores what's stored).
+      try {
+        localStorage.setItem('alka-theme', newTheme)
+      } catch { /* storage unavailable */ }
+      syncThemeColor(newTheme)
       return { theme: newTheme }
     }),
 
@@ -261,8 +267,8 @@ export const useStore = create<AppState>((set, get) => ({
   user: null,
   isSessionLoading: typeof window !== 'undefined' && !!localStorage.getItem('alka-auth'),
 
-  // Sync theme with what the JS in main.tsx already initialized
-  theme: (typeof window !== 'undefined' && document.documentElement.classList.contains('dark')) ? 'dark' : 'light',
+  // Initial theme honors the stored choice; falls back to VITE_DEFAULT_THEME.
+  theme: resolveInitialTheme(),
   showAuthModal: false,
   authError: null,
   login: async (email: string, password: string) => {

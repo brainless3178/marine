@@ -47,24 +47,32 @@ function resolveWidth(size: HeroVideoSize | number): number {
  * - q_auto          → per-frame adaptive quality (biggest byte win)
  * - f_auto          → best container for the requesting browser
  * - vc_auto         → best codec the browser supports (H.264 / HEVC / VP9 / AV1)
- * - adu             → strips the audio track at the CDN (saves ~10–15% bytes)
+ * - ac_none         → strips the audio track at the CDN (saves ~10–15% bytes)
  * - w_<w>,c_limit   → scales to the target width; c_limit never upscales
+ *
+ * NOTE: use `ac_none`, not `adu` — Cloudinary rejects `adu` (404), which
+ * silently killed hero playback (the video's onError fired and fell back to
+ * the poster).
  */
 export function getHeroVideoUrl(size: HeroVideoSize | number = 'desktop'): string {
   const width = resolveWidth(size)
-  return `${VIDEO_BASE}/q_auto,f_auto,vc_auto,adu,w_${width},c_limit/${HERO_VIDEO_PUBLIC_ID}.mp4`
+  return `${VIDEO_BASE}/q_auto,f_auto,vc_auto,ac_none,w_${width},c_limit/${HERO_VIDEO_PUBLIC_ID}.mp4`
 }
 
 /**
  * Adaptive bitrate HLS manifest URL — "automatic streaming optimization".
  *
  * Cloudinary's `sp_auto` streaming profile derives multiple bitrate renditions
- * from the source and `fl_streaming` emits an HLS master playlist. Safari and
- * iOS play HLS natively; other browsers need hls.js. Use `supportsNativeHls()`
- * to decide when to hand this manifest to the `<video>` element.
+ * from the source and returns an HLS master playlist. Safari and iOS play HLS
+ * natively; other browsers need hls.js. Use `supportsNativeHls()` to decide
+ * when to hand this manifest to the `<video>` element.
+ *
+ * NOTE: do NOT add `fl_streaming` back — Cloudinary returns 400 when it's
+ * combined with `sp_auto` on this asset; `sp_auto` alone already emits the
+ * master playlist.
  */
 export function getHeroHlsUrl(): string {
-  return `${VIDEO_BASE}/sp_auto,fl_streaming/${HERO_VIDEO_PUBLIC_ID}.m3u8`
+  return `${VIDEO_BASE}/sp_auto/${HERO_VIDEO_PUBLIC_ID}.m3u8`
 }
 
 /**

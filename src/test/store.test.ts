@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { useStore } from '../store/useStore'
+import { DEFAULT_THEME, resolveInitialTheme } from '../lib/theme'
 import type { Product } from '../types'
 
 // Mock i18next since it's used by the store
@@ -246,6 +247,48 @@ describe('useStore', () => {
       useStore.getState().generateOrderId()
       const orderId = useStore.getState().orderId
       expect(orderId).toMatch(/^AT-ORD-\d{5}$/)
+    })
+  })
+
+  describe('Theme', () => {
+    afterEach(() => {
+      localStorage.removeItem('alka-theme')
+      document.documentElement.classList.remove('light', 'dark')
+    })
+
+    it('resolves the initial theme from localStorage (not the DOM class)', () => {
+      // No stored theme → the env-configured default (VITE_DEFAULT_THEME)
+      localStorage.removeItem('alka-theme')
+      expect(resolveInitialTheme()).toBe(DEFAULT_THEME)
+
+      localStorage.setItem('alka-theme', 'dark')
+      expect(resolveInitialTheme()).toBe('dark')
+
+      localStorage.setItem('alka-theme', 'light')
+      expect(resolveInitialTheme()).toBe('light')
+    })
+
+    it('toggles the theme and updates the <html> class', () => {
+      useStore.setState({ theme: 'light' })
+      document.documentElement.classList.add('light')
+      document.documentElement.classList.remove('dark')
+
+      useStore.getState().toggleTheme()
+
+      expect(useStore.getState().theme).toBe('dark')
+      expect(document.documentElement.classList.contains('dark')).toBe(true)
+      expect(document.documentElement.classList.contains('light')).toBe(false)
+    })
+
+    it('persists the theme choice to localStorage', () => {
+      useStore.setState({ theme: 'light' })
+      localStorage.removeItem('alka-theme')
+
+      useStore.getState().toggleTheme()
+      expect(localStorage.getItem('alka-theme')).toBe('dark')
+
+      useStore.getState().toggleTheme()
+      expect(localStorage.getItem('alka-theme')).toBe('light')
     })
   })
 })

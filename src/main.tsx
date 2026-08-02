@@ -14,17 +14,21 @@ import App from './App.tsx'
 import en from './locales/en.json'
 import ar from './locales/ar.json'
 import es from './locales/es.json'
+import { resolveInitialTheme, syncThemeColor } from './lib/theme'
 
-// Keep the storefront bright by default; buyers can still switch to dark mode.
-const storedTheme = localStorage.getItem('alka-theme')
-if (storedTheme === 'dark') {
+// Apply the saved theme (or the VITE_DEFAULT_THEME env default, light unless
+// configured otherwise). Runs after the inline script in index.html, which
+// already painted the right theme — this keeps store/classes in sync.
+const initialTheme = resolveInitialTheme()
+if (initialTheme === 'dark') {
   document.documentElement.classList.remove('light')
   document.documentElement.classList.add('dark')
-  localStorage.setItem('alka-theme', 'dark')
 } else {
   document.documentElement.classList.add('light')
-  localStorage.setItem('alka-theme', 'light')
+  document.documentElement.classList.remove('dark')
 }
+localStorage.setItem('alka-theme', initialTheme)
+syncThemeColor(initialTheme)
 
 // Detect initial language for RTL support
 const browserLang = navigator.language?.startsWith('ar') ? 'ar' : navigator.language?.startsWith('es') ? 'es' : 'en'
