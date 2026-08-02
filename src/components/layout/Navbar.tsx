@@ -35,7 +35,7 @@ const TRUST_ITEMS = [
 
 /** Shared style for the compact icon buttons in the action cluster. */
 const ICON_BTN =
-  'flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[#CBD5E1] transition-colors hover:border-white/25 hover:text-white focus-visible:outline-2 focus-visible:outline-[#2DD4BF]'
+  'flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--nav-btn-border)] bg-[var(--nav-btn-bg)] text-[var(--nav-text-muted)] transition-colors hover:border-[var(--nav-btn-hover-border)] hover:text-[var(--nav-text)] focus-visible:outline-2 focus-visible:outline-[var(--accent-primary)]'
 
 function BrandLockup() {
   const locale = useLocale()
@@ -49,13 +49,13 @@ function BrandLockup() {
         alt="Alka Traders Logo"
         width={40}
         height={40}
-        className="h-10 w-10 shrink-0 rounded-lg object-cover ring-1 ring-white/10"
+        className="h-10 w-10 shrink-0 rounded-lg object-cover ring-1 ring-[var(--nav-btn-border)]"
       />
       <span className="flex flex-col leading-none">
-        <span className="font-manrope text-lg font-bold tracking-tight text-white sm:text-xl">
+        <span className="font-manrope text-lg font-bold tracking-tight text-[var(--nav-text)] sm:text-xl">
           Alka Traders
         </span>
-        <span className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[2px] text-[#94A3B8] sm:block">
+        <span className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[2px] text-[var(--nav-text-muted)] sm:block">
           Marine & Industrial Equipment
         </span>
       </span>
@@ -119,32 +119,32 @@ export function Navbar() {
   return (
     <div className="site-header">
       {/* ── TOP UTILITY BAR: email/phone · trust indicators ── */}
-      <div className="border-b border-white/5 bg-[var(--hero-utility-bg)] pt-[env(safe-area-inset-top)] text-[#CBD5E1]">
+      <div className="border-b border-[var(--header-utility-border)] bg-[var(--header-utility-bg)] pt-[env(safe-area-inset-top)] text-[var(--header-utility-text)]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
           {/* Desktop / tablet: single 40px row */}
           <div className="hidden h-10 items-center justify-between text-[13px] font-medium sm:flex">
             <div className="flex items-center gap-6">
               <a
                 href={`mailto:${settings.rfqEmail}`}
-                className="utility-link flex items-center gap-1.5 font-medium text-[#CBD5E1] no-underline transition-colors hover:text-white"
+                className="utility-link flex items-center gap-1.5 font-medium text-[var(--header-utility-text)] no-underline transition-colors hover:text-[var(--accent-primary)]"
               >
-                <Mail size={13} className="shrink-0 text-[#14B8A6]" />
+                <Mail size={13} className="shrink-0 text-[var(--accent-primary)]" />
                 {settings.rfqEmail}
               </a>
               <a
                 href={`tel:${settings.phoneNumber}`}
-                className="utility-link flex items-center gap-1.5 font-medium text-[#CBD5E1] no-underline transition-colors hover:text-white"
+                className="utility-link flex items-center gap-1.5 font-medium text-[var(--header-utility-text)] no-underline transition-colors hover:text-[var(--accent-primary)]"
               >
-                <Phone size={13} className="shrink-0 text-[#14B8A6]" />
+                <Phone size={13} className="shrink-0 text-[var(--accent-primary)]" />
                 {settings.phoneNumber}
               </a>
             </div>
             <div className="flex items-center gap-5">
               {TRUST_ITEMS.map((item, i) => (
                 <div key={item.labelKey} className="flex items-center gap-5">
-                  {i > 0 && <span className="h-3.5 w-px bg-white/10" aria-hidden="true" />}
+                  {i > 0 && <span className="h-3.5 w-px bg-[var(--header-utility-border)]" aria-hidden="true" />}
                   <span className="flex items-center gap-1.5 whitespace-nowrap">
-                    <item.icon size={13} className="shrink-0 text-[#14B8A6]" />
+                    <item.icon size={13} className="shrink-0 text-[var(--accent-primary)]" />
                     {t(`topbar.${item.labelKey}`)}
                   </span>
                 </div>
@@ -157,25 +157,25 @@ export function Navbar() {
             <div className="flex items-center gap-4">
               <a
                 href={`mailto:${settings.rfqEmail}`}
-                className="utility-link flex items-center gap-1.5 font-medium text-[#CBD5E1] no-underline transition-colors hover:text-white"
+                className="utility-link flex items-center gap-1.5 font-medium text-[var(--header-utility-text)] no-underline transition-colors hover:text-[var(--accent-primary)]"
               >
-                <Mail size={12} className="shrink-0 text-[#14B8A6]" />
+                <Mail size={12} className="shrink-0 text-[var(--accent-primary)]" />
                 {settings.rfqEmail}
               </a>
               <a
                 href={`tel:${settings.phoneNumber}`}
-                className="utility-link flex items-center gap-1.5 font-medium text-[#CBD5E1] no-underline transition-colors hover:text-white"
+                className="utility-link flex items-center gap-1.5 font-medium text-[var(--header-utility-text)] no-underline transition-colors hover:text-[var(--accent-primary)]"
               >
-                <Phone size={12} className="shrink-0 text-[#14B8A6]" />
+                <Phone size={12} className="shrink-0 text-[var(--accent-primary)]" />
                 {settings.phoneNumber}
               </a>
             </div>
             <div className="flex items-center gap-2.5 text-[11px]">
               {TRUST_ITEMS.map((item, i) => (
                 <span key={item.labelKey} className="flex items-center gap-2.5">
-                  {i > 0 && <span className="text-white/15" aria-hidden="true">•</span>}
+                  {i > 0 && <span className="opacity-40" aria-hidden="true">•</span>}
                   <span className="flex items-center gap-1 whitespace-nowrap">
-                    <item.icon size={12} className="shrink-0 text-[#14B8A6]" />
+                    <item.icon size={12} className="shrink-0 text-[var(--accent-primary)]" />
                     {t(`topbar.${item.labelKey}`)}
                   </span>
                 </span>
@@ -187,8 +187,8 @@ export function Navbar() {
 
       {/* ── MAIN NAVIGATION ── */}
       <nav
-        className={`sticky top-0 z-50 border-b border-white/5 bg-[var(--hero-header-bg)] backdrop-blur-[12px] transition-shadow duration-300 ${
-          scrolled ? 'shadow-[0_16px_40px_rgba(2,6,23,0.45)]' : ''
+        className={`sticky top-0 z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[12px] transition-shadow duration-300 ${
+          scrolled ? 'shadow-[var(--shadow-card)]' : ''
         }`}
       >
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-5 px-4 py-3 sm:px-6">
@@ -206,12 +206,12 @@ export function Navbar() {
                   key={link.path}
                   to={localizedTo}
                   className={`relative text-sm font-semibold no-underline transition-colors ${
-                    isActive ? 'text-[#14B8A6]' : 'text-[#CBD5E1] hover:text-white'
+                    isActive ? 'text-[var(--accent-primary)]' : 'text-[var(--nav-text-muted)] hover:text-[var(--nav-text)]'
                   }`}
                 >
                   {t(`nav.${link.labelKey}`)}
                   {isActive && (
-                    <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 rounded-full bg-[#14B8A6]" aria-hidden="true" />
+                    <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 rounded-full bg-[var(--accent-primary)]" aria-hidden="true" />
                   )}
                 </Link>
               )
@@ -230,7 +230,7 @@ export function Navbar() {
                 <Globe size={16} />
               </button>
               {langOpen && (
-                <div className="absolute right-0 top-full mt-2 w-28 overflow-hidden rounded-xl border border-white/10 bg-[#1E293B] shadow-2xl z-50">
+                <div className="absolute right-0 top-full mt-2 w-28 overflow-hidden rounded-xl border border-[var(--nav-dropdown-border)] bg-[var(--nav-dropdown-bg)] shadow-2xl z-50">
                   {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
@@ -238,12 +238,12 @@ export function Navbar() {
                         navigate(switchLocalePath(pathname, lang.code))
                         setLangOpen(false)
                       }}
-                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-xs font-bold transition-colors hover:bg-white/5 ${
-                        language === lang.code ? 'text-[#14B8A6]' : 'text-[#CBD5E1]'
+                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-xs font-bold transition-colors hover:bg-[var(--surface-soft)] ${
+                        language === lang.code ? 'text-[var(--accent-primary)]' : 'text-[var(--nav-text-muted)]'
                       }`}
                     >
                       {language === lang.code && (
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#14B8A6]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-primary)]" />
                       )}
                       {lang.label}
                     </button>
@@ -262,7 +262,7 @@ export function Navbar() {
             >
               <ShoppingCart size={18} />
               {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#14B8A6] px-1 text-xs font-bold leading-none text-[#0F172A]">
+                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--accent-primary)] px-1 text-xs font-bold leading-none text-[var(--btn-blue-text)]">
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               )}
@@ -282,7 +282,7 @@ export function Navbar() {
             {/* Request Quote (primary CTA) */}
             <Link
               to={localizedPath('/rfq')}
-              className="hidden items-center rounded-lg bg-[#14B8A6] px-5 py-2.5 text-sm font-semibold text-[#0F172A] no-underline transition-colors hover:bg-[#2DD4BF] focus-visible:outline-2 focus-visible:outline-[#2DD4BF] lg:inline-flex"
+              className="hidden items-center rounded-lg bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-semibold text-[var(--btn-blue-text)] no-underline transition-colors hover:bg-[var(--accent-primary-hover)] focus-visible:outline-2 focus-visible:outline-[var(--accent-primary)] lg:inline-flex"
             >
               {t('nav.requestQuote')}
             </Link>
@@ -293,7 +293,7 @@ export function Navbar() {
                 onClick={() => setProfileOpen((v) => !v)}
                 className={`${ICON_BTN} ${
                   isLoggedIn
-                    ? 'border-[#14B8A6]/40 bg-[#14B8A6]/10 text-[#14B8A6] hover:text-[#2DD4BF]'
+                    ? 'border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)]'
                     : ''
                 }`}
                 aria-label="Profile"
@@ -301,31 +301,31 @@ export function Navbar() {
                 <UserCircle2 size={20} />
               </button>
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-xl border border-white/10 bg-[#1E293B] shadow-2xl z-50">
+                <div className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-xl border border-[var(--nav-dropdown-border)] bg-[var(--nav-dropdown-bg)] shadow-2xl z-50">
                   {isLoggedIn ? (
                     <>
-                      <div className="border-b border-white/10 bg-white/5 px-4 py-3">
-                        <p className="truncate text-xs font-bold text-white">{user?.name || 'My Account'}</p>
-                        <p className="mt-0.5 truncate text-[11px] text-[#94A3B8]">{user?.email || ''}</p>
+                      <div className="border-b border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3">
+                        <p className="truncate text-xs font-bold text-[var(--text-primary)]">{user?.name || 'My Account'}</p>
+                        <p className="mt-0.5 truncate text-[11px] text-[var(--text-muted)]">{user?.email || ''}</p>
                       </div>
                       <Link
                         to={localizedPath('/account/profile')}
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[#CBD5E1] no-underline transition-colors hover:bg-white/5 hover:text-white"
+                        className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--nav-text-muted)] no-underline transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--nav-text)]"
                       >
-                        <User size={14} className="text-[#94A3B8]" /> My Profile
+                        <User size={14} className="text-[var(--text-muted)]" /> My Profile
                       </Link>
                       <Link
                         to={localizedPath('/account/orders')}
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[#CBD5E1] no-underline transition-colors hover:bg-white/5 hover:text-white"
+                        className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--nav-text-muted)] no-underline transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--nav-text)]"
                       >
-                        <Package size={14} className="text-[#94A3B8]" /> My Orders
+                        <Package size={14} className="text-[var(--text-muted)]" /> My Orders
                       </Link>
-                      <div className="border-t border-white/10">
+                      <div className="border-t border-[var(--border)]">
                         <button
                           onClick={() => { logout(); setProfileOpen(false) }}
-                          className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[#f87171] transition-colors hover:bg-white/5"
+                          className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--danger)] transition-colors hover:bg-[var(--surface-soft)]"
                         >
                           <LogOut size={14} /> Sign Out
                         </button>
@@ -333,19 +333,19 @@ export function Navbar() {
                     </>
                   ) : (
                     <>
-                      <div className="border-b border-white/10 bg-white/5 px-4 py-3">
-                        <p className="text-xs font-bold text-white">Welcome</p>
-                        <p className="mt-0.5 text-[11px] text-[#94A3B8]">Sign in to access your account</p>
+                      <div className="border-b border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3">
+                        <p className="text-xs font-bold text-[var(--text-primary)]">Welcome</p>
+                        <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">Sign in to access your account</p>
                       </div>
                       <button
                         onClick={() => { setShowAuthModal(true); setProfileOpen(false) }}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-white/5"
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-soft)]"
                       >
-                        <LogIn size={14} className="text-[#14B8A6]" /> Sign In
+                        <LogIn size={14} className="text-[var(--accent-primary)]" /> Sign In
                       </button>
                       <button
                         onClick={() => { setShowAuthModal(true); setProfileOpen(false) }}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[#14B8A6] transition-colors hover:bg-white/5"
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-semibold text-[var(--accent-primary)] transition-colors hover:bg-[var(--surface-soft)]"
                       >
                         <UserCircle2 size={14} /> Create Account
                       </button>
@@ -369,7 +369,7 @@ export function Navbar() {
 
         {/* Mobile menu */}
         <div
-          className={`absolute left-0 right-0 top-full z-50 border-b border-white/10 bg-[rgba(15,23,42,0.98)] px-5 py-4 shadow-2xl backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${
+          className={`absolute left-0 right-0 top-full z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] px-5 py-4 shadow-2xl backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${
             mobileOpen ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
           }`}
           style={{ maxHeight: mobileOpen ? '80vh' : '0', overflow: 'hidden' }}
@@ -383,15 +383,15 @@ export function Navbar() {
                   key={link.path}
                   to={localizedTo}
                   className={`rounded-lg px-3 py-2 text-sm font-bold no-underline transition-colors ${
-                    isActive ? 'bg-white/5 text-[#14B8A6]' : 'text-[#CBD5E1] hover:bg-white/5 hover:text-white'
+                    isActive ? 'bg-[var(--surface-soft)] text-[var(--accent-primary)]' : 'text-[var(--nav-text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--nav-text)]'
                   }`}
                 >
                   {t(`nav.${link.labelKey}`)}
                 </Link>
               )
             })}
-            <div className="mt-1 border-t border-white/10 pt-3">
-              <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
+            <div className="mt-1 border-t border-[var(--border)] pt-3">
+              <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
                 {t('nav.language')}
               </span>
               <div className="flex gap-2">
@@ -401,8 +401,8 @@ export function Navbar() {
                     onClick={() => navigate(switchLocalePath(pathname, lang.code))}
                     className={`rounded-lg border px-3 py-2 text-xs font-bold transition-colors ${
                       language === lang.code
-                        ? 'border-[#14B8A6]/50 bg-[#14B8A6]/10 text-[#14B8A6]'
-                        : 'border-white/10 text-[#CBD5E1] hover:border-white/25'
+                        ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
+                        : 'border-[var(--border)] text-[var(--nav-text-muted)] hover:border-[var(--accent-primary)]'
                     }`}
                   >
                     {lang.label}
@@ -413,41 +413,41 @@ export function Navbar() {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <a
                 href={`https://wa.me/${settings.whatsappNumber}`}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-xs font-bold text-[#CBD5E1] no-underline transition-colors hover:border-white/25 hover:text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3 text-xs font-bold text-[var(--text-primary)] no-underline transition-colors hover:border-[var(--accent-primary)]"
               >
                 <MessageCircle size={14} /> WhatsApp
               </a>
               <a
                 href={`tel:${settings.phoneNumber}`}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-xs font-bold text-[#CBD5E1] no-underline transition-colors hover:border-white/25 hover:text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3 text-xs font-bold text-[var(--text-primary)] no-underline transition-colors hover:border-[var(--accent-primary)]"
               >
                 <Phone size={14} /> Call
               </a>
             </div>
-            <div className="mt-1 border-t border-white/10 pt-3">
+            <div className="mt-1 border-t border-[var(--border)] pt-3">
               {isLoggedIn ? (
                 <div className="flex flex-col gap-1">
-                  <div className="rounded-lg bg-white/5 px-3 py-2">
-                    <p className="truncate text-xs font-bold text-white">{user?.name || 'My Account'}</p>
-                    <p className="truncate text-[11px] text-[#94A3B8]">{user?.email || ''}</p>
+                  <div className="rounded-lg bg-[var(--surface-soft)] px-3 py-2">
+                    <p className="truncate text-xs font-bold text-[var(--text-primary)]">{user?.name || 'My Account'}</p>
+                    <p className="truncate text-[11px] text-[var(--text-muted)]">{user?.email || ''}</p>
                   </div>
                   <Link
                     to={localizedPath('/account/profile')}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[#CBD5E1] no-underline transition-colors hover:bg-white/5 hover:text-white"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[var(--nav-text-muted)] no-underline transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--nav-text)]"
                   >
                     <User size={13} /> My Profile
                   </Link>
                   <Link
                     to={localizedPath('/account/orders')}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[#CBD5E1] no-underline transition-colors hover:bg-white/5 hover:text-white"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[var(--nav-text-muted)] no-underline transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--nav-text)]"
                   >
                     <Package size={13} /> My Orders
                   </Link>
                   <button
                     onClick={() => { logout(); setMobileOpen(false) }}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[#f87171] transition-colors hover:bg-white/5"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[var(--danger)] transition-colors hover:bg-[var(--surface-soft)]"
                   >
                     <LogOut size={13} /> Sign Out
                   </button>
@@ -455,7 +455,7 @@ export function Navbar() {
               ) : (
                 <button
                   onClick={() => { setShowAuthModal(true); setMobileOpen(false) }}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#14B8A6]/40 bg-[#14B8A6]/10 px-4 py-3 text-xs font-bold text-[#14B8A6] transition-colors hover:bg-[#14B8A6]/20"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10 px-4 py-3 text-xs font-bold text-[var(--accent-primary)] transition-colors hover:bg-[var(--accent-primary)]/20"
                 >
                   <UserCircle2 size={15} /> Sign In / Create Account
                 </button>
@@ -464,7 +464,7 @@ export function Navbar() {
             <Link
               to={localizedPath('/rfq')}
               onClick={() => setMobileOpen(false)}
-              className="inline-flex items-center justify-center rounded-lg bg-[#14B8A6] px-5 py-3 text-xs font-bold text-[#0F172A] no-underline transition-colors hover:bg-[#2DD4BF]"
+              className="inline-flex items-center justify-center rounded-lg bg-[var(--accent-primary)] px-5 py-3 text-xs font-bold text-[var(--btn-blue-text)] no-underline transition-colors hover:bg-[var(--accent-primary-hover)]"
             >
               {t('nav.requestQuote')}
             </Link>

@@ -12,13 +12,13 @@ import {
 describe('getHeroVideoUrl', () => {
   it('applies all required transformations for each breakpoint', () => {
     expect(getHeroVideoUrl('mobile')).toBe(
-      'https://res.cloudinary.com/y7up4zti/video/upload/q_auto,f_auto,vc_auto,adu,w_720,c_limit/hero_apy76l.mp4'
+      'https://res.cloudinary.com/y7up4zti/video/upload/q_auto,f_auto,vc_auto,ac_none,w_720,c_limit/hero_apy76l.mp4'
     )
     expect(getHeroVideoUrl('tablet')).toBe(
-      'https://res.cloudinary.com/y7up4zti/video/upload/q_auto,f_auto,vc_auto,adu,w_1280,c_limit/hero_apy76l.mp4'
+      'https://res.cloudinary.com/y7up4zti/video/upload/q_auto,f_auto,vc_auto,ac_none,w_1280,c_limit/hero_apy76l.mp4'
     )
     expect(getHeroVideoUrl('desktop')).toBe(
-      'https://res.cloudinary.com/y7up4zti/video/upload/q_auto,f_auto,vc_auto,adu,w_1920,c_limit/hero_apy76l.mp4'
+      'https://res.cloudinary.com/y7up4zti/video/upload/q_auto,f_auto,vc_auto,ac_none,w_1920,c_limit/hero_apy76l.mp4'
     )
   })
 
@@ -39,9 +39,9 @@ describe('getHeroVideoUrl', () => {
 })
 
 describe('getHeroHlsUrl / supportsNativeHls', () => {
-  it('builds an adaptive HLS manifest with sp_auto + fl_streaming', () => {
+  it('builds an adaptive HLS manifest with sp_auto', () => {
     expect(getHeroHlsUrl()).toBe(
-      'https://res.cloudinary.com/y7up4zti/video/upload/sp_auto,fl_streaming/hero_apy76l.m3u8'
+      'https://res.cloudinary.com/y7up4zti/video/upload/sp_auto/hero_apy76l.m3u8'
     )
   })
 

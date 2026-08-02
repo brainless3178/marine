@@ -146,7 +146,7 @@ export function Hero() {
       {/* Dark overlays: keep the video atmospheric — never the focal point */}
       <div className="absolute inset-0 bg-[var(--hero-bg)]/65" aria-hidden="true" />
       <div
-        className="absolute inset-0 bg-gradient-to-r from-[rgba(15,23,42,0.92)] via-[rgba(15,23,42,0.5)] to-transparent"
+        className="absolute inset-0 bg-gradient-to-r from-[var(--hero-overlay-start)] via-[var(--hero-overlay-mid)] to-transparent"
         aria-hidden="true"
       />
       <div
@@ -158,7 +158,7 @@ export function Hero() {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           {/* ── Left: label, headline, CTAs, trust badges ── */}
           <div className="max-w-2xl lg:col-span-7 backdrop-blur-[2px]">
-            <span className="hero-reveal inline-flex items-center gap-2 rounded-full border border-[var(--hero-border)] bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--hero-text-secondary)]">
+            <span className="hero-reveal inline-flex items-center gap-2 rounded-full border border-[var(--hero-border)] bg-[var(--hero-chip-bg)] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--hero-text-secondary)]">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--hero-accent)]" aria-hidden="true" />
               Marine & Industrial Procurement
             </span>
