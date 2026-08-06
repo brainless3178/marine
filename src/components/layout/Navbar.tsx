@@ -191,7 +191,7 @@ export function Navbar() {
 
       {/* ── MAIN NAVIGATION ── */}
       <nav
-        className={`site-header sticky top-0 z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[12px] transition-shadow duration-300 ${
+        className={`site-header sticky top-0 z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[24px] backdrop-saturate-150 transition-shadow duration-300 ${
           scrolled ? 'shadow-[var(--shadow-card)]' : ''
         }`}
       >
@@ -373,7 +373,7 @@ export function Navbar() {
 
         {/* Mobile menu */}
         <div
-          className={`absolute left-0 right-0 top-full z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] px-5 py-4 shadow-2xl backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${
+          className={`absolute left-0 right-0 top-full z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] px-5 py-4 shadow-2xl backdrop-blur-[24px] backdrop-saturate-150 transition-all duration-300 ease-in-out lg:hidden ${
             mobileOpen ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
           }`}
           style={{ maxHeight: mobileOpen ? '80vh' : '0', overflow: 'hidden' }}

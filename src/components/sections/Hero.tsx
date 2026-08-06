@@ -6,7 +6,6 @@ import {
 import { useHeroVideo } from '@/hooks/useHeroVideo'
 import { getHeroPosterJpgUrl } from '@/lib/cloudinaryVideo'
 import { useLocalizedPath } from '@/lib/locale'
-import { useStore } from '@/store/useStore'
 import { HeroFeatureCard, type HeroFeatureCardProps } from './HeroFeatureCard'
 
 const FEATURE_CARDS: HeroFeatureCardProps[] = [
@@ -74,7 +73,7 @@ const HeroBackground = memo(function HeroBackground({
         sizes="100vw"
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="hero-media absolute inset-0 h-full w-full object-cover"
         fetchPriority="high"
         decoding="async"
         onError={(e) => {
@@ -96,7 +95,7 @@ const HeroBackground = memo(function HeroBackground({
           ref={videoRef}
           data-testid="hero-video"
           src={videoSrc}
-          className={`absolute inset-0 h-full w-full object-cover saturate-[0.85] transition-opacity duration-700 ease-out ${
+          className={`hero-media absolute inset-0 h-full w-full object-cover saturate-[0.85] transition-opacity duration-700 ease-out ${
             isPlaying ? 'opacity-100' : 'opacity-0'
           }`}
           autoPlay
@@ -126,11 +125,6 @@ export function Hero() {
     onVideoError,
   } = useHeroVideo()
   const localizedPath = useLocalizedPath()
-  // The foggy marine footage only suits the dark theme — light mode gets a
-  // clean airy gradient so it never reads as washed-out haze.
-  // (Prerendered HTML is an SEO shell replaced by createRoot, so the theme
-  // read here is always the live client theme — no SSR mismatch.)
-  const showMedia = useStore((s) => s.theme) === 'dark'
 
   return (
     <section
@@ -138,38 +132,32 @@ export function Hero() {
       aria-label="Alka Traders — trusted marine spare parts delivered worldwide"
       className="relative -mt-[var(--hero-header-offset)] min-h-[calc(100vh_+_var(--hero-header-offset))] overflow-hidden bg-[var(--hero-bg)] supports-[height:100svh]:min-h-[calc(100svh_+_var(--hero-header-offset))]"
     >
-      {showMedia ? (
-        <>
-          <HeroBackground
-            posterUrl={posterUrl}
-            posterSrcSet={posterSrcSet}
-            showVideo={showVideo}
-            isPlaying={isPlaying}
-            videoSrc={videoSrc}
-            videoRef={videoRef}
-            onVideoPlaying={onVideoPlaying}
-            onVideoError={onVideoError}
-          />
+      <HeroBackground
+        posterUrl={posterUrl}
+        posterSrcSet={posterSrcSet}
+        showVideo={showVideo}
+        isPlaying={isPlaying}
+        videoSrc={videoSrc}
+        videoRef={videoRef}
+        onVideoPlaying={onVideoPlaying}
+        onVideoError={onVideoError}
+      />
 
-          {/* Dark overlays: keep the video atmospheric — never the focal point */}
-          <div className="absolute inset-0 bg-[var(--hero-bg)]/65" aria-hidden="true" />
-          <div
-            className="absolute inset-0 bg-gradient-to-r from-[var(--hero-overlay-start)] via-[var(--hero-overlay-mid)] to-transparent"
-            aria-hidden="true"
-          />
-          <div
-            className="absolute inset-0 bg-gradient-to-t from-[var(--hero-bg)]/90 via-transparent to-[var(--hero-bg)]/40"
-            aria-hidden="true"
-          />
-        </>
-      ) : (
-        <div className="hero-light-bg absolute inset-0" aria-hidden="true" />
-      )}
+      {/* Minimal overlays — just enough to ensure text readability while
+          letting the hero video/poster remain vibrant and visible.
+          Light: rgba(255,255,255,0.06) / Dark: rgba(0,0,0,0.32) */}
+      <div className="absolute inset-0 bg-black/10 dark:bg-black/32" aria-hidden="true" />
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-[var(--hero-overlay-start)] via-[var(--hero-overlay-mid)] to-transparent"
+        aria-hidden="true" />
+      <div
+        className="absolute inset-0 bg-gradient-to-t from-[var(--hero-bg)]/20 via-transparent to-[var(--hero-bg)]/10"
+        aria-hidden="true" />
 
       <div className="site-container relative z-10 pt-[var(--hero-header-offset)] pb-16 sm:pb-20 lg:pb-24">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           {/* ── Left: label, headline, CTAs, trust badges ── */}
-          <div className="max-w-2xl lg:col-span-7 backdrop-blur-[2px]">
+          <div className="max-w-2xl lg:col-span-7">
             <span className="hero-reveal inline-flex items-center gap-2 rounded-full border border-[var(--hero-border)] bg-[var(--hero-chip-bg)] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--hero-text-secondary)]">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--hero-accent)]" aria-hidden="true" />
               Marine & Industrial Procurement
