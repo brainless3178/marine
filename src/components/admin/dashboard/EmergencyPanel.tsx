@@ -35,7 +35,7 @@ export function EmergencyPanel({ alerts, rfqs }: Props) {
         {emergencyRfqs.slice(0, 5).map((rfq: any) => (
           <div
             key={rfq.id}
-            className="flex items-center justify-between rounded-xl bg-white/60 dark:bg-black/20 px-4 py-2.5"
+            className="flex items-center justify-between rounded-xl bg-white/14 dark:bg-black/20 backdrop-blur-sm px-4 py-2.5"
           >
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-[var(--text-primary)] truncate">
@@ -72,7 +72,7 @@ export function EmergencyPanel({ alerts, rfqs }: Props) {
         {dangerAlerts.slice(0, 3).map((a: any, i: number) => (
           <div
             key={`alert-${i}`}
-            className="flex items-center gap-2 rounded-xl bg-white/60 dark:bg-black/20 px-4 py-2.5"
+            className="flex items-center gap-2 rounded-xl bg-white/14 dark:bg-black/20 backdrop-blur-sm px-4 py-2.5"
           >
             <AlertTriangle size={14} className="text-[var(--danger)] shrink-0" />
             <span className="text-xs text-[var(--text-secondary)] font-medium">

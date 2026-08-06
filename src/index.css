@@ -55,8 +55,8 @@
   --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
   --sidebar-section-label: rgba(255, 255, 255, 0.52);
   --sidebar-section-label-hover: rgba(255, 255, 255, 0.68);
-  --header-glass: rgba(255, 255, 255, 0.92);
-  --header-glass-dark: rgba(17, 24, 39, 0.92);
+  --header-glass: rgba(255, 255, 255, 0.70);
+  --header-glass-dark: rgba(17, 24, 39, 0.70);
   --scrollbar-thumb: rgba(0, 0, 0, 0.12);
   --scrollbar-thumb-hover: rgba(0, 0, 0, 0.20);
   --gold-glow-strong: rgba(123, 99, 55, 0.26);
@@ -207,8 +207,8 @@ html.light {
   --header-utility-bg: rgba(246, 244, 239, 0.95);
   --header-utility-border: rgba(0, 0, 0, 0.08);
   --header-utility-text: #4c5753;
-  --header-bg: rgba(255, 255, 255, 0.92);
-  --header-border: rgba(0, 0, 0, 0.08);
+  --header-bg: rgba(255, 255, 255, 0.70);
+  --header-border: rgba(255, 255, 255, 0.15);
   --nav-text: #1c211f;
   --nav-text-muted: #6d7772;
   --nav-btn-bg: rgba(0, 0, 0, 0.04);
@@ -268,8 +268,8 @@ html.dark {
   --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
   --sidebar-section-label: rgba(255, 255, 255, 0.52);
   --sidebar-section-label-hover: rgba(255, 255, 255, 0.68);
-  --header-glass: rgba(255, 255, 255, 0.88);
-  --header-glass-dark: rgba(15, 20, 25, 0.92);
+  --header-glass: rgba(18, 18, 20, 0.70);
+  --header-glass-dark: rgba(18, 18, 20, 0.70);
   --scrollbar-thumb: rgba(255, 255, 255, 0.12);
   --scrollbar-thumb-hover: rgba(255, 255, 255, 0.20);
   --gold-glow-strong: rgba(201, 178, 123, 0.28);
@@ -325,8 +325,8 @@ html.dark {
   --header-utility-bg: rgba(15, 23, 42, 0.95);
   --header-utility-border: rgba(255, 255, 255, 0.08);
   --header-utility-text: #cbd5e1;
-  --header-bg: rgba(15, 23, 42, 0.85);
-  --header-border: rgba(255, 255, 255, 0.08);
+  --header-bg: rgba(18, 18, 20, 0.70);
+  --header-border: rgba(255, 255, 255, 0.15);
   --nav-text: #f7f4ed;
   --nav-text-muted: #cbd5e1;
   --nav-btn-bg: rgba(255, 255, 255, 0.05);
@@ -743,9 +743,12 @@ html.dark {
 
 /* ── Mobile-first global fixes ──────────────────────────── */
 @media (max-width: 48em) {
-  /* Ensure no horizontal overflow */
+  /* Ensure no horizontal overflow. Use `clip` (not `hidden`) — `overflow-x:
+     hidden` turns html/body into scroll containers, which breaks
+     position: sticky on the nav. `clip` clips without creating a scroll
+     container, so the sticky header keeps working on mobile. */
   html, body {
-    overflow-x: hidden;
+    overflow-x: clip;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -868,55 +871,59 @@ p, li, h1, h2, h3, h4, h5, h6 {
 html.light {
   --hero-bg: #f6f4ef;
   --hero-bg-secondary: #e9ece8;
-  --hero-card-bg: rgba(255, 255, 255, 0.82);
+  --hero-card-bg: rgba(255, 255, 255, 0.14);
   --hero-accent: #00796b;
   --hero-accent-hover: #005f55;
   --hero-text: #1c211f;
   --hero-text-secondary: #4c5753;
   --hero-text-muted: #6d7772;
-  --hero-border: rgba(0, 0, 0, 0.08);
-  --hero-chip-bg: rgba(0, 0, 0, 0.04);
-  --hero-icon-bg: rgba(0, 0, 0, 0.04);
-  --hero-icon-border: rgba(0, 0, 0, 0.08);
-  --hero-overlay-start: rgba(246, 244, 239, 0.9);
-  --hero-overlay-mid: rgba(246, 244, 239, 0.55);
-  --hero-card-hover-border: rgba(0, 121, 107, 0.5);
-  --hero-card-hover-bg: rgba(255, 255, 255, 0.96);
-  --hero-btn-secondary-border: rgba(0, 0, 0, 0.22);
-  --hero-header-bg: rgba(246, 244, 239, 0.75);
+  --hero-border: rgba(255, 255, 255, 0.28);
+  --hero-chip-bg: rgba(255, 255, 255, 0.12);
+  --hero-icon-bg: rgba(255, 255, 255, 0.12);
+  --hero-icon-border: rgba(255, 255, 255, 0.20);
+  --hero-overlay-start: rgba(255, 255, 255, 0.06);
+  --hero-overlay-mid: rgba(255, 255, 255, 0.03);
+  --hero-card-hover-border: rgba(255, 255, 255, 0.42);
+  --hero-card-hover-bg: rgba(255, 255, 255, 0.18);
+  --hero-btn-secondary-border: rgba(255, 255, 255, 0.22);
+  --hero-btn-secondary-bg: rgba(255, 255, 255, 0.08);
+  --hero-btn-secondary-hover-bg: rgba(255, 255, 255, 0.16);
+  --hero-header-bg: rgba(255, 255, 255, 0.70);
   --hero-utility-bg: rgba(246, 244, 239, 0.95);
 }
 
 html.dark {
   --hero-bg: #0f172a;
   --hero-bg-secondary: #1e293b;
-  --hero-card-bg: rgba(15, 23, 42, 0.55);
+  --hero-card-bg: rgba(18, 18, 20, 0.45);
   --hero-accent: #14b8a6;
   --hero-accent-hover: #2dd4bf;
   --hero-text: #ffffff;
   --hero-text-secondary: #cbd5e1;
   --hero-text-muted: #94a3b8;
-  --hero-border: rgba(255, 255, 255, 0.08);
-  --hero-chip-bg: rgba(255, 255, 255, 0.05);
-  --hero-icon-bg: rgba(255, 255, 255, 0.05);
-  --hero-icon-border: rgba(255, 255, 255, 0.1);
-  --hero-overlay-start: rgba(15, 23, 42, 0.92);
-  --hero-overlay-mid: rgba(15, 23, 42, 0.5);
-  --hero-card-hover-border: rgba(45, 212, 191, 0.5);
-  --hero-card-hover-bg: rgba(30, 41, 59, 0.65);
-  --hero-btn-secondary-border: rgba(255, 255, 255, 0.22);
-  --hero-header-bg: rgba(15, 23, 42, 0.75);
+  --hero-border: rgba(255, 255, 255, 0.10);
+  --hero-chip-bg: rgba(255, 255, 255, 0.06);
+  --hero-icon-bg: rgba(255, 255, 255, 0.06);
+  --hero-icon-border: rgba(255, 255, 255, 0.10);
+  --hero-overlay-start: rgba(0, 0, 0, 0.32);
+  --hero-overlay-mid: rgba(0, 0, 0, 0.15);
+  --hero-card-hover-border: rgba(255, 255, 255, 0.15);
+  --hero-card-hover-bg: rgba(25, 25, 28, 0.55);
+  --hero-btn-secondary-border: rgba(255, 255, 255, 0.12);
+  --hero-btn-secondary-bg: rgba(255, 255, 255, 0.05);
+  --hero-btn-secondary-hover-bg: rgba(255, 255, 255, 0.10);
+  --hero-header-bg: rgba(18, 18, 20, 0.70);
   --hero-utility-bg: rgba(15, 23, 42, 0.95);
 }
 
-/* Light-mode hero backdrop: clean, airy gradients instead of the foggy
-   marine footage. The fog/sea video is reserved for the cinematic dark
-   theme — on light it only shows through as washed-out haze. */
-.hero-light-bg {
-  background:
-    radial-gradient(58rem 32rem at 6% 0%, rgba(0, 121, 107, 0.10), transparent 62%),
-    radial-gradient(46rem 28rem at 94% 2%, rgba(123, 99, 55, 0.10), transparent 62%),
-    linear-gradient(180deg, var(--hero-bg) 0%, color-mix(in srgb, var(--hero-bg) 88%, var(--surface-soft) 12%) 100%);
+/* Hero footage: keep it vibrant in both themes. Minimal overlays let the
+   video/poster show through — glass cards and subtle gradients provide
+   depth without washing out the image. */
+html.light .hero-media {
+  filter: saturate(1.1) contrast(1.02);
+}
+html.dark .hero-media {
+  filter: saturate(1.15) brightness(0.95);
 }
 
 :root {
@@ -952,17 +959,27 @@ html.dark {
     animation: heroFadeUp 0.3s ease-out forwards;
   }
 
-  /* Feature card */
+  /* Feature card — premium glassmorphism */
   .hero-card {
     background: var(--hero-card-bg);
     border: 1px solid var(--hero-border);
     border-radius: 16px;
-    transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+  html.dark .hero-card {
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
   }
   .hero-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px) scale(1.02);
     border-color: var(--hero-card-hover-border);
     background: var(--hero-card-hover-bg);
+    box-shadow: 0 14px 45px rgba(0, 0, 0, 0.12);
+  }
+  html.dark .hero-card:hover {
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
   }
 
   /* CTA buttons — 16px / 600 per design spec. Colors are re-declared on
@@ -991,13 +1008,16 @@ html.dark {
     transform: translateY(-1px);
   }
   .hero-btn-secondary {
+    background: var(--hero-btn-secondary-bg);
     border: 1px solid var(--hero-btn-secondary-border);
     color: var(--hero-text);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .hero-btn-secondary:hover {
-    background: var(--hero-text);
+    background: var(--hero-btn-secondary-hover-bg);
     border-color: var(--hero-text);
-    color: var(--hero-bg);
+    color: var(--hero-text);
     transform: translateY(-1px);
   }
 }

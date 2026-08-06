@@ -67,8 +67,7 @@ beforeEach(() => {
   ;(globalThis as unknown as Record<string, unknown>).IntersectionObserver = MockIntersectionObserver
   vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(() => Promise.resolve())
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {})
-  // The foggy poster/video only renders in dark mode — flip the store theme
-  // so the media-layer assertions below exercise the dark hero.
+  // Media layer renders in both themes; pin a stable theme for the assertions.
   useStore.setState({ theme: 'dark' })
 })
 
@@ -149,7 +148,7 @@ describe('Hero', () => {
     expect(screen.getByTestId('hero-poster')).toBeTruthy()
   })
 
-  it('hides the foggy poster/video in light mode and renders a clean gradient', () => {
+  it('keeps the video in light mode with the warm-tint class', () => {
     useStore.setState({ theme: 'light' })
     render(
       <MemoryRouter>
@@ -157,29 +156,33 @@ describe('Hero', () => {
       </MemoryRouter>
     )
 
-    fireIntersect()
-    expect(screen.queryByTestId('hero-poster')).toBeNull()
+    const poster = screen.getByTestId('hero-poster') as HTMLImageElement
+    expect(poster).toBeTruthy()
+    expect(poster.className).toContain('hero-media')
     expect(screen.queryByTestId('hero-video')).toBeNull()
-    expect(document.querySelector('.hero-light-bg')).toBeTruthy()
+
+    fireIntersect()
+
+    const video = screen.getByTestId('hero-video') as HTMLVideoElement
+    expect(video.className).toContain('hero-media')
     // Content still renders in light mode
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Trusted Marine Spare Parts.')
   })
 
-  it('swaps back to the video when toggled to dark mode', () => {
+  it('shows the media layer in both light and dark themes', () => {
+    useStore.setState({ theme: 'light' })
     render(
       <MemoryRouter>
         <Hero />
       </MemoryRouter>
     )
-    expect(screen.getByTestId('hero-poster')).toBeTruthy()
-    expect(document.querySelector('.hero-light-bg')).toBeNull()
+    fireIntersect()
 
-    act(() => useStore.setState({ theme: 'light' }))
-    expect(screen.queryByTestId('hero-poster')).toBeNull()
-    expect(document.querySelector('.hero-light-bg')).toBeTruthy()
+    expect(screen.getByTestId('hero-poster')).toBeTruthy()
+    expect(screen.getByTestId('hero-video')).toBeTruthy()
 
     act(() => useStore.setState({ theme: 'dark' }))
     expect(screen.getByTestId('hero-poster')).toBeTruthy()
-    expect(document.querySelector('.hero-light-bg')).toBeNull()
+    expect(screen.getByTestId('hero-video')).toBeTruthy()
   })
 })
