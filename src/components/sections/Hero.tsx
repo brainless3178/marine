@@ -6,6 +6,7 @@ import {
 import { useHeroVideo } from '@/hooks/useHeroVideo'
 import { getHeroPosterJpgUrl } from '@/lib/cloudinaryVideo'
 import { useLocalizedPath } from '@/lib/locale'
+import { useStore } from '@/store/useStore'
 import { HeroFeatureCard, type HeroFeatureCardProps } from './HeroFeatureCard'
 
 const FEATURE_CARDS: HeroFeatureCardProps[] = [
@@ -125,6 +126,11 @@ export function Hero() {
     onVideoError,
   } = useHeroVideo()
   const localizedPath = useLocalizedPath()
+  // The foggy marine footage only suits the dark theme — light mode gets a
+  // clean airy gradient so it never reads as washed-out haze.
+  // (Prerendered HTML is an SEO shell replaced by createRoot, so the theme
+  // read here is always the live client theme — no SSR mismatch.)
+  const showMedia = useStore((s) => s.theme) === 'dark'
 
   return (
     <section
@@ -132,27 +138,33 @@ export function Hero() {
       aria-label="Alka Traders — trusted marine spare parts delivered worldwide"
       className="relative -mt-[var(--hero-header-offset)] min-h-[calc(100vh_+_var(--hero-header-offset))] overflow-hidden bg-[var(--hero-bg)] supports-[height:100svh]:min-h-[calc(100svh_+_var(--hero-header-offset))]"
     >
-      <HeroBackground
-        posterUrl={posterUrl}
-        posterSrcSet={posterSrcSet}
-        showVideo={showVideo}
-        isPlaying={isPlaying}
-        videoSrc={videoSrc}
-        videoRef={videoRef}
-        onVideoPlaying={onVideoPlaying}
-        onVideoError={onVideoError}
-      />
+      {showMedia ? (
+        <>
+          <HeroBackground
+            posterUrl={posterUrl}
+            posterSrcSet={posterSrcSet}
+            showVideo={showVideo}
+            isPlaying={isPlaying}
+            videoSrc={videoSrc}
+            videoRef={videoRef}
+            onVideoPlaying={onVideoPlaying}
+            onVideoError={onVideoError}
+          />
 
-      {/* Dark overlays: keep the video atmospheric — never the focal point */}
-      <div className="absolute inset-0 bg-[var(--hero-bg)]/65" aria-hidden="true" />
-      <div
-        className="absolute inset-0 bg-gradient-to-r from-[var(--hero-overlay-start)] via-[var(--hero-overlay-mid)] to-transparent"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-[var(--hero-bg)]/90 via-transparent to-[var(--hero-bg)]/40"
-        aria-hidden="true"
-      />
+          {/* Dark overlays: keep the video atmospheric — never the focal point */}
+          <div className="absolute inset-0 bg-[var(--hero-bg)]/65" aria-hidden="true" />
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-[var(--hero-overlay-start)] via-[var(--hero-overlay-mid)] to-transparent"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-[var(--hero-bg)]/90 via-transparent to-[var(--hero-bg)]/40"
+            aria-hidden="true"
+          />
+        </>
+      ) : (
+        <div className="hero-light-bg absolute inset-0" aria-hidden="true" />
+      )}
 
       <div className="site-container relative z-10 pt-[var(--hero-header-offset)] pb-16 sm:pb-20 lg:pb-24">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">

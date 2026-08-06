@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Hero } from '../components/sections/Hero'
+import { useStore } from '../store/useStore'
 
 // ─── mocks ────────────────────────────────────────────────────────────────
 
@@ -66,6 +67,9 @@ beforeEach(() => {
   ;(globalThis as unknown as Record<string, unknown>).IntersectionObserver = MockIntersectionObserver
   vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(() => Promise.resolve())
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {})
+  // The foggy poster/video only renders in dark mode — flip the store theme
+  // so the media-layer assertions below exercise the dark hero.
+  useStore.setState({ theme: 'dark' })
 })
 
 afterEach(() => {
@@ -143,5 +147,39 @@ describe('Hero', () => {
     fireIntersect()
     expect(screen.queryByTestId('hero-video')).toBeNull()
     expect(screen.getByTestId('hero-poster')).toBeTruthy()
+  })
+
+  it('hides the foggy poster/video in light mode and renders a clean gradient', () => {
+    useStore.setState({ theme: 'light' })
+    render(
+      <MemoryRouter>
+        <Hero />
+      </MemoryRouter>
+    )
+
+    fireIntersect()
+    expect(screen.queryByTestId('hero-poster')).toBeNull()
+    expect(screen.queryByTestId('hero-video')).toBeNull()
+    expect(document.querySelector('.hero-light-bg')).toBeTruthy()
+    // Content still renders in light mode
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Trusted Marine Spare Parts.')
+  })
+
+  it('swaps back to the video when toggled to dark mode', () => {
+    render(
+      <MemoryRouter>
+        <Hero />
+      </MemoryRouter>
+    )
+    expect(screen.getByTestId('hero-poster')).toBeTruthy()
+    expect(document.querySelector('.hero-light-bg')).toBeNull()
+
+    act(() => useStore.setState({ theme: 'light' }))
+    expect(screen.queryByTestId('hero-poster')).toBeNull()
+    expect(document.querySelector('.hero-light-bg')).toBeTruthy()
+
+    act(() => useStore.setState({ theme: 'dark' }))
+    expect(screen.getByTestId('hero-poster')).toBeTruthy()
+    expect(document.querySelector('.hero-light-bg')).toBeNull()
   })
 })
