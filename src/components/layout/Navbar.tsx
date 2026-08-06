@@ -116,8 +116,12 @@ export function Navbar() {
     return () => document.removeEventListener('click', handleClick)
   }, [])
 
+  // NOTE: this returns a fragment (not a wrapping div) on purpose. The
+  // <nav> must be a DIRECT child of the page layout's full-height container
+  // so position:sticky is constrained to the whole page, not to a short
+  // header wrapper — otherwise the nav scrolls out of view after ~100px.
   return (
-    <div className="site-header">
+    <>
       {/* ── TOP UTILITY BAR: email/phone · trust indicators ── */}
       <div className="border-b border-[var(--header-utility-border)] bg-[var(--header-utility-bg)] pt-[env(safe-area-inset-top)] text-[var(--header-utility-text)]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
@@ -187,7 +191,7 @@ export function Navbar() {
 
       {/* ── MAIN NAVIGATION ── */}
       <nav
-        className={`sticky top-0 z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[12px] transition-shadow duration-300 ${
+        className={`site-header sticky top-0 z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[12px] transition-shadow duration-300 ${
           scrolled ? 'shadow-[var(--shadow-card)]' : ''
         }`}
       >
@@ -471,6 +475,6 @@ export function Navbar() {
           </div>
         </div>
       </nav>
-    </div>
+    </>
   )
 }

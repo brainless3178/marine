@@ -909,6 +909,16 @@ html.dark {
   --hero-utility-bg: rgba(15, 23, 42, 0.95);
 }
 
+/* Light-mode hero backdrop: clean, airy gradients instead of the foggy
+   marine footage. The fog/sea video is reserved for the cinematic dark
+   theme — on light it only shows through as washed-out haze. */
+.hero-light-bg {
+  background:
+    radial-gradient(58rem 32rem at 6% 0%, rgba(0, 121, 107, 0.10), transparent 62%),
+    radial-gradient(46rem 28rem at 94% 2%, rgba(123, 99, 55, 0.10), transparent 62%),
+    linear-gradient(180deg, var(--hero-bg) 0%, color-mix(in srgb, var(--hero-bg) 88%, var(--surface-soft) 12%) 100%);
+}
+
 :root {
   /* Combined height of utility bar + main nav so the 100svh hero can
      extend behind the translucent header. The safe-area term keeps the
