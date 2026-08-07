@@ -155,7 +155,10 @@ export function Hero() {
         aria-hidden="true" />
 
       <div className="site-container relative z-10 pt-[var(--hero-header-offset)] pb-16 sm:pb-20 lg:pb-24">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+        {/* Explicit grid-cols-1 on mobile: without it the implicit `auto`
+            column sizes to the widest item's max-content (~672px), pushing
+            the headline past the viewport edge and clipping it at small widths. */}
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
           {/* ── Left: label, headline, CTAs, trust badges ── */}
           <div className="max-w-2xl lg:col-span-7">
             <span className="hero-reveal inline-flex items-center gap-2 rounded-full border border-[var(--hero-border)] bg-[var(--hero-chip-bg)] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--hero-text-secondary)]">

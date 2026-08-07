@@ -135,3 +135,7 @@ export type ListResponse<T> = SharedListResponse<T>
 export type ProductListResponse = SharedProductListResponse & {
   products: Product[]
 }
+
+/** Filter-option payload returned alongside the storefront product list
+ * (full-catalog counts for the sidebar). */
+export type ProductListFilters = NonNullable<SharedProductListResponse['filters']>

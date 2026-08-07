@@ -7,9 +7,9 @@ export interface ProductFilters {
   availability?: string
   condition?: string
   brandId?: string
-  brand?: string
+  brand?: string | string[]
   categoryId?: string
-  category?: string
+  category?: string | string[]
   industry?: string
   search?: string
   onSale?: boolean
@@ -63,8 +63,14 @@ export async function listStorefrontProducts(params: ProductFilters) {
   const { page, limit, skip } = paginationParams(params.page, params.limit)
 
   const where: any = { status: 'published' }
-  if (params.category) where.category = { slug: params.category }
-  if (params.brand) where.brand = { slug: params.brand }
+  if (params.category) {
+    const cats = Array.isArray(params.category) ? params.category : [params.category]
+    where.category = cats.length === 1 ? { slug: cats[0] } : { slug: { in: cats } }
+  }
+  if (params.brand) {
+    const brands = Array.isArray(params.brand) ? params.brand : [params.brand]
+    where.brand = brands.length === 1 ? { slug: brands[0] } : { slug: { in: brands } }
+  }
   if (params.industry) where.industries = { some: { industry: { slug: params.industry } } }
   if (params.condition) where.condition = params.condition
   if (params.availability) where.availability = params.availability
@@ -90,6 +96,7 @@ export async function listStorefrontProducts(params: ProductFilters) {
   else if (params.sort === 'price-desc') orderBy = { regularPrice: 'desc' }
   else if (params.sort === 'name-asc') orderBy = { name: 'asc' }
   else if (params.sort === 'name-desc') orderBy = { name: 'desc' }
+  else if (params.sort === 'category') orderBy = { category: { name: 'asc' } }
   else if (params.sort === 'newest') orderBy = { createdAt: 'desc' }
   else if (params.sort === 'oldest') orderBy = { createdAt: 'asc' }
 

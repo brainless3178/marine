@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Hero } from '../components/sections/Hero'
+import { VIDEO_LOAD_DEFER_MS } from '../hooks/useHeroVideo'
 import { useStore } from '../store/useStore'
 
 // ─── mocks ────────────────────────────────────────────────────────────────
@@ -53,10 +54,14 @@ function setConnection(conn: { saveData?: boolean; effectiveType?: string } | un
 }
 
 function fireIntersect() {
-  // The IO callback flips the hook's inView state — wrap in act() so React
-  // flushes the update and mounts the <video> before assertions run.
+  // The IO callback defers the inView flip by VIDEO_LOAD_DEFER_MS (LCP-first
+  // video gating) — fast-forward the timer inside act() so the <video> mounts
+  // before assertions run.
   act(() => {
+    vi.useFakeTimers()
     observerCallback?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver)
+    vi.advanceTimersByTime(VIDEO_LOAD_DEFER_MS + 50)
+    vi.useRealTimers()
   })
 }
 

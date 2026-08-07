@@ -95,12 +95,12 @@ export function AuthModal() {
   useEffect(() => {
     if (showAuthModal) {
       document.addEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
     }
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       if (!document.querySelector('[role="dialog"], [role="alertdialog"]')) {
-        document.body.style.overflow = ''
+        document.documentElement.style.overflow = ''
       }
     }
   }, [showAuthModal, handleKeyDown])

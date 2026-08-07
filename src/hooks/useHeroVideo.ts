@@ -12,6 +12,15 @@ const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 const DESKTOP_QUERY = '(min-width: 1280px)'
 const TABLET_QUERY = '(min-width: 768px)'
 
+/**
+ * How long after the hero enters the viewport we wait before starting the
+ * video fetch. The hero is on screen at page load, so without this the video
+ * (multi-MB at w_720+) competes with the LCP poster + webfonts for the
+ * connection. The poster covers the hero meanwhile, so the fade-in a moment
+ * later is imperceptible — but LCP is measurably faster on real networks.
+ */
+export const VIDEO_LOAD_DEFER_MS = 2000
+
 /** Map the current viewport to the closest hero video size bucket. */
 function getViewportSize(): HeroVideoSize {
   if (typeof window === 'undefined') return 'desktop'
@@ -107,17 +116,30 @@ export function useHeroVideo() {
       setInView(true)
       return
     }
+    let deferTimer: number | undefined
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
-          setInView(true)
+          // Defer the heavy video fetch until LCP resources have won the
+          // connection (see VIDEO_LOAD_DEFER_MS above). If the tab is
+          // backgrounded before the timer fires, skip the load entirely — the
+          // poster covers the hero and the visibilitychange handler can't
+          // pause a video that mounts while hidden.
+          deferTimer = window.setTimeout(() => {
+            if (!document.hidden) setInView(true)
+          }, VIDEO_LOAD_DEFER_MS)
           observer.disconnect()
         }
       },
       { rootMargin: '200px 0px', threshold: 0.05 }
     )
     observer.observe(node)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      // If the component unmounts before the deferred timer fires, cancel it
+      // so the video never mounts after the hero is gone.
+      if (deferTimer !== undefined) window.clearTimeout(deferTimer)
+    }
   }, [])
 
   const videoSrc = shouldLoadVideo ? (USE_NATIVE_HLS ? getHeroHlsUrl() : getHeroVideoUrl(resolvedSize)) : ''

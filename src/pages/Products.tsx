@@ -15,14 +15,20 @@ import { SEO } from '../components/seo/SEO'
 import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
 import type { Product } from '../types'
 
+const SORT_OPTIONS = ['relevance', 'name-asc', 'name-desc', 'category', 'price-asc', 'price-desc'] as const
+type SortOption = (typeof SORT_OPTIONS)[number]
+
+// Every URL query key this page manages — used to strip them all on "Clear all".
+const FILTER_PARAMS = ['search', 'category', 'brand', 'industry', 'priceMin', 'priceMax', 'onSale', 'availability', 'sort', 'page'] as const
+
 export default function Products() {
   const { t } = useTranslation()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const {
     searchQuery, setSearchQuery,
     selectedCategories, setSelectedCategories,
     selectedBrands, setSelectedBrands,
-    setSelectedIndustry,
+    selectedIndustry, setSelectedIndustry,
     priceRange, setPriceRange,
     showOnSale, setShowOnSale,
     urgencyFilter, setUrgencyFilter,
@@ -32,34 +38,90 @@ export default function Products() {
 
   const { handleAddToCart, addedIds } = useAddToCart()
 
-  // React Query caches the product list with deduplication + background refetch
-  const { data: productListData, isLoading } = useProductList()
-
-  const apiProducts: Product[] = useMemo(() => {
-    if (productListData?.products?.length) {
-      return apiProductsToFrontend(productListData.products)
-    }
-    return []
-  }, [productListData])
-
-  const apiLoaded = !isLoading
-
-  const finalProducts: Product[] = useMemo(() => {
-    if (productListData?.products?.length) return apiProducts
-    if (!isLoading) return staticProducts
-    return []
-  }, [apiProducts, productListData, isLoading])
-
-  const { filteredCount } = useProducts(finalProducts)
-  const finalCount = filteredCount
-
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1)
+  // Server-side pagination: the API filters + paginates the published catalog
+  // (limit/page), so it scales past any single-response cap. Multi-selected
+  // categories/brands are sent comma-separated and split on the backend.
   const PAGE_SIZE = 24
-  const totalPages = Math.ceil(finalCount / PAGE_SIZE)
-  const paginatedProducts = finalProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  // Must match the store's default priceRange so the untouched state means "no filter"
+  const DEFAULT_PRICE_MAX = 10000
 
-  useEffect(() => { setCurrentPage(1) }, [searchQuery, selectedCategories, selectedBrands, priceRange, showOnSale, urgencyFilter, sortBy])
+  // The URL is the source of truth for pagination: ?page=N drives the current
+  // page (implicitly 1 when absent), so back/forward and shared deep links
+  // restore the exact page. Filter state stays in the store (it drives the
+  // sidebar, chips, and the API-down fallback) and is hydrated from the URL.
+  const currentPage = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1)
+
+  // Central write helper: updates the URL's query string for filter/page
+  // changes so every state is shareable and back/forward walks the filter
+  // history. `replace` is reserved for transient states (search typing,
+  // out-of-range page normalization) so they don't spam history.
+  const writeParams = useCallback((updater: (p: URLSearchParams) => void, replace = false) => {
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev)
+      updater(p)
+      return p
+    }, { replace })
+  }, [setSearchParams])
+
+  const queryParams = useMemo<Record<string, string>>(() => {
+    const params: Record<string, string> = { limit: String(PAGE_SIZE), page: String(currentPage) }
+    if (searchQuery.trim()) params.search = searchQuery.trim()
+    if (selectedCategories.length > 0) params.category = selectedCategories.join(',')
+    if (selectedBrands.length > 0) params.brand = selectedBrands.join(',')
+    if (selectedIndustry) params.industry = selectedIndustry
+    // A price range equal to the store default {min: 0, max: 10000} means "no
+    // filter" — only send params once a bound actually changes, so the untouched
+    // state never excludes the top of the catalog (which can exceed $10k).
+    if (priceRange.min > 0 || priceRange.max !== DEFAULT_PRICE_MAX) {
+      if (priceRange.min > 0) params.priceMin = String(priceRange.min)
+      if (priceRange.max !== DEFAULT_PRICE_MAX) params.priceMax = String(priceRange.max)
+    }
+    if (showOnSale) params.onSale = 'true'
+    if (urgencyFilter === 'emergency') params.availability = 'emergency'
+    if (sortBy !== 'relevance') params.sort = sortBy
+    return params
+  }, [currentPage, searchQuery, selectedCategories, selectedBrands, selectedIndustry, priceRange, showOnSale, urgencyFilter, sortBy])
+
+  // React Query caches each filter/page combination; keepPreviousData keeps the
+  // previous results visible while the next set loads.
+  const { data: productListData, isLoading } = useProductList(queryParams)
+  const apiOk = !!productListData
+
+  const apiProducts: Product[] = useMemo(
+    () => (productListData?.products?.length ? apiProductsToFrontend(productListData.products) : []),
+    [productListData],
+  )
+  const serverTotal = productListData?.pagination?.total ?? 0
+  const serverTotalPages = Math.max(1, productListData?.pagination?.totalPages ?? 1)
+
+  // Fallback path (API unreachable): filter + paginate the static catalog client-side.
+  // Skipped entirely when the API is up — the server path never reads these values.
+  const { products: staticFiltered, filteredCount: staticFilteredCount } = useProducts(apiOk ? [] : staticProducts)
+  const staticTotalPages = Math.max(1, Math.ceil(staticFilteredCount / PAGE_SIZE))
+  const staticPage = Math.min(currentPage, staticTotalPages)
+  const staticPageProducts = staticFiltered.slice((staticPage - 1) * PAGE_SIZE, staticPage * PAGE_SIZE)
+
+  // Unified view consumed by the render
+  const products = apiOk ? apiProducts : staticPageProducts
+  const initialLoading = isLoading && !productListData
+  // While the very first fetch is in flight, don't surface the static fallback
+  // count (255/17) — pass 0 so the mobile filter header doesn't flash it.
+  const finalCount = initialLoading ? 0 : (apiOk ? serverTotal : staticFilteredCount)
+  const totalPages = apiOk ? serverTotalPages : staticTotalPages
+  const safePage = Math.min(currentPage, totalPages)
+
+  // If the requested page is beyond the last valid page (stale deep link, or a
+  // filter that shrank the result set), normalize the URL to the last page.
+  // `replace` so the correction doesn't add a history entry. Page 1 is omitted
+  // (delete) to keep the canonical URL clean.
+  useEffect(() => {
+    if (apiOk && currentPage > serverTotalPages) {
+      writeParams((p) => {
+        if (serverTotalPages > 1) p.set('page', String(serverTotalPages))
+        else p.delete('page')
+      }, true)
+    }
+  }, [apiOk, currentPage, serverTotalPages, writeParams])
 
   useEffect(() => {
     const el = document.querySelector('main')
@@ -77,49 +139,168 @@ export default function Products() {
   const debouncedSetSearch = useCallback((value: string) => {
     setLocalSearch(value)
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
-    debounceTimerRef.current = setTimeout(() => setSearchQuery(value), 300)
-  }, [setSearchQuery, setLocalSearch])
+    const trimmed = value.trim()
+    debounceTimerRef.current = setTimeout(() => {
+      setSearchQuery(trimmed)
+      // replace: live typing shouldn't create a history entry per keystroke
+      writeParams((p) => {
+        if (trimmed) p.set('search', trimmed)
+        else p.delete('search')
+        p.delete('page')
+      }, true)
+    }, 300)
+  }, [setSearchQuery, setLocalSearch, writeParams])
 
   useEffect(() => () => { if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current) }, [])
 
+  // Hydrate the store from the URL whenever it changes — on first load (deep
+  // links), on back/forward, and after our own writes. Setters only fire when
+  // a value genuinely differs (compare-and-set), so the URL can never fight
+  // the state it just produced.
   useEffect(() => {
-    const catParam = searchParams.get('category')
-    const brandParam = searchParams.get('brand')
-    const searchParam = searchParams.get('search')
-    const industryParam = searchParams.get('industry')
-    if (catParam) setSelectedCategories([catParam])
-    if (brandParam) setSelectedBrands([brandParam])
-    if (searchParam) setSearchQuery(searchParam)
-    if (industryParam) setSelectedIndustry(industryParam)
-    return () => { clearFilters() }
-  }, [searchParams, setSelectedCategories, setSelectedBrands, setSelectedIndustry, setSearchQuery, clearFilters])
+    const sp = searchParams
+    const st = useStore.getState()
+    const nextCategories = (sp.get('category') ?? '').split(',').filter(Boolean)
+    const nextBrands = (sp.get('brand') ?? '').split(',').filter(Boolean)
+    const nextSearch = sp.get('search') ?? ''
+    const nextIndustry = sp.get('industry') ?? ''
+    const nextMin = Math.max(0, parseInt(sp.get('priceMin') ?? '0', 10) || 0)
+    const nextMax = Math.max(nextMin + 1, parseInt(sp.get('priceMax') ?? String(DEFAULT_PRICE_MAX), 10) || DEFAULT_PRICE_MAX)
+    const nextOnSale = sp.get('onSale') === 'true'
+    const nextUrgency = sp.get('availability') === 'emergency' ? 'emergency' : 'all'
+    const rawSort = sp.get('sort') ?? ''
+    const nextSort: SortOption = (SORT_OPTIONS as readonly string[]).includes(rawSort) ? (rawSort as SortOption) : 'relevance'
+
+    if (st.selectedCategories.join(',') !== nextCategories.join(',')) setSelectedCategories(nextCategories)
+    if (st.selectedBrands.join(',') !== nextBrands.join(',')) setSelectedBrands(nextBrands)
+    if (st.searchQuery !== nextSearch) setSearchQuery(nextSearch)
+    if (st.selectedIndustry !== nextIndustry) setSelectedIndustry(nextIndustry)
+    if (st.priceRange.min !== nextMin || st.priceRange.max !== nextMax) setPriceRange({ min: nextMin, max: nextMax })
+    if (st.showOnSale !== nextOnSale) setShowOnSale(nextOnSale)
+    if (st.urgencyFilter !== nextUrgency) setUrgencyFilter(nextUrgency)
+    if (st.sortBy !== nextSort) setSortBy(nextSort)
+  }, [searchParams, setSelectedCategories, setSelectedBrands, setSelectedIndustry, setSearchQuery, setPriceRange, setShowOnSale, setUrgencyFilter, setSortBy])
+
+  // Leaving the page clears the store's filter state so a later visit starts
+  // fresh — the URL (which still holds the filters) re-hydrates on next mount.
+  useEffect(() => () => { clearFilters() }, [clearFilters])
 
   useEffect(() => { setLocalMinPrice(priceRange.min.toString()); setLocalMaxPrice(priceRange.max.toString()) }, [priceRange])
 
+  // ── Filter/page handlers: update the store optimistically AND write the URL ──
   const toggleCategory = (cat: string) => {
-    setSelectedCategories(selectedCategories.includes(cat) ? selectedCategories.filter(c => c !== cat) : [...selectedCategories, cat])
+    const st = useStore.getState()
+    const next = st.selectedCategories.includes(cat)
+      ? st.selectedCategories.filter((c) => c !== cat)
+      : [...st.selectedCategories, cat]
+    setSelectedCategories(next)
+    writeParams((p) => {
+      if (next.length > 0) p.set('category', next.join(','))
+      else p.delete('category')
+      p.delete('page') // a filter change always resets to page 1
+    })
   }
   const toggleBrand = (slug: string) => {
-    setSelectedBrands(selectedBrands.includes(slug) ? selectedBrands.filter(b => b !== slug) : [...selectedBrands, slug])
+    const st = useStore.getState()
+    const next = st.selectedBrands.includes(slug)
+      ? st.selectedBrands.filter((b) => b !== slug)
+      : [...st.selectedBrands, slug]
+    setSelectedBrands(next)
+    writeParams((p) => {
+      if (next.length > 0) p.set('brand', next.join(','))
+      else p.delete('brand')
+      p.delete('page')
+    })
   }
   const applyPriceFilter = () => {
-    const min = parseInt(localMinPrice) || 0
-    const max = parseInt(localMaxPrice) || 0
-    setPriceRange({ min: Math.max(0, min), max: Math.max(max, min + 1) })
+    const min = Math.max(0, parseInt(localMinPrice, 10) || 0)
+    const max = Math.max(parseInt(localMaxPrice, 10) || 0, min + 1)
+    setPriceRange({ min, max })
+    writeParams((p) => {
+      if (min > 0) p.set('priceMin', String(min))
+      else p.delete('priceMin')
+      if (max !== DEFAULT_PRICE_MAX) p.set('priceMax', String(max))
+      else p.delete('priceMax')
+      p.delete('page')
+    })
+  }
+  const handleToggleOnSale = () => {
+    const next = !showOnSale
+    setShowOnSale(next)
+    writeParams((p) => {
+      if (next) p.set('onSale', 'true')
+      else p.delete('onSale')
+      p.delete('page')
+    })
+  }
+  const handleSetUrgency = (next: 'all' | 'emergency') => {
+    setUrgencyFilter(next)
+    writeParams((p) => {
+      if (next === 'emergency') p.set('availability', 'emergency')
+      else p.delete('availability')
+      p.delete('page')
+    })
+  }
+  const handleSortChange = (value: SortOption) => {
+    setSortBy(value)
+    writeParams((p) => {
+      if (value !== 'relevance') p.set('sort', value)
+      else p.delete('sort')
+      p.delete('page')
+    })
+  }
+  const handlePageChange = (page: number) => {
+    writeParams((p) => p.set('page', String(page)))
+  }
+  const handleClearFilters = () => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    clearFilters()
+    setLocalSearch('')
+    writeParams((p) => {
+      for (const key of FILTER_PARAMS) p.delete(key)
+    })
   }
 
-  // Derive categories and brands from loaded products (API or static fallback)
-  const derivedCategories = finalProducts.reduce<{ id: string; name: string; count: number }[]>((acc, p) => {
-    const existing = acc.find(c => c.id === p.category)
-    if (existing) { existing.count++ } else { acc.push({ id: p.category, name: p.category.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), count: 1 }) }
-    return acc
-  }, [])
+  // Sidebar options come from the API's `filters` payload — full-catalog counts
+  // and authoritative slugs (also fixes brand slugs that were previously derived
+  // from display names, e.g. "Bosch Rexroth" → boschrexroth vs the real
+  // bosch-rexroth). The static fallback derives them from the catalog.
+  const apiFilters = productListData?.filters
 
-  const derivedBrands = finalProducts.reduce<{ slug: string; name: string }[]>((acc, p) => {
-    const slug = p.brand.toLowerCase().replace(/\s+/g, '').replace(/\./g, '')
-    if (!acc.find(b => b.slug === slug)) { acc.push({ slug, name: p.brand }) }
-    return acc
+  // Price input bounds: use the API's filters.priceRange when available (it
+  // reflects the real catalog spread, e.g. $85–$12,000 — not the old hard-coded
+  // $1,000 cap); otherwise derive from the static catalog so the fallback path
+  // stays consistent.
+  const staticPriceBounds = useMemo(() => {
+    let min = Infinity
+    let max = 0
+    for (const p of staticProducts) {
+      const price = p.onSale && p.salePrice ? p.salePrice : p.price
+      if (price < min) min = price
+      if (price > max) max = price
+    }
+    return { min: Number.isFinite(min) ? min : 0, max: max || 1000 }
   }, [])
+  const priceBounds = apiOk && apiFilters?.priceRange ? apiFilters.priceRange : staticPriceBounds
+
+  const derivedCategories = useMemo(() => {
+    if (apiOk && apiFilters?.categories?.length) return apiFilters.categories
+    return staticProducts.reduce<{ id: string; name: string; count: number }[]>((acc, p) => {
+      const existing = acc.find((c) => c.id === p.category)
+      if (existing) existing.count++
+      else acc.push({ id: p.category, name: p.category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()), count: 1 })
+      return acc
+    }, [])
+  }, [apiOk, apiFilters])
+
+  const derivedBrands = useMemo(() => {
+    if (apiOk && apiFilters?.brands?.length) return apiFilters.brands.map((b) => ({ slug: b.id, name: b.name }))
+    return staticProducts.reduce<{ slug: string; name: string }[]>((acc, p) => {
+      const slug = p.brand.toLowerCase().replace(/\s+/g, '').replace(/\./g, '')
+      if (!acc.find((b) => b.slug === slug)) acc.push({ slug, name: p.brand })
+      return acc
+    }, [])
+  }, [apiOk, apiFilters])
 
   // Active filter chips
   const hasActiveFilters = searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0 || showOnSale || urgencyFilter === 'emergency'
@@ -144,8 +325,8 @@ export default function Products() {
     description: productsSeoDescription,
     mainEntity: {
       '@type': 'ItemList',
-      numberOfItems: Math.min(paginatedProducts.length, 24),
-      itemListElement: paginatedProducts.slice(0, 24).map((product, index) => ({
+      numberOfItems: Math.min(products.length, 24),
+      itemListElement: products.slice(0, 24).map((product, index) => ({
         '@type': 'ListItem',
         position: index + 1,
         url: `https://alkatraders.co/product/${product.id}`,
@@ -205,11 +386,12 @@ export default function Products() {
               onMinPriceChange={setLocalMinPrice}
               onMaxPriceChange={setLocalMaxPrice}
               onApplyPrice={applyPriceFilter}
+              priceBounds={priceBounds}
               showOnSale={showOnSale}
-              onToggleOnSale={() => setShowOnSale(!showOnSale)}
+              onToggleOnSale={handleToggleOnSale}
               urgencyFilter={urgencyFilter}
-              onSetUrgencyFilter={setUrgencyFilter}
-              onClearFilters={clearFilters}
+              onSetUrgencyFilter={handleSetUrgency}
+              onClearFilters={handleClearFilters}
               showFiltersMobile={showFiltersMobile}
               onToggleMobile={() => setShowFiltersMobile((v) => !v)}
               totalCount={finalCount}
@@ -223,7 +405,7 @@ export default function Products() {
                   {searchQuery && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-primary)] bg-[var(--accent-primary)]/5 text-[var(--accent-primary)]">
                       Search: "{searchQuery}"
-                      <button onClick={() => { setSearchQuery(''); setLocalSearch('') }} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
+                      <button onClick={() => { if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current); setSearchQuery(''); setLocalSearch(''); writeParams((p) => { p.delete('search'); p.delete('page') }) }} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
                     </span>
                   )}
                   {selectedCategories.map((catId) => {
@@ -247,16 +429,16 @@ export default function Products() {
                   {showOnSale && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--danger)] bg-[var(--danger)]/5 text-[var(--danger)]">
                       On Sale
-                      <button onClick={() => setShowOnSale(false)} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
+                      <button onClick={handleToggleOnSale} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
                     </span>
                   )}
                   {urgencyFilter !== 'all' && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--accent-gold)]/30 bg-[var(--accent-gold)]/5 text-[var(--accent-gold)]">
                       Emergency Available
-                      <button onClick={() => setUrgencyFilter('all')} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
+                      <button onClick={() => handleSetUrgency('all')} className="ml-0.5 hover:text-[var(--danger)] transition-colors cursor-pointer bg-transparent border-none p-0 text-inherit font-bold">×</button>
                     </span>
                   )}
-                  <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] transition-colors cursor-pointer">
+                  <button onClick={handleClearFilters} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] transition-colors cursor-pointer">
                     Clear all
                   </button>
                 </div>
@@ -267,7 +449,7 @@ export default function Products() {
                 </span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'relevance' | 'name-asc' | 'name-desc' | 'category' | 'price-asc' | 'price-desc')}
+                  onChange={(e) => handleSortChange(e.target.value as SortOption)}
                   aria-label={t('products.sort')}
                   className="px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] appearance-none cursor-pointer"
                   style={{
@@ -286,20 +468,24 @@ export default function Products() {
                 </select>
               </div>
 
-              {!apiLoaded ? (
+              {initialLoading ? (
                 <ProductGrid products={[]} addedIds={addedIds} onAddToCart={handleAddToCart} isLoading />
               ) : finalCount === 0 ? (
                 <div className="text-center py-20">
                   <p className="text-sm text-[var(--text-muted)]">{t('products.noResults')}</p>
                   <p className="text-xs text-[var(--text-muted)] mt-2">Try removing some filters or search with different keywords.</p>
-                  <button onClick={clearFilters} className="mt-4 text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] bg-transparent border border-[var(--border)] px-4 py-2 rounded-lg cursor-pointer">
+                  <button onClick={handleClearFilters} className="mt-4 text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] bg-transparent border border-[var(--border)] px-4 py-2 rounded-lg cursor-pointer">
                     {t('products.clearFilters')}
                   </button>
                 </div>
+              ) : products.length === 0 ? (
+                // Transient: the fetch for this page returned nothing yet (e.g. the
+                // clamp effect is snapping an out-of-range page back to a valid one)
+                <ProductGrid products={[]} addedIds={addedIds} onAddToCart={handleAddToCart} isLoading />
               ) : (
                 <>
-                  <ProductGrid products={paginatedProducts} addedIds={addedIds} onAddToCart={handleAddToCart} />
-                  <ProductPagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                  <ProductGrid products={products} addedIds={addedIds} onAddToCart={handleAddToCart} />
+                  <ProductPagination currentPage={safePage} totalPages={totalPages} onPageChange={handlePageChange} />
                 </>
               )}
             </main>

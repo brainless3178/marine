@@ -100,6 +100,36 @@
     <link rel="preload" as="image" href="https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/static/alka-traders-logo" />
     <link rel="preload" as="image" href="https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/static/placeholder" />
 
+    <!-- Critical font stylesheet: fetched at Highest priority but applied
+         without blocking first paint (previously a render-blocking CSS
+         @import in index.css that serialized an extra round trip).
+         display=swap means text paints in the fallback face immediately and
+         swaps once the webfonts arrive — an LCP win with zero layout shift
+         risk above the fold. -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
+
+    <!-- Hero LCP poster: start the correct width candidate immediately so the
+         background image is ready when React mounts the <img>. Keep in sync
+         with getHeroPosterUrl()/getHeroPosterSrcSet() in src/lib/cloudinaryVideo.ts. -->
+    <link
+      rel="preload"
+      as="image"
+      href="https://res.cloudinary.com/y7up4zti/video/upload/q_auto:good,w_720,c_limit,so_1/hero_apy76l.webp"
+      imagesrcset="https://res.cloudinary.com/y7up4zti/video/upload/q_auto:good,w_720,c_limit,so_1/hero_apy76l.webp 720w, https://res.cloudinary.com/y7up4zti/video/upload/q_auto:good,w_1280,c_limit,so_1/hero_apy76l.webp 1280w, https://res.cloudinary.com/y7up4zti/video/upload/q_auto:good,w_1920,c_limit,so_1/hero_apy76l.webp 1920w"
+      imagesizes="100vw"
+    />
+
 
   </head>
   <body>

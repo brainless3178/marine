@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react'
-import { useHeroVideo } from '../hooks/useHeroVideo'
+import { useHeroVideo, VIDEO_LOAD_DEFER_MS } from '../hooks/useHeroVideo'
 
 // ─── mocks ────────────────────────────────────────────────────────────────
 
@@ -54,10 +54,14 @@ function setConnection(conn: { saveData?: boolean; effectiveType?: string } | un
 }
 
 function fireIntersect() {
-  // The IO callback triggers setInView(true) — wrap in act() so React flushes
-  // the state update and mounts the <video> before assertions run.
+  // The IO callback defers the inView flip by VIDEO_LOAD_DEFER_MS (so the
+  // heavy video fetch never competes with LCP resources) — fast-forward the
+  // timer inside act() so React mounts the <video> before assertions run.
   act(() => {
+    vi.useFakeTimers()
     observerCallback?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver)
+    vi.advanceTimersByTime(VIDEO_LOAD_DEFER_MS + 50)
+    vi.useRealTimers()
   })
 }
 

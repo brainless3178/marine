@@ -52,7 +52,9 @@ function BrandLockup() {
         className="h-10 w-10 shrink-0 rounded-lg object-cover ring-1 ring-[var(--nav-btn-border)]"
       />
       <span className="flex flex-col leading-none">
-        <span className="font-manrope text-lg font-bold tracking-tight text-[var(--nav-text)] sm:text-xl">
+        {/* Wordmark hidden below sm: the logo alone + 5 icon buttons (48px
+            touch targets) must fit a 320px viewport without overlap. */}
+        <span className="hidden font-manrope text-lg font-bold tracking-tight text-[var(--nav-text)] sm:block sm:text-xl">
           Alka Traders
         </span>
         <span className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[2px] text-[var(--nav-text-muted)] sm:block">
@@ -95,14 +97,18 @@ export function Navbar() {
     setProfileOpen(false)
   }, [pathname])
 
-  // Lock body scroll when the mobile menu is open
+  // Lock page scroll when the mobile menu is open. Lock the <html> element,
+  // NOT <body>: overflow:hidden on body makes body a scroll/clip container,
+  // which breaks position:sticky on the header (it would jump to its natural
+  // position and scroll out of view). Locking html freezes the viewport
+  // without creating a nested scroll container, so the sticky header stays put.
   useEffect(() => {
     if (mobileOpen) {
-      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
-    return () => { document.body.style.overflow = '' }
+    return () => { document.documentElement.style.overflow = '' }
   }, [mobileOpen])
 
   // Close language and profile dropdowns on outside click
@@ -116,38 +122,52 @@ export function Navbar() {
     return () => document.removeEventListener('click', handleClick)
   }, [])
 
-  // NOTE: this returns a fragment (not a wrapping div) on purpose. The
-  // <nav> must be a DIRECT child of the page layout's full-height container
-  // so position:sticky is constrained to the whole page, not to a short
-  // header wrapper — otherwise the nav scrolls out of view after ~100px.
+  // NOTE: this returns ONE sticky <header> wrapper (not a bare nav) on
+  // purpose. The wrapper must be a DIRECT child of the page layout's
+  // full-height container so position:sticky is constrained to the whole
+  // page, not to a short header wrapper — otherwise the header scrolls out
+  // of view after ~100px. The wrapper sticks BOTH the utility bar and the
+  // main nav, so the email/phone/trust texts stay visible while scrolling.
   return (
-    <>
+    <header className="sticky top-0 z-50">
       {/* ── TOP UTILITY BAR: email/phone · trust indicators ── */}
       <div className="border-b border-[var(--header-utility-border)] bg-[var(--header-utility-bg)] pt-[env(safe-area-inset-top)] text-[var(--header-utility-text)]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
           {/* Desktop / tablet: single 40px row */}
           <div className="hidden h-10 items-center justify-between text-[13px] font-medium sm:flex">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 max-[899px]:gap-4">
               <a
                 href={`mailto:${settings.rfqEmail}`}
-                className="utility-link flex items-center gap-1.5 font-medium text-[var(--header-utility-text)] no-underline transition-colors hover:text-[var(--accent-primary)]"
+                className="utility-link flex items-center gap-1.5 font-medium text-[var(--header-utility-text)] no-underline transition-colors hover:text-[var(--accent-primary)] max-[899px]:text-xs"
               >
                 <Mail size={13} className="shrink-0 text-[var(--accent-primary)]" />
                 {settings.rfqEmail}
               </a>
               <a
                 href={`tel:${settings.phoneNumber}`}
-                className="utility-link flex items-center gap-1.5 font-medium text-[var(--header-utility-text)] no-underline transition-colors hover:text-[var(--accent-primary)]"
+                className="utility-link flex items-center gap-1.5 font-medium text-[var(--header-utility-text)] no-underline transition-colors hover:text-[var(--accent-primary)] max-[899px]:text-xs"
               >
                 <Phone size={13} className="shrink-0 text-[var(--accent-primary)]" />
                 {settings.phoneNumber}
               </a>
+              {/* 640-767px is too narrow for the full trust row alongside
+                  email+phone, but the free-shipping promise always fits and
+                  is the headline of this bar — keep it visible at every width. */}
+              <span className="hidden min-[640px]:max-[767px]:flex items-center gap-1.5 text-xs whitespace-nowrap">
+                <Truck size={12} className="shrink-0 text-[var(--accent-primary)]" />
+                {t('topbar.freeShipping')}
+              </span>
             </div>
-            <div className="flex items-center gap-5">
+            {/* Trust items compact from 768px — measured minimum width for the
+                email+phone row alongside all three trust texts is ~700px in
+                every language, so 768px+ fits comfortably. 640-767px keeps
+                email+phone only; phones (<640px) get the trust row in the
+                compact two-line layout instead. */}
+            <div className="hidden min-[768px]:flex items-center gap-5 max-[899px]:gap-1.5">
               {TRUST_ITEMS.map((item, i) => (
-                <div key={item.labelKey} className="flex items-center gap-5">
-                  {i > 0 && <span className="h-3.5 w-px bg-[var(--header-utility-border)]" aria-hidden="true" />}
-                  <span className="flex items-center gap-1.5 whitespace-nowrap">
+                <div key={item.labelKey} className="flex items-center gap-5 max-[899px]:gap-1.5">
+                  {i > 0 && <span className="h-3.5 w-px bg-[var(--header-utility-border)] max-[899px]:hidden" aria-hidden="true" />}
+                  <span className="flex items-center gap-1.5 whitespace-nowrap max-[899px]:text-[11px]">
                     <item.icon size={13} className="shrink-0 text-[var(--accent-primary)]" />
                     {t(`topbar.${item.labelKey}`)}
                   </span>
@@ -174,7 +194,7 @@ export function Navbar() {
                 {settings.phoneNumber}
               </a>
             </div>
-            <div className="flex items-center gap-2.5 text-[11px]">
+            <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[11px]">
               {TRUST_ITEMS.map((item, i) => (
                 <span key={item.labelKey} className="flex items-center gap-2.5">
                   {i > 0 && <span className="opacity-40" aria-hidden="true">•</span>}
@@ -191,8 +211,8 @@ export function Navbar() {
 
       {/* ── MAIN NAVIGATION ── */}
       <nav
-        className={`site-header sticky top-0 z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[24px] backdrop-saturate-150 transition-shadow duration-300 ${
-          scrolled ? 'shadow-[var(--shadow-card)]' : ''
+        className={`site-header relative border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[24px] backdrop-saturate-150 transition-shadow duration-300 ${
+          scrolled ? 'shadow-[0_4px_20px_rgba(0,0,0,0.08)]' : 'shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
         }`}
       >
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-5 px-4 py-3 sm:px-6">
@@ -224,8 +244,9 @@ export function Navbar() {
 
           {/* Right action cluster */}
           <div className="flex items-center gap-2">
-            {/* Language switcher */}
-            <div className="relative" data-lang-switcher>
+            {/* Language switcher (hidden on <380px so the action cluster fits
+                a 320px viewport; still reachable inside the mobile menu) */}
+            <div className="relative max-[380px]:hidden" data-lang-switcher>
               <button
                 onClick={() => setLangOpen((v) => !v)}
                 className={ICON_BTN}
@@ -272,12 +293,15 @@ export function Navbar() {
               )}
             </button>
 
-            {/* WhatsApp */}
+            {/* WhatsApp — hidden below xl: at 1024-1279px the cluster (lang +
+                theme + cart + whatsapp + RFQ CTA + profile) is ~13px wider than
+                the viewport, clipping the profile button (iPad Pro portrait).
+                WhatsApp stays reachable in the mobile menu and utility bar. */}
             <a
               href={`https://wa.me/${settings.whatsappNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              className={`${ICON_BTN} hidden sm:flex`}
+              className={`${ICON_BTN} hidden xl:flex`}
               aria-label={`WhatsApp ${settings.phoneNumber}`}
             >
               <MessageCircle size={18} />
@@ -376,7 +400,16 @@ export function Navbar() {
           className={`absolute left-0 right-0 top-full z-50 border-b border-[var(--header-border)] bg-[var(--header-bg)] px-5 py-4 shadow-2xl backdrop-blur-[24px] backdrop-saturate-150 transition-all duration-300 ease-in-out lg:hidden ${
             mobileOpen ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
           }`}
-          style={{ maxHeight: mobileOpen ? '80vh' : '0', overflow: 'hidden' }}
+          style={{
+            // The menu drops below the FULL sticky header (utility bar + nav),
+            // so keep a comfortable bottom margin and reserve room for the iOS
+            // home indicator — otherwise the last items sit under it.
+            maxHeight: mobileOpen
+              ? 'calc(100dvh - var(--hero-header-offset) - 2.5rem - env(safe-area-inset-bottom, 0px))'
+              : '0',
+            overflowY: mobileOpen ? 'auto' : 'hidden',
+            overscrollBehavior: 'contain',
+          }}
         >
           <div className="mx-auto flex max-w-[1280px] flex-col gap-3">
             {STATIC_NAV_LINKS.map((link) => {
@@ -475,6 +508,6 @@ export function Navbar() {
           </div>
         </div>
       </nav>
-    </>
+    </header>
   )
 }

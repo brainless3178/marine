@@ -16,6 +16,9 @@ interface ProductFiltersProps {
   onMinPriceChange: (v: string) => void
   onMaxPriceChange: (v: string) => void
   onApplyPrice: () => void
+  /** Min/max the inputs should allow — seeded from the API's filters.priceRange
+   * (the real catalog spread) so high-value items are reachable. */
+  priceBounds?: { min: number; max: number }
   // On Sale
   showOnSale: boolean
   onToggleOnSale: () => void
@@ -35,6 +38,7 @@ export function ProductFilters({
   derivedCategories, selectedCategories, onToggleCategory,
   derivedBrands, selectedBrands, onToggleBrand,
   localMinPrice, localMaxPrice, onMinPriceChange, onMaxPriceChange, onApplyPrice,
+  priceBounds = { min: 0, max: 10000 },
   showOnSale, onToggleOnSale,
   urgencyFilter, onSetUrgencyFilter,
   onClearFilters,
@@ -92,7 +96,7 @@ export function ProductFilters({
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                min={0} max={1000}
+                min={priceBounds.min} max={priceBounds.max}
                 value={localMinPrice}
                 onChange={(e) => onMinPriceChange(e.target.value)}
                 onBlur={onApplyPrice}
@@ -103,7 +107,7 @@ export function ProductFilters({
               <span className="text-[var(--text-muted)] text-xs">—</span>
               <input
                 type="number"
-                min={0} max={1000}
+                min={priceBounds.min} max={priceBounds.max}
                 value={localMaxPrice}
                 onChange={(e) => onMaxPriceChange(e.target.value)}
                 onBlur={onApplyPrice}

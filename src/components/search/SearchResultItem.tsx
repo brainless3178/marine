@@ -48,7 +48,7 @@ export function SearchResultItem({ result, isActive, onClick, typeLabel }: Searc
         <div className="text-sm font-medium truncate">{result.title}</div>
         <div className={`text-xs truncate ${isActive ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'}`}>{result.description}</div>
       </div>
-      <span className={`text-xs uppercase tracking-[1px] ${isActive ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'}`}>{typeLabel || result.type}</span>
+      <span className={`flex-shrink-0 whitespace-nowrap text-xs uppercase tracking-[1px] ${isActive ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'}`}>{typeLabel || result.type}</span>
     </button>
   )
 }
