@@ -1,4 +1,7 @@
 import dotenv from 'dotenv'
+import { EventEmitter } from 'events'
+// Increase default max listeners to prevent EventEmitter memory leak warnings
+EventEmitter.prototype.setMaxListeners.call(EventEmitter, 20)
 dotenv.config()
 
 // ─── Logger (imported early so env validation can use it) ──
@@ -23,7 +26,9 @@ if (!process.env.JWT_SECRET) {
 
 const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v])
 if (missingVars.length > 0) {
-  startupLogger.warn({ missingVars }, 'WARNING: Missing environment variables')
+  startupLogger.error({ missingVars }, 'CRITICAL: Missing required environment variables')
+  // Exit early to avoid starting the server in a broken state
+  process.exit(1)
 }
 
 // Warn about missing PayPal config
@@ -112,7 +117,7 @@ import { startEmailQueueProcessor, stopEmailQueueProcessor } from './services/em
 
 // ─── App Setup ─────────────────────────────────────────────────
 const app = express()
-const PORT = parseInt(process.env.PORT || '3001', 10)
+const PORT = parseInt(process.env.PORT || '8080', 10) // Updated fallback port for Hostinger
 
 // ─── Trust Proxy (CRITICAL for Hostinger / any reverse proxy) ──
 // Hostinger runs NGINX in front of Node.js. Without this:
@@ -353,18 +358,28 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
 
 // ─── Start Server ──────────────────────────────────────────────
 async function main() {
-  app.listen(PORT, '0.0.0.0', () => {
+  app.listen(PORT, '0.0.0.0', async () => {
     startupLogger.info({ port: PORT }, 'Server started')
     startupLogger.info(`Health check: http://localhost:${PORT}/api/health`)
 
-    prisma.$connect()
-      .then(() => {
+    // Retry DB connection up to 3 times with exponential backoff
+    const maxAttempts = 3
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await prisma.$connect()
         dbLogger.info('Database connected')
         startEmailQueueProcessor()
-      })
-      .catch((error) => {
-        dbLogger.error({ err: error }, 'Database connection warning')
-      })
+        break // success
+      } catch (error) {
+        dbLogger.error({ err: error, attempt }, 'Database connection attempt failed')
+        if (attempt === maxAttempts) {
+          startupLogger.error('Unable to connect to database after multiple attempts – exiting')
+          process.exit(1)
+        }
+        // wait before next attempt (exponential backoff)
+        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)))
+      }
+    }
   })
 }
 
