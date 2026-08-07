@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test'
 
 // ─── Test Credentials ───────────────────────────────────────────────────────
-const ADMIN_EMAIL = 'admin@alkatraders.com'
+const ADMIN_EMAIL = 'sales@alkatraders.co'
 const ADMIN_PASSWORD = 'admin123'
 
 // ─── Reusable Helpers ───────────────────────────────────────────────────────
@@ -212,7 +212,7 @@ test.describe('Admin Layout', () => {
     const userMenuBtn = page.locator('header button').filter({ has: page.locator('svg.lucide-chevron-down') }).first()
     await userMenuBtn.click()
     await expect(page.locator('text=Sign Out').last()).toBeVisible({ timeout: 3000 })
-    await expect(page.locator('text=admin@alkatraders.com').first()).toBeVisible()
+    await expect(page.locator('text=sales@alkatraders.co').first()).toBeVisible()
     await expect(page.locator('text=Profile Settings').first()).toBeVisible()
     await expect(page.locator('text=Preferences').first()).toBeVisible()
   })

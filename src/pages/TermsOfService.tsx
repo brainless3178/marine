@@ -204,9 +204,9 @@ export default function TermsOfService() {
             <h2 className="font-display text-lg font-bold text-[var(--text-primary)] mb-3">Contact</h2>
             <p className="text-sm leading-relaxed">
               For questions about these terms, contact us at{' '}
-              <a href="mailto:info@alkatraders.com" className="text-[var(--accent-primary)] hover:underline">info@alkatraders.com</a>{' '}
+              <a href="mailto:sales@alkatraders.co" className="text-[var(--accent-primary)] hover:underline">sales@alkatraders.co</a>{' '}
               or call{' '}
-              <a href="tel:+919726900547" className="text-[var(--accent-primary)] hover:underline">+91 97269 00547</a>.
+              <a href="tel:+918799095041" className="text-[var(--accent-primary)] hover:underline">+91 87990 95041</a>.
             </p>
           </section>
         </div>

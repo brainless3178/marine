@@ -2,33 +2,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Hero } from '../components/sections/Hero'
-import { VIDEO_LOAD_DEFER_MS } from '../hooks/useHeroVideo'
-import { useStore } from '../store/useStore'
 
 // ─── mocks ────────────────────────────────────────────────────────────────
 
-let observerCallback: IntersectionObserverCallback | null = null
-
-class MockIntersectionObserver {
-  constructor(callback: IntersectionObserverCallback, _options?: IntersectionObserverInit) {
-    observerCallback = callback
-  }
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-
-/** Configurable window.matchMedia. min-width queries are fixed (desktop/tablet
- *  per jsdom's 1024px viewport); everything else comes from `overrides`. */
+/** Configurable window.matchMedia — everything matches per `overrides`. */
 function installMatchMedia(overrides: Record<string, boolean> = {}) {
   Object.defineProperty(window, 'matchMedia', {
     configurable: true,
     writable: true,
     value: vi.fn((query: string) => {
-      let matches = false
-      if (query === '(min-width: 1280px)') matches = false
-      else if (query === '(min-width: 768px)') matches = true
-      else matches = overrides[query] ?? false
+      const matches = overrides[query] ?? false
       return {
         get matches() {
           return matches
@@ -45,56 +28,31 @@ function installMatchMedia(overrides: Record<string, boolean> = {}) {
   })
 }
 
-function setConnection(conn: { saveData?: boolean; effectiveType?: string } | undefined) {
-  if (conn === undefined) {
-    delete (navigator as unknown as Record<string, unknown>).connection
-  } else {
-    Object.defineProperty(navigator, 'connection', { configurable: true, value: conn })
-  }
-}
-
-function fireIntersect() {
-  // The IO callback defers the inView flip by VIDEO_LOAD_DEFER_MS (LCP-first
-  // video gating) — fast-forward the timer inside act() so the <video> mounts
-  // before assertions run.
-  act(() => {
-    vi.useFakeTimers()
-    observerCallback?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver)
-    vi.advanceTimersByTime(VIDEO_LOAD_DEFER_MS + 50)
-    vi.useRealTimers()
-  })
+function renderHero() {
+  return render(
+    <MemoryRouter>
+      <Hero />
+    </MemoryRouter>
+  )
 }
 
 beforeEach(() => {
-  observerCallback = null
   installMatchMedia()
-  setConnection(undefined)
-  ;(globalThis as unknown as Record<string, unknown>).IntersectionObserver = MockIntersectionObserver
-  vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(() => Promise.resolve())
-  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {})
-  // Media layer renders in both themes; pin a stable theme for the assertions.
-  useStore.setState({ theme: 'dark' })
 })
 
 afterEach(() => {
   vi.restoreAllMocks()
-  delete (globalThis as unknown as Record<string, unknown>).IntersectionObserver
-  setConnection(undefined)
+  vi.useRealTimers()
 })
 
 // ─── tests ─────────────────────────────────────────────────────────────────
 
 describe('Hero', () => {
-  it('renders the headline, CTAs, trust badges, and four feature cards', () => {
-    render(
-      <MemoryRouter>
-        <Hero />
-      </MemoryRouter>
-    )
+  it('renders the headline, CTAs, and trust badges — no video or poster media', () => {
+    renderHero()
 
     const heading = screen.getByRole('heading', { level: 1 })
     expect(heading).toHaveTextContent('Trusted Marine Spare Parts.')
-    expect(heading).toHaveTextContent('Delivered Worldwide.')
 
     expect(screen.getByRole('link', { name: /shop products/i })).toHaveAttribute('href', '/en/shop')
     expect(screen.getByRole('link', { name: /search ship spares/i })).toHaveAttribute(
@@ -103,91 +61,53 @@ describe('Hero', () => {
     )
 
     expect(screen.getByText('Quality Assured')).toBeTruthy()
-    // 'Buyer Arranged Export' appears both as a trust badge and a feature card
-    expect(screen.getAllByText('Buyer Arranged Export').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('Buyer Arranged Export')).toBeTruthy()
 
-    // Four feature cards
-    expect(screen.getAllByRole('article')).toHaveLength(4)
-  })
-
-  it('paints the poster immediately and defers the video until the hero is in view', () => {
-    render(
-      <MemoryRouter>
-        <Hero />
-      </MemoryRouter>
-    )
-
-    expect(screen.getByTestId('hero-poster')).toBeTruthy()
+    // The old hero painted a poster/video background — it must be gone.
+    expect(screen.queryByTestId('hero-poster')).toBeNull()
     expect(screen.queryByTestId('hero-video')).toBeNull()
-
-    fireIntersect()
-
-    const video = screen.getByTestId('hero-video') as HTMLVideoElement
-    // jsdom viewport (1024px) → tablet source
-    expect(video.getAttribute('src')).toContain('w_1280,c_limit')
   })
 
-  it('never loads the video for prefers-reduced-motion users', () => {
+  it('types the first phrase character by character (typewriter effect)', () => {
+    vi.useFakeTimers()
+    renderHero()
+
+    // The caret is rendered immediately, before typing begins.
+    expect(screen.getByRole('heading', { level: 1 }).querySelector('.hero-typewriter-caret')).toBeTruthy()
+
+    const display = screen.getByTestId('typewriter-display')
+    // Before the start delay the typed line is empty.
+    expect(display.textContent).toBe('')
+
+    // Advance past startDelay (400ms) + typing (~55ms/char) — 5 chars in.
+    act(() => {
+      vi.advanceTimersByTime(400 + 55 * 4)
+    })
+    // "Delivered Worldwide." typed 5 characters in.
+    expect(display.textContent).toBe('Deliv')
+
+    // Remaining 15 chars at ~55ms each.
+    act(() => {
+      vi.advanceTimersByTime(55 * 15 + 10)
+    })
+    expect(display.textContent).toBe('Delivered Worldwide.')
+  })
+
+  it('shows the full first phrase immediately for prefers-reduced-motion users', () => {
     installMatchMedia({ '(prefers-reduced-motion: reduce)': true })
-    render(
-      <MemoryRouter>
-        <Hero />
-      </MemoryRouter>
-    )
+    vi.useFakeTimers()
+    renderHero()
 
-    fireIntersect()
-    expect(screen.queryByTestId('hero-video')).toBeNull()
-    expect(screen.getByTestId('hero-poster')).toBeTruthy()
+    // No animation: the full phrase is present even before timers advance.
+    expect(screen.getByTestId('typewriter-display').textContent).toBe('Delivered Worldwide.')
   })
 
-  it('never loads the video when Save-Data is enabled', () => {
-    setConnection({ saveData: true, effectiveType: '4g' })
-    render(
-      <MemoryRouter>
-        <Hero />
-      </MemoryRouter>
-    )
+  it('exposes a stable full-phrase label to screen readers', () => {
+    renderHero()
 
-    fireIntersect()
-    expect(screen.queryByTestId('hero-video')).toBeNull()
-    expect(screen.getByTestId('hero-poster')).toBeTruthy()
-  })
-
-  it('keeps the video in light mode with the warm-tint class', () => {
-    useStore.setState({ theme: 'light' })
-    render(
-      <MemoryRouter>
-        <Hero />
-      </MemoryRouter>
-    )
-
-    const poster = screen.getByTestId('hero-poster') as HTMLImageElement
-    expect(poster).toBeTruthy()
-    expect(poster.className).toContain('hero-media')
-    expect(screen.queryByTestId('hero-video')).toBeNull()
-
-    fireIntersect()
-
-    const video = screen.getByTestId('hero-video') as HTMLVideoElement
-    expect(video.className).toContain('hero-media')
-    // Content still renders in light mode
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Trusted Marine Spare Parts.')
-  })
-
-  it('shows the media layer in both light and dark themes', () => {
-    useStore.setState({ theme: 'light' })
-    render(
-      <MemoryRouter>
-        <Hero />
-      </MemoryRouter>
-    )
-    fireIntersect()
-
-    expect(screen.getByTestId('hero-poster')).toBeTruthy()
-    expect(screen.getByTestId('hero-video')).toBeTruthy()
-
-    act(() => useStore.setState({ theme: 'dark' }))
-    expect(screen.getByTestId('hero-poster')).toBeTruthy()
-    expect(screen.getByTestId('hero-video')).toBeTruthy()
+    // The sr-only span carries the full current phrase regardless of typing state.
+    const srText = document.querySelector('.sr-only')
+    expect(srText).toBeTruthy()
+    expect(srText?.textContent).toContain('Delivered Worldwide.')
   })
 })

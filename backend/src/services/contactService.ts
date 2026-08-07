@@ -45,7 +45,7 @@ export async function submitEmergencyRequest(data: {
       rfqNumber: await generateRfqNumber(),
       fullName: data.name,
       phone: data.phone,
-      email: 'emergency@alkatraders.com',
+      email: 'sales@alkatraders.co',
       productDescription: data.partDescription,
       urgency: 'emergency',
       status: 'new',

@@ -8,11 +8,12 @@ import {
   ShieldCheck,
   Truck,
   RotateCcw,
-  MessageCircle,
   Percent,
   Minus,
   Plus,
+  MessageCircle,
 } from 'lucide-react'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
 import { useStore } from '../store/useStore'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 import { SEO } from '../components/seo/SEO'
@@ -337,7 +338,7 @@ export default function ProductDetail() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-bold px-6 py-2.5 rounded-xl text-xs transition-all hover:bg-[var(--accent-primary-hover)] no-underline"
                 >
-                  <MessageCircle size={14} /> {t('product.inquireWhatsApp')}
+                  <WhatsAppIcon size={14} /> {t('product.inquireWhatsApp')}
                 </a>
               </div>
             )}

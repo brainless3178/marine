@@ -33,7 +33,7 @@ export async function getPublicSettings() {
 
   // Add defaults from env vars
   result['site.companyName'] = result['site.companyName'] || process.env.COMPANY_NAME || 'Alka Traders'
-  result['site.whatsappNumber'] = result['site.whatsappNumber'] || process.env.WHATSAPP_NUMBER || '919726900547'
+  result['site.whatsappNumber'] = result['site.whatsappNumber'] || process.env.WHATSAPP_NUMBER || '918799095041'
   result['checkout.shippingCost'] = result['checkout.shippingCost'] || Number(process.env.DEFAULT_SHIPPING_COST) || 25
   result['checkout.taxRate'] = result['checkout.taxRate'] || Number(process.env.DEFAULT_TAX_RATE) || 0.08
 

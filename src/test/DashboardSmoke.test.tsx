@@ -55,7 +55,7 @@ vi.mock('../hooks/useStoreSettings', () => ({
   useStoreSettings: () => ({
     taxRate: 0.05,
     shippingCost: 25,
-    whatsappNumber: '919726900547',
+    whatsappNumber: '918799095041',
     currency: 'USD',
   }),
 }))

@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Shield, Clock, Globe, MessageCircle, Mail, ChevronDown, Phone, Calendar, Zap, TriangleAlert, Loader2 } from 'lucide-react'
+import { Shield, Clock, Globe, Mail, ChevronDown, Phone, Calendar, Zap, TriangleAlert, Loader2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 import { faqItems } from '../data/testimonials'
 import { countries } from '../data/countries'
 import { storefront } from '../lib/api'
 import { SEO } from '../components/seo/SEO'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
 import type { RFQFormData } from '../types'
 
 const roles = [
@@ -137,7 +138,7 @@ export default function RFQ() {
               {t('rfq.browseProducts')}
             </a>
             <a href={`https://wa.me/${whatsappNumber}`} className="inline-flex items-center gap-2 text-xs font-semibold border border-[var(--success)] text-[var(--success)] px-[18px] py-[10px] hover:bg-[var(--success)]/10 transition-all no-underline rounded-xl">
-              <MessageCircle size={14} /> {t('rfq.whatsappUsNow')}
+              <WhatsAppIcon size={14} /> {t('rfq.whatsappUsNow')}
             </a>
           </div>
         </div>
@@ -418,7 +419,7 @@ export default function RFQ() {
                   </a>
                   <a href={`https://wa.me/${whatsappNumber}`}
                     className="flex items-center justify-center gap-2 text-xs font-semibold border border-[var(--accent-primary)] text-[var(--accent-primary)] px-[18px] py-[10px] mt-3 hover:bg-[var(--accent-primary)]/10 transition-all no-underline rounded-xl">
-                    <MessageCircle size={14} className="text-[var(--success)]" /> {t('contact.whatsapp')}
+                    <WhatsAppIcon size={14} className="text-[var(--success)]" /> {t('contact.whatsapp')}
                   </a>
                 </div>
               </div>

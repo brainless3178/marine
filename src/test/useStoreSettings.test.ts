@@ -37,12 +37,12 @@ describe('useStoreSettings', () => {
     const useStoreSettings = await loadHook()
     const { result } = renderHook(() => useStoreSettings())
 
-    expect(result.current.whatsappNumber).toBe('919726900547')
+    expect(result.current.whatsappNumber).toBe('918799095041')
     expect(result.current.shippingCost).toBe(25)
     expect(result.current.taxRate).toBe(0.08)
-    expect(result.current.rfqEmail).toBe('rfq@alkatraders.com')
-    expect(result.current.emergencyEmail).toBe('emergency@alkatraders.com')
-    expect(result.current.phoneNumber).toBe('+919726900547')
+    expect(result.current.rfqEmail).toBe('sales@alkatraders.co')
+    expect(result.current.emergencyEmail).toBe('sales@alkatraders.co')
+    expect(result.current.phoneNumber).toBe('+918799095041')
   })
 
   it('fetches settings from API on mount', async () => {
@@ -77,7 +77,7 @@ describe('useStoreSettings', () => {
 
     await act(async () => {})
 
-    expect(result.current.whatsappNumber).toBe('919726900547')
+    expect(result.current.whatsappNumber).toBe('918799095041')
     expect(result.current.shippingCost).toBe(25)
   })
 
@@ -89,7 +89,7 @@ describe('useStoreSettings', () => {
 
     await act(async () => {})
 
-    expect(result.current.whatsappNumber).toBe('919726900547')
+    expect(result.current.whatsappNumber).toBe('918799095041')
     expect(result.current.shippingCost).toBe(25)
     expect(result.current.taxRate).toBe(0.08)
   })
@@ -120,8 +120,8 @@ describe('useStoreSettings', () => {
     const { result: result2 } = renderHook(() => useStoreSettings())
 
     // Both instances should get the same default settings
-    expect(result1.current.whatsappNumber).toBe('919726900547')
-    expect(result2.current.whatsappNumber).toBe('919726900547')
+    expect(result1.current.whatsappNumber).toBe('918799095041')
+    expect(result2.current.whatsappNumber).toBe('918799095041')
     expect(result1.current.shippingCost).toBe(result2.current.shippingCost)
   })
 

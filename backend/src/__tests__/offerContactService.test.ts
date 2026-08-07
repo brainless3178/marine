@@ -5,7 +5,7 @@ vi.hoisted(() => {
   process.env.COMPANY_EMAIL = 'info@test.com'
   process.env.FRONTEND_URL = 'http://localhost:5173'
   process.env.ADMIN_EMAIL = 'admin@test.com'
-  process.env.WHATSAPP_NUMBER = '919726900547'
+  process.env.WHATSAPP_NUMBER = '918799095041'
 })
 
 const mockPrisma = {

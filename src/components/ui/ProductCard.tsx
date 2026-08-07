@@ -1,5 +1,6 @@
 import { memo } from 'react'
-import { Check, MessageCircle, PackageCheck, ShoppingCart, Sparkles } from 'lucide-react'
+import { Check, PackageCheck, ShoppingCart, Sparkles } from 'lucide-react'
+import { WhatsAppIcon } from './WhatsAppIcon'
 import { Link } from 'react-router-dom'
 import type { TFunction } from 'i18next'
 import type { Product } from '../../types'
@@ -155,7 +156,7 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
               className="inline-flex min-h-11 w-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--success)] no-underline transition hover:-translate-y-0.5 hover:border-[var(--success)]"
               aria-label={'WhatsApp quote for ' + product.name}
             >
-              <MessageCircle size={17} />
+              <WhatsAppIcon size={17} />
             </a>
           </div>
         </div>

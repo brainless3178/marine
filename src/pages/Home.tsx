@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
-import { Anchor, ArrowRight, Clock, Cog, Droplets, MessageCircle, Package, Search, ShieldCheck, Truck, Wrench, Zap } from 'lucide-react'
+import { Anchor, ArrowRight, Clock, Cog, Droplets, Package, Search, ShieldCheck, Truck, Wrench, Zap } from 'lucide-react'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
 import { useTranslation } from 'react-i18next'
 import { useAddToCart } from '../hooks/useAddToCart'
 import { SEO } from '../components/seo/SEO'
@@ -295,7 +296,7 @@ export default function Home() {
             <p className="text-xs font-black uppercase tracking-[0.22em] text-white/70">Urgent vessel procurement</p>
             <h3 className="mt-3 font-display text-3xl font-bold leading-tight text-white">Need a rare ship spare?</h3>
             <p className="mt-3 text-sm leading-relaxed text-white/70">Send the part number, photo, maker name, vessel details, and delivery port. We will confirm stock or source an alternative.</p>
-            <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--accent-primary)] px-5 py-3 text-xs font-black uppercase tracking-[0.1em] text-[var(--btn-blue-text)] no-underline hover:bg-[var(--accent-primary-hover)] hover:text-[var(--btn-blue-text)]"><MessageCircle size={16} /> WhatsApp RFQ</a>
+            <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--accent-primary)] px-5 py-3 text-xs font-black uppercase tracking-[0.1em] text-[var(--btn-blue-text)] no-underline hover:bg-[var(--accent-primary-hover)] hover:text-[var(--btn-blue-text)]"><WhatsAppIcon size={16} /> WhatsApp RFQ</a>
           </div>
         </div>
       </section>

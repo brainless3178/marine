@@ -1,11 +1,11 @@
 import { escapeHtml } from '../utils/html-escape.js'
 
-const WHATSAPP = process.env.WHATSAPP_NUMBER || '919726900547'
-const COMPANY = process.env.COMPANY_EMAIL || 'info@alkatraders.com'
+const WHATSAPP = process.env.WHATSAPP_NUMBER || '918799095041'
+const COMPANY = process.env.COMPANY_EMAIL || 'sales@alkatraders.co'
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
-const RFQ_EMAIL = process.env.RFQ_EMAIL || 'rfq@alkatraders.com'
-const EMERGENCY_EMAIL = process.env.EMERGENCY_EMAIL || 'emergency@alkatraders.com'
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alkatraders.com'
+const RFQ_EMAIL = process.env.RFQ_EMAIL || 'sales@alkatraders.co'
+const EMERGENCY_EMAIL = process.env.EMERGENCY_EMAIL || 'sales@alkatraders.co'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'sales@alkatraders.co'
 
 // ─── Template Helpers ──────────────────────────────────────────
 

@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MapPin, Clock, Phone, Mail, MessageCircle, Send, Check, Loader2 } from 'lucide-react'
+import { MapPin, Clock, Phone, Mail, Send, Check, Loader2 } from 'lucide-react'
 import { offices } from '../data/testimonials'
 import { storefront } from '../lib/api'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 import { SEO } from '../components/seo/SEO'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
 
 export default function Contact() {
   const { t } = useTranslation()
@@ -103,7 +104,7 @@ export default function Contact() {
               <div className="bg-[var(--secondary-bg)] border border-[var(--border)] p-8 mb-6">
                 <h3 className="text-lg font-semibold mb-4">{t('contact.instantTitle')}</h3>
                 <a href={`https://wa.me/${whatsappNumber}`} className="flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-[var(--success)] font-semibold text-sm border border-[var(--success)] hover:bg-[var(--success)]/10 transition-all no-underline mb-4 rounded-xl">
-                  <MessageCircle size={16} /> {t('contact.whatsapp')}
+                  <WhatsAppIcon size={16} /> {t('contact.whatsapp')}
                 </a>
                 <a href={`mailto:${rfqEmail}`} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] no-underline hover:text-[var(--accent-primary)] mb-3">
                   <Mail size={16} className="text-[var(--accent-primary)]" /> {rfqEmail}

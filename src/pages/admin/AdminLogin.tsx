@@ -73,7 +73,7 @@ export default function AdminLogin() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@alkatraders.com"
+                  placeholder="sales@alkatraders.co"
                   className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/55 transition-all focus:border-[var(--accent-primary)] focus:bg-white/10 "
                 />
               </div>
