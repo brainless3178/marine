@@ -19,9 +19,9 @@ const run = (cmd, cwd = '.') => {
   execSync(cmd, { stdio: 'inherit', cwd: resolve(cwd) })
 }
 
-// 1. Install root dependencies (already done by Hostinger, but ensure prisma is ready)
+// 1. Install backend dependencies
 console.log('\n📦 Step 1: Install backend dependencies...')
-run('npm install --ignore-scripts', 'backend')
+run('npm install --include=dev', 'backend')
 
 // 2. Generate Prisma client
 console.log('\n🔧 Step 2: Generate Prisma client...')
@@ -29,7 +29,7 @@ run('npx prisma generate', 'backend')
 
 // 3. Build the TypeScript backend
 console.log('\n🔨 Step 3: Compile backend TypeScript...')
-run('npx tsc', 'backend')
+run('node ../node_modules/typescript/bin/tsc', 'backend')
 
 // 4. Build the React frontend
 console.log('\n⚛️  Step 4: Build React frontend...')
