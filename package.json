@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "dev": "node ./node_modules/vite/bin/vite.js",
-    "build": "node ./node_modules/typescript/bin/tsc -b && node ./node_modules/vite/bin/vite.js build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs && cd backend && npx prisma generate && npm run build && cd .. && node scripts/copy-frontend.mjs",
-    "build:hostinger": "npm run build",
+    "build": "node ./node_modules/typescript/bin/tsc -b && node ./node_modules/vite/bin/vite.js build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "build:hostinger": "node scripts/hostinger-build.mjs",
+    "start": "node backend/dist/server.js",
     "postinstall": "cd backend && npx prisma generate",
     "typecheck": "node ./node_modules/typescript/bin/tsc -b --noEmit",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
