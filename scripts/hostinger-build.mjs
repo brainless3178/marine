@@ -29,7 +29,7 @@ run('npx prisma generate', 'backend')
 
 // 3. Build the TypeScript backend
 console.log('\n🔨 Step 3: Compile backend TypeScript...')
-run('node ../node_modules/typescript/bin/tsc', 'backend')
+run('npx tsc', 'backend')
 
 // 4. Build the React frontend
 console.log('\n⚛️  Step 4: Build React frontend...')
