@@ -1,6 +1,10 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
+// ─── Logger (imported early so env validation can use it) ──
+import logger, { startupLogger, dbLogger } from './utils/logger.js'
+import { initSentry } from './utils/sentry.js'
+
 // ─── Validate Required Environment Variables ───────────────
 const REQUIRED_ENV_VARS = [
   'JWT_SECRET',
@@ -33,9 +37,6 @@ if (process.env.NODE_ENV === 'production') {
     startupLogger.warn('JWT_SECRET contains insecure keywords. Replace with a strong random secret.')
   }
 }
-
-import logger, { startupLogger, dbLogger } from './utils/logger.js'
-import { initSentry } from './utils/sentry.js'
 
 // Initialize Sentry before anything else
 initSentry()
@@ -109,38 +110,72 @@ import { startEmailQueueProcessor, stopEmailQueueProcessor } from './services/em
 const app = express()
 const PORT = parseInt(process.env.PORT || '3001', 10)
 
-// ─── Security Middleware ───────────────────────────────────────
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", 'https://www.paypal.com', 'https://www.paypalobjects.com'],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-      imgSrc: ["'self'", 'data:', 'https:', 'https://res.cloudinary.com'],
-      connectSrc: ["'self'", 'https://*.paypal.com', 'https://*.paypalobjects.com', 'https://res.cloudinary.com'],
-      frameSrc: ['https://www.paypal.com', 'https://sandbox.paypal.com'],
-      frameAncestors: ["'none'"],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
-      objectSrc: ["'none'"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"],
-      manifestSrc: ["'self'"],
-      upgradeInsecureRequests: [],
-    },
-  },
-  crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: { policy: 'same-origin' },
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true,
-  },
-}))
+// ─── Trust Proxy (CRITICAL for Hostinger / any reverse proxy) ──
+// Hostinger runs NGINX in front of Node.js. Without this:
+// - req.ip returns 127.0.0.1 → rate limiting breaks (all users share one IP)
+// - req.secure returns false → secure cookies won't be set over HTTPS
+// - req.protocol returns 'http' → HSTS and redirects break
+app.set('trust proxy', 1)
 
+// ─── Security Middleware ───────────────────────────────────────
+// In production, the backend serves both the React SPA and the API.
+// Strict CSP only applies to /api routes. For static frontend files,
+// we disable CSP (the React build has its own meta CSP tag if needed).
+app.use((req, res, next) => {
+  // Apply strict CSP only to API routes
+  if (req.path.startsWith('/api')) {
+    return helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", 'https://www.paypal.com', 'https://www.paypalobjects.com'],
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+          imgSrc: ["'self'", 'data:', 'https:', 'https://res.cloudinary.com'],
+          connectSrc: ["'self'", 'https://*.paypal.com', 'https://*.paypalobjects.com', 'https://res.cloudinary.com'],
+          frameSrc: ['https://www.paypal.com', 'https://sandbox.paypal.com'],
+          frameAncestors: ["'none'"],
+          fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+          objectSrc: ["'none'"],
+          baseUri: ["'self'"],
+          formAction: ["'self'"],
+          manifestSrc: ["'self'"],
+          upgradeInsecureRequests: [],
+        },
+      },
+      crossOriginEmbedderPolicy: false,
+      crossOriginOpenerPolicy: { policy: 'same-origin' },
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+      hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true,
+      },
+    })(req, res, next)
+  }
+  // For non-API routes (frontend static files), use relaxed helmet
+  return helmet({
+    contentSecurityPolicy: false, // Let the React SPA handle its own CSP
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  })(req, res, next)
+})
+
+// CORS: In production single-origin setup (Hostinger), frontend and API
+// are on the same origin, so CORS headers are technically not needed.
+// We still configure CORS to allow the specified origin for flexibility
+// (e.g., if a subdomain setup is used later).
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || false,
+  origin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    : false,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Idempotency-Key', 'X-Request-ID'],
@@ -273,6 +308,34 @@ for (const prefix of API_PREFIXES) {
   app.use(`${prefix}/auth/reset-password`, passwordResetLimiter)
   app.use(`${prefix}/auth`, publicLimiter, customerAuthRoutes)
 }
+// ─── Serve React Frontend in Production ───────────────────────
+// After all API routes, serve the React SPA static files.
+// This MUST come before the 404 handler so that frontend routes
+// (e.g., /products, /admin, /about) are served by index.html.
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.resolve('frontend-dist')
+  if (fs.existsSync(frontendPath)) {
+    // Serve static assets (JS, CSS, images) with long cache
+    app.use(express.static(frontendPath, {
+      maxAge: '1y',
+      immutable: true,
+      index: false, // Don't auto-serve index.html for directories
+    }))
+
+    // SPA fallback — any non-API route that doesn't match a static file
+    // gets index.html so React Router can handle client-side routing
+    app.get('*', (req, res) => {
+      // Don't serve index.html for API routes that weren't matched
+      if (req.path.startsWith('/api')) {
+        return sendError(res, 'API endpoint not found', 404)
+      }
+      res.sendFile(path.join(frontendPath, 'index.html'))
+    })
+  } else {
+    startupLogger.warn('frontend-dist/ not found — frontend will not be served')
+  }
+}
+
 // ─── 404 Handler ───────────────────────────────────────────────
 app.use((_req, res) => {
   sendError(res, 'Not found', 404)
