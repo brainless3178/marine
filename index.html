@@ -98,7 +98,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://alka-traders-api.onrender.com" />
     <link rel="preload" as="image" href="https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/static/alka-traders-logo" />
-    <link rel="preload" as="image" href="https://res.cloudinary.com/y7up4zti/image/upload/v1/alka/static/placeholder" />
+    <!-- NOTE: the generic placeholder (used only as an on-demand fallback for
+         products with no image) is intentionally NOT preloaded — it wasted a
+         request and triggered "preloaded but not used" warnings on every page. -->
 
     <!-- Critical font stylesheet: fetched at Highest priority but applied
          without blocking first paint (previously a render-blocking CSS

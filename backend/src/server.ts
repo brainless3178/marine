@@ -117,7 +117,7 @@ app.use(helmet({
       scriptSrc: ["'self'", 'https://www.paypal.com', 'https://www.paypalobjects.com'],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       imgSrc: ["'self'", 'data:', 'https:', 'https://res.cloudinary.com'],
-      connectSrc: ["'self'", 'https://api-m.paypal.com', 'https://www.paypal.com', 'https://res.cloudinary.com'],
+      connectSrc: ["'self'", 'https://*.paypal.com', 'https://*.paypalobjects.com', 'https://res.cloudinary.com'],
       frameSrc: ['https://www.paypal.com', 'https://sandbox.paypal.com'],
       frameAncestors: ["'none'"],
       fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
