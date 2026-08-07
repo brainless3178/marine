@@ -1,0 +1,8 @@
+{
+  "runtime": "node",
+  "nodeVersion": "20",
+  "rootDir": ".",
+  "buildCommand": "npm run build:hostinger",
+  "startCommand": "node backend/dist/backend/src/server.js",
+  "entryFile": "backend/dist/backend/src/server.js"
+}
