@@ -353,7 +353,7 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
 
 // ─── Start Server ──────────────────────────────────────────────
 async function main() {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     startupLogger.info({ port: PORT }, 'Server started')
     startupLogger.info(`Health check: http://localhost:${PORT}/api/health`)
 
