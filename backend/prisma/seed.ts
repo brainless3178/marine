@@ -7,7 +7,7 @@ async function main() {
   console.log('🌱 Seeding database...')
 
   // ─── Create Admin User ─────────────────────────────────────
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@alkatraders.com'
+  const adminEmail = process.env.ADMIN_EMAIL || 'sales@alkatraders.co'
   const adminPassword = process.env.ADMIN_PASSWORD
   if (!adminPassword) {
     console.error('❌ ADMIN_PASSWORD environment variable is required for seeding.')
@@ -230,7 +230,7 @@ async function main() {
 
   // ─── Create Offices ────────────────────────────────────────
   const officeData = [
-    { city: 'BHAVNAGAR', country: 'India', address: 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', timezone: 'Asia/Kolkata', phone: '+91 97269 00547', email: 'info@alkatraders.com', coordinatesLat: 21.7645, coordinatesLng: 72.1519 },
+    { city: 'BHAVNAGAR', country: 'India', address: 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', timezone: 'Asia/Kolkata', phone: '+91 87990 95041', email: 'sales@alkatraders.co', coordinatesLat: 21.7645, coordinatesLng: 72.1519 },
   ]
 
   for (let i = 0; i < officeData.length; i++) {
@@ -242,12 +242,12 @@ async function main() {
   const settings = [
     { key: 'site.companyName', value: 'Alka Traders', category: 'site' },
     { key: 'site.tagline', value: 'Marine and Industrial Equipment', category: 'site' },
-    { key: 'site.email', value: process.env.COMPANY_EMAIL || 'info@alkatraders.com', category: 'site' },
-    { key: 'site.phone', value: process.env.COMPANY_PHONE || '+91 97269 00547', category: 'site' },
-    { key: 'site.whatsappNumber', value: process.env.WHATSAPP_NUMBER || '919726900547', category: 'site' },
+    { key: 'site.email', value: process.env.COMPANY_EMAIL || 'sales@alkatraders.co', category: 'site' },
+    { key: 'site.phone', value: process.env.COMPANY_PHONE || '+91 87990 95041', category: 'site' },
+    { key: 'site.whatsappNumber', value: process.env.WHATSAPP_NUMBER || '918799095041', category: 'site' },
     { key: 'site.currency', value: 'USD', category: 'site' },
-    { key: 'site.rfqEmail', value: process.env.RFQ_EMAIL || 'rfq@alkatraders.com', category: 'site' },
-    { key: 'site.emergencyEmail', value: process.env.EMERGENCY_EMAIL || 'emergency@alkatraders.com', category: 'site' },
+    { key: 'site.rfqEmail', value: process.env.RFQ_EMAIL || 'sales@alkatraders.co', category: 'site' },
+    { key: 'site.emergencyEmail', value: process.env.EMERGENCY_EMAIL || 'sales@alkatraders.co', category: 'site' },
     { key: 'checkout.shippingCost', value: Number(process.env.DEFAULT_SHIPPING_COST) || 25, category: 'checkout' },
     { key: 'checkout.taxRate', value: Number(process.env.DEFAULT_TAX_RATE) || 0.08, category: 'checkout' },
     { key: 'checkout.freeShippingThreshold', value: 500, category: 'checkout' },

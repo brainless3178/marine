@@ -17,7 +17,7 @@ const resend = process.env.RESEND_API_KEY
 
 const emailLog = logger.child({ context: 'email' })
 
-const FROM = process.env.EMAIL_FROM || 'noreply@alkatraders.com'
+const FROM = process.env.EMAIL_FROM || 'sales@alkatraders.co'
 const MAX_EMAIL_ATTEMPTS = 3
 
 // ─── Email Queue ───────────────────────────────────────────────

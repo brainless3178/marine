@@ -7,7 +7,7 @@ vi.hoisted(() => {
   process.env.RFQ_EMAIL = 'rfq@test.com'
   process.env.EMERGENCY_EMAIL = 'emergency@test.com'
   process.env.ADMIN_EMAIL = 'admin@test.com'
-  process.env.WHATSAPP_NUMBER = '919726900547'
+  process.env.WHATSAPP_NUMBER = '918799095041'
 })
 
 const mockPrisma = {

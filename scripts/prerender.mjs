@@ -101,7 +101,7 @@ function orgJsonLd() {
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+919726900547',
+      telephone: '+918799095041',
       contactType: 'sales',
       availableLanguage: ['English', 'Arabic', 'Spanish'],
     },

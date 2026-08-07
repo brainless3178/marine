@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
-  Clock, Globe, Lock, LogIn, LogOut, Mail, Menu, MessageCircle, Package,
+  Clock, Globe, Lock, LogIn, LogOut, Mail, Menu, Package,
   Phone, ShoppingCart, Truck, User, UserCircle2, X,
 } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
 import { ThemeToggle } from '../ui/ThemeToggle'
+import { WhatsAppIcon } from '../ui/WhatsAppIcon'
 import { useLocale, useLocalizedPath, switchLocalePath } from '../../lib/locale'
 import type { Language } from '../../types'
 
@@ -304,7 +305,7 @@ export function Navbar() {
               className={`${ICON_BTN} hidden xl:flex`}
               aria-label={`WhatsApp ${settings.phoneNumber}`}
             >
-              <MessageCircle size={18} />
+              <WhatsAppIcon size={18} />
             </a>
 
             {/* Request Quote (primary CTA) */}
@@ -452,7 +453,7 @@ export function Navbar() {
                 href={`https://wa.me/${settings.whatsappNumber}`}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3 text-xs font-bold text-[var(--text-primary)] no-underline transition-colors hover:border-[var(--accent-primary)]"
               >
-                <MessageCircle size={14} /> WhatsApp
+                <WhatsAppIcon size={14} /> WhatsApp
               </a>
               <a
                 href={`tel:${settings.phoneNumber}`}

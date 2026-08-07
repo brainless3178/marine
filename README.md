@@ -106,7 +106,7 @@ npm run dev
 Visit http://localhost:5173
 
 ### Default Admin Credentials
-- **Email:** admin@alkatraders.com
+- **Email:** sales@alkatraders.co
 - **Password:** *(set during seed via ADMIN_PASSWORD env var)*
 
 ## 📁 Project Structure

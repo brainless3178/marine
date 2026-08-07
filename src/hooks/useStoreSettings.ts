@@ -11,12 +11,12 @@ interface StoreSettings {
 }
 
 const DEFAULTS: StoreSettings = {
-  whatsappNumber: '919726900547',
+  whatsappNumber: '918799095041',
   shippingCost: 25,
   taxRate: 0.08,
-  rfqEmail: 'rfq@alkatraders.com',
-  emergencyEmail: 'emergency@alkatraders.com',
-  phoneNumber: '+919726900547',
+  rfqEmail: 'sales@alkatraders.co',
+  emergencyEmail: 'sales@alkatraders.co',
+  phoneNumber: '+918799095041',
 }
 
 let cachedSettings: StoreSettings = { ...DEFAULTS }

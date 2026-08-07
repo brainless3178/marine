@@ -60,7 +60,7 @@ export interface NotificationPrefs {
 export const defaultSite: SiteConfig = {
   companyName: 'Alka Traders',
   tagline: 'Leading Supplier & Exporter of Used & Unbranded Marine Equipment',
-  email: 'info@alkatraders.com',
+  email: 'sales@alkatraders.co',
   phone: '+971 4 XXX XXXX',
   address: 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA',
   city: 'BHAVNAGAR',
@@ -102,7 +102,7 @@ export const defaultNotifications: NotificationPrefs = {
   newCustomer: false,
   weeklyReport: true,
   monthlyReport: true,
-  reportEmail: 'admin@alkatraders.com',
+  reportEmail: 'sales@alkatraders.co',
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────────

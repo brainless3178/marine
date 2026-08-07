@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, useInView } from 'framer-motion'
-import { Clock, Phone, Mail, MessageCircle, TriangleAlert, Check, Loader2 } from 'lucide-react'
+import { Clock, Phone, Mail, TriangleAlert, Check, Loader2 } from 'lucide-react'
 import { useStoreSettings } from '../hooks/useStoreSettings'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
 import { storefront } from '../lib/api'
 import { SEO } from '../components/seo/SEO'
 
@@ -42,7 +43,7 @@ export default function Emergency() {
           <div className="flex gap-4 justify-center flex-wrap">
             <a href={`https://wa.me/${whatsappNumber}`}
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-danger text-[var(--btn-danger-text)] font-semibold text-sm border border-danger hover:bg-danger hover:border-danger hover:-translate-y-0.5 transition-all shadow-[0_0_20px_var(--danger-border)] rounded-xl">
-              <MessageCircle size={16} /> {t('emergency.ctaWhatsapp')}
+              <WhatsAppIcon size={16} /> {t('emergency.ctaWhatsapp')}
             </a>
             <a href={`tel:${phoneNumber}`}
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-transparent text-danger font-semibold text-sm border border-danger hover:bg-danger/10 hover:-translate-y-0.5 transition-all rounded-xl">
@@ -87,7 +88,7 @@ export default function Emergency() {
               <h3 className="text-base font-semibold mb-4">{t('emergency.emergencyContacts')}</h3>
               <div className="flex flex-col gap-3">
                 {[
-                  { Icon: MessageCircle, href: `https://wa.me/${whatsappNumber}`, label: t('emergency.whatsappLabel'), text: t('emergency.emergencyText') },
+                  { Icon: WhatsAppIcon, href: `https://wa.me/${whatsappNumber}`, label: t('emergency.whatsappLabel'), text: t('emergency.emergencyText') },
                   { Icon: Phone, href: `tel:${phoneNumber}`, label: t('emergency.phoneLabel'), text: phoneNumber },
                   { Icon: Mail, href: `mailto:${emergencyEmail}`, label: t('emergency.emailLabel'), text: emergencyEmail },
                 ].map((item, i) => (

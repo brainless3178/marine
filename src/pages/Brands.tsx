@@ -127,9 +127,6 @@ export default function Brands() {
       {/* Brand Cards Section */}
       <section className="py-16">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <h2 className="font-display font-bold text-section-lg tracking-tight mb-8 text-center">
-            Our Partner Brands
-          </h2>
           <div className="flex gap-2 flex-wrap mb-8 justify-center">
             {filters.map((f) => (
               <button

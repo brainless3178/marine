@@ -385,7 +385,7 @@ async function main() {
   console.log(`   Products to migrate: ${rawProducts.length}`)
 
   // 1. Ensure admin user exists (for created_by/updated_by)
-  const admin = await prisma.adminUser.findFirst({ where: { email: 'admin@alkatraders.com' } })
+  const admin = await prisma.adminUser.findFirst({ where: { email: 'sales@alkatraders.co' } })
   if (!admin) {
     console.error('❌ Admin user not found. Run seed.ts first.')
     process.exit(1)

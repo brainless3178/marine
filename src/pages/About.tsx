@@ -15,7 +15,7 @@ export default function About() {
     <div>
       <SEO
         title="About Us — Marine Equipment Specialists"
-        description="Alka Traders — globally connected marine and industrial equipment supplier based in Bhavnagar, Gujarat, India. 25+ years of industry expertise."
+        description="Alka Traders — globally connected marine and industrial equipment supplier based in Bhavnagar, Gujarat, India. Since 1990 — 35+ years of industry expertise."
         canonical="/about"
       />
       <BreadcrumbJsonLd items={[{ name: 'Home', url: '/' }, { name: 'About', url: '/about' }]} />

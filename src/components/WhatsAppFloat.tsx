@@ -1,4 +1,4 @@
-import { MessageCircle } from 'lucide-react'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 
 export function WhatsAppFloat() {
@@ -16,7 +16,7 @@ export function WhatsAppFloat() {
       className="group fixed bottom-6 right-6 z-[45] flex items-center gap-0 rounded-full bg-[#25D366] text-white shadow-[0_4px_20px_rgba(37,211,102,0.35)] transition-all duration-300 hover:gap-3 hover:pr-5 hover:shadow-xl hover:shadow-[#25D366]/25 animate-[whatsappFloatIn_0.5s_ease-out_both]"
     >
       <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] transition-transform duration-300 group-hover:scale-105">
-        <MessageCircle size={26} stroke="white" strokeWidth={1.5} />
+        <WhatsAppIcon size={26} className="text-white" />
       </span>
       <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-semibold transition-all duration-300 group-hover:max-w-[120px]">
         Chat with us

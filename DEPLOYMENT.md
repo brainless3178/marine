@@ -45,15 +45,15 @@
 | `PAYPAL_CLIENT_SECRET` | *(your PayPal client secret)* |
 | `PAYPAL_MODE` | `sandbox` |
 | `RESEND_API_KEY` | *(your Resend API key)* |
-| `EMAIL_FROM` | `noreply@alkatraders.com` |
-| `RFQ_EMAIL` | `rfq@alkatraders.com` |
-| `EMERGENCY_EMAIL` | `emergency@alkatraders.com` |
-| `ADMIN_EMAIL` | `admin@alkatraders.com` |
+| `EMAIL_FROM` | `sales@alkatraders.co` |
+| `RFQ_EMAIL` | `sales@alkatraders.co` |
+| `EMERGENCY_EMAIL` | `sales@alkatraders.co` |
+| `ADMIN_EMAIL` | `sales@alkatraders.co` |
 | `DEFAULT_SHIPPING_COST` | `25` |
 | `DEFAULT_TAX_RATE` | `0.08` |
 | `COMPANY_NAME` | `Alka Traders` |
-| `COMPANY_EMAIL` | `info@alkatraders.com` |
-| `WHATSAPP_NUMBER` | `919726900547` |
+| `COMPANY_EMAIL` | `sales@alkatraders.co` |
+| `WHATSAPP_NUMBER` | `918799095041` |
 
 6. Click **Create Web Service**
 7. Wait for the deploy to finish — your backend URL will be something like `https://alka-traders-api.onrender.com`
@@ -189,7 +189,7 @@ Copy the output and set it as `JWT_SECRET` in Render.
 
 After deployment, log in with the admin credentials created during the database seed:
 
-- **Email:** admin@alkatraders.com
+- **Email:** sales@alkatraders.co
 - **Password:** *(set during seed — change immediately after first login)*
 
 **⚠️ Change the admin password immediately after first login via the Admin Panel!**

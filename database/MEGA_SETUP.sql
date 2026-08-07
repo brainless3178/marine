@@ -4,8 +4,8 @@
 -- SINGLE FILE: Schema + Seed Data
 -- Run this ONCE to set up the entire database from scratch.
 --
--- Admin Login:  admin@alkatraders.com / admin123
--- Customer Login: customer@alkatraders.com / customer123
+-- Admin Login:  sales@alkatraders.co / admin123
+-- Customer Login: sales@alkatraders.co / customer123
 -- ============================================================================
 
 -- ============================================================================
@@ -680,11 +680,11 @@ ORDER BY month DESC;
 -- ============================================================================
 -- S0. USERS
 -- ============================================================================
--- Admin: admin@alkatraders.com / admin123
+-- Admin: sales@alkatraders.co / admin123
 INSERT INTO admin_users (id, email, password_hash, name, role, is_active)
 VALUES (
     'a0000000-0000-4000-8000-000000000001',
-    'admin@alkatraders.com',
+    'sales@alkatraders.co',
     '$2b$12$UtNaVqpn/YUv/EHSuC/zD.4.JHBV0aKM4SN5KgvYcaljwwlTAJKjK',
     'Store Owner',
     'owner',
@@ -694,11 +694,11 @@ VALUES (
     name = EXCLUDED.name,
     role = EXCLUDED.role;
 
--- Test Customer: customer@alkatraders.com / customer123
+-- Test Customer: sales@alkatraders.co / customer123
 INSERT INTO customers (id, email, password_hash, name, phone, company, country, status)
 VALUES (
     'c0000000-0000-4000-8000-000000000001',
-    'customer@alkatraders.com',
+    'sales@alkatraders.co',
     '$2b$12$6q5Vgt7golk5tlL7HrcO4O8z2XT0WrFOUGAjvCNBKOzASaiP/sYHq',
     'Test Customer',
     '+1 555 123 4567',
@@ -865,7 +865,7 @@ INSERT INTO testimonials (name, role, company, text, rating, sort_order, is_visi
 -- S6. OFFICES (4)
 -- ============================================================================
 INSERT INTO offices (city, country, address, timezone, phone, email, coordinates_lat, coordinates_lng, sort_order, is_visible) VALUES
-('BHAVNAGAR', 'India', 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', 'Asia/Kolkata', '+91 97269 00547', 'info@alkatraders.com', 21.7645, 72.1519, 0, TRUE);
+('BHAVNAGAR', 'India', 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', 'Asia/Kolkata', '+91 87990 95041', 'sales@alkatraders.co', 21.7645, 72.1519, 0, TRUE);
 
 -- ============================================================================
 -- S7. STORE SETTINGS (11)
@@ -873,12 +873,12 @@ INSERT INTO offices (city, country, address, timezone, phone, email, coordinates
 INSERT INTO store_settings (key, value, category, updated_by) VALUES
 ('site.companyName',       '"Alka Traders"',           'site', 'a0000000-0000-4000-8000-000000000001'),
 ('site.tagline',           '"Marine and Industrial Equipment"', 'site', 'a0000000-0000-4000-8000-000000000001'),
-('site.email',             '"info@alkatraders.com"',   'site', 'a0000000-0000-4000-8000-000000000001'),
-('site.phone',             '"+91 97269 00547"',        'site', 'a0000000-0000-4000-8000-000000000001'),
-('site.whatsappNumber',    '"919726900547"',           'site', 'a0000000-0000-4000-8000-000000000001'),
+('site.email',             '"sales@alkatraders.co"',   'site', 'a0000000-0000-4000-8000-000000000001'),
+('site.phone',             '"+91 87990 95041"',        'site', 'a0000000-0000-4000-8000-000000000001'),
+('site.whatsappNumber',    '"918799095041"',           'site', 'a0000000-0000-4000-8000-000000000001'),
 ('site.currency',          '"USD"',                    'site', 'a0000000-0000-4000-8000-000000000001'),
-('site.rfqEmail',          '"rfq@alkatraders.com"',    'site', 'a0000000-0000-4000-8000-000000000001'),
-('site.emergencyEmail',    '"emergency@alkatraders.com"','site', 'a0000000-0000-4000-8000-000000000001'),
+('site.rfqEmail',          '"sales@alkatraders.co"',    'site', 'a0000000-0000-4000-8000-000000000001'),
+('site.emergencyEmail',    '"sales@alkatraders.co"','site', 'a0000000-0000-4000-8000-000000000001'),
 ('checkout.shippingCost',  '25',                       'checkout', 'a0000000-0000-4000-8000-000000000001'),
 ('checkout.taxRate',       '0.08',                     'checkout', 'a0000000-0000-4000-8000-000000000001'),
 ('checkout.freeShippingThreshold', '500',              'checkout', 'a0000000-0000-4000-8000-000000000001')
@@ -904,8 +904,8 @@ INSERT INTO homepage_sections (section_type, label, is_enabled, sort_order, conf
 --   Tables:      27
 --   Views:        3
 --   Triggers:    12
---   Admin:    1 row (admin@alkatraders.com / admin123)
---   Customer: 1 row (customer@alkatraders.com / customer123)
+--   Admin:    1 row (sales@alkatraders.co / admin123)
+--   Customer: 1 row (sales@alkatraders.co / customer123)
 --   Categories:  19
 --   Brands:      22
 --   Industries:   6

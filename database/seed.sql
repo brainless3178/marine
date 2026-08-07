@@ -23,7 +23,7 @@
 
 -- For raw SQL, you can insert directly with a pre-hashed password:
 -- INSERT INTO admin_users (id, email, password_hash, name, role)
--- VALUES ('a0000000-0000-0000-0000-000000000001', 'admin@alkatraders.com',
+-- VALUES ('a0000000-0000-0000-0000-000000000001', 'sales@alkatraders.co',
 --         '$2a$12$LJ3m4ys3GzGKz2Kz2Kz2KeXyz2Kz2Kz2Kz2Kz2Kz2Kz2Kz2Kz2Kz', 'Store Owner', 'owner');
 
 -- ============================================================================
@@ -269,7 +269,7 @@ INSERT INTO testimonials (id, name, role, company, text, rating, sort_order, is_
 -- ============================================================================
 
 INSERT INTO offices (id, city, country, address, timezone, phone, email, coordinates_lat, coordinates_lng, sort_order, is_visible) VALUES
-('o0000001-0000-0000-0000-000000000001', 'BHAVNAGAR', 'India',      'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', 'Asia/Kolkata', '+91 97269 00547', 'info@alkatraders.com', 21.7645000, 72.1519000, 0, TRUE);
+('o0000001-0000-0000-0000-000000000001', 'BHAVNAGAR', 'India',      'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', 'Asia/Kolkata', '+91 87990 95041', 'sales@alkatraders.co', 21.7645000, 72.1519000, 0, TRUE);
 
 -- ============================================================================
 -- 7. STORE SETTINGS (11)
@@ -278,12 +278,12 @@ INSERT INTO offices (id, city, country, address, timezone, phone, email, coordin
 INSERT INTO store_settings (id, "key", value, category) VALUES
 ('s0000001-0000-0000-0000-000000000001', 'site.companyName',              '"Alka Traders"',                               'site'),
 ('s0000002-0000-0000-0000-000000000002', 'site.tagline',                  '"Marine and Industrial Equipment"',             'site'),
-('s0000003-0000-0000-0000-000000000003', 'site.email',                    '"info@alkatraders.com"',                       'site'),
-('s0000004-0000-0000-0000-000000000004', 'site.phone',                    '"+91 97269 00547"',                           'site'),
-('s0000005-0000-0000-0000-000000000005', 'site.whatsappNumber',           '"919726900547"',                              'site'),
+('s0000003-0000-0000-0000-000000000003', 'site.email',                    '"sales@alkatraders.co"',                       'site'),
+('s0000004-0000-0000-0000-000000000004', 'site.phone',                    '"+91 87990 95041"',                           'site'),
+('s0000005-0000-0000-0000-000000000005', 'site.whatsappNumber',           '"918799095041"',                              'site'),
 ('s0000006-0000-0000-0000-000000000006', 'site.currency',                 '"USD"',                                       'site'),
-('s0000007-0000-0000-0000-000000000007', 'site.rfqEmail',                 '"rfq@alkatraders.com"',                       'site'),
-('s0000008-0000-0000-0000-000000000008', 'site.emergencyEmail',           '"emergency@alkatraders.com"',                 'site'),
+('s0000007-0000-0000-0000-000000000007', 'site.rfqEmail',                 '"sales@alkatraders.co"',                       'site'),
+('s0000008-0000-0000-0000-000000000008', 'site.emergencyEmail',           '"sales@alkatraders.co"',                 'site'),
 ('s0000009-0000-0000-0000-000000000009', 'checkout.shippingCost',         '25',                                          'checkout'),
 ('s0000010-0000-0000-0000-000000000010', 'checkout.taxRate',              '0.08',                                        'checkout'),
 ('s0000011-0000-0000-0000-000000000011', 'checkout.freeShippingThreshold','500',                                         'checkout')

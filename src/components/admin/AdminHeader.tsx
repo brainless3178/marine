@@ -180,7 +180,7 @@ export function AdminHeader() {
                   {adminUser?.name || 'Admin'}
                 </p>
                 <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                  {adminUser?.email || 'admin@alkatraders.com'}
+                  {adminUser?.email || 'sales@alkatraders.co'}
                 </p>
                 <span className="admin-badge admin-badge-info mt-2 text-[0.625rem]">
                   {adminUser?.role?.replace(/-/g, ' ') || 'Owner'}

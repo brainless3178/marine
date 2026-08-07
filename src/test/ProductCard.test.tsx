@@ -6,7 +6,7 @@ import type { Product } from '../types'
 
 // Mock useStoreSettings
 vi.mock('../hooks/useStoreSettings', () => ({
-  useStoreSettings: () => ({ whatsappNumber: '919726900547' }),
+  useStoreSettings: () => ({ whatsappNumber: '918799095041' }),
 }))
 
 // Mock OptimizedImage
@@ -156,7 +156,7 @@ describe('ProductCard', () => {
   it('has WhatsApp button with correct link', () => {
     renderProductCard()
     const whatsappLink = screen.getByLabelText('WhatsApp quote for Hydraulic Pump HP-200')
-    expect(whatsappLink).toHaveAttribute('href', expect.stringContaining('wa.me/919726900547'))
+    expect(whatsappLink).toHaveAttribute('href', expect.stringContaining('wa.me/918799095041'))
     expect(whatsappLink).toHaveAttribute('target', '_blank')
   })
 })

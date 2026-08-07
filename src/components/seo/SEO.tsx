@@ -111,14 +111,14 @@ export function SEO({
     contactPoint: [
       {
         '@type': 'ContactPoint',
-        telephone: '+91-97269-00547',
+        telephone: '+91-87990-95041',
         contactType: 'sales',
         areaServed: ['IN', 'AE', 'SG', 'NL', 'US', 'GB', 'DE', 'JP'],
         availableLanguage: ['English', 'Hindi'],
       },
       {
         '@type': 'ContactPoint',
-        email: 'info@alkatraders.com',
+        email: 'sales@alkatraders.co',
         contactType: 'customer service',
         areaServed: ['IN', 'AE', 'SG', 'NL'],
       },

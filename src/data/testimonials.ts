@@ -42,18 +42,18 @@ export const offices: Office[] = [
     country: 'India',
     address: 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA',
     timezone: 'Asia/Kolkata',
-    phone: '+91 97269 00547',
-    email: 'info@alkatraders.com',
+    phone: '+91 87990 95041',
+    email: 'sales@alkatraders.co',
     coordinates: [21.7645, 72.1519],
   },
 ]
 
 export const timelineEvents: TimelineEvent[] = [
-  { year: '2010', title: 'Founded in Mumbai', description: 'Alka Traders established as a marine procurement specialist serving the Indian coastal fleet.' },
+  { year: '1990', title: 'Founded in Bhavnagar, Gujarat', description: 'Alka Traders began its journey in Bhavnagar, Gujarat as a marine procurement specialist serving the Indian coastal fleet.' },
   { year: '2013', title: '100+ Brand Partnerships', description: 'Crossed 100 authorized brand partnerships across marine and industrial sectors.' },
   { year: '2016', title: '10,000+ Products', description: 'Catalog crossed 10,000 line items across 6 major categories.' },
   { year: '2019', title: 'Global Expansion', description: 'Expanded global reach serving customers in 30+ countries worldwide.' },
-  { year: '2022', title: 'Bhavnagar Headquarters', description: 'Consolidated operations at our headquarters in Bhavnagar, Gujarat.' },
+  { year: '2022', title: 'Modern Headquarters', description: 'Consolidated operations into a modern headquarters facility in Bhavnagar, Gujarat.' },
   { year: '2024', title: 'Global Operations', description: 'Serving 50+ countries with a network of 200+ brand partners from our Bhavnagar hub.' },
 ]
 

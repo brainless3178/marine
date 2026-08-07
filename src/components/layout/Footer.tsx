@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react'
+import { Mail, Phone, MapPin } from 'lucide-react'
+import { WhatsAppIcon } from '../ui/WhatsAppIcon'
 
 function LinkedInIcon({ size = 16 }: { size?: number }) {
   return (
@@ -44,7 +45,7 @@ export function Footer() {
                 <LinkedInIcon size={16} />
               </a>
               <a href={`https://wa.me/${settings.whatsappNumber}`} aria-label="WhatsApp" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-[#4ade80] hover:border-[var(--accent-primary)] transition-all">
-                <MessageCircle size={16} />
+                <WhatsAppIcon size={16} />
               </a>
               <a href={`mailto:${settings.rfqEmail}`} aria-label="Email" className="flex items-center justify-center w-11 h-11 min-h-[44px] min-w-[44px] rounded-lg bg-white/8 border border-white/12 text-white/80 hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all">
                 <Mail size={16} />
@@ -86,7 +87,7 @@ export function Footer() {
               <MapPin size={14} className="mt-0.5 flex-shrink-0" />              PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA, BHAVNAGAR-364001, GUJARAT, INDIA
             </p>
             <a href={`https://wa.me/${settings.whatsappNumber}`} className="inline-flex items-center gap-2 rounded-lg text-xs font-bold border border-white/12 bg-white/8 text-white px-[18px] py-[10px] mt-3 hover:border-[var(--accent-primary)] transition-all no-underline">
-              <MessageCircle size={14} className="text-success" /> {t('contact.whatsapp')}
+              <WhatsAppIcon size={14} className="text-success" /> {t('contact.whatsapp')}
             </a>
           </div>
         </div>

@@ -1,8 +1,9 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CircleCheck, MessageCircle, Mail, Send } from 'lucide-react'
+import { CircleCheck, Mail, Send } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
+import { WhatsAppIcon } from '../ui/WhatsAppIcon'
 
 export function RFQSection() {
   const { t } = useTranslation()
@@ -98,7 +99,7 @@ export function RFQSection() {
           </ul>
           <div className="flex flex-col gap-2.5">
             <a href={`https://wa.me/${settings.whatsappNumber}`} className="flex items-center gap-2.5 text-sm font-semibold no-underline text-[var(--text-primary)] hover:text-[var(--success)] transition-colors">
-              <MessageCircle size={18} className="text-[var(--success)]" /> WhatsApp Us Now
+              <WhatsAppIcon size={18} className="text-[var(--success)]" /> WhatsApp Us Now
             </a>
             <a href={`mailto:${settings.rfqEmail}`} className="flex items-center gap-2.5 text-sm font-semibold no-underline text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors">
               <Mail size={18} className="text-[var(--accent-blue)]" /> {settings.rfqEmail}

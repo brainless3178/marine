@@ -6,6 +6,10 @@
   NODE_VERSION = "20"
   # Default site theme ("light" or "dark"). Users can still toggle; choice persists.
   VITE_DEFAULT_THEME = "light"
+  # Canonical site URL used for SEO (canonical links, hreflang, OG image URLs).
+  VITE_SITE_URL = "https://alkatraders.co"
+  # App version, surfaced in the UI footer and used as the Sentry release tag.
+  VITE_APP_VERSION = "1.0.0"
 
 # Enable Brotli compression for all assets
 [[headers]]
