@@ -2,7 +2,7 @@
   "runtime": "node",
   "nodeVersion": "22",
   "rootDir": ".",
-  "buildCommand": "npm run build:hostinger",
-  "startCommand": "node backend/dist/server.js",
-  "entryFile": "backend/dist/server.js"
+  "buildCommand": "npm run build",
+  "startCommand": "node server.js",
+  "entryFile": "server.js"
 }
