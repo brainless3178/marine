@@ -29,10 +29,20 @@ const idParamsSchema = z.object({
 })
 
 // ─── List Products (Storefront) ────────────────────────────────
+
+/** Split a comma-separated query param (e.g. `category=marine,electrical`) into
+ * a list of slugs. Returns undefined for empty input so single values behave
+ * exactly like before. */
+function splitList(v: unknown): string[] | undefined {
+  if (typeof v !== 'string' || !v.trim()) return undefined
+  const list = v.split(',').map((s) => s.trim()).filter(Boolean)
+  return list.length ? list : undefined
+}
+
 router.get('/', validateQuery(productQuerySchema), asyncHandler(async (req, res) => {
   const filters = {
-    category: req.query.category as string | undefined,
-    brand: req.query.brand as string | undefined,
+    category: splitList(req.query.category),
+    brand: splitList(req.query.brand),
     industry: req.query.industry as string | undefined,
     condition: req.query.condition as string | undefined,
     availability: req.query.availability as string | undefined,

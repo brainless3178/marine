@@ -55,7 +55,7 @@ export default function Emergency() {
       {/* Emergency clock demo */}
       <section className="py-16" ref={clockSectionRef}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <motion.div
               className="bg-[var(--secondary-bg)] border border-[var(--border)] p-6 sm:p-10 text-center"
               animate={clockInView ? {

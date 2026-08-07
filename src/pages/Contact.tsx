@@ -57,7 +57,7 @@ export default function Contact() {
           {/* Offices */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
             {offices.map((office) => (
-              <div key={office.city} className="bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1">
+              <div key={office.city} className="flex h-full flex-col bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1">
                 <h3 className="heading-lg mb-1">{office.city}</h3>
                 <p className="text-xs text-[var(--text-muted)] mb-3">{office.country}</p>
                 <p className="text-xs text-[var(--text-secondary)] flex items-start gap-1.5 mb-2">
@@ -66,7 +66,7 @@ export default function Contact() {
                 <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5 mb-2">
                   <Clock size={12} className="text-[var(--accent-primary)] flex-shrink-0" /> {office.timezone.split('/')[1]}
                 </p>
-                <a href={`tel:${office.phone}`} className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5 no-underline hover:text-[var(--accent-primary)]">
+                <a href={`tel:${office.phone}`} className="mt-auto flex items-center gap-1.5 text-xs text-[var(--text-secondary)] no-underline hover:text-[var(--accent-primary)]">
                   <Phone size={12} className="text-[var(--accent-primary)]" /> {office.phone}
                 </a>
               </div>

@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Fonts are loaded via <link rel="preload" as="style"> in index.html — a CSS
+   @import here would serialise an extra round trip and block first paint.
+   The <link> uses display=swap so text paints in the fallback face instantly. */
 
 @tailwind base;
 @tailwind components;
@@ -207,8 +209,8 @@ html.light {
   --header-utility-bg: rgba(246, 244, 239, 0.95);
   --header-utility-border: rgba(0, 0, 0, 0.08);
   --header-utility-text: #4c5753;
-  --header-bg: rgba(255, 255, 255, 0.70);
-  --header-border: rgba(255, 255, 255, 0.15);
+  --header-bg: rgba(255, 255, 255, 0.88);
+  --header-border: rgba(0, 0, 0, 0.08);
   --nav-text: #1c211f;
   --nav-text-muted: #6d7772;
   --nav-btn-bg: rgba(0, 0, 0, 0.04);
@@ -820,6 +822,18 @@ html.dark {
   [style*="rotateY"] {
     transform: none !important;
   }
+
+  /* Heavy full-width backdrop blur (24px + saturate) repaints the sticky
+     header on every scroll frame — mid-range phones drop frames and INP
+     suffers. Reduce the blur radius and drop saturate on touch devices. */
+  .site-header {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .hero-card {
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+  }
 }
 
 /* ── Focus visible for keyboard accessibility ───────────── */
@@ -869,17 +883,21 @@ p, li, h1, h2, h3, h4, h5, h6 {
    ══════════════════════════════════════════════════════════════ */
 :root,
 html.light {
-  --hero-bg: #f6f4ef;
-  --hero-bg-secondary: #e9ece8;
+  /* Dark fallback: the hero media (poster/video) paints over this, but if it
+     is slow to load — or fails — white hero text must never sit on a cream
+     background. Kept in sync with html.dark so both themes share the same
+     dark base under the footage. */
+  --hero-bg: #0f172a;
+  --hero-bg-secondary: #1e293b;
   --hero-card-bg: rgba(255, 255, 255, 0.14);
-  --hero-accent: #00796b;
-  --hero-accent-hover: #005f55;
-  --hero-text: #1c211f;
-  --hero-text-secondary: #4c5753;
-  --hero-text-muted: #6d7772;
+  --hero-accent: #5dd5bf;
+  --hero-accent-hover: #8ee4d4;
+  --hero-text: #ffffff;
+  --hero-text-secondary: rgba(255, 255, 255, 0.88);
+  --hero-text-muted: rgba(255, 255, 255, 0.72);
   --hero-border: rgba(255, 255, 255, 0.28);
-  --hero-chip-bg: rgba(255, 255, 255, 0.12);
-  --hero-icon-bg: rgba(255, 255, 255, 0.12);
+  --hero-chip-bg: rgba(255, 255, 255, 0.10);
+  --hero-icon-bg: rgba(255, 255, 255, 0.10);
   --hero-icon-border: rgba(255, 255, 255, 0.20);
   --hero-overlay-start: rgba(255, 255, 255, 0.06);
   --hero-overlay-mid: rgba(255, 255, 255, 0.03);
@@ -1020,6 +1038,20 @@ html.dark .hero-media {
     color: var(--hero-text);
     transform: translateY(-1px);
   }
+}
+
+/* Hero section: force white text in light mode — overrides the global
+   h1-h6 color:var(--text-primary) which is dark. */
+html.light section[aria-label*="Alka Traders"] h1,
+html.light section[aria-label*="Alka Traders"] h3,
+html.light section[aria-label*="Alka Traders"] p,
+html.light section[aria-label*="Alka Traders"] span,
+html.light .hero-card h3,
+html.light .hero-card p {
+  color: var(--hero-text) !important;
+}
+html.light section[aria-label*="Alka Traders"] .hero-card p {
+  color: var(--hero-text-muted) !important;
 }
 
 /* Premium header: keep links clean inside the dark header. */

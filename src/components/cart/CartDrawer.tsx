@@ -53,15 +53,17 @@ export function CartDrawer() {
     return () => document.removeEventListener('keydown', handleKey)
   }, [showCartDrawer, closeDrawer])
 
-  // Lock body scroll when open — with ref counting to support multiple modals
+  // Lock page scroll when open — with ref counting to support multiple modals.
+  // Lock <html> not <body>: overflow:hidden on body makes body a clip
+  // container that breaks position:sticky on the site header.
   useEffect(() => {
     if (showCartDrawer) {
-      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
     }
     return () => {
       // Only clear overflow if no other modal is open
       if (!document.querySelector('[role="dialog"], [role="alertdialog"]')) {
-        document.body.style.overflow = ''
+        document.documentElement.style.overflow = ''
       }
     }
   }, [showCartDrawer])

@@ -18,7 +18,7 @@ function ProductCard({ product, addedIds, onAddToCart }: { product: Product; add
   const isAdded = addedIds.has(product.id)
 
   return (
-    <div className="card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-primary)] group">
+    <div className="card flex h-full flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-primary)] group">
       <Link to={`/product/${product.id}`} className="block relative overflow-hidden bg-[var(--surface-soft)]">
         <OptimizedImage
           src={getProductImageUrl(product.filename)}
@@ -48,7 +48,7 @@ function ProductCard({ product, addedIds, onAddToCart }: { product: Product; add
           </div>
         )}
       </Link>
-      <div className="p-4">
+      <div className="flex flex-1 flex-col p-4">
         <span className="inline-block font-mono text-xs px-2 py-1 rounded-full border text-[var(--accent-primary)] border-[var(--accent-primary)]/15 bg-[var(--accent-primary)]/5 mb-2">
           {product.brand}
         </span>
@@ -58,45 +58,47 @@ function ProductCard({ product, addedIds, onAddToCart }: { product: Product; add
         <span className="font-mono text-xs text-[var(--text-muted)] block mt-1">
           {t('product.skuPrefix', { sku: product.sku })}
         </span>
-        <div className="mt-3 flex items-end justify-between gap-2">
-          <div>
-            {product.onSale && product.salePrice ? (
-              <div className="flex items-center gap-2">
-                <span className="font-display font-bold text-xl tracking-tight tabular-nums text-[var(--danger)]">
-                  ${product.salePrice.toFixed(2)}
+        <div className="mt-auto pt-3">
+          <div className="flex items-end justify-between gap-2">
+            <div>
+              {product.onSale && product.salePrice ? (
+                <div className="flex items-center gap-2">
+                  <span className="font-display font-bold text-xl tracking-tight tabular-nums text-[var(--danger)]">
+                    ${product.salePrice.toFixed(2)}
+                  </span>
+                  <span className="font-display font-bold text-sm text-[var(--text-muted)] line-through">
+                    ${product.price.toFixed(2)}
+                  </span>
+                </div>
+              ) : (
+                <span className="font-display font-bold text-xl tracking-tight tabular-nums text-[var(--text-primary)]">
+                  ${effPrice.toFixed(2)}
                 </span>
-                <span className="font-display font-bold text-sm text-[var(--text-muted)] line-through">
-                  ${product.price.toFixed(2)}
-                </span>
-              </div>
-            ) : (
-              <span className="font-display font-bold text-xl tracking-tight tabular-nums text-[var(--text-primary)]">
-                ${effPrice.toFixed(2)}
-              </span>
-            )}
+              )}
+            </div>
+            <span className={`text-xs font-bold ${product.inStock ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
+              {product.inStock ? t('product.inStockCount', { count: product.stockCount }) : t('product.outOfStockCount')}
+            </span>
           </div>
-          <span className={`text-xs font-bold ${product.inStock ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
-            {product.inStock ? t('product.inStockCount', { count: product.stockCount }) : t('product.outOfStockCount')}
-          </span>
-        </div>
-        <button
-          onClick={() => { if (!product.inStock) return; onAddToCart(product) }}
-          disabled={!product.inStock}
-          className={`inline-flex items-center justify-center w-full gap-2 text-xs font-bold px-[18px] py-[11px] mt-3 transition-all duration-300 border cursor-pointer rounded-lg ${
-            !product.inStock
-              ? 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed'
+          <button
+            onClick={() => { if (!product.inStock) return; onAddToCart(product) }}
+            disabled={!product.inStock}
+            className={`mt-3 inline-flex items-center justify-center w-full gap-2 text-xs font-bold px-[18px] py-[11px] transition-all duration-300 border cursor-pointer rounded-lg ${
+              !product.inStock
+                ? 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed'
+                : isAdded
+                  ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
+                  : 'btn-primary border-none'
+            }`}
+          >
+            {!product.inStock
+              ? t('product.outOfStock')
               : isAdded
-                ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
-                : 'btn-primary border-none'
-          }`}
-        >
-          {!product.inStock
-            ? t('product.outOfStock')
-            : isAdded
-              ? <><Check size={14} /> {t('product.added')}</>
-              : <><ShoppingCart size={14} /> {t('product.addToCart')}</>
-          }
-        </button>
+                ? <><Check size={14} /> {t('product.added')}</>
+                : <><ShoppingCart size={14} /> {t('product.addToCart')}</>
+            }
+          </button>
+        </div>
       </div>
     </div>
   )

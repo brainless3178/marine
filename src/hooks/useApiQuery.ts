@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import type { ApiProduct, Pagination } from '../lib/api-types'
+import type { ApiProduct, Pagination, ProductListFilters } from '../lib/api-types'
 
 // ─── Query Key Factory ─────────────────────────────────────────
 // Stable, predictable query keys for cache invalidation.
@@ -34,9 +34,11 @@ export const queryKeys = {
 export function useProductList(params?: Record<string, string>) {
   return useQuery({
     queryKey: queryKeys.products.list(params),
-    queryFn: () => api.get<{ products: ApiProduct[]; pagination: Pagination }>(
+    queryFn: () => api.get<{ products: ApiProduct[]; pagination: Pagination; filters?: ProductListFilters }>(
       `/storefront/products${params ? '?' + new URLSearchParams(params).toString() : ''}`
     ),
+    // Keep the previous page/filter results visible while the next set loads
+    placeholderData: keepPreviousData,
   })
 }
 

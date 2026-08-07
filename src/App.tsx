@@ -90,10 +90,11 @@ function LocaleLayout() {
     }
   }, [locale, setLanguage, language, isValid])
 
-  // Redirect legacy non-prefixed URLs like /products → /en/products
-  // All hooks must be called before any early returns.
+  // Redirect legacy non-prefixed URLs like /products → /en/products.
+  // Preserve the query string so filter deep links (?category=&brand=&search=)
+  // survive the redirect. All hooks must be called before any early returns.
   if (!isValid) {
-    return <Navigate to={`/en${location.pathname}`} replace />
+    return <Navigate to={`/en${location.pathname}${location.search}`} replace />
   }
 
   return (
