@@ -32,14 +32,27 @@ const distPath = path.join(__dirname, 'frontend', 'dist')
 const indexPath = path.join(distPath, 'index.html')
 
 // ─── Ensure the production build exists ──────────────────────────
+const buildTimeoutMs = 300 * 1000
+
 if (!fs.existsSync(indexPath)) {
   console.error(`✖ Build not found at ${distPath}`)
   console.error('  Attempting on-the-fly build...')
   try {
+    // If dependencies are missing (e.g. the deploy build step only installed
+    // frontend/ deps via `npm install --prefix frontend`), install them first
+    // so the build can run from the repository root.
+    if (!fs.existsSync(path.join(__dirname, 'node_modules', 'vite', 'bin', 'vite.js'))) {
+      console.error('  vite not installed — running npm install (may take a few minutes)...')
+      execSync('npm install --no-audit --no-fund', {
+        cwd: __dirname,
+        stdio: 'inherit',
+        timeout: buildTimeoutMs,
+      })
+    }
     execSync('node ./node_modules/vite/bin/vite.js build', {
       cwd: __dirname,
       stdio: 'inherit',
-      timeout: 5 * 60 * 1000,
+      timeout: buildTimeoutMs,
     })
   } catch (err) {
     console.error('  On-the-fly build failed:', err.message)

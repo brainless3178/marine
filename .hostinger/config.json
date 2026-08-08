@@ -1,8 +1,8 @@
 {
   "runtime": "node",
   "nodeVersion": "22",
-  "rootDir": "",
-  "buildCommand": "npm install && node ./node_modules/vite/bin/vite.js build",
-  "startCommand": "node server.js",
+  "rootDir": "frontend",
+  "buildCommand": "npm install && npm run build",
+  "startCommand": "npm start",
   "entryFile": "server.js"
 }
