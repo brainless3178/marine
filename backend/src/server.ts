@@ -60,7 +60,15 @@ import { rateLimit } from 'express-rate-limit'
 import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
+import { fileURLToPath } from 'url'
 import { PrismaClient } from '@prisma/client'
+
+// ─── __dirname for ES modules ───────────────────────────────────
+// Compiled file lives at backend/dist/server.js
+// Project root (where frontend-dist/ lives) is two levels up.
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..')
 import { sanitize } from './middleware/sanitize.js'
 import { verifyCsrf, issueCsrfToken } from './middleware/csrf.js'
 import { loginLimiter, registerLimiter, passwordResetLimiter } from './middleware/rateLimit.js'
@@ -322,12 +330,13 @@ for (const prefix of API_PREFIXES) {
 // This MUST come before the 404 handler so that frontend routes
 // (e.g., /products, /admin, /about) are served by index.html.
 if (process.env.NODE_ENV === 'production') {
-  // Try multiple possible locations for the frontend build output
+  // Use __dirname-based paths for reliable resolution on Hostinger.
+  // Compiled file: backend/dist/server.js → PROJECT_ROOT is two levels up.
   const possiblePaths = [
+    path.join(PROJECT_ROOT, 'frontend-dist'),
+    path.join(PROJECT_ROOT, 'dist'),
     path.resolve('frontend-dist'),
     path.resolve('dist'),
-    path.join(process.cwd(), 'frontend-dist'),
-    path.join(process.cwd(), 'dist'),
   ]
 
   let frontendPath: string | null = null
@@ -340,7 +349,7 @@ if (process.env.NODE_ENV === 'production') {
   }
 
   if (frontendPath) {
-    startupLogger.info({ frontendPath }, 'Serving frontend from')
+    startupLogger.info({ frontendPath, PROJECT_ROOT }, 'Serving frontend from')
     // Serve static assets (JS, CSS, images) with long cache
     app.use(express.static(frontendPath, {
       maxAge: '1y',
@@ -359,13 +368,12 @@ if (process.env.NODE_ENV === 'production') {
     })
   } else {
     // List what directories actually exist at the project root for debugging
-    const cwd = process.cwd()
     let dirContents: string[] = []
     try {
-      dirContents = fs.readdirSync(cwd).filter(f => !f.startsWith('.') && f !== 'node_modules')
+      dirContents = fs.readdirSync(PROJECT_ROOT).filter(f => !f.startsWith('.') && f !== 'node_modules')
     } catch { /* ignore */ }
     startupLogger.error(
-      { cwd, dirContents, searched: possiblePaths },
+      { PROJECT_ROOT, cwd: process.cwd(), dirContents, searched: possiblePaths },
       'CRITICAL: frontend-dist/index.html not found — frontend will NOT be served. ' +
       'The site will show 404 for all non-API routes.'
     )
