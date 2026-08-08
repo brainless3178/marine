@@ -1,15 +1,16 @@
 /**
  * copy-frontend.mjs
  * 
- * Copies the Vite frontend build output (dist/) into the project root's
- * frontend-dist/ directory so the backend can serve it in production.
+ * Copies the Vite frontend build output (frontend/dist) into the project
+ * root's frontend-dist/ directory as a legacy convenience artifact.
  * 
- * Used by: npm run build:hostinger
+ * Used by: npm run build (full local build chain)
  */
 import { cpSync, mkdirSync, existsSync, rmSync } from 'fs'
 import { resolve } from 'path'
 
-const src = resolve('dist')
+// Vite outputs to frontend/dist (see vite.config.ts), not root dist/.
+const src = resolve('frontend/dist')
 const dest = resolve('frontend-dist')
 
 if (!existsSync(src)) {
