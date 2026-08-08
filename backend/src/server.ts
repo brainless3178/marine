@@ -322,8 +322,25 @@ for (const prefix of API_PREFIXES) {
 // This MUST come before the 404 handler so that frontend routes
 // (e.g., /products, /admin, /about) are served by index.html.
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.resolve('frontend-dist')
-  if (fs.existsSync(frontendPath)) {
+  // Try multiple possible locations for the frontend build output
+  const possiblePaths = [
+    path.resolve('frontend-dist'),
+    path.resolve('dist'),
+    path.join(process.cwd(), 'frontend-dist'),
+    path.join(process.cwd(), 'dist'),
+  ]
+
+  let frontendPath: string | null = null
+  for (const p of possiblePaths) {
+    const indexPath = path.join(p, 'index.html')
+    if (fs.existsSync(indexPath)) {
+      frontendPath = p
+      break
+    }
+  }
+
+  if (frontendPath) {
+    startupLogger.info({ frontendPath }, 'Serving frontend from')
     // Serve static assets (JS, CSS, images) with long cache
     app.use(express.static(frontendPath, {
       maxAge: '1y',
@@ -338,10 +355,20 @@ if (process.env.NODE_ENV === 'production') {
       if (req.path.startsWith('/api')) {
         return sendError(res, 'API endpoint not found', 404)
       }
-      res.sendFile(path.join(frontendPath, 'index.html'))
+      res.sendFile(path.join(frontendPath!, 'index.html'))
     })
   } else {
-    startupLogger.warn('frontend-dist/ not found — frontend will not be served')
+    // List what directories actually exist at the project root for debugging
+    const cwd = process.cwd()
+    let dirContents: string[] = []
+    try {
+      dirContents = fs.readdirSync(cwd).filter(f => !f.startsWith('.') && f !== 'node_modules')
+    } catch { /* ignore */ }
+    startupLogger.error(
+      { cwd, dirContents, searched: possiblePaths },
+      'CRITICAL: frontend-dist/index.html not found — frontend will NOT be served. ' +
+      'The site will show 404 for all non-API routes.'
+    )
   }
 }
 
