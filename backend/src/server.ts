@@ -327,32 +327,19 @@ for (const prefix of API_PREFIXES) {
 // This MUST come before the 404 handler so that frontend routes
 // (e.g., /products, /admin, /about) are served by index.html.
 if (process.env.NODE_ENV === 'production') {
-  // Try frontend-dist first (copy-frontend.mjs output), then dist (Vite output)
-  const candidates = [
-    path.resolve(__dirname, '../../frontend-dist'),
-    path.resolve(__dirname, '../../dist'),
-  ]
-
-  let frontendPath = ''
-  for (const p of candidates) {
-    if (fs.existsSync(path.join(p, 'index.html'))) {
-      frontendPath = p
-      break
-    }
-  }
+  // Vite outputs to dist/, copy-frontend.mjs copies to frontend-dist/
+  const frontendPath = path.resolve(__dirname, '../../dist')
   const indexPath = path.join(frontendPath, 'index.html')
 
   console.log({ frontendPath, indexPath, exists: fs.existsSync(indexPath) })
 
-  if (frontendPath) {
-    app.use(express.static(frontendPath))
-    app.use((req, res, next) => {
-      if (req.path.startsWith('/api/')) return next()
-      res.sendFile(indexPath, (err) => {
-        if (err) next(err)
-      })
+  app.use(express.static(frontendPath))
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) return next()
+    res.sendFile(indexPath, (err) => {
+      if (err) next(err)
     })
-  }
+  })
 }
 
 // ─── 404 Handler ───────────────────────────────────────────────
