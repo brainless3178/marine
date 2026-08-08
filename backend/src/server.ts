@@ -19,8 +19,19 @@ if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGIN) {
   process.env.CORS_ORIGIN = 'https://alkatraders.co'
 }
 
-// Frontend origin for CORS (separate Hostinger app)
-const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'https://alkatraders.co'
+// Frontend origins for CORS (separate Hostinger app)
+const PRODUCTION_CORS_ORIGINS = [
+  'https://alkatraders.co',
+  'https://www.alkatraders.co',
+]
+const DEVELOPMENT_CORS_ORIGINS = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  process.env.CORS_ORIGIN || 'http://localhost:5173',
+  ...PRODUCTION_CORS_ORIGINS,
+]
+const CORS_ORIGINS = process.env.NODE_ENV === 'production'
+  ? PRODUCTION_CORS_ORIGINS
+  : Array.from(new Set(DEVELOPMENT_CORS_ORIGINS.filter(Boolean)))
 
 if (!process.env.JWT_SECRET) {
   startupLogger.warn('JWT_SECRET not set in environment. Using fallback secret.')
@@ -162,12 +173,7 @@ app.use(helmet({
 
 // CORS: Allow frontend origin (separate Hostinger app on alkatraders.co)
 app.use(cors({
-  origin: [
-    FRONTEND_ORIGIN,
-    process.env.CORS_ORIGIN,
-    'https://alkatraders.co',
-    'https://api.alkatraders.co',
-  ].filter(Boolean) as string[],
+  origin: CORS_ORIGINS,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Idempotency-Key', 'X-Request-ID'],
