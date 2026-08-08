@@ -9,6 +9,7 @@
 import { Resend } from 'resend'
 import { prisma } from '../server.js'
 import logger from '../utils/logger.js'
+import { withTimeout } from '../utils/withTimeout.js'
 import type { Prisma } from '@prisma/client'
 
 const resend = process.env.RESEND_API_KEY
@@ -19,6 +20,9 @@ const emailLog = logger.child({ context: 'email' })
 
 const FROM = process.env.EMAIL_FROM || 'sales@alkatraders.co'
 const MAX_EMAIL_ATTEMPTS = 3
+// The processor runs on a timer that does not await previous ticks, so an
+// unreachable database must not leave queries pending and accumulating.
+const QUEUE_POLL_TIMEOUT_MS = 10_000
 
 // ─── Email Queue ───────────────────────────────────────────────
 
@@ -101,11 +105,15 @@ export function startEmailQueueProcessor(intervalMs = 60_000) {
   if (processorInterval) return
   processorInterval = setInterval(async () => {
     try {
-      const pending = await prisma.emailQueue.findMany({
-        where: { status: 'retrying', attempts: { lt: MAX_EMAIL_ATTEMPTS } },
-        orderBy: { createdAt: 'asc' },
-        take: 10,
-      })
+      const pending = await withTimeout(
+        prisma.emailQueue.findMany({
+          where: { status: 'retrying', attempts: { lt: MAX_EMAIL_ATTEMPTS } },
+          orderBy: { createdAt: 'asc' },
+          take: 10,
+        }),
+        QUEUE_POLL_TIMEOUT_MS,
+        'email-queue-poll',
+      )
       for (const record of pending) {
         await sendEmail(record.id)
       }
