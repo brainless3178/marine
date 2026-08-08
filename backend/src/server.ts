@@ -327,15 +327,16 @@ for (const prefix of API_PREFIXES) {
 // This MUST come before the 404 handler so that frontend routes
 // (e.g., /products, /admin, /about) are served by index.html.
 if (process.env.NODE_ENV === 'production') {
-  // Compiled file: backend/dist/server.js → ../../ = project root
   const frontendPath = path.resolve(__dirname, '../../frontend-dist')
-  console.log('Frontend path:', frontendPath)
+  const indexPath = path.join(frontendPath, 'index.html')
+
+  console.log({ frontendPath, indexPath, exists: fs.existsSync(indexPath) })
 
   app.use(express.static(frontendPath))
 
-  app.get('*', (req, res, next) => {
+  app.use((req, res, next) => {
     if (req.path.startsWith('/api/')) return next()
-    res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
+    res.sendFile(indexPath, (err) => {
       if (err) next(err)
     })
   })
