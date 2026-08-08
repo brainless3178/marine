@@ -19,6 +19,9 @@ if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGIN) {
   process.env.CORS_ORIGIN = 'https://alkatraders.co'
 }
 
+// Frontend origin for CORS (separate Hostinger app)
+const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'https://alkatraders.co'
+
 if (!process.env.JWT_SECRET) {
   startupLogger.warn('JWT_SECRET not set in environment. Using fallback secret.')
   process.env.JWT_SECRET = '2b83abcc07ed401b23fff63cb06ca816464e8b4a4110adc53640cbc97aac49f8'
@@ -60,12 +63,7 @@ import { rateLimit } from 'express-rate-limit'
 import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
-import { fileURLToPath } from 'url'
 import { PrismaClient } from '@prisma/client'
-
-// ES module __dirname — compiled file lives at backend/dist/server.js
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 import { sanitize } from './middleware/sanitize.js'
 import { verifyCsrf, issueCsrfToken } from './middleware/csrf.js'
 import { loginLimiter, registerLimiter, passwordResetLimiter } from './middleware/rateLimit.js'
@@ -132,64 +130,44 @@ const PORT = parseInt(process.env.PORT || '3000', 10) // Hostinger default port
 app.set('trust proxy', 1)
 
 // ─── Security Middleware ───────────────────────────────────────
-// In production, the backend serves both the React SPA and the API.
-// Strict CSP only applies to /api routes. For static frontend files,
-// we disable CSP (the React build has its own meta CSP tag if needed).
-app.use((req, res, next) => {
-  // Apply strict CSP only to API routes
-  if (req.path.startsWith('/api')) {
-    return helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", 'https://www.paypal.com', 'https://www.paypalobjects.com'],
-          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-          imgSrc: ["'self'", 'data:', 'https:', 'https://res.cloudinary.com'],
-          connectSrc: ["'self'", 'https://*.paypal.com', 'https://*.paypalobjects.com', 'https://res.cloudinary.com'],
-          frameSrc: ['https://www.paypal.com', 'https://sandbox.paypal.com'],
-          frameAncestors: ["'none'"],
-          fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
-          objectSrc: ["'none'"],
-          baseUri: ["'self'"],
-          formAction: ["'self'"],
-          manifestSrc: ["'self'"],
-          upgradeInsecureRequests: [],
-        },
-      },
-      crossOriginEmbedderPolicy: false,
-      crossOriginOpenerPolicy: { policy: 'same-origin' },
-      crossOriginResourcePolicy: { policy: 'cross-origin' },
-      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-      hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true,
-      },
-    })(req, res, next)
-  }
-  // For non-API routes (frontend static files), use relaxed helmet
-  return helmet({
-    contentSecurityPolicy: false, // Let the React SPA handle its own CSP
-    crossOriginEmbedderPolicy: false,
-    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-      preload: true,
+// API-only backend — apply strict security headers to all routes.
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", 'https://www.paypal.com', 'https://www.paypalobjects.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      imgSrc: ["'self'", 'data:', 'https:', 'https://res.cloudinary.com'],
+      connectSrc: ["'self'", 'https://*.paypal.com', 'https://*.paypalobjects.com', 'https://res.cloudinary.com'],
+      frameSrc: ['https://www.paypal.com', 'https://sandbox.paypal.com'],
+      frameAncestors: ["'none'"],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      manifestSrc: ["'self'"],
+      upgradeInsecureRequests: [],
     },
-  })(req, res, next)
-})
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+}))
 
-// CORS: In production single-origin setup (Hostinger), frontend and API
-// are on the same origin, so CORS headers are technically not needed.
-// We still configure CORS to allow the specified origin for flexibility
-// (e.g., if a subdomain setup is used later).
+// CORS: Allow frontend origin (separate Hostinger app on alkatraders.co)
 app.use(cors({
-  origin: process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-    : false,
+  origin: [
+    FRONTEND_ORIGIN,
+    process.env.CORS_ORIGIN,
+    'https://alkatraders.co',
+    'https://api.alkatraders.co',
+  ].filter(Boolean) as string[],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Idempotency-Key', 'X-Request-ID'],
@@ -322,26 +300,6 @@ for (const prefix of API_PREFIXES) {
   app.use(`${prefix}/auth/reset-password`, passwordResetLimiter)
   app.use(`${prefix}/auth`, publicLimiter, customerAuthRoutes)
 }
-// ─── Serve React Frontend in Production ───────────────────────
-// After all API routes, serve the React SPA static files.
-// This MUST come before the 404 handler so that frontend routes
-// (e.g., /products, /admin, /about) are served by index.html.
-if (process.env.NODE_ENV === 'production') {
-  // Vite outputs to dist/, copy-frontend.mjs copies to frontend-dist/
-  const frontendPath = path.resolve(__dirname, '../../dist')
-  const indexPath = path.join(frontendPath, 'index.html')
-
-  console.log({ frontendPath, indexPath, exists: fs.existsSync(indexPath) })
-
-  app.use(express.static(frontendPath))
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/api/')) return next()
-    res.sendFile(indexPath, (err) => {
-      if (err) next(err)
-    })
-  })
-}
-
 // ─── 404 Handler ───────────────────────────────────────────────
 app.use((_req, res) => {
   sendError(res, 'Not found', 404)

@@ -1,8 +1,8 @@
 {
   "runtime": "node",
   "nodeVersion": "22",
-  "rootDir": ".",
-  "buildCommand": "node scripts/hostinger-build.mjs",
-  "startCommand": "node server.js",
-  "entryFile": "server.js"
+  "rootDir": "backend",
+  "buildCommand": "npm install --include=dev && npx prisma generate && npx tsc",
+  "startCommand": "node dist/server.js",
+  "entryFile": "dist/server.js"
 }

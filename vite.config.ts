@@ -58,6 +58,8 @@ export default defineConfig({
     },
   },
   build: {
+    outDir: 'frontend/dist',
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
