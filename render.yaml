@@ -9,7 +9,7 @@ services:
     plan: free
     rootDir: backend
     buildCommand: npm install --include=dev && npx prisma generate && npm run build
-    startCommand: node dist/backend/src/server.js
+    startCommand: npm start
     postDeployCommand: npx prisma migrate deploy
     healthCheckPath: /api/health
     autoDeploy: true
@@ -18,6 +18,10 @@ services:
         value: production
       - key: DATABASE_URL
         sync: false
+      # Use Neon's serverless driver over HTTPS/443 instead of TCP/5432.
+      # Set to "tcp" only on hosts that allow outbound 5432.
+      - key: DB_DRIVER
+        value: neon-http
       - key: DIRECT_URL
         sync: false
       # ⚠️ IMPORTANT: Set these to a fixed 64-char hex string in Render dashboard.

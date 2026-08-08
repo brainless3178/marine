@@ -2,6 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
+  // Driver adapters are GA as of Prisma 6.x — no preview flag needed.
   provider = "prisma-client-js"
 }
 

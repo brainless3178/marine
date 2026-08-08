@@ -1,18 +1,18 @@
-import dotenv from 'dotenv'
+// Must stay the first import: ESM hoists imports, so this is what guarantees the
+// environment is loaded before any other module reads process.env.
+import './utils/env.js'
 import { EventEmitter } from 'events'
 // Increase default max listeners to prevent EventEmitter memory leak warnings
 EventEmitter.prototype.setMaxListeners.call(EventEmitter, 20)
-dotenv.config()
 
 // ─── Logger (imported early so env validation can use it) ──
 import logger, { startupLogger, dbLogger } from './utils/logger.js'
 import { initSentry } from './utils/sentry.js'
 
 // ─── Validate Required Environment Variables ───────────────
-const REQUIRED_ENV_VARS = [
-  'JWT_SECRET',
-  'DATABASE_URL',
-] as const
+// JWT_SECRET / DATABASE_URL are validated in ./utils/env.js, which must run
+// before the hoisted prismaClient import constructs a client. Only the
+// non-fatal, Prisma-independent warnings remain here.
 
 if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGIN) {
   startupLogger.warn('CORS_ORIGIN not set in environment. Falling back to https://alkatraders.co')
@@ -32,18 +32,6 @@ const DEVELOPMENT_CORS_ORIGINS = [
 const CORS_ORIGINS = process.env.NODE_ENV === 'production'
   ? PRODUCTION_CORS_ORIGINS
   : Array.from(new Set(DEVELOPMENT_CORS_ORIGINS.filter(Boolean)))
-
-if (!process.env.JWT_SECRET) {
-  startupLogger.warn('JWT_SECRET not set in environment. Using fallback secret.')
-  process.env.JWT_SECRET = '2b83abcc07ed401b23fff63cb06ca816464e8b4a4110adc53640cbc97aac49f8'
-}
-
-const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v])
-if (missingVars.length > 0) {
-  startupLogger.error({ missingVars }, 'CRITICAL: Missing required environment variables')
-  // Exit early to avoid starting the server in a broken state
-  process.exit(1)
-}
 
 // Warn about missing PayPal config
 if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
@@ -74,7 +62,8 @@ import { rateLimit } from 'express-rate-limit'
 import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
-import { PrismaClient } from '@prisma/client'
+import { prisma, describeDbDriver, getRedactedDbHost } from './utils/prismaClient.js'
+import { withTimeout } from './utils/withTimeout.js'
 import { sanitize } from './middleware/sanitize.js'
 import { verifyCsrf, issueCsrfToken } from './middleware/csrf.js'
 import { loginLimiter, registerLimiter, passwordResetLimiter } from './middleware/rateLimit.js'
@@ -83,9 +72,10 @@ import { sendSuccess, sendError } from './middleware/response.js'
 import { apiDeprecationMiddleware, API_VERSION } from './middleware/api-version.js'
 
 // ─── Database ──────────────────────────────────────────────────
-export const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-})
+// Constructed in ./utils/prismaClient.js so it can select the right driver
+// (Neon serverless over 443 vs plain TCP 5432). Re-exported here because many
+// modules already do `import { prisma } from '../server.js'`.
+export { prisma }
 
 // ─── Routes ────────────────────────────────────────────────────
 import adminAuthRoutes from './routes/admin/auth.js'
@@ -132,6 +122,8 @@ import { startEmailQueueProcessor, stopEmailQueueProcessor } from './services/em
 // ─── App Setup ─────────────────────────────────────────────────
 const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10) // Hostinger default port
+const HEALTH_DB_TIMEOUT_MS = 3_000
+const DB_CONNECT_TIMEOUT_MS = 10_000
 
 // ─── Trust Proxy (CRITICAL for Hostinger / any reverse proxy) ──
 // Hostinger runs NGINX in front of Node.js. Without this:
@@ -230,10 +222,23 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))
 // ─── Health Check ──────────────────────────────────────────────
 app.get(['/health', '/api/health'], async (_req, res) => {
   try {
-    await prisma.$queryRaw`SELECT 1`
+    // Bounded: an unreachable database must yield a fast 503, not a hung request.
+    await withTimeout(prisma.$queryRaw`SELECT 1`, HEALTH_DB_TIMEOUT_MS, 'health-check-db')
     res.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString() })
-  } catch {
-    res.status(503).json({ status: 'error', database: 'disconnected', timestamp: new Date().toISOString() })
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : 'unknown error'
+    dbLogger.error({ err: error, driver: describeDbDriver(), host: getRedactedDbHost() }, 'Health check failed')
+    res.status(503).json({
+      status: 'error',
+      database: 'disconnected',
+      timestamp: new Date().toISOString(),
+      // Infrastructure details (driver, host, raw error) are omitted in
+      // production to avoid disclosing internals on a public endpoint. They are
+      // always available in the server logs.
+      ...(process.env.NODE_ENV === 'production'
+        ? {}
+        : { driver: describeDbDriver(), host: getRedactedDbHost(), reason }),
+    })
   }
 })
 
@@ -323,24 +328,56 @@ async function main() {
     startupLogger.info({ port: PORT }, 'Server started')
     startupLogger.info(`Health check: http://localhost:${PORT}/api/health`)
 
-    // Retry DB connection up to 3 times with exponential backoff
+    // Banner on stderr so it always reaches the platform's error log — the first
+    // place to look when a deployment returns 503.
+    process.stderr.write([
+      '─── backend startup ───',
+      `  node      : ${process.version}`,
+      `  env       : ${process.env.NODE_ENV || 'development'}`,
+      `  port      : ${PORT}`,
+      `  cwd       : ${process.cwd()}`,
+      `  entry     : ${process.argv[1] || 'unknown'}`,
+      `  db driver : ${describeDbDriver()}`,
+      `  db host   : ${getRedactedDbHost()}`,
+      '───────────────────────',
+      '',
+    ].join('\n'))
+
+    // Retry DB connection up to 3 times with exponential backoff.
+    // Each attempt is bounded: a firewall that silently drops packets would
+    // otherwise leave $connect() pending forever and this loop never finishes.
     const maxAttempts = 3
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        await prisma.$connect()
+        await withTimeout(prisma.$connect(), DB_CONNECT_TIMEOUT_MS, 'prisma-connect')
         dbLogger.info('Database connected')
-        startEmailQueueProcessor()
         break // success
       } catch (error) {
         dbLogger.error({ err: error, attempt }, 'Database connection attempt failed')
         if (attempt === maxAttempts) {
-          startupLogger.error('Unable to connect to database after multiple attempts – exiting')
-          process.exit(1)
+          // Deliberately do NOT exit. The HTTP server is already listening and
+          // every route that doesn't touch the database still works. Exiting
+          // would take down a partially-healthy API and replace a precise error
+          // with an opaque platform-level 503.
+          startupLogger.error('Unable to connect to database after multiple attempts')
+          process.stderr.write(
+            `ERROR: database unreachable after ${maxAttempts} attempts ` +
+            `(${describeDbDriver()} → ${getRedactedDbHost()}): ` +
+            `${error instanceof Error ? error.message : 'unknown error'}\n` +
+            'Non-database routes remain available. See /api/health for status.\n',
+          )
+          break
         }
         // wait before next attempt (exponential backoff)
         await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)))
       }
     }
+
+    // Started regardless of the outcome above: Prisma reconnects lazily, so if
+    // the database only becomes reachable later, the queue must already be
+    // polling or queued mail would never be delivered. Each tick is internally
+    // guarded against errors.
+    startEmailQueueProcessor()
   })
 }
 
