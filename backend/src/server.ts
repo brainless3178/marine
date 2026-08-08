@@ -63,12 +63,9 @@ import fs from 'fs'
 import { fileURLToPath } from 'url'
 import { PrismaClient } from '@prisma/client'
 
-// ─── __dirname for ES modules ───────────────────────────────────
-// Compiled file lives at backend/dist/server.js
-// Project root (where frontend-dist/ lives) is two levels up.
+// ES module __dirname — compiled file lives at backend/dist/server.js
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..')
 import { sanitize } from './middleware/sanitize.js'
 import { verifyCsrf, issueCsrfToken } from './middleware/csrf.js'
 import { loginLimiter, registerLimiter, passwordResetLimiter } from './middleware/rateLimit.js'
@@ -330,54 +327,18 @@ for (const prefix of API_PREFIXES) {
 // This MUST come before the 404 handler so that frontend routes
 // (e.g., /products, /admin, /about) are served by index.html.
 if (process.env.NODE_ENV === 'production') {
-  // Use __dirname-based paths for reliable resolution on Hostinger.
-  // Compiled file: backend/dist/server.js → PROJECT_ROOT is two levels up.
-  const possiblePaths = [
-    path.join(PROJECT_ROOT, 'frontend-dist'),
-    path.join(PROJECT_ROOT, 'dist'),
-    path.resolve('frontend-dist'),
-    path.resolve('dist'),
-  ]
+  // Compiled file: backend/dist/server.js → ../../ = project root
+  const frontendPath = path.resolve(__dirname, '../../frontend-dist')
+  console.log('Frontend path:', frontendPath)
 
-  let frontendPath: string | null = null
-  for (const p of possiblePaths) {
-    const indexPath = path.join(p, 'index.html')
-    if (fs.existsSync(indexPath)) {
-      frontendPath = p
-      break
-    }
-  }
+  app.use(express.static(frontendPath))
 
-  if (frontendPath) {
-    startupLogger.info({ frontendPath, PROJECT_ROOT }, 'Serving frontend from')
-    // Serve static assets (JS, CSS, images) with long cache
-    app.use(express.static(frontendPath, {
-      maxAge: '1y',
-      immutable: true,
-      index: false, // Don't auto-serve index.html for directories
-    }))
-
-    // SPA fallback — any non-API route that doesn't match a static file
-    // gets index.html so React Router can handle client-side routing
-    app.get('*', (req, res) => {
-      // Don't serve index.html for API routes that weren't matched
-      if (req.path.startsWith('/api')) {
-        return sendError(res, 'API endpoint not found', 404)
-      }
-      res.sendFile(path.join(frontendPath!, 'index.html'))
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next()
+    res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
+      if (err) next(err)
     })
-  } else {
-    // List what directories actually exist at the project root for debugging
-    let dirContents: string[] = []
-    try {
-      dirContents = fs.readdirSync(PROJECT_ROOT).filter(f => !f.startsWith('.') && f !== 'node_modules')
-    } catch { /* ignore */ }
-    startupLogger.error(
-      { PROJECT_ROOT, cwd: process.cwd(), dirContents, searched: possiblePaths },
-      'CRITICAL: frontend-dist/index.html not found — frontend will NOT be served. ' +
-      'The site will show 404 for all non-API routes.'
-    )
-  }
+  })
 }
 
 // ─── 404 Handler ───────────────────────────────────────────────
