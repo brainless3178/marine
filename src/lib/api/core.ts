@@ -10,7 +10,13 @@
  * - Convenience methods (get/post/put/patch/del)
  */
 
-const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api/v1'
+const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '')
+// '/api' is the legacy Netlify dev-proxy value. The Hostinger frontend has no
+// /api proxy, so that value would silently break every API call — fall back to
+// the production API instead. An empty value is left untouched so the Vite dev
+// server proxy keeps working during local development.
+const apiUrl = rawApiUrl === '/api' ? 'https://api.alkatraders.co' : rawApiUrl
+const API_BASE = apiUrl + '/api/v1'
 
 // ─── Token Storage (in-memory, NOT localStorage for security) ───
 
