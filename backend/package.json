@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "postinstall": "prisma generate || exit 0",
     "build": "prisma generate && tsc",
     "build:backend": "npm run build",
     "start": "node dist/server.js",
