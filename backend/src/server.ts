@@ -117,7 +117,7 @@ import { startEmailQueueProcessor, stopEmailQueueProcessor } from './services/em
 
 // ─── App Setup ─────────────────────────────────────────────────
 const app = express()
-const PORT = parseInt(process.env.PORT || '8080', 10) // Updated fallback port for Hostinger
+const PORT = parseInt(process.env.PORT || '3000', 10) // Hostinger default port
 
 // ─── Trust Proxy (CRITICAL for Hostinger / any reverse proxy) ──
 // Hostinger runs NGINX in front of Node.js. Without this:
@@ -239,7 +239,7 @@ app.use((req: express.Request, _res: express.Response, next: express.NextFunctio
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))
 
 // ─── Health Check ──────────────────────────────────────────────
-app.get('/api/health', async (_req, res) => {
+app.get(['/health', '/api/health'], async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`
     res.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString() })
