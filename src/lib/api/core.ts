@@ -10,7 +10,7 @@
  * - Convenience methods (get/post/put/patch/del)
  */
 
-const API_BASE = '/api/v1'
+const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api/v1'
 
 // ─── Token Storage (in-memory, NOT localStorage for security) ───
 

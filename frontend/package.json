@@ -1,0 +1,12 @@
+{
+  "name": "alka-traders-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd .. && node ./node_modules/vite/bin/vite.js build",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

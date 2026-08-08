@@ -60,3 +60,4 @@ public/hero.mp4
 
 # Hostinger deployment build artifacts
 frontend-dist/
+frontend/dist/
