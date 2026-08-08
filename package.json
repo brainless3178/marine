@@ -10,9 +10,8 @@
     "dev": "node ./node_modules/vite/bin/vite.js",
     "build:backend": "cd backend && npm install --include=dev && npx prisma generate && npx tsc",
     "build": "npm run build:backend && node ./node_modules/typescript/bin/tsc -b && node ./node_modules/vite/bin/vite.js build && node scripts/copy-frontend.mjs && (node scripts/prerender.mjs || true) && (node scripts/generate-sitemap.mjs || true)",
-    "build:hostinger": "npm run build",
     "start": "node server.js",
-    "postinstall": "cd backend && npx prisma generate",
+    "postinstall": "cd backend && (npx prisma generate || true)",
     "typecheck": "node ./node_modules/typescript/bin/tsc -b --noEmit",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "preview": "node ./node_modules/vite/bin/vite.js preview",
@@ -92,12 +91,12 @@
     "globals": "^17.6.0",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.15",
+    "prisma": "^5.22.0",
     "tailwindcss": "^3.4.19",
     "tsx": "^4.19.4",
+    "typescript": "~5.8.3",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12",
-    "vitest": "^4.1.9",
-    "prisma": "^5.22.0",
-    "typescript": "~5.8.3"
+    "vitest": "^4.1.9"
   }
 }
