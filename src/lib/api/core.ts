@@ -64,11 +64,6 @@ async function getCsrfToken(): Promise<string | null> {
   return csrfTokenPromise
 }
 
-export function clearCsrfToken() {
-  csrfToken = null
-  csrfTokenFetchedAt = 0
-}
-
 export function getAdminToken(): string | null {
   return adminAccessToken
 }
@@ -79,10 +74,6 @@ export function setAdminToken(token: string | null) {
 
 export function setCustomerToken(token: string | null) {
   customerAccessToken = token
-}
-
-export function getCustomerToken(): string | null {
-  return customerAccessToken
 }
 
 // ─── Core Fetch Wrapper ─────────────────────────────────────────

@@ -6,7 +6,7 @@
  *   CLOUDINARY_URL=cloudinary://key:secret@cloudname node scripts/upload-images-to-cloudinary.mjs
  *
  * What it does:
- *   - Scans public/images/products/ (100 product images)
+ *   - Product images are NOT uploaded (catalog intentionally empty)
  *   - Scans public/images/categories/ (16 category images)
  *   - Scans public/brand/ (~500 brand logos)
  *   - Scans public/images/ (logo, placeholder, payments, hero banners)
@@ -88,20 +88,9 @@ async function uploadVideo(filePath, publicId) {
 }
 
 // ─── Upload Product Images ──────────────────────────────────
+// Products were removed from the store — this step is skipped intentionally.
 async function uploadProducts() {
-  console.log('\n📦 Uploading product images...')
-  const files = readdirSync(PRODUCTS_DIR).filter(f => /\.(jpg|jpeg|png|webp|avif)$/i.test(f))
-  
-  for (const file of files) {
-    const publicId = `alka/products/${file.replace(extname(file), '')}`
-    const url = await uploadFile(join(PRODUCTS_DIR, file), publicId)
-    if (url) {
-      cloudinaryUrls[`products/${file}`] = url
-      results.products++
-      process.stdout.write('.')
-    }
-  }
-  console.log(`\n  ✓ ${results.products} product images uploaded`)
+  console.log('\n📦 Product images: skipped (catalog intentionally empty)')
 }
 
 // ─── Upload Category Images ─────────────────────────────────
@@ -146,7 +135,7 @@ async function uploadBrands() {
 // ─── Upload Static Images ───────────────────────────────────
 async function uploadStatic() {
   console.log('\n🖼️  Uploading static images...')
-  const staticFiles = ['alka-traders-logo.jpg', 'placeholder.jpg', 'payments.png', 'marq-3.png', 'marq11.png', 'marq-1.png', 'marq-2.png']
+  const staticFiles = ['alka-traders-logo.png', 'placeholder.jpg', 'payments.png', 'marq-3.png', 'marq11.png', 'marq-1.png', 'marq-2.png']
   
   for (const file of staticFiles) {
     const filePath = join(STATIC_DIR, file)

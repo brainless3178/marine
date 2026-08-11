@@ -9,20 +9,6 @@
  * of these via the adapter layer (src/lib/adapters.ts).
  */
 
-// ─── Enum / Union Types ───────────────────────────────────────
-
-export type ProductStatus = 'draft' | 'published' | 'archived' | 'hidden'
-export type Availability = 'in-stock' | 'sourced' | 'emergency' | 'out-of-stock'
-export type ProductCondition = 'new' | 'refurbished' | 'used' | 'reconditioned' | 'unused'
-export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded'
-export type RfqStatus = 'new' | 'quoted' | 'accepted' | 'rejected' | 'closed'
-export type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'countered' | 'expired'
-export type Urgency = 'standard' | 'urgent' | 'emergency'
-export type Language = 'en' | 'ar' | 'es'
-export type AdminRole = 'owner' | 'store-manager' | 'inventory-manager' | 'sales-agent' | 'content-manager' | 'viewer'
-export type CustomerStatus = 'active' | 'inactive' | 'vip' | 'new'
-
 // ─── Product ───────────────────────────────────────────────────
 
 export interface ProductImage {
@@ -64,6 +50,7 @@ export interface Product {
   showPrice: boolean
   makeOfferEnabled: boolean
   makeOffer?: boolean
+  minimumOfferPrice?: number | null
   stockCount: number
   lowStockThreshold: number
   warehouseLocation?: string | null
@@ -245,14 +232,6 @@ export interface Rfq {
   updatedAt?: string | null
 }
 
-export interface RfqNote {
-  id: string
-  rfqId: string
-  note: string
-  isInternal: boolean
-  createdBy?: string | null
-  createdAt: string
-}
 
 // ─── Offer ─────────────────────────────────────────────────────
 
@@ -456,34 +435,6 @@ export interface Testimonial {
   isVisible?: boolean
 }
 
-// ─── Office ────────────────────────────────────────────────────
-
-export interface Office {
-  id?: string
-  city: string
-  country: string
-  address?: string | null
-  timezone?: string | null
-  phone?: string | null
-  email?: string | null
-  coordinatesLat?: number | null
-  coordinatesLng?: number | null
-  sortOrder?: number
-  isVisible?: boolean
-}
-
-// ─── User Profile (API response shape, differs from middleware AuthUser which is the JWT payload)
-
-export interface UserProfile {
-  id: string
-  name: string
-  email: string
-  role: string
-  avatarUrl?: string | null
-  isActive?: boolean
-  lastLoginAt?: string | null
-  createdAt: string
-}
 
 // ─── Search ────────────────────────────────────────────────────
 

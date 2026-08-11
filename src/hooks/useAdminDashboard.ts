@@ -20,7 +20,7 @@ export interface DashboardStats {
   conditionBreakdown: ConditionBreakdown[]
 }
 
-export interface ProductAlert {
+interface ProductAlert {
   id: string
   name: string
   sku: string
@@ -59,7 +59,7 @@ export interface DashboardActivity {
   createdAt: string
 }
 
-export interface DashboardAlert {
+interface DashboardAlert {
   type: 'danger' | 'warning' | 'info'
   message: string
   entityType?: string

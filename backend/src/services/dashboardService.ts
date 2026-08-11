@@ -1,5 +1,4 @@
 import { prisma } from '../server.js'
-import { paginationParams, paginationResponse } from '../utils/helpers.js'
 
 // ─── Queries ──────────────────────────────────────────────────
 

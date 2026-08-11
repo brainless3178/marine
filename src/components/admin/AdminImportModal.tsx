@@ -69,7 +69,7 @@ export function AdminImportModal({ open, onClose, onImport, importing, importRes
                 <button
                   onClick={() => inputRef.current?.click()}
                   disabled={importing}
-                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent-gold)] px-4 py-2 text-xs font-bold text-navy-deep hover:bg-[var(--gold-light)] transition-colors disabled:opacity-50"
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent-gold)] px-4 py-2 text-xs font-bold text-[var(--btn-blue-text)] hover:brightness-95 transition-colors disabled:opacity-50"
                 >
                   {importing ? (
                     <><Loader2 size={12} className="animate-spin" /> Importing...</>

@@ -40,7 +40,7 @@ export default function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--primary-bg)] px-4">
         <div className="text-center">
           <img
-            src="/images/alka-traders-logo.jpeg"
+            src="/images/alka-traders-logo.png"
             alt="Alka Traders Logo"
             className="w-10 h-10 rounded-xl object-cover shadow-sm mx-auto mb-4"
           />
@@ -60,7 +60,7 @@ export default function ResetPassword() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2.5 mb-2">
             <img
-              src="/images/alka-traders-logo.jpeg"
+              src="/images/alka-traders-logo.png"
               alt="Alka Traders Logo"
               className="w-8 h-8 rounded-xl object-cover shadow-sm"
             />

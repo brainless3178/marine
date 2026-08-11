@@ -264,12 +264,9 @@ html.dark .admin-stat-card:hover {
   min-height: 100vh;
 }
 
-html.light .admin-login-bg {
-  background:
-    radial-gradient(circle at 20% 30%, var(--gold-muted-light), transparent 30rem),
-    radial-gradient(circle at 80% 70%, var(--login-teal), transparent 30rem),
-    linear-gradient(135deg, var(--admin-login-gradient-light-start) 0%, var(--admin-login-gradient-light-mid) 50%, var(--admin-login-gradient-light-end) 100%);
-}
+/* The admin login deliberately stays on the dark navy gradient in BOTH themes
+   (matching the always-dark admin sidebar). A light-mode variant was attempted
+   but left white text invisible against the light gradient, so it was removed. */
 
 /* ── Quick action button ─────────────────────────────────── */
 .admin-quick-action {

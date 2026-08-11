@@ -138,6 +138,7 @@
     "submit": "Submit RFQ",
     "success": "RFQ Submitted Successfully",
     "successSub": "Your requirement has been received by our procurement team. Expected response time: Within 4 business hours.",
+    "expectedResponseIn": "Expected response in",
     "rfqId": "RFQ #",
     "formContact": "Contact Details",
     "formProduct": "Product Information",
@@ -456,6 +457,9 @@
   "product": {
     "addToCart": "Add to Cart",
     "addToCartUpper": "Add To Cart",
+    "sale": "OFF",
+    "saleEndsIn": "Sale ends in",
+    "endsSoon": "Ending soon",
     "buyNow": "Buy Now",
     "makeOffer": "Make an Offer",
     "added": "Added!",

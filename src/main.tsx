@@ -6,6 +6,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import { initSentry } from './lib/sentry'
 import { queryClient } from './lib/queryClient'
+import { TickerProvider } from './components/TickerProvider'
 initSentry()
 
 import './index.css'
@@ -52,7 +53,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
-        <App />
+        <TickerProvider>
+          <App />
+        </TickerProvider>
       </HelmetProvider>
     </QueryClientProvider>
   </StrictMode>,

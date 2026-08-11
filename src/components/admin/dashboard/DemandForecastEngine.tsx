@@ -111,7 +111,7 @@ export function DemandForecastEngine({ products, orders }: Props) {
           {[10, 20, 30].map(n => (
             <button key={n} onClick={() => setTopN(n)}
               className={`rounded-lg px-2 py-0.5 text-[0.5rem] font-bold transition-all ${
-                topN === n ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
+                topN === n ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
               }`}>Top {n}</button>
           ))}
         </div>

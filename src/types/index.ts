@@ -1,4 +1,4 @@
-export type ProductCategory =
+type ProductCategory =
   | 'marine'
   | 'electrical'
   | 'hydraulic'
@@ -19,13 +19,13 @@ export type ProductCategory =
   | 'rigging'
   | 'other-business'
 
-export type Availability = 'in-stock' | 'sourced' | 'emergency' | 'out-of-stock'
+type Availability = 'in-stock' | 'sourced' | 'emergency' | 'out-of-stock'
 
-export type Urgency = 'standard' | 'urgent' | 'emergency'
+type Urgency = 'standard' | 'urgent' | 'emergency'
 
 export type Language = 'en' | 'ar' | 'es'
 
-export interface ProductImage {
+interface ProductImage {
   url: string
   alt: string
   label?: string
@@ -45,8 +45,11 @@ export interface Product {
   description: string
   condition: 'new' | 'refurbished' | 'used' | 'reconditioned' | 'unused'
   price: number
+  regularPrice?: number
   salePrice?: number
   onSale?: boolean
+  saleStartsAt?: string
+  saleEndsAt?: string
   inStock: boolean
   stockCount: number
   customLabel?: string
@@ -130,14 +133,6 @@ export interface FAQItem {
   answer: string
 }
 
-export interface SearchResult {
-  id: string
-  type: 'product' | 'page' | 'category'
-  title: string
-  description: string
-  path: string
-}
-
 export interface CartItem {
   product: Product
   quantity: number
@@ -150,30 +145,6 @@ export interface User {
   phone?: string
   company?: string
   country?: string
-}
-
-export interface ShippingAddress {
-  fullName: string
-  addressLine1: string
-  addressLine2: string
-  city: string
-  state: string
-  postalCode: string
-  country: string
-}
-
-export interface OrderSummary {
-  orderId: string
-  items: CartItem[]
-  shipping: ShippingAddress
-  paymentMethod: string
-  subtotal: number
-  shippingCost: number
-  tax: number
-  total: number
-  estimatedDelivery: string
-  status?: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
-  cancelRequested?: boolean
 }
 
 export interface PriceRange {

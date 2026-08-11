@@ -25,7 +25,7 @@ interface SEOProps {
 const BASE_URL = import.meta.env.VITE_SITE_URL || 'https://alkatraders.co'
 const SITE_NAME = 'Alka Traders'
 const DEFAULT_DESCRIPTION = 'Marine & industrial equipment supplier — ship spares, surplus machinery, electrical automation, hydraulic systems, and emergency procurement. Based in Bhavnagar, Gujarat, India.'
-const DEFAULT_OG_IMAGE = `${BASE_URL}/images/alka-traders-logo.jpeg`
+const DEFAULT_OG_IMAGE = `${BASE_URL}/images/alka-traders-logo.png`
 
 /** Build absolute hreflang links for all supported locales. */
 function buildHreflangLinks(_locale: Language, pathWithoutLocale: string): Array<{ hreflang: string; href: string }> {

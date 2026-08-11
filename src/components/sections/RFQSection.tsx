@@ -4,6 +4,8 @@ import { CircleCheck, Mail, Send } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
 import { WhatsAppIcon } from '../ui/WhatsAppIcon'
+import { ResponseCountdown } from '../ui/ResponseCountdown'
+import { getRfqResponseDeadline } from '../../lib/rfqSla'
 
 export function RFQSection() {
   const { t } = useTranslation()
@@ -14,7 +16,7 @@ export function RFQSection() {
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
   }, [])
-  const { rfqSubmitted, rfqId, setRfqSubmitted, generateRfqId } = useStore()
+  const { rfqSubmitted, rfqId, setRfqSubmitted, generateRfqId, rfqDeadline, setRfqDeadline } = useStore()
   const settings = useStoreSettings()
   const [formData, setFormData] = useState({
     name: '',
@@ -35,6 +37,7 @@ export function RFQSection() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     generateRfqId()
+    setRfqDeadline(getRfqResponseDeadline(formData.urgency))
     setRfqSubmitted(true)
   }
 
@@ -52,6 +55,9 @@ export function RFQSection() {
             <h3 className="text-xl font-bold mb-3 text-[var(--text-primary)]">{t('rfq.success')}</h3>
             <p className="font-mono text-lg text-[var(--accent-primary)] mb-2">{t('rfq.rfqId')}{rfqId}</p>
             <p className="text-sm text-[var(--text-secondary)]">{t('rfq.successSub')}</p>
+            <div className="mt-6 flex justify-center">
+              <ResponseCountdown deadline={rfqDeadline} />
+            </div>
           </div>
         </div>
       </section>

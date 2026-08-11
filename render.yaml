@@ -56,7 +56,7 @@ services:
       - key: EMERGENCY_EMAIL
         value: sales@alkatraders.co
       - key: ADMIN_EMAIL
-        value: sales@alkatraders.co
+        value: admin@alkatraders.co
       - key: DEFAULT_SHIPPING_COST
         value: "25"
       - key: DEFAULT_TAX_RATE

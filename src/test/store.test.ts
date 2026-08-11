@@ -230,6 +230,13 @@ describe('useStore', () => {
       const rfqId = useStore.getState().rfqId
       expect(rfqId).toMatch(/^AT-\d{5}$/)
     })
+
+    it('sets and clears the RFQ response deadline', () => {
+      useStore.getState().setRfqDeadline('2026-08-11T14:00:00.000Z')
+      expect(useStore.getState().rfqDeadline).toBe('2026-08-11T14:00:00.000Z')
+      useStore.getState().setRfqDeadline(null)
+      expect(useStore.getState().rfqDeadline).toBeNull()
+    })
   })
 
   describe('Checkout', () => {

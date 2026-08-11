@@ -6,10 +6,11 @@ import { AdminProductFilters } from '../../components/admin/AdminProductFilters'
 import { AdminProductTable } from '../../components/admin/AdminProductTable'
 import type { SortKey, SortDir } from '../../components/admin/AdminProductTable'
 import { AdminImportModal } from '../../components/admin/AdminImportModal'
+import { ProductOfferModal } from '../../components/admin/ProductOfferModal'
 import { Plus, Upload } from 'lucide-react'
 import Papa from 'papaparse'
 import { admin } from '../../lib/api'
-import type { ApiBrand, ApiCategory, Pagination } from '../../lib/api-types'
+import type { ApiBrand, ApiCategory, ApiProduct, Pagination } from '../../lib/api-types'
 
 const ITEMS_PER_PAGE = 20
 
@@ -25,6 +26,7 @@ interface AdminProduct {
   stockCount: number
   condition: string
   availability: string
+  status: string
   isNewArrival: boolean
   images: { url: string; alt: string; label?: string }[]
   customLabel?: string
@@ -52,6 +54,7 @@ export default function AdminProducts() {
   const [filterBrand, setFilterBrand] = useState(searchParams.get('brand') || '')
   const [filterCondition, setFilterCondition] = useState(searchParams.get('condition') || '')
   const [filterAvailability, setFilterAvailability] = useState(searchParams.get('availability') || '')
+  const [filterStatus, setFilterStatus] = useState(searchParams.get('status') || '')
   const [filterOnSale, setFilterOnSale] = useState(searchParams.get('sale') === 'true')
   const [filterNewArrival, setFilterNewArrival] = useState(searchParams.get('new') === 'true')
   const [showFilters, setShowFilters] = useState(false)
@@ -98,6 +101,7 @@ export default function AdminProducts() {
       }
       if (filterCondition) params.condition = filterCondition
       if (filterAvailability) params.availability = filterAvailability
+      if (filterStatus) params.status = filterStatus
       if (filterOnSale) params.onSale = 'true'
       if (filterNewArrival) params.isNewArrival = 'true'
       params.sort = sortKey
@@ -119,6 +123,7 @@ export default function AdminProducts() {
         stockCount: p.stockCount ?? 0,
         condition: p.condition || 'used',
         availability: p.availability || 'in-stock',
+        status: p.status || 'draft',
         isNewArrival: p.isNewArrival ?? false,
         images: p.images || [],
         customLabel: p.customLabel || '',
@@ -130,7 +135,7 @@ export default function AdminProducts() {
     } finally {
       setLoading(false)
     }
-  }, [search, filterCategory, filterBrand, categoryIdMap, brandIdMap, filterCondition, filterAvailability, filterOnSale, filterNewArrival, sortKey, sortDir, page, toast])
+  }, [search, filterCategory, filterBrand, categoryIdMap, brandIdMap, filterCondition, filterAvailability, filterStatus, filterOnSale, filterNewArrival, sortKey, sortDir, page, toast])
 
   useEffect(() => {
     const timer = setTimeout(() => fetchProducts(), 300)
@@ -148,6 +153,7 @@ export default function AdminProducts() {
     if (filterBrand) result = result.filter((p) => getBrandName(p.brand) === filterBrand)
     if (filterCondition) result = result.filter((p) => p.condition === filterCondition)
     if (filterAvailability) result = result.filter((p) => p.availability === filterAvailability)
+    if (filterStatus) result = result.filter((p) => (p.status || 'draft') === filterStatus)
     if (filterOnSale) result = result.filter((p) => p.onSale)
     if (filterNewArrival) result = result.filter((p) => p.isNewArrival)
 
@@ -161,11 +167,12 @@ export default function AdminProducts() {
         case 'price': cmp = (a.onSale && a.salePrice ? a.salePrice : a.price) - (b.onSale && b.salePrice ? b.salePrice : b.price); break
         case 'stock': cmp = a.stockCount - b.stockCount; break
         case 'condition': cmp = a.condition.localeCompare(b.condition); break
+        case 'status': cmp = (a.status || 'draft').localeCompare(b.status || 'draft'); break
       }
       return sortDir === 'asc' ? cmp : -cmp
     })
     return result
-  }, [productList, search, filterCategory, filterBrand, filterCondition, filterAvailability, filterOnSale, filterNewArrival, sortKey, sortDir])
+  }, [productList, search, filterCategory, filterBrand, filterCondition, filterAvailability, filterStatus, filterOnSale, filterNewArrival, sortKey, sortDir])
 
   const totalPages = pagination?.totalPages || Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
   const totalItems = pagination?.total ?? filteredProducts.length
@@ -194,15 +201,16 @@ export default function AdminProducts() {
     if (filterBrand) params.brand = filterBrand
     if (filterCondition) params.condition = filterCondition
     if (filterAvailability) params.availability = filterAvailability
+    if (filterStatus) params.status = filterStatus
     if (filterOnSale) params.sale = 'true'
     if (filterNewArrival) params.new = 'true'
     if (page > 1) params.page = String(page)
     setSearchParams(params, { replace: true })
-  }, [search, filterCategory, filterBrand, filterCondition, filterAvailability, filterOnSale, filterNewArrival, page, setSearchParams])
+  }, [search, filterCategory, filterBrand, filterCondition, filterAvailability, filterStatus, filterOnSale, filterNewArrival, page, setSearchParams])
 
   useEffect(() => {
     setSelectedIds(new Set())
-  }, [search, filterCategory, filterBrand, filterCondition, filterAvailability, filterOnSale, filterNewArrival, page])
+  }, [search, filterCategory, filterBrand, filterCondition, filterAvailability, filterStatus, filterOnSale, filterNewArrival, page])
 
   const toggleSelectAll = () => {
     if (selectedIds.size === paginatedProducts.length) {
@@ -226,12 +234,22 @@ export default function AdminProducts() {
     else { setSortKey(key); setSortDir('asc') }
   }
 
-  const activeFilterCount = [filterCategory, filterBrand, filterCondition, filterAvailability, filterOnSale, filterNewArrival].filter(Boolean).length
+  const activeFilterCount = [filterCategory, filterBrand, filterCondition, filterAvailability, filterStatus, filterOnSale, filterNewArrival].filter(Boolean).length
 
   const clearFilters = () => {
     setFilterCategory(''); setFilterBrand(''); setFilterCondition('')
-    setFilterAvailability(''); setFilterOnSale(false); setFilterNewArrival(false)
+    setFilterAvailability(''); setFilterStatus(''); setFilterOnSale(false); setFilterNewArrival(false)
     setSearch(''); setPage(1); setSearchParams({})
+  }
+
+  const BULK_ACTION_LABELS: Record<string, string> = {
+    publish: 'published',
+    unpublish: 'hidden',
+    archive: 'archived',
+    'mark-offer': 'marked for offers',
+    'set-new-arrival': 'marked as new arrival',
+    'set-featured': 'marked as featured',
+    'unset-featured': 'unmarked as featured',
   }
 
   const handleBulkAction = async (action: string) => {
@@ -240,7 +258,8 @@ export default function AdminProducts() {
 
     try {
       await admin.products.bulk(ids, action)
-      toast(`${ids.length} product${ids.length > 1 ? 's' : ''} ${action}`, 'success')
+      const label = BULK_ACTION_LABELS[action] || action
+      toast(`${ids.length} product${ids.length > 1 ? 's' : ''} ${label}`, 'success')
       fetchProducts()
     } catch (err: unknown) {
       toast(err instanceof Error ? err.message : 'Bulk action failed', 'error')
@@ -267,6 +286,9 @@ export default function AdminProducts() {
   const [showImport, setShowImport] = useState(false)
   const [importing, setImporting] = useState(false)
   const [importResult, setImportResult] = useState<{ created: number; skipped: number; errors: string[] } | null>(null)
+  const [offerProduct, setOfferProduct] = useState<ApiProduct | null>(null)
+  const [offerOpen, setOfferOpen] = useState(false)
+  const [offerSaving, setOfferSaving] = useState(false)
 
   const handleDuplicate = async (productId: string) => {
     setDuplicating(productId)
@@ -278,6 +300,42 @@ export default function AdminProducts() {
       toast(err instanceof Error ? err.message : 'Failed to duplicate product', 'error')
     } finally {
       setDuplicating(null)
+    }
+  }
+
+  const handleOpenOffer = async (productId: string) => {
+    try {
+      const res = await admin.products.get(productId)
+      setOfferProduct(res.product)
+      setOfferOpen(true)
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to load product', 'error')
+    }
+  }
+
+  const handleSaveOffer = async (data: {
+    salePrice: number | null
+    saleStartsAt: string | null
+    saleEndsAt: string | null
+    makeOfferEnabled: boolean
+    minimumOfferPrice: number | null
+    isFeatured: boolean
+    isNewArrival: boolean
+    customLabel: string | null
+    customLabelColor: string | null
+  }) => {
+    if (!offerProduct) return
+    setOfferSaving(true)
+    try {
+      await admin.products.update(offerProduct.id, data)
+      toast(`Offer applied to ${offerProduct.name}`, 'success')
+      setOfferOpen(false)
+      setOfferProduct(null)
+      fetchProducts()
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Failed to apply offer', 'error')
+    } finally {
+      setOfferSaving(false)
     }
   }
 
@@ -329,8 +387,8 @@ export default function AdminProducts() {
   }
 
   const handleExportCsv = () => {
-    const headers = ['Name', 'SKU', 'Brand', 'Category', 'Price', 'Sale Price', 'Stock', 'Condition', 'Availability']
-    const rows = filteredProducts.map((p) => [p.name, p.sku, getBrandName(p.brand), getCategoryName(p.category), p.price.toString(), p.salePrice?.toString() || '', p.stockCount.toString(), p.condition, p.availability])
+    const headers = ['Name', 'SKU', 'Brand', 'Category', 'Price', 'Sale Price', 'Stock', 'Condition', 'Availability', 'Status']
+    const rows = filteredProducts.map((p) => [p.name, p.sku, getBrandName(p.brand), getCategoryName(p.category), p.price.toString(), p.salePrice?.toString() || '', p.stockCount.toString(), p.condition, p.availability, p.status || 'draft'])
     const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `"${c}"`).join(','))].join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -361,7 +419,7 @@ export default function AdminProducts() {
           </button>
           <Link
             to="/admin/products/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[var(--btn-blue-text)] no-underline transition-all hover:brightness-95 hover:-translate-y-0.5"
           >
             <Plus size={14} /> Add Product
           </Link>
@@ -385,6 +443,8 @@ export default function AdminProducts() {
         onFilterConditionChange={setFilterCondition}
         filterAvailability={filterAvailability}
         onFilterAvailabilityChange={setFilterAvailability}
+        filterStatus={filterStatus}
+        onFilterStatusChange={setFilterStatus}
         filterOnSale={filterOnSale}
         onFilterOnSaleToggle={() => setFilterOnSale((v) => !v)}
         filterNewArrival={filterNewArrival}
@@ -406,6 +466,7 @@ export default function AdminProducts() {
         onSort={handleSort}
         onDuplicate={handleDuplicate}
         duplicating={duplicating}
+        onOffer={handleOpenOffer}
         onDeleteRequest={setDeleteTarget}
         onClearFilters={clearFilters}
         onBulkAction={handleBulkAction}
@@ -435,6 +496,15 @@ export default function AdminProducts() {
       danger
       onConfirm={handleDelete}
       onCancel={() => setDeleteTarget(null)}
+    />
+
+    {/* ── Run Offer ── */}
+    <ProductOfferModal
+      open={offerOpen}
+      product={offerProduct}
+      saving={offerSaving}
+      onClose={() => { setOfferOpen(false); setOfferProduct(null) }}
+      onSave={handleSaveOffer}
     />
     </>
   )

@@ -1,7 +1,7 @@
 import { type ComponentType } from 'react'
 import { Package, FileText, LayoutGrid } from 'lucide-react'
 
-export type SearchResultType = 'product' | 'page' | 'category' | 'brand'
+type SearchResultType = 'product' | 'page' | 'category' | 'brand'
 
 export interface SearchResult {
   id: string

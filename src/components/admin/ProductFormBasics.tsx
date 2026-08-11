@@ -1,5 +1,6 @@
-import { AlertCircle } from 'lucide-react'
-import { isLightColor } from '../../lib/utils'
+import { useRef } from 'react'
+import { AlertCircle, Wand2 } from 'lucide-react'
+import { isLightColor, buildProductSkuBase, generateProductSku } from '../../lib/utils'
 import { BrandCombobox } from './BrandCombobox'
 import type { ProductFormData } from '../../hooks/useProductForm'
 
@@ -24,6 +25,14 @@ export function ProductFormBasics({
   getFieldClass, getSelectClass, labelClass, errorClass, errors,
   brandList, categoryList, industryList, toggleIndustry,
 }: ProductFormBasicsProps) {
+  const skuInputRef = useRef<HTMLInputElement>(null)
+
+  const useGeneratedSku = () => {
+    updateField('sku', generateProductSku(form.name))
+    // Focus the SKU input so the admin can immediately edit the generated value.
+    skuInputRef.current?.focus()
+  }
+
   return (
     <div className="space-y-5">
       <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">Basic Information</h2>
@@ -39,12 +48,35 @@ export function ProductFormBasics({
           className={getFieldClass('name')}
         />
         {showError('name') && <p className={errorClass}><AlertCircle size={10} />{errors.name}</p>}
+
+        {/* Live auto-SKU preview — updates as the name is typed. Only shown
+            while SKU is empty; the 7-char unique suffix is added on save. */}
+        {!form.sku.trim() && form.name.trim() && (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--accent-teal)]/50 bg-[var(--teal-soft)] px-2.5 py-1 font-mono text-[11px] font-bold text-[var(--accent-teal)]"
+              title="A unique 7-character suffix is added automatically on save"
+            >
+              <Wand2 size={11} />
+              Auto SKU: {buildProductSkuBase(form.name)}-XXXXXXX
+            </span>
+            <button
+              type="button"
+              onClick={useGeneratedSku}
+              className="inline-flex items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]"
+              title="Fill the SKU field with this generated value so you can edit it"
+            >
+              Use & edit
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>SKU *</label>
+          <label className={labelClass}>SKU <span className="normal-case font-semibold text-[var(--text-muted)]">(auto-generated if empty)</span></label>
           <input
+            ref={skuInputRef}
             type="text"
             value={form.sku}
             onChange={(e) => updateField('sku', e.target.value)}
@@ -55,7 +87,7 @@ export function ProductFormBasics({
           {showError('sku') && <p className={errorClass}><AlertCircle size={10} />{errors.sku}</p>}
         </div>
         <div>
-          <label className={labelClass}>Brand *</label>
+          <label className={labelClass}>Brand <span className="normal-case font-semibold text-[var(--text-muted)]">(optional)</span></label>
           <BrandCombobox
             value={form.brand}
             brands={brandList}
@@ -68,7 +100,7 @@ export function ProductFormBasics({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Category *</label>
+          <label className={labelClass}>Category <span className="normal-case font-semibold text-[var(--text-muted)]">(optional)</span></label>
           <select
             value={form.category}
             onChange={(e) => updateField('category', e.target.value)}
@@ -83,7 +115,7 @@ export function ProductFormBasics({
           {showError('category') && <p className={errorClass}><AlertCircle size={10} />{errors.category}</p>}
         </div>
         <div>
-          <label className={labelClass}>Condition *</label>
+          <label className={labelClass}>Condition</label>
           <select
             value={form.condition}
             onChange={(e) => updateField('condition', e.target.value)}

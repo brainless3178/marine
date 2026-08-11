@@ -169,7 +169,7 @@ export async function updateOrderStatus(id: string, status: string, note: string
     await sendOrderPaidEmail(id, order)
   }
   if (status === 'cancelled') {
-    await sendOrderCancelledEmail(id, order)
+    await sendOrderCancelledEmail(order)
   }
 
   return updated
@@ -177,7 +177,7 @@ export async function updateOrderStatus(id: string, status: string, note: string
 
 // ─── Admin: Update Tracking ────────────────────────────────────
 
-export async function updateTracking(id: string, trackingNumber: string, courier: string, actor: AuthUser, ipAddress = '') {
+export async function updateTracking(id: string, trackingNumber: string, courier: string) {
   const order = await prisma.order.update({
     where: { id }, data: { trackingNumber, courier },
   })
@@ -222,7 +222,7 @@ export async function cancelOrder(id: string, reason: string | undefined, actor:
     entityId: order.id, entityName: order.orderNumber, ipAddress,
   })
 
-  await sendOrderCancelledEmail(id, order)
+  await sendOrderCancelledEmail(order)
   return order
 }
 
@@ -317,7 +317,7 @@ async function sendOrderPaidEmail(id: string, order: any) {
   }).catch(err => logger.error({ err }, 'Order confirmation email failed'))
 }
 
-async function sendOrderCancelledEmail(id: string, order: any) {
+async function sendOrderCancelledEmail(order: any) {
   if (!order.customerId) return
   const customer = await prisma.customer.findUnique({
     where: { id: order.customerId }, select: { email: true, name: true },

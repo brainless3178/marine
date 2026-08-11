@@ -268,7 +268,7 @@ export default function Home() {
         <div className="site-container grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)] md:p-8">
             <img
-              src="/images/alka-traders-logo.jpeg"
+              src="/images/alka-traders-logo.png"
               alt="Alka Traders Logo"
               className="h-12 w-12 rounded-2xl object-cover shadow-sm mb-5"
             />

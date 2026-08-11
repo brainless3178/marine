@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { admin } from '../lib/api'
 import { useToast } from '../components/admin/Toast'
+import { toLocalInputValue, fromLocalInputValue, isSaleWindowValid, generateProductSku } from '../lib/utils'
 import type { ApiProduct, ApiBrand, ApiCategory, ApiIndustry } from '../lib/api-types'
 
 export interface SpecRow {
@@ -22,7 +23,10 @@ export interface ProductFormData {
   images: { url: string; alt: string; label: string }[]
   regularPrice: string
   salePrice: string
+  saleStartsAt: string
+  saleEndsAt: string
   makeOfferEnabled: boolean
+  minimumOfferPrice: string
   currency: string
   inStock: boolean
   stockCount: string
@@ -59,7 +63,7 @@ export const TABS: { id: TabId; label: string }[] = [
   { id: 'notes', label: 'Admin Notes' },
 ]
 
-export function getEmptyForm(): ProductFormData {
+function getEmptyForm(): ProductFormData {
   return {
     name: '',
     sku: '',
@@ -73,7 +77,10 @@ export function getEmptyForm(): ProductFormData {
     images: [{ url: '', alt: '', label: 'Main' }],
     regularPrice: '',
     salePrice: '',
+    saleStartsAt: '',
+    saleEndsAt: '',
     makeOfferEnabled: true,
+    minimumOfferPrice: '',
     currency: 'USD',
     inStock: true,
     stockCount: '1',
@@ -98,7 +105,7 @@ export function getEmptyForm(): ProductFormData {
   }
 }
 
-export function getFormFromProduct(product: ApiProduct): ProductFormData {
+function getFormFromProduct(product: ApiProduct): ProductFormData {
   return {
     name: product.name || '',
     sku: product.sku || '',
@@ -120,7 +127,10 @@ export function getFormFromProduct(product: ApiProduct): ProductFormData {
       : [{ url: '', alt: '', label: 'Main' }],
     regularPrice: (product.regularPrice ?? product.price ?? '').toString(),
     salePrice: product.salePrice?.toString() || '',
+    saleStartsAt: toLocalInputValue(product.saleStartsAt),
+    saleEndsAt: toLocalInputValue(product.saleEndsAt),
     makeOfferEnabled: product.makeOfferEnabled ?? product.makeOffer ?? false,
+    minimumOfferPrice: product.minimumOfferPrice ? String(product.minimumOfferPrice) : '',
     currency: product.currency || 'USD',
     inStock: product.inStock ?? product.stockCount > 0,
     stockCount: (product.stockCount ?? 0).toString(),
@@ -246,9 +256,13 @@ export function useProductForm() {
   // ── Helpers ──
 
   const tabErrors: Record<TabId, boolean> = {
-    basics: !form.name.trim() || !form.sku.trim() || !form.brand || !form.category,
+    // Only the product name is mandatory — SKU/brand/category are optional
+    // (SKU is auto-generated from the name when left blank).
+    basics: !form.name.trim(),
     images: false,
-    pricing: !!(form.salePrice && form.regularPrice && Number(form.salePrice) >= Number(form.regularPrice)),
+    pricing: !!(form.salePrice && form.regularPrice && Number(form.salePrice) >= Number(form.regularPrice))
+      || !!(form.salePrice && !isSaleWindowValid(form.saleStartsAt, form.saleEndsAt))
+      || !!(form.makeOfferEnabled && form.minimumOfferPrice && Number(form.minimumOfferPrice) <= 0),
     inventory: false,
     specs: false,
     details: false,
@@ -303,15 +317,21 @@ export function useProductForm() {
 
   const validate = useCallback((): Record<string, string> => {
     const e: Record<string, string> = {}
+    // Only the product name is mandatory. Everything else is optional so an
+    // admin can list a product without being blocked on partial data.
     if (!form.name.trim()) e.name = 'Product name is required'
-    if (!form.sku.trim()) e.sku = 'SKU is required'
-    if (!form.brand) e.brand = 'Brand is required'
-    if (!form.category) e.category = 'Category is required'
+    // Pricing rules only fire when the fields are actually filled in.
     if (form.salePrice && form.regularPrice && Number(form.salePrice) >= Number(form.regularPrice)) {
       e.salePrice = 'Sale price must be lower than regular price'
     }
+    if (form.salePrice && !isSaleWindowValid(form.saleStartsAt, form.saleEndsAt)) {
+      e.saleEndsAt = 'Sale end date must be after the start date'
+    }
+    if (form.makeOfferEnabled && form.minimumOfferPrice && Number(form.minimumOfferPrice) <= 0) {
+      e.minimumOfferPrice = 'Minimum offer price must be greater than 0'
+    }
     return e
-  }, [form.name, form.sku, form.brand, form.category, form.salePrice, form.regularPrice])
+  }, [form.name, form.salePrice, form.regularPrice, form.saleStartsAt, form.saleEndsAt, form.makeOfferEnabled, form.minimumOfferPrice])
 
   const isValid = Object.keys(validate()).length === 0
 
@@ -381,6 +401,13 @@ export function useProductForm() {
 
     setSaving(true)
     try {
+      // Auto-generate a SKU from the product name when left blank, so the
+      // backend's non-empty SKU constraint never blocks an otherwise valid save.
+      const finalSku = form.sku.trim() || generateProductSku(form.name)
+      if (!form.sku.trim()) {
+        updateField('sku', finalSku)
+      }
+
       // Auto-create brand if it's a new name (not a UUID)
       let brandId = form.brand
       if (brandId && !isUuid(brandId)) {
@@ -401,7 +428,7 @@ export function useProductForm() {
 
       const payload: Partial<ApiProduct> = {
         name: form.name,
-        sku: form.sku,
+        sku: finalSku,
         brandId: brandId || null,
         categoryId: form.category || null,
         industryIds: form.industries,
@@ -419,7 +446,10 @@ export function useProductForm() {
         })),
         regularPrice: Number(form.regularPrice) || 0,
         salePrice: form.salePrice ? Number(form.salePrice) : null,
+        saleStartsAt: form.salePrice ? fromLocalInputValue(form.saleStartsAt) : null,
+        saleEndsAt: form.salePrice ? fromLocalInputValue(form.saleEndsAt) : null,
         makeOfferEnabled: form.makeOfferEnabled,
+        minimumOfferPrice: form.makeOfferEnabled && form.minimumOfferPrice ? Number(form.minimumOfferPrice) : null,
         currency: form.currency,
         inStock: form.inStock,
         stockCount: Number(form.stockCount) || 0,
@@ -468,7 +498,7 @@ export function useProductForm() {
     } finally {
       setSaving(false)
     }
-  }, [form, isEditing, id, navigate, toast, validate])
+  }, [form, isEditing, id, navigate, toast, validate, updateField])
 
   return {
     id, isEditing, navigate,

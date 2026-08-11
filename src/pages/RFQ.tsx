@@ -8,6 +8,8 @@ import { countries } from '../data/countries'
 import { storefront } from '../lib/api'
 import { SEO } from '../components/seo/SEO'
 import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
+import { ResponseCountdown } from '../components/ui/ResponseCountdown'
+import { getRfqResponseDeadline } from '../lib/rfqSla'
 import type { RFQFormData } from '../types'
 
 const roles = [
@@ -22,7 +24,7 @@ const roles = [
 
 export default function RFQ() {
   const { t } = useTranslation()
-  const { rfqStep, setRfqStep, rfqSubmitted, rfqId, setRfqSubmitted, generateRfqId } = useStore()
+  const { rfqStep, setRfqStep, rfqSubmitted, rfqId, setRfqSubmitted, generateRfqId, rfqDeadline, setRfqDeadline } = useStore()
   const { whatsappNumber, phoneNumber, rfqEmail } = useStoreSettings()
   const [formData, setFormData] = useState<RFQFormData>({
     fullName: '',
@@ -107,6 +109,7 @@ export default function RFQ() {
       } else {
         generateRfqId()
       }
+      setRfqDeadline(getRfqResponseDeadline(formData.urgency))
       setRfqSubmitted(true)
       setRfqStep(1) // Reset step for next submission
     } catch (err: any) {
@@ -130,6 +133,9 @@ export default function RFQ() {
           <p className="text-body-sm text-[var(--text-secondary)] max-w-[480px] mx-auto">
             {t('rfq.successSub')}
           </p>
+          <div className="flex justify-center mt-6">
+            <ResponseCountdown deadline={rfqDeadline} />
+          </div>
           <div className="flex gap-4 flex-wrap justify-center mt-8">
             <a href="/rfq" className="inline-flex items-center gap-2 text-xs font-semibold border border-[var(--accent-primary)] text-[var(--accent-primary)] px-[18px] py-[10px] hover:bg-[var(--accent-primary)]/10 transition-all no-underline rounded-xl">
               {t('rfq.submitAnother')}

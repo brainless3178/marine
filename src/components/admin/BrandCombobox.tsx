@@ -214,7 +214,7 @@ export function BrandCombobox({ value, brands, onChange, onBlur, error, classNam
                   >
                     <span className={`flex h-4 w-4 items-center justify-center rounded-full border ${
                       isSelected
-                        ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-navy-deep'
+                        ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-[var(--btn-blue-text)]'
                         : 'border-[var(--border)]'
                     }`}>
                       {isSelected && <Check size={10} strokeWidth={3} />}

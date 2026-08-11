@@ -57,7 +57,7 @@ export async function importProducts(rows: any[], actor: AuthUser, ipAddress = '
 // ─── Export to CSV ─────────────────────────────────────────────
 
 export async function exportProductsCsv(params: { status?: string; page?: number; limit?: number }) {
-  const { page, limit, skip } = paginationParams(params.page, params.limit)
+  const { limit, skip } = paginationParams(params.page, params.limit)
 
   const where: any = {}
   if (params.status) where.status = params.status

@@ -77,7 +77,7 @@ export async function getMediaUsage(assetId: string) {
 
 // ─── Mutations ─────────────────────────────────────────────────
 
-export async function uploadMedia(file: Express.Multer.File, actor: AuthUser, ipAddress = '') {
+export async function uploadMedia(file: Express.Multer.File, actor: AuthUser) {
   if (!file) throw Object.assign(new Error('No file provided'), { status: 400 })
 
   // Optimize image
@@ -127,7 +127,7 @@ export async function uploadMedia(file: Express.Multer.File, actor: AuthUser, ip
   }
 }
 
-export async function deleteMedia(assetId: string, ipAddress = '') {
+export async function deleteMedia(assetId: string) {
   const asset = await prisma.mediaAsset.findUnique({ where: { id: assetId } })
   if (!asset) throw Object.assign(new Error('Media asset not found'), { status: 404 })
 

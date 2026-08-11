@@ -191,7 +191,7 @@ export function AuthModal() {
             <div className="text-center mb-6">
               <div className="flex items-center justify-center gap-2.5 mb-1">
                 <img
-                  src="/images/alka-traders-logo.jpeg"
+                  src="/images/alka-traders-logo.png"
                   alt="Alka Traders Logo"
                   className="w-9 h-9 rounded-xl object-cover shadow-sm"
                 />

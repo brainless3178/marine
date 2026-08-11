@@ -85,7 +85,7 @@ export function GeoSalesAnalytics({ orders }: Props) {
           return (
             <button key={tab.key} onClick={() => setSortBy(tab.key)}
               className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${
-                sortBy === tab.key ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                sortBy === tab.key ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}>
               <Icon size={10} /> {tab.label}
             </button>

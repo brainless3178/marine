@@ -44,7 +44,7 @@ export default function AdminLogin() {
         {/* Logo */}
         <div className="mb-8 text-center">
           <img
-            src="/images/alka-traders-logo.jpeg"
+            src="/images/alka-traders-logo.png"
             alt="Alka Traders Logo"
             className="mx-auto mb-4 h-16 w-16 rounded-2xl object-cover shadow-[0_12px_40px_var(--focus-ring)]"
           />
@@ -73,7 +73,7 @@ export default function AdminLogin() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="sales@alkatraders.co"
+                  placeholder="admin@alkatraders.co"
                   className="w-full rounded-xl border border-white/15 bg-white/8 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/55 transition-all focus:border-[var(--accent-primary)] focus:bg-white/10 "
                 />
               </div>
@@ -108,7 +108,7 @@ export default function AdminLogin() {
 
             {/* Error */}
             {error && (
-              <div className="flex items-center gap-2 rounded-lg bg-danger/50/10 border border-danger/20 px-3 py-2.5 text-xs font-semibold text-danger">
+              <div className="flex items-center gap-2 rounded-lg bg-[var(--admin-login-error-bg)] border border-[var(--admin-login-error-border)] px-3 py-2.5 text-xs font-semibold text-[var(--admin-login-error-text)]">
                 <AlertCircle size={14} />
                 {error}
               </div>

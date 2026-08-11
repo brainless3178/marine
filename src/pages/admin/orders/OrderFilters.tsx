@@ -34,7 +34,7 @@ export function OrderFilters({
           onClick={() => { setStatusFilter(''); setPage(1) }}
           className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${
             statusFilter === ''
-              ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]'
+              ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)] shadow-[0_4px_12px_rgba(232,170,36,0.2)]'
               : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'
           }`}
         >

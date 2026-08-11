@@ -18,7 +18,6 @@ import type {
   OrderItem,
   OrderTimeline,
   Rfq,
-  RfqNote,
   Offer,
   OfferItem,
   Customer,
@@ -30,16 +29,11 @@ import type {
   StoreSettings,
   HomepageSection,
   Testimonial,
-  Office,
-  UserProfile,
   SearchResult,
-  ProductImage,
-  ProductSpec,
 } from '@shared/types'
 
 import type {
   Pagination as ApiPagination,
-  ListResponse as SharedListResponse,
   ProductListResponse as SharedProductListResponse,
 } from '@shared/api-responses'
 
@@ -49,8 +43,6 @@ export type Pagination = ApiPagination
 
 // ─── Product ─────────────────────────────────────────────────
 
-export type ApiProductImage = ProductImage
-export type ApiProductSpec = ProductSpec
 export type ApiProduct = Product
 
 // ─── Brand ───────────────────────────────────────────────────
@@ -74,7 +66,6 @@ export type ApiOrder = Order
 // ─── RFQ ─────────────────────────────────────────────────────
 
 export type ApiRfq = Rfq
-export type ApiRfqNote = RfqNote
 
 // ─── Offer ───────────────────────────────────────────────────
 
@@ -117,21 +108,12 @@ export type ApiHomepageSection = HomepageSection
 
 export type ApiTestimonial = Testimonial
 
-// ─── Office ──────────────────────────────────────────────────
-
-export type ApiOffice = Office
-
-// ─── User ────────────────────────────────────────────────────
-
-export type ApiUser = UserProfile
-
 // ─── Search ─────────────────────────────────────────────────
 
 export type ApiSearchResult = SearchResult
 
 // ─── Wrapper types for list responses ────────────────────────
 
-export type ListResponse<T> = SharedListResponse<T>
 export type ProductListResponse = SharedProductListResponse & {
   products: Product[]
 }

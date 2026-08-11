@@ -81,4 +81,3 @@ export const industries: Industry[] = [
   },
 ]
 
-export const industryIds = industries.map(i => i.id)

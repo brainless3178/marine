@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import type { Request } from 'express'
 import { rateLimit, RateLimitRequestHandler } from 'express-rate-limit'
 
 // ─── Brute-Force Protection for Auth Endpoints ───────────────

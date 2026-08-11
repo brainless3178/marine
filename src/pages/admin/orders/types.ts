@@ -27,7 +27,7 @@ export interface Order {
   timeline: { status: OrderStatus; date: string; note: string }[]
 }
 
-export const STATUS_FLOW: OrderStatus[] = ['pending', 'confirmed', 'paid', 'processing', 'packed', 'shipped', 'delivered']
+const STATUS_FLOW: OrderStatus[] = ['pending', 'confirmed', 'paid', 'processing', 'packed', 'shipped', 'delivered']
 
 export function mapApiOrder(o: ApiOrder): Order {
   const oAny = o as unknown as Record<string, unknown>

@@ -71,7 +71,7 @@ export function BestsellerInsights({ products, orders }: Props) {
         {(['revenue', 'quantity'] as const).map(m => (
           <button key={m} onClick={() => setMetric(m)}
             className={`rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${
-              metric === m ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              metric === m ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
             }`}>
             {m === 'revenue' ? 'By Revenue' : 'By Quantity'}
           </button>

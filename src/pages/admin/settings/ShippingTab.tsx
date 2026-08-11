@@ -18,7 +18,7 @@ export function ShippingTab({ zones, setZones }: ShippingTabProps) {
         <p className="text-sm text-[var(--text-muted)]">{zones.length} shipping zones configured</p>
         <button
           onClick={() => { setNewZoneOpen(true); setEditingZone(null) }}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[var(--btn-blue-text)] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all"
         >
           <Plus size={14} /> Add Zone
         </button>
@@ -168,7 +168,7 @@ function NewZoneForm({ onAdd, onCancel }: { onAdd: (zone: Omit<ShippingZone, 'id
             active: true,
           })}
           disabled={!name.trim()}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[var(--btn-blue-text)] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all disabled:opacity-40"
         >
           <Plus size={14} /> Create Zone
         </button>

@@ -113,7 +113,7 @@ export default function AdminCustomers() {
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Customers</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">{filteredCustomers.length} of {customers.length} customers</p>
         </div>
-        <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
+        <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[var(--btn-blue-text)] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
           <Plus size={14} /> Add Customer
         </button>
       </div>
@@ -142,7 +142,7 @@ export default function AdminCustomers() {
       {/* Status Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         <button onClick={() => { setStatusFilter(''); setPage(1) }}
-          className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${statusFilter === '' ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
+          className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${statusFilter === '' ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)] shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
           All ({customers.length})
         </button>
         {(Object.keys(statusConfig) as CustomerStatus[]).map((status) => (

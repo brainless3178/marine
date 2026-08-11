@@ -30,9 +30,10 @@ UPDATE offices
 SET phone = '+91 87990 95041', email = 'sales@alkatraders.co'
 WHERE email IN ('info@alkatraders.com', 'sales@alkatraders.co');
 
--- ── 4. Admin login email → sales@alkatraders.co (matches ADMIN_EMAIL) ──
--- The admin user's password is untouched — only the login email changes.
+-- ── 4. Admin login email → admin@alkatraders.co (matches ADMIN_EMAIL) ──
+-- The admin user's password is untouched here — only the login email changes.
+-- (Password hash is set separately — see update-admin-login.sql.)
 UPDATE admin_users
-SET email = 'sales@alkatraders.co'
-WHERE email IN ('admin@alkatraders.com', 'admin@alkatraders.co')
-  AND NOT EXISTS (SELECT 1 FROM admin_users WHERE email = 'sales@alkatraders.co');
+SET email = 'admin@alkatraders.co'
+WHERE email IN ('admin@alkatraders.com', 'sales@alkatraders.co')
+  AND NOT EXISTS (SELECT 1 FROM admin_users WHERE email = 'admin@alkatraders.co');

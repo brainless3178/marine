@@ -184,7 +184,7 @@ export default function AdminAuditLog() {
 
       {/* Type Filters */}
       <div className="flex gap-2 overflow-x-auto pb-1">
-        <button onClick={() => { setTypeFilter(''); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${typeFilter === '' ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
+        <button onClick={() => { setTypeFilter(''); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${typeFilter === '' ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)] shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
           All
         </button>
         {(Object.keys(typeConfig) as ActionType[]).map((t) => {

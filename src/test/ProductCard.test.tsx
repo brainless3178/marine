@@ -18,6 +18,7 @@ vi.mock('../components/ui/OptimizedImage', () => ({
 // Mock lucide icons
 vi.mock('lucide-react', () => ({
   Check: ({ size }: { size?: number }) => <span data-testid="icon-check" data-size={size}>✓</span>,
+  Clock: ({ size }: { size?: number }) => <span data-testid="icon-clock" data-size={size}>⏰</span>,
   MessageCircle: ({ size }: { size?: number }) => <span data-testid="icon-whatsapp" data-size={size}>💬</span>,
   PackageCheck: ({ size }: { size?: number }) => <span data-testid="icon-package" data-size={size}>📦</span>,
   ShoppingCart: ({ size }: { size?: number }) => <span data-testid="icon-cart" data-size={size}>🛒</span>,
@@ -57,6 +58,9 @@ function renderProductCard(product = baseProduct, options?: { added?: boolean; o
       'product.outOfStockCount': 'Out of stock',
       'product.addToCart': 'Add to Cart',
       'product.added': 'Added',
+      'product.sale': 'OFF',
+      'product.saleEndsIn': 'Sale ends in',
+      'product.endsSoon': 'Ending soon',
     }
     return translations[key] || key
   }) as any
@@ -120,6 +124,55 @@ describe('ProductCard', () => {
     renderProductCard(saleProduct)
     expect(screen.getByText('$950.00')).toBeInTheDocument()
     expect(screen.getByText('$1200.00')).toBeInTheDocument() // Strikethrough original
+  })
+
+  it('shows SALE percentage badge for on-sale products', () => {
+    const saleProduct = {
+      ...baseProduct,
+      onSale: true,
+      salePrice: 950,
+      regularPrice: 1200,
+      price: 950, // effective price is the sale price
+    }
+    renderProductCard(saleProduct)
+    expect(screen.getByText('-21% OFF')).toBeInTheDocument()
+  })
+
+  it('shows countdown when sale has a future end date', () => {
+    const future = new Date(Date.now() + 2 * 86_400_000 + 3_600_000).toISOString()
+    const saleProduct = {
+      ...baseProduct,
+      onSale: true,
+      salePrice: 950,
+      regularPrice: 1200,
+      price: 950,
+      saleEndsAt: future,
+    }
+    renderProductCard(saleProduct)
+    expect(screen.getByText('Sale ends in')).toBeInTheDocument()
+    expect(screen.getByText(/\d+d \d{2}:\d{2}:\d{2}/)).toBeInTheDocument()
+  })
+
+  it('highlights the countdown as ending soon when under 24h remain', () => {
+    const soon = new Date(Date.now() + 3_600_000).toISOString()
+    const saleProduct = {
+      ...baseProduct,
+      onSale: true,
+      salePrice: 950,
+      regularPrice: 1200,
+      price: 950,
+      saleEndsAt: soon,
+    }
+    renderProductCard(saleProduct)
+    expect(screen.getByText('Ending soon')).toBeInTheDocument()
+    // The urgent strip uses a pulsing danger treatment, not the calm one
+    expect(screen.getByText('Ending soon').closest('div')).toHaveClass('animate-danger-pulse')
+  })
+
+  it('hides sale badge and countdown for non-sale products', () => {
+    renderProductCard()
+    expect(screen.queryByText(/-\d+% OFF/)).not.toBeInTheDocument()
+    expect(screen.queryByText('Sale ends in')).not.toBeInTheDocument()
   })
 
   it('shows out of stock overlay when not in stock', () => {

@@ -138,6 +138,7 @@
     "submit": "Enviar Cotización",
     "success": "Cotización Enviada con Éxito",
     "successSub": "Su requisito ha sido recibido por nuestro equipo de adquisiciones. Tiempo de respuesta esperado: Dentro de 4 horas hábiles.",
+    "expectedResponseIn": "Respuesta esperada en",
     "rfqId": "Cotización #",
     "contactStep": "Contacto",
     "productStep": "Producto",
@@ -453,6 +454,9 @@
   "product": {
     "addToCart": "Añadir al Carrito",
     "addToCartUpper": "Añadir Al Carrito",
+    "sale": "DTO",
+    "saleEndsIn": "La oferta termina en",
+    "endsSoon": "Termina pronto",
     "buyNow": "Comprar Ahora",
     "makeOffer": "Hacer una Oferta",
     "added": "¡Añadido!",

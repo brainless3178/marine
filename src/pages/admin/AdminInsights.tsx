@@ -137,7 +137,7 @@ export default function AdminInsights() {
         <p className="text-xs text-[var(--text-muted)] mt-1">{error}</p>
         <button
           onClick={refresh}
-          className="mt-3 rounded-xl bg-[var(--accent-gold)] px-4 py-2 text-xs font-bold text-navy-deep hover:bg-[var(--gold-light)] transition-colors"
+          className="mt-3 rounded-xl bg-[var(--accent-gold)] px-4 py-2 text-xs font-bold text-[var(--btn-blue-text)] hover:brightness-95 transition-colors"
         >
           Retry
         </button>
@@ -150,7 +150,7 @@ export default function AdminInsights() {
       {/* Floating TOC Toggle Button */}
       <button
         onClick={() => setShowTOC(!showTOC)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-[var(--accent-gold)] text-navy-deep shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-[var(--accent-gold)] text-[var(--btn-blue-text)] shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center"
         title="Jump to section"
       >
         <Layers size={20} />

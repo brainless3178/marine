@@ -200,7 +200,7 @@ export default function AdminOffers() {
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-1">
-        <button onClick={() => { setStatusFilter(''); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${statusFilter === '' ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
+        <button onClick={() => { setStatusFilter(''); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${statusFilter === '' ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)] shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
           All ({offers.length})
         </button>
         {(Object.keys(statusConfig) as OfferStatus[]).map((s) => (
@@ -309,7 +309,7 @@ export default function AdminOffers() {
                     <CheckCircle size={20} className="mx-auto text-[var(--success)] mb-1" />
                     <p className="text-xs font-bold text-[var(--success)]">Offer Accepted — ready to process</p>
                   </div>
-                  <button onClick={() => handleConvertToOrder(selectedOffer.id)} disabled={convertingOffer === selectedOffer.id} className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--success)] px-4 py-2.5 text-xs font-bold text-white hover:bg-[var(--success)]/90 transition-colors disabled:opacity-50">
+                  <button onClick={() => handleConvertToOrder(selectedOffer.id)} disabled={convertingOffer === selectedOffer.id} className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--success)] px-4 py-2.5 text-xs font-bold text-[var(--btn-success-text)] hover:bg-[var(--success)]/90 transition-colors disabled:opacity-50">
                     {convertingOffer === selectedOffer.id ? <><Loader2 size={12} className="animate-spin" /> Converting...</> : <><ShoppingCart size={12} /> Convert to Order</>}
                   </button>
                 </div>

@@ -90,7 +90,7 @@ export function CheckoutSuccess({
                 setCancelRequested(true)
               }}
               disabled={!cancelReason.trim()}
-              className="w-full py-3 bg-[var(--accent-gold)] text-navy-deep font-bold text-xs rounded-xl hover:bg-[var(--gold-light)] transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-[var(--accent-gold)] text-[var(--btn-blue-text)] font-bold text-xs rounded-xl hover:brightness-95 transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t('checkout.cancelSubmitBtn')}
             </button>

@@ -34,6 +34,31 @@ const CLOUDINARY_BASE = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/ima
  *   3. /uploads/ paths (admin-uploaded images, stored in Cloudinary) → passed through
  *   4. Local static files → /images/products/...
  */
+/**
+ * Deterministic SKU base derived from a product name — slugifies to uppercase
+ * alphanumerics + dashes, capped at 20 chars, with a 'PRODUCT' fallback.
+ * Used for the live "auto SKU" preview in the product form: it updates on
+ * every keystroke and matches exactly what `generateProductSku` will produce.
+ */
+export function buildProductSkuBase(name: string): string {
+  return name.trim().toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 20) || 'PRODUCT'
+}
+
+/**
+ * Auto-generate a SKU from a product name when the admin leaves it blank.
+ * Slugifies the name (see `buildProductSkuBase`) and appends a short unique
+ * suffix so the backend's non-empty SKU constraint is satisfied without
+ * blocking the save.
+ */
+export function generateProductSku(name: string): string {
+  const base = buildProductSkuBase(name)
+  // Time + random component so rapid same-name saves never collide (the 4-char
+  // time suffix alone only changes every ~28 minutes, which would trip the
+  // backend's unique-SKU constraint and block saves).
+  const suffix = `${Date.now().toString(36).toUpperCase().slice(-4)}${Math.random().toString(36).toUpperCase().slice(2, 5)}`
+  return `${base}-${suffix}`
+}
+
 export function getProductImageUrl(pathOrFilename?: string): string {
   if (!pathOrFilename) return `${CLOUDINARY_BASE}/alka/static/placeholder`
   if (pathOrFilename.startsWith('http://') || pathOrFilename.startsWith('https://')) return pathOrFilename
@@ -95,16 +120,51 @@ export function applyImageFallback(img: HTMLImageElement): void {
 }
 
 /**
- * Get Cloudinary URL for a category image.
- */
-export function getCategoryImageUrl(categoryFile: string): string {
-  const slug = categoryFile.replace(/\.\w+$/, '').toLowerCase().replace(/\s+/g, '-')
-  return `${CLOUDINARY_BASE}/alka/categories/${slug}`
-}
-
-/**
  * Get Cloudinary URL for a static image (logo, placeholder, payments, hero).
  */
 export function getStaticImageUrl(name: string): string {
   return `${CLOUDINARY_BASE}/alka/static/${name}`
+}
+
+/**
+ * Convert an ISO datetime string to a local `datetime-local` input value (YYYY-MM-DDTHH:mm).
+ * Used to prefill sale-start/end fields when editing an existing product.
+ */
+export function toLocalInputValue(iso: string | null | undefined): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+/**
+ * Convert a local `datetime-local` input value to an ISO string (or null when empty/invalid).
+ * The backend expects `saleStartsAt`/`saleEndsAt` as ISO-8601 datetimes.
+ */
+export function fromLocalInputValue(v: string): string | null {
+  if (!v) return null
+  const d = new Date(v)
+  return Number.isNaN(d.getTime()) ? null : d.toISOString()
+}
+
+/**
+ * Whether a sale window (local `datetime-local` values) is valid: end must be after start.
+ * Empty values mean "unlimited" and are always valid.
+ */
+export function isSaleWindowValid(startsAt: string, endsAt: string): boolean {
+  return !startsAt || !endsAt || endsAt >= startsAt
+}
+
+/**
+ * Currency symbol prefix for the given ISO currency code.
+ */
+export function currencyPrefix(currency: string): string {
+  switch (currency) {
+    case 'EUR': return '€'
+    case 'GBP': return '£'
+    case 'INR': return '₹'
+    case 'AED': return 'د.إ'
+    default: return '$'
+  }
 }

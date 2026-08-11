@@ -75,7 +75,7 @@ export function CreateCustomerModal({ open, onClose, onCreated, onToast, onCreat
         </div>
         <div className="flex items-center justify-end gap-2 border-t border-[var(--border)] px-6 py-4">
           <button onClick={onClose} className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2 text-xs font-bold text-[var(--text-secondary)] hover:border-[var(--text-muted)] transition-colors">Cancel</button>
-          <button onClick={handleSubmit} disabled={loading} className="rounded-xl bg-[var(--accent-gold)] px-4 py-2 text-xs font-extrabold text-navy-deep hover:bg-[var(--gold-light)] transition-colors disabled:opacity-50">
+          <button onClick={handleSubmit} disabled={loading} className="rounded-xl bg-[var(--accent-gold)] px-4 py-2 text-xs font-extrabold text-[var(--btn-blue-text)] hover:brightness-95 transition-colors disabled:opacity-50">
             {loading ? 'Creating...' : 'Create Customer'}
           </button>
         </div>

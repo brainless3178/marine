@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -46,7 +46,7 @@ function BrandLockup() {
       className="flex items-center gap-3 no-underline transition-opacity hover:opacity-90"
     >
       <img
-        src="/images/alka-traders-logo.jpeg"
+        src="/images/alka-traders-logo.png"
         alt="Alka Traders Logo"
         width={40}
         height={40}
@@ -73,6 +73,8 @@ export function Navbar() {
   const locale = useLocale()
   const localizedPath = useLocalizedPath()
   const [scrolled, setScrolled] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  const lastScrollY = useRef(0)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -87,8 +89,19 @@ export function Navbar() {
   const settings = useStoreSettings()
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 32)
-    window.addEventListener('scroll', handleScroll)
+    const handleScroll = () => {
+      const y = window.scrollY
+      setScrolled(y > 32)
+      const delta = y - lastScrollY.current
+      // Hide the header on scroll down (past 140px), reveal on scroll up / near top
+      if (y > 140 && delta > 6) {
+        setHidden(true)
+      } else if (delta < -6 || y <= 140) {
+        setHidden(false)
+      }
+      lastScrollY.current = y
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -96,6 +109,7 @@ export function Navbar() {
     setMobileOpen(false)
     setLangOpen(false)
     setProfileOpen(false)
+    setHidden(false)
   }, [pathname])
 
   // Lock page scroll when the mobile menu is open. Lock the <html> element,
@@ -130,7 +144,9 @@ export function Navbar() {
   // of view after ~100px. The wrapper sticks BOTH the utility bar and the
   // main nav, so the email/phone/trust texts stay visible while scrolling.
   return (
-    <header className="sticky top-0 z-50">
+    <header
+      className={`sticky top-0 z-50 transition-[transform,visibility] duration-300 ease-in-out ${hidden ? '-translate-y-full invisible' : 'translate-y-0 visible'}`}
+    >
       {/* ── TOP UTILITY BAR: email/phone · trust indicators ── */}
       <div className="border-b border-[var(--header-utility-border)] bg-[var(--header-utility-bg)] pt-[env(safe-area-inset-top)] text-[var(--header-utility-text)]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
@@ -213,7 +229,7 @@ export function Navbar() {
       {/* ── MAIN NAVIGATION ── */}
       <nav
         className={`site-header relative border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[24px] backdrop-saturate-150 transition-shadow duration-300 ${
-          scrolled ? 'shadow-[0_4px_20px_rgba(0,0,0,0.08)]' : 'shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
+          scrolled ? 'shadow-[0_6px_24px_rgba(0,0,0,0.16)]' : 'shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
         }`}
       >
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-5 px-4 py-3 sm:px-6">

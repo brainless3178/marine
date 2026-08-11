@@ -163,11 +163,11 @@ export function CheckoutReview({
         {paymentMethod === 'paypal' ? (
           <div className="w-full">
             {creatingOrder ? (
-              <div className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-gold text-navy-deep font-semibold text-sm rounded-full">
+              <div className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-gold text-[var(--btn-blue-text)] font-semibold text-sm rounded-full">
                 <Loader2 size={16} className="animate-spin" /> Creating order...
               </div>
             ) : paypalScriptLoading ? (
-              <div className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-gold text-navy-deep font-semibold text-sm rounded-full">
+              <div className="flex items-center justify-center gap-2 px-7 py-3.5 bg-accent-gold text-[var(--btn-blue-text)] font-semibold text-sm rounded-full">
                 <Loader2 size={16} className="animate-spin" /> Loading PayPal...
               </div>
             ) : PayPalButtons ? (

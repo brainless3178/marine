@@ -16,28 +16,6 @@ export interface Pagination {
   hasPrev: boolean
 }
 
-// ─── Standard API Response Envelope ───────────────────────────
-
-export interface ApiResponse<T = unknown> {
-  ok: boolean
-  data?: T
-  error?: string
-  details?: FieldError[]
-  pagination?: Pagination
-}
-
-export interface FieldError {
-  field: string
-  message: string
-}
-
-// ─── List Response ────────────────────────────────────────────
-
-export interface ListResponse<T> {
-  items: T[]
-  pagination: Pagination
-}
-
 export interface ProductListResponse {
   products: unknown[]
   pagination: Pagination

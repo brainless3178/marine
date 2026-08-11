@@ -60,7 +60,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </button>
             <button
               onClick={this.handleRetry}
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep hover:bg-[var(--gold-light)] transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[var(--btn-blue-text)] hover:brightness-95 transition-colors"
             >
               <RefreshCw size={14} /> Try Again
             </button>

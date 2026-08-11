@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import { z } from 'zod'
 import multer from 'multer'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
-import { asyncHandler, validateBody, validateQuery, validateParams } from '../../middleware/validate.js'
+import { asyncHandler, validateQuery, validateParams } from '../../middleware/validate.js'
 import * as mediaService from '../../services/mediaService.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
 import logger from '../../utils/logger.js'
@@ -19,15 +19,6 @@ const listMediaQuerySchema = z.object({
 
 const uuidParamSchema = z.object({
   id: z.string().uuid(),
-})
-
-const uploadResponseSchema = z.object({
-  asset: z.object({
-    id: z.string(),
-    url: z.string(),
-    filename: z.string(),
-  }).optional(),
-  message: z.string().optional(),
 })
 
 // ─── Multer Config ────────────────────────────────────────────

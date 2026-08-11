@@ -60,6 +60,8 @@ interface AppState {
   setRfqSubmitted: (submitted: boolean) => void
   rfqId: string
   generateRfqId: () => void
+  rfqDeadline: string | null
+  setRfqDeadline: (deadline: string | null) => void
 
   // Cmd+K
   commandOpen: boolean
@@ -256,6 +258,8 @@ export const useStore = create<AppState>((set, get) => ({
   rfqId: '',
   generateRfqId: () =>
     set({ rfqId: `AT-${Math.floor(10000 + Math.random() * 90000)}` }),
+  rfqDeadline: null,
+  setRfqDeadline: (rfqDeadline) => set({ rfqDeadline }),
 
   // Cmd+K
   commandOpen: false,

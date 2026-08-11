@@ -110,7 +110,7 @@ export function MissionControlDashboard({ stats, orders, rfqs, products, custome
           {(['all', 'revenue', 'operations', 'inventory', 'customers', 'security'] as const).map(s => (
             <button key={s} onClick={() => setSection(s)}
               className={`shrink-0 rounded-lg px-2 py-0.5 text-[0.5rem] font-bold transition-all ${
-                section === s ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
+                section === s ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)]'
               }`}>{s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}</button>
           ))}
         </div>

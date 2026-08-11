@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getImageFallbackUrl, applyImageFallback } from '../lib/utils'
+import { getImageFallbackUrl, applyImageFallback, generateProductSku, buildProductSkuBase } from '../lib/utils'
 
 // Test any utility functions that might exist
 // Since the project may not have a dedicated utils file, we test inline utilities
@@ -189,6 +189,59 @@ describe('URL utilities', () => {
 
     expect(parseQueryString('?page=1&search=test')).toEqual({ page: '1', search: 'test' })
     expect(parseQueryString('')).toEqual({})
+  })
+})
+
+describe('buildProductSkuBase', () => {
+  it('slugifies deterministically (same input → same base)', () => {
+    const base = buildProductSkuBase('Hydraulic Pump HP-200')
+    // 21 chars of slug → capped to 20
+    expect(base).toBe('HYDRAULIC-PUMP-HP-20')
+    expect(buildProductSkuBase('Hydraulic Pump HP-200')).toBe(base)
+  })
+
+  it('is capped at 20 chars', () => {
+    expect(buildProductSkuBase('Hydraulic Pump HP-200').length).toBe(20)
+    expect(buildProductSkuBase('A Very Long Marine Product Name That Exceeds The Cap').length).toBe(20)
+  })
+
+  it('strips punctuation and collapses spaces', () => {
+    expect(buildProductSkuBase('  Marine   GPS! Navigator  ')).toBe('MARINE-GPS-NAVIGATOR')
+  })
+
+  it('falls back to PRODUCT for empty names', () => {
+    expect(buildProductSkuBase('')).toBe('PRODUCT')
+    expect(buildProductSkuBase('   ')).toBe('PRODUCT')
+  })
+})
+
+describe('generateProductSku', () => {
+  const SUFFIX = '[A-Z0-9]{7}'
+
+  it('prefixes the deterministic base with a unique suffix', () => {
+    const sku = generateProductSku('Hydraulic Pump HP-200')
+    // 'HYDRAULIC-PUMP-HP-200' is 21 chars — the base is capped at 20, then a suffix is appended
+    expect(sku).toMatch(new RegExp(`^HYDRAULIC-PUMP-HP-20-${SUFFIX}$`))
+    // The base matches buildProductSkuBase exactly
+    expect(sku.startsWith(buildProductSkuBase('Hydraulic Pump HP-200'))).toBe(true)
+  })
+
+  it('strips punctuation and collapses spaces', () => {
+    const sku = generateProductSku('  Marine   GPS! Navigator  ')
+    expect(sku).toMatch(new RegExp(`^MARINE-GPS-NAVIGATOR-${SUFFIX}$`))
+  })
+
+  it('uses a PRODUCT fallback for empty/whitespace names', () => {
+    expect(generateProductSku('')).toMatch(new RegExp(`^PRODUCT-${SUFFIX}$`))
+    expect(generateProductSku('   ')).toMatch(new RegExp(`^PRODUCT-${SUFFIX}$`))
+  })
+
+  it('produces distinct SKUs for rapid same-name saves (no collision)', () => {
+    const a = generateProductSku('Pump')
+    const b = generateProductSku('Pump')
+    expect(a).toMatch(new RegExp(`^PUMP-${SUFFIX}$`))
+    expect(b).toMatch(new RegExp(`^PUMP-${SUFFIX}$`))
+    expect(a).not.toBe(b)
   })
 })
 

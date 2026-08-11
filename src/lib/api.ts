@@ -6,15 +6,10 @@
  * lives in smaller sub-modules under `api/`.
  */
 
-export { api, apiFetch, ApiError, API_BASE } from './api/core'
-export type { ApiOptions } from './api/core'
+export { api } from './api/core'
 
 // Token management
-export {
-  getAdminToken, setAdminToken,
-  getCustomerToken, setCustomerToken,
-  clearCsrfToken,
-} from './api/core'
+export { getAdminToken, setAdminToken, setCustomerToken } from './api/core'
 
 // Storefront endpoints (public)
 export { storefront } from './api/storefront'

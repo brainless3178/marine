@@ -133,7 +133,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-2">
           <Link
             to="/admin/products/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-navy-deep no-underline transition-all hover:bg-[var(--gold-light)] hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-extrabold text-[var(--btn-blue-text)] no-underline transition-all hover:brightness-95 hover:-translate-y-0.5"
           >
             <Plus size={14} />
             Add Product

@@ -99,7 +99,7 @@ export function ProductPerformance({ products, orders }: Props) {
           return (
             <button key={key} onClick={() => setQuadrant(key)}
               className={`shrink-0 rounded-lg px-2.5 py-1 text-[0.625rem] font-bold transition-all ${
-                quadrant === key ? 'bg-[var(--accent-gold)] text-navy-deep' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                quadrant === key ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)]' : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}>
               {cfg.label} ({cfg.count})
             </button>

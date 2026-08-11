@@ -129,7 +129,7 @@ export function AdminSidebar() {
       {/* Logo */}
       <div className="flex items-center gap-3 border-b border-white/8 px-4 py-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-gold)]">
-          <span className="font-display text-sm font-extrabold text-navy-deep">AT</span>
+          <span className="font-display text-sm font-extrabold text-[var(--btn-blue-text)]">AT</span>
         </div>
         {!collapsed && (
           <div className="flex flex-col overflow-hidden">
@@ -212,7 +212,7 @@ export function AdminSidebar() {
       {/* Collapse toggle */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] shadow-lg transition-colors hover:bg-[var(--accent-gold)] hover:text-navy-deep"
+        className="absolute -right-3 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[var(--accent-blue)] text-[var(--btn-blue-text)] shadow-lg transition-colors hover:bg-[var(--accent-gold)] hover:text-[var(--btn-blue-text)]"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}

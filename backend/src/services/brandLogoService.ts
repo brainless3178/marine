@@ -1,6 +1,5 @@
 import path from 'path'
 import fs from 'fs'
-import type { Express } from 'express'
 import { prisma } from '../server.js'
 import { logAudit } from '../utils/audit.js'
 import type { AuthUser } from '../middleware/auth.js'

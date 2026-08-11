@@ -1,5 +1,7 @@
-import { Save, Eye, ArrowLeft, Loader2, CheckCircle } from 'lucide-react'
+import { useState } from 'react'
+import { Save, Eye, ExternalLink, ArrowLeft, Loader2, CheckCircle } from 'lucide-react'
 import { useProductForm, TABS } from '../../hooks/useProductForm'
+import { ProductPreviewModal } from '../../components/admin/ProductPreviewModal'
 import { ProductFormBasics } from '../../components/admin/ProductFormBasics'
 import { ProductFormImages } from '../../components/admin/ProductFormImages'
 import { ProductFormPricing } from '../../components/admin/ProductFormPricing'
@@ -11,6 +13,7 @@ import { ProductFormNotes } from '../../components/admin/ProductFormNotes'
 
 export default function AdminProductForm() {
   const hook = useProductForm()
+  const [showPreview, setShowPreview] = useState(false)
 
   if (hook.loadingProduct) {
     return (
@@ -42,6 +45,12 @@ export default function AdminProductForm() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowPreview(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] no-underline hover:border-[var(--accent-blue)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            <Eye size={14} /> Preview
+          </button>
           {hook.isEditing && (
             <a
               href={`/product/${hook.id}`}
@@ -49,7 +58,7 @@ export default function AdminProductForm() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] no-underline hover:border-[var(--accent-blue)] transition-colors"
             >
-              <Eye size={14} /> Preview
+              <ExternalLink size={14} /> View Live
             </a>
           )}
           <button
@@ -59,8 +68,8 @@ export default function AdminProductForm() {
               hook.saved
                 ? 'bg-[var(--success)] text-[var(--btn-success-text)]'
                 : !hook.isValid && hook.attempted
-                  ? 'bg-[var(--text-muted)] text-white cursor-not-allowed opacity-60'
-                  : 'bg-[var(--accent-gold)] text-navy-deep hover:bg-[var(--gold-light)] hover:-translate-y-0.5'
+                  ? 'bg-[var(--text-muted)] text-[var(--btn-blue-text)] cursor-not-allowed opacity-60'
+                  : 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)] hover:brightness-95 hover:-translate-y-0.5'
             }`}
           >
             {hook.saving ? <Loader2 size={14} className="animate-spin" /> : hook.saved ? <CheckCircle size={14} /> : <Save size={14} />}
@@ -79,7 +88,7 @@ export default function AdminProductForm() {
                 onClick={() => hook.setActiveTab(tab.id)}
                 className={`whitespace-nowrap rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${
                   hook.activeTab === tab.id
-                    ? 'bg-[var(--accent-gold)] text-navy-deep shadow-[0_4px_12px_rgba(232,170,36,0.2)]'
+                    ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)] shadow-[0_4px_12px_rgba(232,170,36,0.2)]'
                     : 'text-[var(--text-secondary)] hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -180,6 +189,14 @@ export default function AdminProductForm() {
           </div>
         </div>
       </div>
+
+      {showPreview && (
+        <ProductPreviewModal
+          form={hook.form}
+          brandList={hook.brandList}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   )
 }

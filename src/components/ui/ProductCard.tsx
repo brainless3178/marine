@@ -1,11 +1,12 @@
 import { memo } from 'react'
-import { Check, PackageCheck, ShoppingCart, Sparkles } from 'lucide-react'
+import { Check, Clock, PackageCheck, ShoppingCart, Sparkles } from 'lucide-react'
 import { WhatsAppIcon } from './WhatsAppIcon'
 import { Link } from 'react-router-dom'
 import type { TFunction } from 'i18next'
 import type { Product } from '../../types'
 import { OptimizedImage } from './OptimizedImage'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
+import { useSaleCountdown } from '../../hooks/useSaleCountdown'
 import { isLightColor, getProductImageUrl } from '../../lib/utils'
 
 interface ProductCardProps {
@@ -27,6 +28,15 @@ const conditionLabel: Record<Product['condition'], string> = {
 export const ProductCard = memo(function ProductCard({ product, added = false, onAddToCart, t, compact = false }: ProductCardProps) {
   // product.price is already the effective price (adapter sets it to salePrice when on sale)
   const displayPrice = product.onSale && product.salePrice ? product.salePrice : product.price
+  // Original (pre-sale) price — the adapter passes it through as regularPrice
+  const regularPrice = product.regularPrice ?? product.price
+  const offPct =
+    product.onSale && product.salePrice && regularPrice > product.salePrice
+      ? Math.round((1 - product.salePrice / regularPrice) * 100)
+      : 0
+  const countdown = useSaleCountdown(product.saleEndsAt)
+  // A live sale window inside the next 24h gets an urgent "ends soon" highlight.
+  const endsSoon = Boolean(countdown && !countdown.expired && countdown.days === 0)
   const canBuy = product.inStock && Boolean(onAddToCart)
   const { whatsappNumber } = useStoreSettings()
   const whatsappText = encodeURIComponent('Hi, I need a quote for ' + product.name + ' (SKU: ' + product.sku + ').')
@@ -55,6 +65,11 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[var(--overlay-dark)] to-transparent opacity-80" />
 
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+          {offPct > 0 && (
+            <span className="rounded-full bg-[var(--danger)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--btn-danger-text)] shadow-lg">
+              -{offPct}% {t('product.sale')}
+            </span>
+          )}
           {product.customLabel && (
             <span
               className="rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] shadow-lg"
@@ -64,7 +79,7 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
             </span>
           )}
           {product.availability === 'emergency' && (
-            <span className="rounded-full border border-danger/30/30 bg-danger/95 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-lg">
+            <span className="rounded-full border border-danger/30/30 bg-danger/95 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--btn-danger-text)] shadow-lg">
               {t('product.emergency')}
             </span>
           )}
@@ -109,7 +124,25 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
         )}
 
         <div className="mt-auto pt-4">
-          <div className="mb-3 flex items-end justify-between gap-3">
+          {countdown && !countdown.expired && product.onSale && (
+          <div
+            className={
+              'mb-3 flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] ' +
+              (endsSoon
+                ? 'animate-danger-pulse border border-[var(--danger)] bg-[var(--danger)] text-[var(--btn-danger-text)]'
+                : 'border border-danger/20 bg-danger/10 text-[var(--danger)]')
+            }
+          >
+            <Clock size={11} className="shrink-0" />
+            <span>{endsSoon ? t('product.endsSoon') : t('product.saleEndsIn')}</span>
+            <span className="ml-auto font-mono tabular-nums">
+              {countdown.days > 0 && <>{countdown.days}d </>}
+              {String(countdown.hours).padStart(2, '0')}:{String(countdown.minutes).padStart(2, '0')}:{String(countdown.seconds).padStart(2, '0')}
+            </span>
+          </div>
+        )}
+
+        <div className="mb-3 flex items-end justify-between gap-3">
             <div>
               <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Buyer price</span>
               {product.onSale && product.salePrice ? (
@@ -118,7 +151,7 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
                     {'$'}{product.salePrice.toFixed(2)}
                   </span>
                   <span className="font-display text-sm font-bold text-[var(--text-muted)] line-through">
-                    {'$'}{product.price.toFixed(2)}
+                    {'$'}{regularPrice.toFixed(2)}
                   </span>
                 </div>
               ) : (

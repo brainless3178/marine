@@ -142,7 +142,7 @@ export default function AdminHomepage() {
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Homepage Content</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">{sections.filter((s) => s.enabled).length} of {sections.length} sections enabled</p>
         </div>
-        <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-5 py-2.5 text-xs font-bold text-navy-deep hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all disabled:opacity-50">
+        <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-5 py-2.5 text-xs font-bold text-[var(--btn-blue-text)] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all disabled:opacity-50">
           {saving ? <><Loader2 size={14} className="animate-spin" /> Saving...</> : saved ? <><CheckCircle size={14} /> Saved!</> : <><Save size={14} /> Save Changes</>}
         </button>
       </div>

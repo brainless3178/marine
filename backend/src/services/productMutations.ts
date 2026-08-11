@@ -155,6 +155,7 @@ export async function bulkUpdate(ids: string[], action: string, value: string | 
     case 'set-featured': updateData = { isFeatured: true }; break
     case 'unset-featured': updateData = { isFeatured: false }; break
     case 'set-new-arrival': updateData = { isNewArrival: true }; break
+    case 'mark-offer': updateData = { makeOfferEnabled: true }; break
     case 'set-category': updateData = { categoryId: value }; break
     case 'set-brand': updateData = { brandId: value }; break
     default: throw Object.assign(new Error('Invalid action'), { status: 400 })

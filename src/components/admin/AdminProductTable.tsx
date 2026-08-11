@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom'
 import {
   ArrowUpDown, Eye, Pencil, Trash2, Package, ImageOff, Tag,
-  CheckSquare, Square, X, Loader2, Copy,
+  CheckSquare, Square, X, Loader2, Copy, BadgePercent,
 } from 'lucide-react'
 import { OptimizedImage } from '../ui/OptimizedImage'
 import { AdminPagination } from './AdminPagination'
 
-export type SortKey = 'name' | 'sku' | 'brand' | 'category' | 'price' | 'stock' | 'condition'
+export type SortKey = 'name' | 'sku' | 'brand' | 'category' | 'price' | 'stock' | 'condition' | 'status'
 export type SortDir = 'asc' | 'desc'
 
-export interface ProductTableItem {
+interface ProductTableItem {
   id: string
   name: string
   sku: string
@@ -21,6 +21,7 @@ export interface ProductTableItem {
   stockCount: number
   condition: string
   availability: string
+  status: string
   isNewArrival: boolean
   images: { url: string; alt: string; label?: string }[]
   customLabel?: string
@@ -37,6 +38,7 @@ interface AdminProductTableProps {
   onSort: (key: SortKey) => void
   onDuplicate: (id: string) => void
   duplicating: string | null
+  onOffer: (id: string) => void
   onDeleteRequest: (id: string) => void
   onClearFilters: () => void
 
@@ -80,11 +82,21 @@ function getAvailabilityBadge(availability: string): string {
   return map[availability] || 'admin-badge-hidden'
 }
 
+function getStatusBadge(status: string): string {
+  const map: Record<string, string> = {
+    published: 'admin-badge-published',
+    draft: 'admin-badge-draft',
+    hidden: 'admin-badge-hidden',
+    archived: 'admin-badge-info',
+  }
+  return map[status] || 'admin-badge-hidden'
+}
+
 export function AdminProductTable({
   products: paginatedProducts, loading,
   selectedIds, onToggleSelect, onToggleSelectAll,
   onSort,
-  onDuplicate, duplicating, onDeleteRequest, onClearFilters,
+  onDuplicate, duplicating, onOffer, onDeleteRequest, onClearFilters,
   onBulkAction, onClearSelection,
   page, totalPages, totalItems, onPageChange,
 }: AdminProductTableProps) {
@@ -99,13 +111,13 @@ export function AdminProductTable({
             <button onClick={() => onBulkAction('publish')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-teal)]">
               Publish
             </button>
-            <button onClick={() => onBulkAction('hide')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-gold)]">
+            <button onClick={() => onBulkAction('unpublish')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-gold)]">
               Hide
             </button>
-            <button onClick={() => onBulkAction('markSale')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-blue)]">
-              Mark Sale
+            <button onClick={() => onBulkAction('mark-offer')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-blue)]">
+              Enable Offers
             </button>
-            <button onClick={() => onBulkAction('newArrival')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-blue)]">
+            <button onClick={() => onBulkAction('set-new-arrival')} className="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 text-[0.625rem] font-bold text-[var(--text-secondary)] hover:border-[var(--accent-blue)]">
               New Arrival
             </button>
           </div>
@@ -140,14 +152,15 @@ export function AdminProductTable({
                 <th><button onClick={() => onSort('price')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">Price <ArrowUpDown size={10} /></button></th>
                 <th><button onClick={() => onSort('stock')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">Stock <ArrowUpDown size={10} /></button></th>
                 <th>Condition</th>
-                <th>Status</th>
+                <th><button onClick={() => onSort('status')} className="flex items-center gap-1 hover:text-[var(--text-primary)]">Status <ArrowUpDown size={10} /></button></th>
+                <th>Availability</th>
                 <th className="w-20">Actions</th>
               </tr>
             </thead>
             <tbody>
               {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="text-center py-12">
+                  <td colSpan={11} className="text-center py-12">
                     <Package size={32} className="mx-auto text-[var(--text-muted)] mb-3" />
                     <p className="text-sm font-semibold text-[var(--text-muted)]">No products found</p>
                     <button onClick={onClearFilters} className="mt-2 text-xs font-bold text-[var(--accent-gold)] hover:underline">
@@ -221,6 +234,7 @@ export function AdminProductTable({
                       </span>
                     </td>
                     <td><span className={`admin-badge ${getConditionBadge(product.condition)} capitalize`}>{product.condition}</span></td>
+                    <td><span className={`admin-badge ${getStatusBadge(product.status)} capitalize`}>{product.status || 'draft'}</span></td>
                     <td><span className={`admin-badge ${getAvailabilityBadge(product.availability)}`}>{product.availability.replace(/-/g, ' ')}</span></td>
                     <td>
                       <div className="flex items-center gap-1">
@@ -231,15 +245,24 @@ export function AdminProductTable({
                         >
                           <Pencil size={12} />
                         </Link>
-                        <a
-                          href={`/product/${product.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 transition-colors"
-                          title="View on storefront"
-                        >
-                          <Eye size={12} />
-                        </a>
+                        {product.status === 'published' ? (
+                          <a
+                            href={`/product/${product.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 transition-colors"
+                            title="View on storefront"
+                          >
+                            <Eye size={12} />
+                          </a>
+                        ) : (
+                          <span
+                            className="flex h-7 w-7 cursor-not-allowed items-center justify-center rounded-lg text-[var(--text-muted)] opacity-40"
+                            title="Publish to view on storefront"
+                          >
+                            <Eye size={12} />
+                          </span>
+                        )}
                         <button
                           onClick={() => onDuplicate(product.id)}
                           disabled={duplicating === product.id}
@@ -247,6 +270,13 @@ export function AdminProductTable({
                           title="Duplicate as draft"
                         >
                           <Copy size={12} />
+                        </button>
+                        <button
+                          onClick={() => onOffer(product.id)}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-gold)] hover:bg-[var(--gold-muted)] transition-colors"
+                          title="Run offer (sale / make offer)"
+                        >
+                          <BadgePercent size={12} />
                         </button>
                         <button
                           onClick={() => onDeleteRequest(product.id)}

@@ -18,8 +18,6 @@ const trackingSchema = z.object({
   courier: z.string().min(1),
 })
 
-const STATUS_FLOW = ['pending', 'confirmed', 'paid', 'processing', 'packed', 'shipped', 'delivered']
-
 // ─── List All Orders ───────────────────────────────────────────
 router.get('/', asyncHandler(async (req, res) => {
   const result = await orderService.listOrders({
@@ -58,7 +56,7 @@ router.patch('/:id/status', requireRole('store-manager'), validateBody(statusUpd
 router.patch('/:id/tracking', requireRole('store-manager'), validateBody(trackingSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const order = await orderService.updateTracking(
-      req.params.id as string, req.body.trackingNumber, req.body.courier, req.user!, req.ip
+      req.params.id as string, req.body.trackingNumber, req.body.courier
     )
     sendSuccess(res, { order })
   } catch (err: any) {

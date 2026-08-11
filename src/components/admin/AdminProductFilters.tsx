@@ -18,6 +18,8 @@ interface AdminProductFiltersProps {
   onFilterConditionChange: (value: string) => void
   filterAvailability: string
   onFilterAvailabilityChange: (value: string) => void
+  filterStatus: string
+  onFilterStatusChange: (value: string) => void
   filterOnSale: boolean
   onFilterOnSaleToggle: () => void
   filterNewArrival: boolean
@@ -38,6 +40,7 @@ export function AdminProductFilters({
   filterBrand, onFilterBrandChange,
   filterCondition, onFilterConditionChange,
   filterAvailability, onFilterAvailabilityChange,
+  filterStatus, onFilterStatusChange,
   filterOnSale, onFilterOnSaleToggle,
   filterNewArrival, onFilterNewArrivalToggle,
   uniqueBrands, uniqueCategories,
@@ -67,7 +70,7 @@ export function AdminProductFilters({
         >
           <Filter size={14} /> Filters
           {activeFilterCount > 0 && (
-            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--accent-gold)] px-1.5 text-[0.625rem] font-bold text-navy-deep">
+            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--accent-gold)] px-1.5 text-[0.625rem] font-bold text-[var(--btn-blue-text)]">
               {activeFilterCount}
             </span>
           )}
@@ -82,7 +85,21 @@ export function AdminProductFilters({
 
       {/* ── Filter dropdowns ── */}
       {showFilters && (
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 border-t border-[var(--border)] pt-4">
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 border-t border-[var(--border)] pt-4">
+          <div>
+            <label className="mb-1 block text-[0.625rem] font-bold uppercase tracking-wider text-[var(--text-muted)]">Status</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => { onFilterStatusChange(e.target.value); onPageReset() }}
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:border-[var(--accent-gold)]"
+            >
+              <option value="">All Statuses</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="hidden">Hidden</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
           <div>
             <label className="mb-1 block text-[0.625rem] font-bold uppercase tracking-wider text-[var(--text-muted)]">Category</label>
             <select
@@ -131,7 +148,7 @@ export function AdminProductFilters({
               onClick={() => { onFilterOnSaleToggle(); onPageReset() }}
               className={`w-full rounded-lg border px-3 py-2 text-xs font-bold transition-all ${
                 filterOnSale
-                  ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-navy-deep'
+                  ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)] text-[var(--btn-blue-text)]'
                   : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)]'
               }`}
             >
@@ -143,7 +160,7 @@ export function AdminProductFilters({
               onClick={() => { onFilterNewArrivalToggle(); onPageReset() }}
               className={`w-full rounded-lg border px-3 py-2 text-xs font-bold transition-all ${
                 filterNewArrival
-                  ? 'border-[var(--accent-teal)] bg-[var(--accent-teal)] text-white'
+                  ? 'border-[var(--accent-teal)] bg-[var(--accent-teal)] text-[var(--btn-blue-text)]'
                   : 'border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-secondary)]'
               }`}
             >
@@ -181,6 +198,20 @@ export function AdminProductFilters({
               <button onClick={() => { onFilterAvailabilityChange(''); onPageReset() }}><X size={10} /></button>
             </span>
           )}
+          {filterStatus && (() => {
+            const chipStyles: Record<string, string> = {
+              published: 'bg-[var(--success)]/10 text-[var(--success)]',
+              draft: 'bg-[var(--accent-gold)]/10 text-[var(--accent-gold)]',
+              hidden: 'bg-[var(--surface-soft)] text-[var(--text-secondary)]',
+              archived: 'bg-[var(--accent-blue)]/10 text-[var(--accent-blue)]',
+            }
+            return (
+              <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[0.625rem] font-bold capitalize ${chipStyles[filterStatus] || chipStyles.hidden}`}>
+                {filterStatus}
+                <button onClick={() => { onFilterStatusChange(''); onPageReset() }}><X size={10} /></button>
+              </span>
+            )
+          })()}
           {filterOnSale && (
             <span className="inline-flex items-center gap-1 rounded-md bg-[var(--danger)]/10 px-2 py-1 text-[0.625rem] font-bold text-[var(--danger)]">
               On Sale

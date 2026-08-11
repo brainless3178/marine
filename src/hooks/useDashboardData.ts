@@ -4,7 +4,7 @@ import type {
   ApiDashboardStats, ApiOrder, ApiRfq, ApiOffer, ApiProduct, ApiCustomer,
 } from '../lib/api-types'
 
-export interface DashboardAlert {
+interface DashboardAlert {
   id: string
   type: string
   message: string
@@ -12,7 +12,7 @@ export interface DashboardAlert {
   [key: string]: unknown
 }
 
-export interface DashboardActivityLog {
+interface DashboardActivityLog {
   id: string
   action: string
   actorEmail?: string

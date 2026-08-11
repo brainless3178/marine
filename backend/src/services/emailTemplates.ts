@@ -5,11 +5,11 @@ const COMPANY = process.env.COMPANY_EMAIL || 'sales@alkatraders.co'
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
 const RFQ_EMAIL = process.env.RFQ_EMAIL || 'sales@alkatraders.co'
 const EMERGENCY_EMAIL = process.env.EMERGENCY_EMAIL || 'sales@alkatraders.co'
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'sales@alkatraders.co'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alkatraders.co'
 
 // ─── Template Helpers ──────────────────────────────────────────
 
-function baseLayout(title: string, body: string): string {
+function baseLayout(body: string): string {
   const whatsapp = WHATSAPP
   const company = COMPANY
   const frontendUrl = FRONTEND_URL
@@ -75,7 +75,7 @@ export const emailTemplates = {
       `<tr><td style="padding:8px 0;border-bottom:1px solid #f1f5f9;color:#1e293b;">${i.name}</td><td style="padding:8px 0;border-bottom:1px solid #f1f5f9;text-align:center;color:#64748b;">${i.quantity}</td><td style="padding:8px 0;border-bottom:1px solid #f1f5f9;text-align:right;color:#1e293b;">$${i.price.toFixed(2)}</td></tr>`
     ).join('')
 
-    const html = baseLayout('Order Confirmation', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Order Confirmed ✅</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Thank you for your order, ${escapeHtml(data.customerName)}!</p>
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;">
@@ -96,7 +96,7 @@ export const emailTemplates = {
   },
 
   orderShipped(data: { orderNumber: string; customerName: string; trackingNumber: string; courier: string }): QueueEmail {
-    const html = baseLayout('Order Shipped', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Your Order Has Shipped 🚚</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${escapeHtml(data.customerName)}, your order is on its way!</p>
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin-bottom:24px;">
@@ -108,7 +108,7 @@ export const emailTemplates = {
   },
 
   orderCancelled(data: { orderNumber: string; customerName: string; reason: string }): QueueEmail {
-    const html = baseLayout('Order Cancelled', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Order Cancelled</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${escapeHtml(data.customerName)}, your order <strong>${escapeHtml(data.orderNumber)}</strong> has been cancelled.</p>
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin-bottom:24px;">
@@ -121,7 +121,7 @@ export const emailTemplates = {
 
   rfqReceived(data: { rfqNumber: string; customerName: string; productDescription: string; urgency: string }): QueueEmail {
     const urgencyColor = data.urgency === 'emergency' ? '#dc2626' : data.urgency === 'urgent' ? '#f59e0b' : '#0ea5e9'
-    const html = baseLayout('New RFQ Received', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">New RFQ Received 📋</h2>
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;">
         <tr><td>${infoRow('RFQ Number', `<span style="color:#0ea5e9;font-weight:700;">${data.rfqNumber}</span>`)}${infoRow('Customer', data.customerName)}${infoRow('Urgency', `<span style="display:inline-block;background:${urgencyColor};color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;text-transform:uppercase;">${data.urgency}</span>`)}${infoRow('Description', escapeHtml(data.productDescription))}</td></tr>
@@ -132,7 +132,7 @@ export const emailTemplates = {
   },
 
   rfqResponse(data: { rfqNumber: string; customerName: string; message: string }): QueueEmail {
-    const html = baseLayout('RFQ Response', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Response to Your RFQ</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 16px;">Hi ${data.customerName}, we've received your RFQ <strong>${data.rfqNumber}</strong> and our team is working on it.</p>
       <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;color:#1e293b;font-size:14px;line-height:1.6;">${escapeHtml(data.message)}</div>
@@ -142,7 +142,7 @@ export const emailTemplates = {
   },
 
   emergencyAlert(data: { rfqNumber: string; customerName: string; phone: string; partDescription: string; vesselName?: string }): QueueEmail {
-    const html = baseLayout('🚨 EMERGENCY RFQ', `
+    const html = baseLayout(`
       <div style="background:#fef2f2;border:2px solid #dc2626;border-radius:8px;padding:20px;margin-bottom:24px;">
         <h2 style="margin:0 0 8px;color:#dc2626;font-size:22px;">🚨 EMERGENCY RFQ — RESPOND WITHIN 2 HOURS</h2>
         <p style="color:#991b1b;font-size:14px;margin:0;">This requires immediate attention.</p>
@@ -157,7 +157,7 @@ export const emailTemplates = {
   },
 
   offerReceived(data: { offerNumber: string; productName: string; offeredPrice: number; customerEmail: string }): QueueEmail {
-    const html = baseLayout('New Offer Received', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">New Make-Offer Request 💰</h2>
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;">
         <tr><td>${infoRow('Offer Number', `<span style="color:#0ea5e9;font-weight:700;">${data.offerNumber}</span>`)}${infoRow('Product', data.productName)}${infoRow('Offered Price', `<span style="color:#059669;font-weight:700;font-size:16px;">$${data.offeredPrice.toFixed(2)}</span>`)}${infoRow('Customer', data.customerEmail)}</td></tr>
@@ -170,7 +170,7 @@ export const emailTemplates = {
   offerDecision(data: { offerNumber: string; productName: string; decision: 'accepted' | 'rejected' | 'countered'; counterPrice?: number }): QueueEmail {
     const colors = { accepted: '#059669', rejected: '#dc2626', countered: '#f59e0b' }
     const labels = { accepted: 'Accepted ✅', rejected: 'Rejected ❌', countered: `Countered at $${data.counterPrice?.toFixed(2)}` }
-    const html = baseLayout(`Offer ${labels[data.decision]}`, `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:${colors[data.decision]};font-size:22px;">Offer ${labels[data.decision]}</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Your offer for <strong>${data.productName}</strong> has been ${data.decision}.</p>
       ${infoRow('Offer', data.offerNumber)}
@@ -182,7 +182,7 @@ export const emailTemplates = {
   },
 
   contactNotification(data: { name: string; email: string; subject: string; message: string }): QueueEmail {
-    const html = baseLayout('New Contact Message', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">New Contact Message 📩</h2>
       ${infoRow('From', `${escapeHtml(data.name)} &lt;${escapeHtml(data.email)}&gt;`)}
       ${infoRow('Subject', escapeHtml(data.subject) || '(no subject)')}
@@ -193,7 +193,7 @@ export const emailTemplates = {
   },
 
   passwordReset(data: { name: string; resetUrl: string; isAdmin?: boolean }): QueueEmail {
-    const html = baseLayout('Password Reset', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Reset Your Password</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${data.name}, we received a password reset request for your ${data.isAdmin ? 'admin' : 'customer'} account.</p>
       ${btn(data.resetUrl, 'Reset Password', '#0ea5e9')}
@@ -203,7 +203,7 @@ export const emailTemplates = {
   },
 
   welcome(data: { name: string; email: string }): QueueEmail {
-    const html = baseLayout('Welcome to Alka Traders', `
+    const html = baseLayout(`
       <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Welcome aboard! 🎉</h2>
       <p style="color:#64748b;font-size:14px;margin:0 0 24px;">Hi ${data.name}, your account has been created successfully.</p>
       <p style="color:#1e293b;font-size:14px;">Browse our marine & industrial equipment catalog, place orders, submit RFQs, and make offers on products.</p>
