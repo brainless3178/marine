@@ -62,8 +62,9 @@ import { rateLimit } from 'express-rate-limit'
 import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
-import { prisma, describeDbDriver, getRedactedDbHost } from './utils/prismaClient.js'
+import { prisma, rawPrisma, describeDbDriver, getRedactedDbHost } from './utils/prismaClient.js'
 import { withTimeout } from './utils/withTimeout.js'
+import { wakeDatabase } from './utils/dbWake.js'
 import { sanitize } from './middleware/sanitize.js'
 import { verifyCsrf, issueCsrfToken } from './middleware/csrf.js'
 import { loginLimiter, registerLimiter, passwordResetLimiter } from './middleware/rateLimit.js'
@@ -122,8 +123,14 @@ import { startEmailQueueProcessor, stopEmailQueueProcessor } from './services/em
 // ─── App Setup ─────────────────────────────────────────────────
 const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10) // Hostinger default port
-const HEALTH_DB_TIMEOUT_MS = 3_000
 const DB_CONNECT_TIMEOUT_MS = 10_000
+
+// Neon free tier scales the compute to zero after ~5 minutes idle. The first
+// request after a suspend must wait out the wake (1–5s) rather than fail fast,
+// otherwise the health endpoint reports 'disconnected' exactly when the DB is
+// merely asleep.
+const HEALTH_WAKE_ATTEMPTS = 3
+const HEALTH_ATTEMPT_TIMEOUT_MS = 5_000
 
 // ─── Trust Proxy (CRITICAL for Hostinger / any reverse proxy) ──
 // Hostinger runs NGINX in front of Node.js. Without this:
@@ -219,12 +226,24 @@ app.use((req: express.Request, _res: express.Response, next: express.NextFunctio
 // ─── Request Logging ──────────────────────────────────────────
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))
 
-// ─── Health Check ──────────────────────────────────────────────
+// ─── Health / Wake ──────────────────────────────────────────────
+// Both endpoints run a wake-aware `SELECT 1`: when the compute is asleep the
+// request waits for the wake (retrying cold-start failures) and then reports
+// success, so a SINGLE request to either URL wakes the server.
+
+async function pingDatabase(): Promise<number> {
+  const startedAt = Date.now()
+  await wakeDatabase(
+    () => rawPrisma.$queryRaw`SELECT 1`,
+    { attempts: HEALTH_WAKE_ATTEMPTS, attemptTimeoutMs: HEALTH_ATTEMPT_TIMEOUT_MS },
+  )
+  return Date.now() - startedAt
+}
+
 app.get(['/health', '/api/health'], async (_req, res) => {
   try {
-    // Bounded: an unreachable database must yield a fast 503, not a hung request.
-    await withTimeout(prisma.$queryRaw`SELECT 1`, HEALTH_DB_TIMEOUT_MS, 'health-check-db')
-    res.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString() })
+    const wakeMs = await pingDatabase()
+    res.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString(), wakeMs })
   } catch (error) {
     const reason = error instanceof Error ? error.message : 'unknown error'
     dbLogger.error({ err: error, driver: describeDbDriver(), host: getRedactedDbHost() }, 'Health check failed')
@@ -239,6 +258,19 @@ app.get(['/health', '/api/health'], async (_req, res) => {
         ? {}
         : { driver: describeDbDriver(), host: getRedactedDbHost(), reason }),
     })
+  }
+})
+
+// The "single request that wakes the server". Point an uptime monitor or cron
+// at this URL (e.g. https://api.alkatraders.co/api/wake) to absorb the cold
+// start before real traffic arrives; the frontend can also ping it on load.
+app.get('/api/wake', async (_req, res) => {
+  try {
+    const wakeMs = await pingDatabase()
+    res.json({ status: 'ok', database: 'connected', wakeMs, timestamp: new Date().toISOString() })
+  } catch (error) {
+    dbLogger.error({ err: error, driver: describeDbDriver(), host: getRedactedDbHost() }, 'Wake request failed')
+    res.status(503).json({ status: 'error', database: 'disconnected', timestamp: new Date().toISOString() })
   }
 })
 

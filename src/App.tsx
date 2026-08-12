@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
 import { useStore } from './store/useStore'
+import { API_BASE } from './lib/api/core'
 import { PageWrapper } from './components/layout/PageWrapper'
 import { PageErrorBoundary } from './components/ui/PageErrorBoundary'
 import { ToastProvider } from './components/admin/Toast'
@@ -153,6 +154,25 @@ function AppContent() {
   const isSessionLoading = useStore((s) => s.isSessionLoading)
   const loadAdminSession = useStore((s) => s.loadAdminSession)
   const loadCustomerSession = useStore((s) => s.loadCustomerSession)
+
+  // Neon free-tier cold-start wake. When the database compute has scaled to
+  // zero (~5 min idle), the first API request would otherwise be slow or fail.
+  // Ping /api/wake on load — and again whenever the tab regains visibility — so
+  // the wake is absorbed before the user's first real query. Fire-and-forget:
+  // the backend's wake loop waits out the cold start and returns 200 once the
+  // compute is back, and the request is a ~50ms no-op when the DB is already up.
+  useEffect(() => {
+    const wakeUrl = `${API_BASE.replace(/\/api\/v1$/, '')}/api/wake`
+    const wake = () => {
+      void fetch(wakeUrl, { credentials: 'include' }).catch(() => {})
+    }
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') wake()
+    }
+    wake()
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [])
 
   useEffect(() => {
     if (localStorage.getItem('alka-admin-auth')) loadAdminSession()

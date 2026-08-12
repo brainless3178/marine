@@ -3,6 +3,7 @@ import './env.js'
 
 import { createRequire } from 'node:module'
 import { PrismaClient } from '@prisma/client'
+import { withColdStartRetry } from './dbWake.js'
 
 // Synchronous, *catchable* module loading. A static `import` of a package that
 // isn't installed throws at module-evaluation time and cannot be recovered from,
@@ -142,7 +143,45 @@ function buildPrismaClient(): PrismaClient {
   )
 }
 
-export const prisma = buildPrismaClient()
+/**
+ * Base client — no retry wrapper. Used by the health/wake endpoints so their
+ * own wake loop isn't nested inside the extension's retry.
+ */
+export const rawPrisma = buildPrismaClient()
+
+/**
+ * App-wide client. Every query (model + raw) is wrapped in a single cold-start
+ * retry: when Neon's free tier has scaled the compute to zero, the first query
+ * after idle fails — the failed attempt wakes the compute, and the retry a
+ * second later succeeds. Without this, the first visitor after ~5 minutes of
+ * inactivity hits a 5xx on every route, not just /api/health.
+ */
+// One retry of the same shape for every query: attempts = 3 with 800ms/1.6s
+// backoff covers a slow (multi-second) compute wake; healthy-DB queries pay
+// zero overhead because the first attempt succeeds.
+//
+// Retrying writes (create/update/delete) is safe here: Neon only suspends an
+// *idle* compute, and a cold-start failure means the connection died before the
+// query was sent — so the retry re-runs work that never executed. It never
+// double-applies a write, and non-cold-start errors are never retried.
+const retryQuery = <T>(fn: () => Promise<T>): Promise<T> =>
+  withColdStartRetry(fn, { attempts: 3, baseDelayMs: 800 })
+
+export const prisma = rawPrisma.$extends({
+  query: {
+    $allModels: {
+      async $allOperations({ args, query }) {
+        return retryQuery(() => query(args))
+      },
+    },
+    // Raw operations take a single callback receiving { args, query }.
+    // See DynamicQueryExtensionCb in @prisma/client runtime types.
+    $queryRaw: async ({ args, query }) => retryQuery(() => query(args)),
+    $queryRawUnsafe: async ({ args, query }) => retryQuery(() => query(args)),
+    $executeRaw: async ({ args, query }) => retryQuery(() => query(args)),
+    $executeRawUnsafe: async ({ args, query }) => retryQuery(() => query(args)),
+  },
+})
 
 /** Which driver ended up active, for the startup banner and error messages. */
 export function describeDbDriver(): string {
