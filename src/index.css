@@ -974,6 +974,11 @@ html.dark {
   }
 }
 
+@keyframes heroCaretBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 @layer components {
   /* Subtle entrance: fade up 20px / 300ms. The global
      prefers-reduced-motion rule collapses it to 0.01ms. */
@@ -986,6 +991,18 @@ html.dark {
      glow so the text keeps full contrast (WCAG AA) at every animation frame. */
   .animate-danger-pulse {
     animation: dangerPulse 1.6s ease-in-out infinite;
+  }
+
+  /* Blinking caret for the hero typewriter headline. */
+  .hero-typewriter-caret {
+    display: inline-block;
+    width: 3px;
+    height: 0.85em;
+    margin-left: 6px;
+    vertical-align: -0.08em;
+    border-radius: 2px;
+    background: var(--hero-accent);
+    animation: heroCaretBlink 1.1s step-end infinite;
   }
 
   /* CTA buttons — 16px / 600 per design spec. Colors are re-declared on

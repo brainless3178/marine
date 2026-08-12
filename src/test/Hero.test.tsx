@@ -1,95 +1,53 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { Hero } from '../components/sections/Hero'
 
-// ─── mocks ────────────────────────────────────────────────────────────────
+// The cobe globe needs a WebGL canvas — not available in jsdom. Render a
+// lightweight stand-in so the Hero layout itself stays testable.
+vi.mock('../components/ui/cobe-globe', () => ({
+  Globe: () => <div data-testid="hero-globe" role="img" aria-label="Global shipping network" />,
+}))
+
+// The typewriter animates via timers; render the first phrase statically.
+vi.mock('../components/ui/Typewriter', () => ({
+  Typewriter: ({ phrases, className }: { phrases: string[]; className?: string }) => (
+    <span data-testid="typewriter" className={className}>{phrases[0]}</span>
+  ),
+}))
 
 function renderHero() {
-  return render(<Hero />)
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <Hero />
+    </MemoryRouter>,
+  )
 }
 
-beforeEach(() => {
-  vi.useFakeTimers()
-})
-
-afterEach(() => {
-  vi.restoreAllMocks()
-  vi.useRealTimers()
-})
-
-// ─── tests ─────────────────────────────────────────────────────────────────
-
-describe('Hero (image slider)', () => {
-  it('renders a 3-slide carousel with the first slide active', () => {
+describe('Hero (global network globe)', () => {
+  it('renders the headline with the typewriter phrase', () => {
     renderHero()
-
-    const slides = screen.getAllByRole('group', { hidden: true })
-    expect(slides).toHaveLength(3)
-
-    // First slide visible, others hidden
-    expect(slides[0]).toHaveAttribute('aria-hidden', 'false')
-    expect(slides[1]).toHaveAttribute('aria-hidden', 'true')
-    expect(slides[2]).toHaveAttribute('aria-hidden', 'true')
-
-    // Slide counter
-    expect(screen.getByText('01 / 03')).toBeTruthy()
-
-    // Three images with descriptive alt text
-    expect(screen.getAllByRole('img', { hidden: true })).toHaveLength(3)
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Trusted Marine Spare Parts.')
+    expect(screen.getByTestId('typewriter')).toHaveTextContent('Delivered Worldwide.')
   })
 
-  it('moves to the next and previous slide via the arrow buttons', () => {
+  it('renders both CTA links to the shop and search', () => {
     renderHero()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
-    expect(screen.getByText('02 / 03')).toBeTruthy()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
-    expect(screen.getByText('03 / 03')).toBeTruthy()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
-    // wraps back to the first slide
-    expect(screen.getByText('01 / 03')).toBeTruthy()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Previous slide' }))
-    expect(screen.getByText('03 / 03')).toBeTruthy()
+    const shop = screen.getByRole('link', { name: /Shop Products/i })
+    const search = screen.getByRole('link', { name: /Search Ship Spares/i })
+    expect(shop.getAttribute('href')).toBe('/en/shop')
+    expect(search.getAttribute('href')).toBe('/en/products?search=ship%20spares')
   })
 
-  it('jumps to a specific slide via the dots', () => {
+  it('renders all four trust badges', () => {
     renderHero()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Go to slide 3' }))
-    expect(screen.getByText('03 / 03')).toBeTruthy()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Go to slide 2' }))
-    expect(screen.getByText('02 / 03')).toBeTruthy()
+    for (const badge of ['Worldwide Shipping', 'Quality Assured', 'Buyer Arranged Export', 'RFQ Support']) {
+      expect(screen.getByText(badge)).toBeTruthy()
+    }
   })
 
-  it('auto-rotates every 5 seconds', () => {
+  it('renders the global network globe', () => {
     renderHero()
-    expect(screen.getByText('01 / 03')).toBeTruthy()
-
-    act(() => {
-      vi.advanceTimersByTime(5000)
-    })
-    expect(screen.getByText('02 / 03')).toBeTruthy()
-  })
-
-  it('supports keyboard arrow navigation', () => {
-    renderHero()
-
-    const region = screen.getByRole('region')
-    fireEvent.keyDown(region, { key: 'ArrowRight' })
-    expect(screen.getByText('02 / 03')).toBeTruthy()
-
-    fireEvent.keyDown(region, { key: 'ArrowLeft' })
-    expect(screen.getByText('01 / 03')).toBeTruthy()
-  })
-
-  it('renders no video or poster media (image slider only)', () => {
-    renderHero()
-
-    expect(screen.queryByTestId('hero-poster')).toBeNull()
-    expect(screen.queryByTestId('hero-video')).toBeNull()
+    expect(screen.getByTestId('hero-globe')).toBeTruthy()
   })
 })

@@ -1,134 +1,143 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { getStaticImageUrl } from '@/lib/utils'
+import { Link } from 'react-router-dom'
+import { Check, Search, ShoppingCart } from 'lucide-react'
+import { Typewriter } from '@/components/ui/Typewriter'
+import { Globe } from '@/components/ui/cobe-globe'
+import { useLocalizedPath } from '@/lib/locale'
+import { useStore } from '@/store/useStore'
 
-const heroSlides = [
-  {
-    id: 'banner-1',
-    src: getStaticImageUrl('marq-3'),
-    alt: 'Marine ship spares, automation equipment, and industrial surplus ready for export from Bhavnagar',
-  },
-  {
-    id: 'banner-2',
-    src: getStaticImageUrl('marq11'),
-    alt: 'Tested ship machinery, hydraulic pumps, electrical drives, and vessel spare parts',
-  },
-  {
-    id: 'banner-3',
-    src: getStaticImageUrl('marq-1'),
-    alt: 'Alang-sourced marine equipment and industrial components packed for global delivery',
-  },
+const TYPED_PHRASES = [
+  'Delivered Worldwide.',
+  'Sourced Within Hours.',
+  'Certified & Tested.',
+  'Shipped to 50+ Countries.',
+]
+
+const TRUST_BADGES = [
+  'Worldwide Shipping',
+  'Quality Assured',
+  'Buyer Arranged Export',
+  'RFQ Support',
+]
+
+// Alka Traders global network — HQ (Bhavnagar) plus the major shipping
+// corridors the storefront serves. Rendered as markers + arcs on the globe.
+const MARKERS = [
+  { id: 'bhavnagar', location: [21.7645, 72.1519] as [number, number], label: 'Bhavnagar' },
+  { id: 'dubai', location: [25.2048, 55.2708] as [number, number], label: 'Dubai' },
+  { id: 'singapore', location: [1.3521, 103.8198] as [number, number], label: 'Singapore' },
+  { id: 'rotterdam', location: [51.9225, 4.4792] as [number, number], label: 'Rotterdam' },
+  { id: 'houston', location: [29.7604, -95.3698] as [number, number], label: 'Houston' },
+  { id: 'shanghai', location: [31.2304, 121.4737] as [number, number], label: 'Shanghai' },
+  { id: 'london', location: [51.5074, -0.1278] as [number, number], label: 'London' },
+  { id: 'sydney', location: [-33.8688, 151.2093] as [number, number], label: 'Sydney' },
+  { id: 'santos', location: [-23.9535, -46.3339] as [number, number], label: 'Santos' },
+]
+
+const ARCS = [
+  { id: 'bhv-dxb', from: [21.7645, 72.1519] as [number, number], to: [25.2048, 55.2708] as [number, number], label: 'Bhavnagar → Dubai' },
+  { id: 'bhv-sin', from: [21.7645, 72.1519] as [number, number], to: [1.3521, 103.8198] as [number, number], label: 'Bhavnagar → Singapore' },
+  { id: 'bhv-hou', from: [21.7645, 72.1519] as [number, number], to: [29.7604, -95.3698] as [number, number], label: 'Bhavnagar → Houston' },
+  { id: 'dxb-rtm', from: [25.2048, 55.2708] as [number, number], to: [51.9225, 4.4792] as [number, number], label: 'Dubai → Rotterdam' },
 ]
 
 export function Hero() {
-  const [current, setCurrent] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const localizedPath = useLocalizedPath()
+  const isDark = useStore((s) => s.theme === 'dark')
 
-  const totalSlides = heroSlides.length
-
-  const goTo = useCallback((index: number) => {
-    setCurrent(((index % totalSlides) + totalSlides) % totalSlides)
-  }, [totalSlides])
-
-  const next = useCallback(() => goTo(current + 1), [current, goTo])
-  const prev = useCallback(() => goTo(current - 1), [current, goTo])
-
-  // Auto-rotation
-  useEffect(() => {
-    if (isPaused) {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      return
-    }
-    intervalRef.current = setInterval(next, 5000)
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [isPaused, next])
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') prev()
-    else if (e.key === 'ArrowRight') next()
-  }, [prev, next])
+  // Brand teal that follows the active theme (light: #00796b, dark: #5dd5bf).
+  const teal: [number, number, number] = isDark ? [0.365, 0.835, 0.75] : [0.0, 0.475, 0.42]
 
   return (
     <section
-      className="relative w-full h-[620px] min-h-[620px] overflow-hidden bg-[var(--hero-bg-deep)] select-none sm:h-[640px] lg:h-[660px]"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-      role="region"
-      aria-label="Alka Traders marine spare parts and industrial equipment"
-      aria-roledescription="carousel"
+      aria-label="Alka Traders — trusted marine spare parts delivered worldwide"
+      className="relative -mt-[var(--hero-header-offset)] flex min-h-[calc(100vh_+_var(--hero-header-offset))] items-center overflow-hidden bg-[var(--hero-bg)] supports-[height:100svh]:min-h-[calc(100svh_+_var(--hero-header-offset))]"
     >
-      {/* ── Slides ── */}
-      {heroSlides.map((slide, index) => (
-        <div
-          key={slide.id}
-          className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-            index === current
-              ? 'opacity-100 scale-100'
-              : 'opacity-0 scale-[1.03] pointer-events-none'
-          }`}
-          role="group"
-          aria-roledescription="slide"
-          aria-label={`Slide ${index + 1} of ${totalSlides}`}
-          aria-hidden={index !== current}
-        >
-          <img
-            src={slide.src}
-            alt={slide.alt}
-            className="h-full w-full object-cover object-[65%_50%]"
-            loading={index === 0 ? 'eager' : 'lazy'}
-            decoding="async"
-            onError={(e) => {
-              const img = e.target as HTMLImageElement
-              img.style.background =
-                'linear-gradient(135deg, var(--hero-bg-mid) 0%, var(--hero-bg-light) 50%, var(--hero-bg-deep) 100%)'
-            }}
-          />
+      {/* Minimal ambient gradients — depth without heavy media. */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--hero-glow-teal),transparent_55%),radial-gradient(ellipse_at_bottom_right,var(--hero-glow-gold),transparent_50%)]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--hero-bg)]/60 via-transparent to-[var(--hero-bg)]"
+        aria-hidden="true"
+      />
+
+      <div className="site-container relative z-10 pt-[var(--hero-header-offset)] pb-16 sm:pb-20 lg:pb-24">
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
+          {/* Copy column */}
+          <div className="mx-auto w-full max-w-xl text-center lg:mx-0 lg:text-left">
+            <span className="hero-reveal inline-flex items-center gap-2 rounded-full border border-[var(--hero-border)] bg-[var(--hero-chip-bg)] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--hero-text-secondary)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--hero-accent)]" aria-hidden="true" />
+              Marine &amp; Industrial Procurement
+            </span>
+
+            <h1
+              className="hero-reveal mt-6 font-manrope text-[clamp(2.5rem,5.2vw,4.25rem)] font-extrabold leading-[1.06] tracking-[-0.03em] text-[var(--hero-text)]"
+              style={{ animationDelay: '60ms' }}
+            >
+              Trusted Marine Spare Parts.
+              <Typewriter
+                phrases={TYPED_PHRASES}
+                className="mt-1 block text-[var(--hero-accent-hover)]"
+              />
+            </h1>
+
+            <p
+              className="hero-reveal mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[var(--hero-text-secondary)] lg:mx-0"
+              style={{ animationDelay: '120ms' }}
+            >
+              Global sourcing for ship owners, yards, and maintenance teams — shop online or send an
+              RFQ and our team will source it.
+            </p>
+
+            <div
+              className="hero-reveal mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start"
+              style={{ animationDelay: '160ms' }}
+            >
+              <Link to={localizedPath('/shop')} className="hero-btn-primary px-7 py-3.5 no-underline">
+                <ShoppingCart size={18} strokeWidth={2} /> Shop Products
+              </Link>
+              <Link
+                to={localizedPath('/products?search=ship%20spares')}
+                className="hero-btn-secondary px-7 py-3.5 no-underline"
+              >
+                <Search size={18} strokeWidth={2} /> Search Ship Spares
+              </Link>
+            </div>
+
+            <ul
+              className="hero-reveal mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5 lg:justify-start"
+              style={{ animationDelay: '200ms' }}
+            >
+              {TRUST_BADGES.map((badge) => (
+                <li
+                  key={badge}
+                  className="flex items-center gap-2 text-sm font-medium text-[var(--hero-text-secondary)]"
+                >
+                  <Check size={15} strokeWidth={2.5} className="shrink-0 text-[var(--hero-accent)]" />
+                  {badge}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Interactive global-network globe (drag to rotate) */}
+          <div className="hero-reveal mx-auto w-full max-w-[540px]" style={{ animationDelay: '140ms' }}>
+            <Globe
+              markers={MARKERS}
+              arcs={ARCS}
+              dark={isDark ? 1 : 0}
+              mapBrightness={isDark ? 6 : 10}
+              markerColor={teal}
+              baseColor={[1, 1, 1]}
+              arcColor={teal}
+              glowColor={isDark ? [0.29, 0.65, 0.61] : [0.0, 0.475, 0.42]}
+              markerSize={0.02}
+              markerElevation={0.015}
+              speed={0.003}
+            />
+          </div>
         </div>
-      ))}
-
-      {/* ── Left Arrow ── */}
-      <button
-        onClick={prev}
-        className="absolute left-3 top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/16 text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all duration-300 hover:border-[var(--hero-accent-orange)] hover:bg-[var(--hero-accent-orange)] focus-visible:outline-2 focus-visible:outline-white/60 md:flex"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft size={24} strokeWidth={2.5} />
-      </button>
-
-      {/* ── Right Arrow ── */}
-      <button
-        onClick={next}
-        className="absolute right-3 top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/16 text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all duration-300 hover:border-[var(--hero-accent-orange)] hover:bg-[var(--hero-accent-orange)] focus-visible:outline-2 focus-visible:outline-white/60 md:flex"
-        aria-label="Next slide"
-      >
-        <ChevronRight size={24} strokeWidth={2.5} />
-      </button>
-
-      {/* ── Dots ── */}
-      <div className="absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-3">
-        {heroSlides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goTo(index)}
-            className={`rounded-full transition-all duration-300 focus-visible:outline-2 focus-visible:outline-white/60 ${
-              index === current
-                ? 'h-2.5 w-9 bg-[var(--hero-accent-orange)] shadow-[0_0_16px_rgba(255,107,0,0.5)]'
-                : 'h-2.5 w-2.5 bg-white/30 hover:bg-white/60'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-            aria-current={index === current ? 'true' : undefined}
-          />
-        ))}
-      </div>
-
-      {/* ── Slide Counter ── */}
-      <div className="absolute right-4 top-4 z-30 rounded-full border border-white/10 bg-black/30 px-4 py-1.5 text-xs font-semibold tracking-widest text-white/70 backdrop-blur-md">
-        {String(current + 1).padStart(2, '0')} / {String(totalSlides).padStart(2, '0')}
       </div>
     </section>
   )
