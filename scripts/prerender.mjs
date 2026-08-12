@@ -267,9 +267,22 @@ function injectIntoTemplate(template, path, routeData) {
 // ─── File Writer ────────────────────────────────────────────────
 
 function writeHtml(path, html) {
-  const filePath = path === '/' || path === '/en'
-    ? join(DIST, 'index.html')
-    : join(DIST, path, 'index.html')
+  // English home serves BOTH the root URL (/) and the locale path (/en/), so
+  // deep links and static-only hosts (Hostinger serving frontend/dist without
+  // the Node fallback) can serve /en/ directly.
+  if (path === '/' || path === '/en') {
+    const targets = [join(DIST, 'index.html')]
+    if (path === '/en') targets.push(join(DIST, 'en', 'index.html'))
+    for (const filePath of targets) {
+      const dir = dirname(filePath)
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+      writeFileSync(filePath, html, 'utf-8')
+    }
+    console.log(`  ✅ ${path}/`)
+    return
+  }
+
+  const filePath = join(DIST, path, 'index.html')
   const dir = dirname(filePath)
 
   if (!existsSync(dir)) {
@@ -277,8 +290,7 @@ function writeHtml(path, html) {
   }
 
   writeFileSync(filePath, html, 'utf-8')
-  const relative = path + '/'
-  console.log(`  ✅ ${relative}`)
+  console.log(`  ✅ ${path}/`)
 }
 
 // ─── _redirects Generator ──────────────────────────────────────
