@@ -15,7 +15,9 @@
  *     Googlebot sees real content and does NOT classify as "Soft 404"
  *   - Standard SPA script so React hydrates on load for human visitors
  *
- * Usage: node scripts/prerender.mjs
+ * Usage: node scripts/prerender.mjs [--dist <dir>]
+ *   --dist   output directory (default: dist). Hostinger's frontend app
+ *            serves frontend/dist, so its build passes --dist frontend/dist.
  * Runs automatically after `npm run build` via postbuild chain.
  */
 
@@ -23,7 +25,10 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { getAllRoutes } from './prerender-routes.mjs'
 
-const DIST = 'dist'
+const distArgIndex = process.argv.indexOf('--dist')
+const DIST = distArgIndex !== -1 && process.argv[distArgIndex + 1]
+  ? process.argv[distArgIndex + 1]
+  : 'dist'
 const BASE_URL = 'https://alkatraders.co'
 const SITE_NAME = 'Alka Traders'
 const DEFAULT_DESC = 'Global supplier of marine spares, industrial equipment, surplus machinery, and emergency procurement parts. Based in Bhavnagar, Gujarat, India.'

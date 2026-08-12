@@ -93,13 +93,13 @@ export async function uploadMedia(file: Express.Multer.File, actor: AuthUser) {
   // Upload to Cloudinary
   const { url, publicId } = await uploadToCloudinary(optimized, fileHash)
 
-  // Atomic transaction: findFirst + create
+  // Dedupe without an interactive transaction: HTTP-mode Neon driver
+  // (PrismaNeonHTTP) doesn't support transactions, and the hash column is
+  // UNIQUE — a concurrent duplicate insert throws P2002, which we catch and
+  // resolve to the existing row. Same guarantee, works on every driver.
   try {
-    const result = await prisma.$transaction(async (tx) => {
-      const existing = await tx.mediaAsset.findFirst({ where: { hash: fileHash } })
-      if (existing) return { asset: existing, created: false }
-
-      const asset = await tx.mediaAsset.create({
+    try {
+      const asset = await prisma.mediaAsset.create({
         data: {
           filename: publicId,
           originalName: file.originalname,
@@ -112,16 +112,18 @@ export async function uploadMedia(file: Express.Multer.File, actor: AuthUser) {
           uploadedBy: actor.id,
         },
       })
-      return { asset, created: true }
-    })
-
-    if (!result.created) {
-      return { asset: result.asset, message: 'Duplicate file — existing asset returned' }
+      return { asset }
+    } catch (err: any) {
+      // P2002 = unique constraint violation on hash — a concurrent upload of
+      // the same file won the race. Return the existing asset instead.
+      if (err?.code === 'P2002') {
+        const existing = await prisma.mediaAsset.findFirst({ where: { hash: fileHash } })
+        if (existing) return { asset: existing, message: 'Duplicate file — existing asset returned' }
+      }
+      throw err
     }
-
-    return { asset: result.asset }
   } catch (err) {
-    // Transaction failed AFTER Cloudinary upload — best-effort cleanup
+    // Create failed AFTER Cloudinary upload — best-effort cleanup
     await destroyCloudinary(publicId)
     throw Object.assign(new Error(`Database error after Cloudinary upload: ${(err as Error).message}`), { status: 502 })
   }

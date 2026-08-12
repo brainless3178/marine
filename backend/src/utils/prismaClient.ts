@@ -10,7 +10,7 @@ import { withColdStartRetry } from './dbWake.js'
 // which would take down the whole server. require() lets us degrade gracefully.
 const nodeRequire = createRequire(import.meta.url)
 
-type DbDriver = 'neon-serverless' | 'postgres-tcp'
+type DbDriver = 'neon-http' | 'neon-ws' | 'postgres-tcp'
 
 // Deliberately NOT `Prisma.LogLevel`. The `Prisma` namespace only carries real
 // types once `prisma generate` has run; against the bare re-export stub shipped
@@ -95,11 +95,25 @@ function buildClientOptions(extra: PrismaClientExtraOptions): ClientOptions {
 }
 
 /**
- * Build a Neon driver adapter that tunnels Postgres over HTTPS/WebSocket on port
- * 443. Required on hosts that block outbound TCP 5432 (e.g. Hostinger shared
- * hosting), where a direct connection hangs forever instead of being refused.
+ * Build the Neon HTTP driver adapter — plain HTTPS POST requests, NO
+ * WebSockets. This is the only Neon driver that works on hosts which silently
+ * drop WebSocket egress (observed on Hostinger: WS handshakes hang forever
+ * while plain HTTPS works fine). Recommended default for Neon hosts.
  */
-function createNeonAdapter(connectionString: string): NeonAdapter {
+function createNeonHttpAdapter(connectionString: string): NeonAdapter {
+  const { PrismaNeonHTTP } = nodeRequire('@prisma/adapter-neon')
+  // The factory constructs @neondatabase/serverless's neon() HTTP queryable
+  // internally — no neonConfig.webSocketConstructor needed.
+  return new PrismaNeonHTTP(connectionString)
+}
+
+/**
+ * Build the Neon WebSocket driver adapter — tunnels Postgres over HTTPS/
+ * WebSocket on port 443. Required on hosts that block outbound TCP 5432 but
+ * DO allow WebSocket egress (a blocked port makes TCP queries hang forever
+ * instead of failing).
+ */
+function createNeonWsAdapter(connectionString: string): NeonAdapter {
   const { neonConfig } = nodeRequire('@neondatabase/serverless')
   const { PrismaNeon } = nodeRequire('@prisma/adapter-neon')
   const ws = nodeRequire('ws')
@@ -119,19 +133,53 @@ function buildPrismaClient(): PrismaClient {
   const rawUrl = process.env.DATABASE_URL
   const forced = process.env.DB_DRIVER
   const looksLikeNeon = parseHost(rawUrl).includes('.neon.tech')
-  const useNeon = forced === 'neon-http' || (looksLikeNeon && forced !== 'tcp')
 
-  if (useNeon && rawUrl) {
+  // Driver selection:
+  //   neon-http = HTTPS POST driver (no WebSockets) — works everywhere plain
+  //               HTTPS does. Default for *.neon.tech hosts.
+  //   neon-ws   = WebSocket tunnel over 443.
+  //   tcp       = direct TCP on 5432 (needs open outbound port).
+  // An explicit neon-http/neon-ws falls through to the next driver if it can't
+  // be constructed; tcp is explicit-only (matches historical behavior).
+  const mode = forced ?? (looksLikeNeon ? 'neon-http' : 'tcp')
+
+  if (mode === 'tcp') {
+    activeDriver = 'postgres-tcp'
+    return new PrismaClient(
+      buildClientOptions(
+        rawUrl ? { datasources: { db: { url: withConnectTimeouts(rawUrl) } } } : {},
+      ),
+    )
+  }
+
+  // HTTP first, then WS, then TCP — each step only runs if construction failed.
+  const order: DbDriver[] = mode === 'neon-ws'
+    ? ['neon-ws', 'neon-http', 'postgres-tcp']
+    : ['neon-http', 'neon-ws', 'postgres-tcp']
+
+  for (const driver of order) {
     try {
-      const adapter = createNeonAdapter(rawUrl)
-      activeDriver = 'neon-serverless'
-      return new PrismaClient(buildClientOptions({ adapter }))
-    } catch (error) {
-      // Fall through to TCP rather than crashing: a partially working API that
-      // reports the real problem beats a boot loop.
-      process.stderr.write(
-        `WARN: Neon serverless driver unavailable, falling back to TCP. ${errorMessage(error)}\n`,
+      if (driver === 'neon-http') {
+        // HTTP mode prefers the direct (non-pooler) endpoint.
+        const adapter = createNeonHttpAdapter(process.env.DIRECT_URL || rawUrl!)
+        activeDriver = 'neon-http'
+        return new PrismaClient(buildClientOptions({ adapter }))
+      }
+      if (driver === 'neon-ws') {
+        const adapter = createNeonWsAdapter(rawUrl!)
+        activeDriver = 'neon-ws'
+        return new PrismaClient(buildClientOptions({ adapter }))
+      }
+      activeDriver = 'postgres-tcp'
+      return new PrismaClient(
+        buildClientOptions(
+          rawUrl ? { datasources: { db: { url: withConnectTimeouts(rawUrl) } } } : {},
+        ),
       )
+    } catch (error) {
+      // Fall through rather than crashing: a partially working API that reports
+      // the real problem beats a boot loop.
+      process.stderr.write(`WARN: ${driver} driver unavailable, trying next. ${errorMessage(error)}\n`)
     }
   }
 
@@ -185,9 +233,14 @@ export const prisma = rawPrisma.$extends({
 
 /** Which driver ended up active, for the startup banner and error messages. */
 export function describeDbDriver(): string {
-  return activeDriver === 'neon-serverless'
-    ? 'neon-serverless (HTTPS/WebSocket, port 443)'
-    : 'postgres-tcp (port 5432)'
+  switch (activeDriver) {
+    case 'neon-http':
+      return 'neon-http (HTTPS POST, port 443)'
+    case 'neon-ws':
+      return 'neon-ws (WebSocket, port 443)'
+    default:
+      return 'postgres-tcp (port 5432)'
+  }
 }
 
 /** Redacted database host — safe to write to logs. */

@@ -10,7 +10,6 @@ const mockPrisma = {
   brand: { count: vi.fn() },
   adminUser: { count: vi.fn() },
   product: { count: vi.fn() },
-  $transaction: vi.fn(),
 }
 
 vi.mock('../server.js', () => ({ prisma: mockPrisma }))
@@ -53,16 +52,8 @@ describe('uploadMedia', () => {
   })
 
   it('uploads and creates media asset', async () => {
-    mockPrisma.mediaAsset.findFirst
-      .mockResolvedValueOnce(null) // pre-check
-    mockPrisma.$transaction.mockImplementation(async (fn: any) => {
-      return fn({
-        mediaAsset: {
-          findFirst: vi.fn().mockResolvedValue(null),
-          create: vi.fn().mockResolvedValue({ id: 'asset-1', url: 'https://res.cloudinary.com/test/image/upload/alka/hash123' }),
-        },
-      })
-    })
+    mockPrisma.mediaAsset.findFirst.mockResolvedValue(null) // pre-check
+    mockPrisma.mediaAsset.create.mockResolvedValue({ id: 'asset-1', url: 'https://res.cloudinary.com/test/image/upload/alka/hash123' })
 
     const mockFile = {
       buffer: Buffer.from('test-image'),
@@ -73,6 +64,27 @@ describe('uploadMedia', () => {
     const result = await uploadMedia(mockFile as Express.Multer.File, mockActor, '127.0.0.1')
     expect(result.asset).toBeDefined()
     expect(result.asset.url).toContain('cloudinary')
+    // Plain create on the extended client — no interactive transaction, so the
+    // HTTP-mode Neon driver (which doesn't support transactions) works.
+    expect(mockPrisma.mediaAsset.create).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns existing asset on concurrent duplicate (P2002)', async () => {
+    mockPrisma.mediaAsset.findFirst
+      .mockResolvedValueOnce(null) // pre-check
+      .mockResolvedValueOnce({ id: 'asset-1', url: 'https://res.cloudinary.com/test/image/upload/alka/hash123' })
+    const uniqueError = Object.assign(new Error('Unique constraint failed'), { code: 'P2002' })
+    mockPrisma.mediaAsset.create.mockRejectedValue(uniqueError)
+
+    const mockFile = {
+      buffer: Buffer.from('test-image'),
+      mimetype: 'image/jpeg',
+      originalname: 'test.jpg',
+    }
+
+    const result = await uploadMedia(mockFile as Express.Multer.File, mockActor, '127.0.0.1')
+    expect(result.asset.id).toBe('asset-1')
+    expect(result.message).toContain('Duplicate')
   })
 })
 

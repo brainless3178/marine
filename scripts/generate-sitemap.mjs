@@ -9,8 +9,11 @@
  *   - xhtml:link rel="alternate" hreflang for all 3 locales + x-default
  *   - changefreq and priority from the route data
  *
- * Usage:  node scripts/generate-sitemap.mjs
- * Output: public/sitemap.xml (overwrites)
+ * Usage:  node scripts/generate-sitemap.mjs [--dist <dir>]
+ *   --dist   output directory for sitemap.xml (default: dist).
+ *            Hostinger's frontend app serves frontend/dist, so its build
+ *            passes --dist frontend/dist.
+ * Output: <dist>/sitemap.xml (overwrites)
  */
 
 import { writeFileSync } from 'fs'
@@ -87,7 +90,11 @@ function main() {
     '',
   ].join('\n')
 
-  const outPath = join('dist', 'sitemap.xml')
+  const distArgIndex = process.argv.indexOf('--dist')
+  const outDir = distArgIndex !== -1 && process.argv[distArgIndex + 1]
+    ? process.argv[distArgIndex + 1]
+    : 'dist'
+  const outPath = join(outDir, 'sitemap.xml')
   writeFileSync(outPath, sitemap, 'utf-8')
 
   console.log(`  ✅ ${routes.length} URLs written to ${outPath}`)

@@ -18,8 +18,9 @@ services:
         value: production
       - key: DATABASE_URL
         sync: false
-      # Use Neon's serverless driver over HTTPS/443 instead of TCP/5432.
-      # Set to "tcp" only on hosts that allow outbound 5432.
+      # Use Neon's HTTP driver (plain HTTPS POST, no WebSockets) instead of
+      # TCP/5432 or the WebSocket tunnel. Set to "neon-ws" for the WS tunnel,
+      # "tcp" only on hosts that allow outbound 5432.
       - key: DB_DRIVER
         value: neon-http
       - key: DIRECT_URL

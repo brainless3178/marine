@@ -34,6 +34,13 @@ export default defineConfig(({ mode }) => {
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,avif,woff2}'],
+        // Serve the cached app shell for SPA navigations. Once the service
+        // worker controls the page, deep-link refreshes (e.g. /en/shop while
+        // the Hostinger Node process is cold-starting) resolve from the
+        // precached shell instead of waiting on the network. First-time
+        // visitors without the SW are covered by the prerendered static
+        // locale pages (frontend/dist/en/...), which are separate files.
+        navigateFallback: 'index.html',
         runtimeCaching: [
           {
             urlPattern: /^https?:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/.*/i,
