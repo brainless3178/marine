@@ -30,7 +30,15 @@ function sanitizeValue(value: unknown): unknown {
 // ─── Sanitize Middleware ─────────────────────────────────────
 // Recursively strips XSS from all string values in req.body.
 // Place this BEFORE validateBody in your route chains.
+//
+// /admin routes are trusted (authenticated admin users) and their payloads
+// are validated by zod, so rich-text/HTML fields must NOT be stripped there.
+const ADMIN_PATH_PATTERN = /\/admin(\/|$)/
+
 export function sanitize(req: Request, _res: Response, next: NextFunction) {
+  if (ADMIN_PATH_PATTERN.test(req.path)) {
+    return next()
+  }
   if (req.body && typeof req.body === 'object') {
     req.body = sanitizeValue(req.body)
   }

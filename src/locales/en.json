@@ -405,6 +405,8 @@
     "orderConfirmation": "Thank you for your order! You will receive a confirmation email shortly. Estimated delivery:",
     "estimatedDelivery": "5-7 Business Days",
     "orderSummary": "Order Summary",
+    "skippedHeading": "Some items were removed from your order",
+    "skippedDesc": "The following products are no longer available and were not included in your order. Your total has been updated accordingly.",
     "continueShopping": "Continue Shopping",
     "trackOrder": "Track Order",
     "cancelHeading": "Need to Cancel Order?",

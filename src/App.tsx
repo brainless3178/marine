@@ -3,6 +3,7 @@ import { Suspense, lazy, useEffect } from 'react'
 import { useStore } from './store/useStore'
 import { API_BASE } from './lib/api/core'
 import { PageWrapper } from './components/layout/PageWrapper'
+import { ScrollToTop } from './components/layout/ScrollToTop'
 import { PageErrorBoundary } from './components/ui/PageErrorBoundary'
 import { ToastProvider } from './components/admin/Toast'
 import { LocaleContext, VALID_LOCALES } from './lib/locale'
@@ -193,6 +194,8 @@ function AppContent() {
   }
 
   return (
+    <>
+    <ScrollToTop />
     <Routes>
       {/* Admin routes — listed FIRST so they take priority */}
       <Route path="/admin/login" element={<Suspense fallback={<LoadingFallback />}><AdminLogin /></Suspense>} />
@@ -233,6 +236,7 @@ function AppContent() {
       {/* Storefront with locale prefix */}
       <Route path="/:locale/*" element={<LocaleLayout />} />
     </Routes>
+    </>
   )
 }
 

@@ -31,6 +31,38 @@ export const testimonials: Testimonial[] = [
     rating: 5,
     productName: 'RIDGID D223 PIPE THREADER RATCHET 1 INCH SQUARE DRIVE FOR...',
   },
+  {
+    id: 'a0000004-0000-0000-0000-000000000004',
+    name: 'nayatolu (37)',
+    role: '',
+    company: '',
+    avatar: 'N',
+    text: 'Excelente vendedor, mi compra llegó sin problema alguno.',
+    rating: 5,
+    productName: 'RIDGID 405/408M TUBING BENDER 5/16 OD 15/16 R & 8 MM OD 2...',
+    verified: 'Past 6 months • Verified purchase',
+  },
+  {
+    id: 'a0000005-0000-0000-0000-000000000005',
+    name: 'tomas-gsxr (132)',
+    role: '',
+    company: '',
+    avatar: 'T',
+    text: 'Absolutt super proffesional we hit a bumb in the road they reaction was lightning fast i will do moore business with these guys',
+    rating: 5,
+    productName: 'DEUMO KUKKO NO 56-2 HYDRAULIC NUT SPLITTER 700NM 7KPM...',
+    verified: 'Past 6 months • Verified purchase',
+  },
+  {
+    id: 'a0000006-0000-0000-0000-000000000006',
+    name: '',
+    role: '',
+    company: '',
+    avatar: 'V',
+    text: 'EL PEDIDO FUE ENVIADO A TIEMPO, MUY BIEN EMPACADO Y CORRESPONDE CON LO OBSERVADO EN LAS IMAGENES QUE FUERON EXHIBIDAS EN LA PAGINA, VENDEDOR AMPLIAMENTE RECOMENDADO',
+    rating: 5,
+    productName: 'TITAN CHAIN TONGS JAWS SIZE 16 PART NO C161 REPLACEMENT J...',
+  },
 ]
 
 export const offices: Office[] = [

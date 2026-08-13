@@ -19,19 +19,29 @@ if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGIN) {
   process.env.CORS_ORIGIN = 'https://alkatraders.co'
 }
 
-// Frontend origins for CORS (separate Hostinger app)
+// Frontend origins for CORS (separate Hostinger app).
+// CORS_ORIGIN from the hosting panel is honored in ALL environments
+// (comma-separated values supported) and merged with the production defaults,
+// so the panel value is never silently ignored.
 const PRODUCTION_CORS_ORIGINS = [
   'https://alkatraders.co',
   'https://www.alkatraders.co',
 ]
+const ENV_CORS_ORIGINS = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean)
 const DEVELOPMENT_CORS_ORIGINS = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
-  process.env.CORS_ORIGIN || 'http://localhost:5173',
   ...PRODUCTION_CORS_ORIGINS,
+  ...ENV_CORS_ORIGINS,
 ]
-const CORS_ORIGINS = process.env.NODE_ENV === 'production'
-  ? PRODUCTION_CORS_ORIGINS
-  : Array.from(new Set(DEVELOPMENT_CORS_ORIGINS.filter(Boolean)))
+const CORS_ORIGINS = Array.from(new Set(
+  (process.env.NODE_ENV === 'production'
+    ? [...PRODUCTION_CORS_ORIGINS, ...ENV_CORS_ORIGINS]
+    : DEVELOPMENT_CORS_ORIGINS
+  ).filter(Boolean),
+))
 
 // Warn about missing PayPal config
 if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {

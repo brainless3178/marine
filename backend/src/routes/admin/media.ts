@@ -9,6 +9,8 @@ import logger from '../../utils/logger.js'
 
 const router = Router()
 router.use(authenticateAdmin)
+// All media mutations (upload/delete) require at least inventory-manager.
+router.use(requireRole('inventory-manager'))
 
 // ─── Zod Schemas ───────────────────────────────────────────────
 const listMediaQuerySchema = z.object({
@@ -105,7 +107,7 @@ router.post('/upload',
 )
 
 // ─── Delete Media ──────────────────────────────────────────────
-router.delete('/:id', requireRole('inventory-manager'), validateParams(uuidParamSchema), asyncHandler(async (req: AuthRequest, res) => {
+router.delete('/:id', validateParams(uuidParamSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const result = await mediaService.deleteMedia(req.params.id as string)
     sendSuccess(res, result)

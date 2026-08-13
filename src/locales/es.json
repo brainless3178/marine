@@ -402,6 +402,8 @@
     "orderConfirmation": "¡Gracias por su pedido! Recibirá un correo de confirmación en breve. Entrega estimada:",
     "estimatedDelivery": "5-7 Días Hábiles",
     "orderSummary": "Resumen del Pedido",
+    "skippedHeading": "Algunos artículos se eliminaron de su pedido",
+    "skippedDesc": "Los siguientes productos ya no están disponibles y no se incluyeron en su pedido. Su total se ha actualizado en consecuencia.",
     "continueShopping": "Seguir Comprando",
     "trackOrder": "Rastrear Pedido",
     "cancelHeading": "¿Necesita Cancelar el Pedido?",

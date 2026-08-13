@@ -176,10 +176,38 @@ describe('createOrder', () => {
     })).rejects.toMatchObject({ status: 400 })
   })
 
-  it('throws when product not found', async () => {
+  it('fails with a clear 409 when no cart items are available (empty catalog)', async () => {
     mockPrisma.product.findUnique.mockResolvedValue(null)
 
-    await expect(createOrder(baseInput)).rejects.toMatchObject({ status: 400 })
+    await expect(createOrder(baseInput)).rejects.toMatchObject({
+      status: 409,
+      message: expect.stringContaining('no longer available'),
+    })
+    expect(mockPrisma.order.create).not.toHaveBeenCalled()
+  })
+
+  it('skips unavailable items and still creates the order with the available ones', async () => {
+    // prod-1 exists, prod-2 is missing from the (emptied) catalog.
+    mockPrisma.product.findUnique
+      .mockResolvedValueOnce({ id: 'prod-1', name: 'Hydraulic Pump', sku: 'HP-200', regularPrice: 100, salePrice: null, stockCount: 10 })
+      .mockResolvedValueOnce(null)
+    mockPrisma.storeSetting.findUnique
+      .mockResolvedValueOnce({ value: '25' })  // shipping
+      .mockResolvedValueOnce({ value: '0.08' }) // tax
+      .mockResolvedValueOnce({ value: '500' })  // free shipping threshold
+    mockPrisma.order.create.mockResolvedValue({ id: 'order-1', orderNumber: 'AT-ORD-999', status: 'pending', items: [], timeline: [] })
+
+    const result = await createOrder(baseInput)
+
+    expect(result.orderNumber).toBe('AT-ORD-999')
+    const callData = mockPrisma.order.create.mock.calls[0][0].data
+    // Only the available line is ordered; it is priced from the product table.
+    expect(callData.items.create).toHaveLength(1)
+    expect(callData.items.create[0]).toMatchObject({ productId: 'prod-1', quantity: 2, unitPrice: 100 })
+    expect(callData.subtotal).toBe(200)
+    // The skipped line is recorded on the timeline for admin visibility.
+    expect(callData.timeline.create.note).toContain('prod-2')
+    expect(callData.timeline.create.note).toContain('Skipped unavailable')
   })
 })
 

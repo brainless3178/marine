@@ -20,16 +20,28 @@ import { resolveInitialTheme, syncThemeColor } from './lib/theme'
 // Apply the saved theme (or the VITE_DEFAULT_THEME env default, light unless
 // configured otherwise). Runs after the inline script in index.html, which
 // already painted the right theme — this keeps store/classes in sync.
-const initialTheme = resolveInitialTheme()
-if (initialTheme === 'dark') {
-  document.documentElement.classList.remove('light')
-  document.documentElement.classList.add('dark')
-} else {
-  document.documentElement.classList.add('light')
-  document.documentElement.classList.remove('dark')
+//
+// Guarded exactly like the inline script: when storage is blocked (Safari
+// private mode, strict privacy settings) localStorage access THROWS a
+// SecurityError. Unguarded, that would kill this module before
+// createRoot().render() — a blank page with the bundle loaded. The inline
+// script already painted the correct theme, so on failure we simply skip the
+// store sync and keep rendering.
+try {
+  const initialTheme = resolveInitialTheme()
+  if (initialTheme === 'dark') {
+    document.documentElement.classList.remove('light')
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.add('light')
+    document.documentElement.classList.remove('dark')
+  }
+  localStorage.setItem('alka-theme', initialTheme)
+  syncThemeColor(initialTheme)
+} catch {
+  // Storage unavailable — inline script default already applied. Never throw
+  // during bootstrap.
 }
-localStorage.setItem('alka-theme', initialTheme)
-syncThemeColor(initialTheme)
 
 // Detect initial language for RTL support
 const browserLang = navigator.language?.startsWith('ar') ? 'ar' : navigator.language?.startsWith('es') ? 'es' : 'en'

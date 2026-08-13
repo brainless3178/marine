@@ -103,7 +103,7 @@ describe('capturePaypalOrder — stock consistency', () => {
   })
 
   it('reverts the order to pending and throws 409 when the stock decrement fails', async () => {
-    mockPrisma.order.findFirst.mockResolvedValue(sampleOrder())
+    mockPrisma.order.findFirst.mockResolvedValue(sampleOrder({ paymentIntentId: 'PAY-9' }))
     mockPrisma.product.findUnique.mockResolvedValue({ stockCount: 10, name: 'Pump' })
     mockPrisma.order.updateMany
       .mockResolvedValueOnce({ count: 1 }) // mark paid
@@ -111,7 +111,10 @@ describe('capturePaypalOrder — stock consistency', () => {
     mockPrisma.$executeRawUnsafe.mockResolvedValue(0)
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ status: 'COMPLETED' }),
+      json: async () => ({
+        status: 'COMPLETED',
+        purchase_units: [{ payments: { captures: [{ amount: { value: '133.00', currency_code: 'USD' } }] } }],
+      }),
     }))
 
     await expect(capturePaypalOrder('PAY-9', 'order-1', 'cust-1')).rejects.toMatchObject({ status: 409 })
@@ -122,12 +125,37 @@ describe('capturePaypalOrder — stock consistency', () => {
   })
 
   it('rejects before charging when pre-flight stock is insufficient', async () => {
-    mockPrisma.order.findFirst.mockResolvedValue(sampleOrder())
+    mockPrisma.order.findFirst.mockResolvedValue(sampleOrder({ paymentIntentId: 'PAY-9' }))
     mockPrisma.product.findUnique.mockResolvedValue({ stockCount: 1, name: 'Pump' })
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
 
     await expect(capturePaypalOrder('PAY-9', 'order-1', 'cust-1')).rejects.toMatchObject({ status: 400 })
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects a PayPal order that was not created for this store order', async () => {
+    // paymentIntentId 'PAY-1' does not match the supplied paypalOrderId 'PAY-9'
+    mockPrisma.order.findFirst.mockResolvedValue(sampleOrder())
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(capturePaypalOrder('PAY-9', 'order-1', 'cust-1')).rejects.toMatchObject({ status: 400 })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('throws 409 when the captured amount differs from the order total', async () => {
+    mockPrisma.order.findFirst.mockResolvedValue(sampleOrder({ paymentIntentId: 'PAY-9' }))
+    mockPrisma.product.findUnique.mockResolvedValue({ stockCount: 10, name: 'Pump' })
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        status: 'COMPLETED',
+        purchase_units: [{ payments: { captures: [{ amount: { value: '42.00', currency_code: 'USD' } }] } }],
+      }),
+    }))
+
+    await expect(capturePaypalOrder('PAY-9', 'order-1', 'cust-1')).rejects.toMatchObject({ status: 409 })
+    expect(mockPrisma.order.updateMany).not.toHaveBeenCalled()
   })
 })

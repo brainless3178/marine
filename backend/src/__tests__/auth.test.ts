@@ -104,6 +104,15 @@ describe('authenticateAdmin middleware', () => {
     expect(next).not.toHaveBeenCalled()
     expect(res.status).toHaveBeenCalledWith(401)
   })
+
+  it('rejects a customer token on admin routes (P0 authorization bypass)', () => {
+    const token = auth.generateToken({ id: 'cust-1', email: 'cust@test.com', role: 'customer', type: 'customer' })
+    const { req, res, next } = mockReqRes(`Bearer ${token}`)
+    auth.authenticateAdmin(req, res, next)
+    expect(next).not.toHaveBeenCalled()
+    expect(res.status).toHaveBeenCalledWith(403)
+    expect(res.json).toHaveBeenCalledWith({ error: 'Admin access required' })
+  })
 })
 
 describe('authenticateCustomer middleware', () => {

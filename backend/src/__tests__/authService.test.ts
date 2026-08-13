@@ -234,6 +234,18 @@ describe('refreshAdminToken', () => {
 
     await expect(refreshAdminToken(fakeToken)).rejects.toMatchObject({ status: 401 })
   })
+
+  it('rejects a customer refresh token (P0 defense in depth)', async () => {
+    const jwt = await import('jsonwebtoken')
+    const customerRefresh = jwt.default.sign(
+      { id: 'cust-uuid', email: 'cust@test.com', role: 'customer', type: 'customer', refresh: true },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    )
+
+    await expect(refreshAdminToken(customerRefresh)).rejects.toMatchObject({ status: 401 })
+    expect(mockPrisma.adminUser.findUnique).not.toHaveBeenCalled()
+  })
 })
 
 describe('logoutAdmin', () => {

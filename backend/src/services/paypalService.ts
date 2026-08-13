@@ -249,6 +249,12 @@ export async function createPaypalOrder(orderId: string, userId: string) {
 export async function capturePaypalOrder(paypalOrderId: string, orderId: string, userId: string) {
   const order = await prisma.order.findFirst({ where: { id: orderId, customerId: userId }, include: { items: true } })
   if (!order) throw Object.assign(new Error('Order not found'), { status: 404 })
+  // Ownership cross-check: the PayPal order being captured must be the exact
+  // one created for this store order — never trust a client-supplied ID.
+  if (order.paymentIntentId !== paypalOrderId) {
+    hookLog.warn({ orderId, paypalOrderId, storedPaymentIntentId: order.paymentIntentId }, 'PayPal order ID mismatch during capture')
+    throw Object.assign(new Error('PayPal order does not match this order'), { status: 400 })
+  }
   if (order.paymentStatus === 'paid') throw Object.assign(new Error('Order already paid'), { status: 400 })
 
   const accessToken = await getPaypalAccessToken()
@@ -275,10 +281,26 @@ export async function capturePaypalOrder(paypalOrderId: string, orderId: string,
     throw Object.assign(new Error('Payment capture failed'), { status: 502 })
   }
 
-  const captureData = await captureRes.json() as { status: string }
+  const captureData = await captureRes.json() as {
+    status: string
+    purchase_units?: Array<{
+      payments?: {
+        captures?: Array<{ amount?: { value?: string; currency_code?: string } }>
+      }
+    }>
+  }
   if (captureData.status !== 'COMPLETED') {
     hookLog.warn({ status: captureData.status, orderId }, 'PayPal capture not completed')
     throw Object.assign(new Error('Payment not completed'), { status: 400 })
+  }
+
+  // Amount verification: PayPal must have captured exactly what we charged the
+  // customer. A mismatch means tampering or a PayPal-side discrepancy — surface
+  // it instead of silently confirming the order.
+  const capturedAmount = Number(captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value)
+  if (Number.isNaN(capturedAmount) || Math.abs(capturedAmount - Number(order.total)) > 0.01) {
+    hookLog.error({ orderId, paypalOrderId, capturedAmount, expected: Number(order.total) }, 'PayPal captured amount mismatch')
+    throw Object.assign(new Error('Captured amount does not match order total'), { status: 409 })
   }
 
   // Atomic idempotency guard

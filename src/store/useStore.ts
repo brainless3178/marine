@@ -23,6 +23,22 @@ interface AdminUser {
   avatar?: string
 }
 
+/** Server-authoritative totals for the most recently placed order. */
+export interface OrderSummary {
+  subtotal: number
+  shippingCost: number
+  tax: number
+  total: number
+  currency: string
+}
+
+/** A cart line the server dropped because its product is no longer in the catalog. */
+export interface SkippedCartItem {
+  productId: string
+  productName: string
+  quantity: number
+}
+
 interface AppState {
   // Theme
   theme: 'dark' | 'light'
@@ -120,6 +136,10 @@ interface AppState {
   setCancelRequested: (req: boolean) => void
   cancelReason: string
   setCancelReason: (reason: string) => void
+  orderSummary: OrderSummary | null
+  setOrderSummary: (summary: OrderSummary | null) => void
+  orderSkippedItems: SkippedCartItem[]
+  setOrderSkippedItems: (items: SkippedCartItem[]) => void
 }
 
 function loadState<T>(key: string, fallback: T): T {
@@ -457,6 +477,10 @@ export const useStore = create<AppState>((set, get) => ({
   orderId: '',
   generateOrderId: () =>
     set({ orderId: `AT-ORD-${Math.floor(10000 + Math.random() * 90000)}` }),
+  orderSummary: null,
+  setOrderSummary: (orderSummary) => set({ orderSummary }),
+  orderSkippedItems: [],
+  setOrderSkippedItems: (orderSkippedItems) => set({ orderSkippedItems }),
   cancelRequested: false,
   setCancelRequested: (cancelRequested) => set({ cancelRequested }),
   cancelReason: '',

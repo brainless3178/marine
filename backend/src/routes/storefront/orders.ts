@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authenticateCustomer, AuthRequest } from '../../middleware/auth.js'
-import { asyncHandler, validateBody } from '../../middleware/validate.js'
+import { asyncHandler, validateBody, validateParams } from '../../middleware/validate.js'
 import { z } from 'zod'
 import { sendSuccess, sendError } from '../../middleware/response.js'
 import * as orderService from '../../services/orderService.js'
@@ -15,6 +15,10 @@ const shippingSchema = z.object({
   state: z.string().optional(),
   postalCode: z.string().optional(),
   country: z.string().min(1),
+})
+
+const orderParamsSchema = z.object({
+  id: z.string().uuid(),
 })
 
 const orderSchema = z.object({
@@ -51,7 +55,7 @@ router.get('/', authenticateCustomer, asyncHandler(async (req: AuthRequest, res)
 }))
 
 // ─── Get Order (own orders only) ───────────────────────────────
-router.get('/:id', authenticateCustomer, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/:id', authenticateCustomer, validateParams(orderParamsSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const order = await orderService.getCustomerOrder(req.params.id as string, req.user!.id)
     sendSuccess(res, { order })
@@ -62,7 +66,7 @@ router.get('/:id', authenticateCustomer, asyncHandler(async (req: AuthRequest, r
 }))
 
 // ─── Request Cancellation ──────────────────────────────────────
-router.post('/:id/cancel', authenticateCustomer, asyncHandler(async (req: AuthRequest, res) => {
+router.post('/:id/cancel', authenticateCustomer, validateParams(orderParamsSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const order = await orderService.requestOrderCancellation(
       req.params.id as string,

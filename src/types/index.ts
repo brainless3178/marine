@@ -89,6 +89,8 @@ export interface Testimonial {
   rating: number
   productName?: string
   productLink?: string
+  /** eBay header meta line, e.g. "Past 6 months • Verified purchase". */
+  verified?: string
 }
 
 export interface Office {

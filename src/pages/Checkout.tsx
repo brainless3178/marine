@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { usePayPalScriptReducer } from '@paypal/react-paypal-js'
 
 import { Truck, Shield } from 'lucide-react'
-import { useStore } from '../store/useStore'
+import { useStore, type SkippedCartItem } from '../store/useStore'
 import { storefront } from '../lib/api'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 import { SEO } from '../components/seo/SEO'
@@ -21,7 +21,6 @@ export default function Checkout() {
     cart, user, getCartTotal, clearCart, getCartCount,
     checkoutStep, setCheckoutStep,
     orderPlaced, setOrderPlaced,
-    generateOrderId,
     cancelReason, setCancelReason,
   } = useStore()
 
@@ -90,45 +89,64 @@ export default function Checkout() {
   }
 
   const createStoreOrder = useCallback(async () => {
-    try {
-      const result = await storefront.orders.create({
-        items: cart.map((item) => ({
-          productId: item.product.id,
-          quantity: item.quantity,
-          price: item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price,
-        })),
-        shipping: {
-          fullName: shipping.fullName,
-          addressLine1: shipping.addressLine1,
-          addressLine2: shipping.addressLine2 || undefined,
-          city: shipping.city,
-          state: shipping.state || undefined,
-          postalCode: shipping.postalCode || undefined,
-          country: shipping.country,
-        },
-        paymentMethod,
-        subtotal,
-        tax,
-        total,
-      })
-      const serverOrderId = result.order?.id || result.order?.orderNumber
-      if (serverOrderId) {
-        useStore.setState({ orderId: serverOrderId })
-        return serverOrderId
-      }
-    } catch (err: unknown) {
-      // Fallback for demo mode if backend is down
-      const e = err as { status?: number; message?: string }
-      const status = e?.status
-      if (status === 502 || status === 503 || status === 504 || e?.message?.includes('Failed to fetch')) {
-        generateOrderId()
-        return useStore.getState().orderId
-      }
-      throw err
+    // No demo-mode fallback: on any backend failure the error propagates to the
+    // caller, which shows it and retains the cart. Real orders only.
+    const result = await storefront.orders.create({
+      items: cart.map((item) => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        price: item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price,
+      })),
+      shipping: {
+        fullName: shipping.fullName,
+        addressLine1: shipping.addressLine1,
+        addressLine2: shipping.addressLine2 || undefined,
+        city: shipping.city,
+        state: shipping.state || undefined,
+        postalCode: shipping.postalCode || undefined,
+        country: shipping.country,
+      },
+      paymentMethod,
+      subtotal,
+      tax,
+      total,
+    })
+    const serverOrderId = result.order?.id || result.order?.orderNumber
+    if (!serverOrderId) {
+      throw new Error('Failed to create order: no order ID returned from server')
     }
-    generateOrderId()
-    return null
-  }, [cart, shipping, paymentMethod, subtotal, tax, total, generateOrderId])
+
+    // The server skips (never prices) lines whose products are no longer in the
+    // catalog — diff the cart against the returned order so the customer can
+    // see exactly which products were dropped from their order.
+    const orderedProductIds = new Set(
+      (result.order?.items ?? []).map((i) => i.productId).filter((id): id is string => Boolean(id))
+    )
+    const skippedItems: SkippedCartItem[] = cart
+      .filter((item) => !orderedProductIds.has(item.product.id))
+      .map((item) => ({
+        productId: item.product.id,
+        productName: item.product.name,
+        quantity: item.quantity,
+      }))
+
+    useStore.setState({
+      orderId: serverOrderId,
+      orderSkippedItems: skippedItems,
+      // Server-authoritative totals (they differ from the client estimate when
+      // items were skipped) — shown on the confirmation page.
+      orderSummary: result.order
+        ? {
+            subtotal: Number(result.order.subtotal),
+            shippingCost: Number(result.order.shippingCost),
+            tax: Number(result.order.tax),
+            total: Number(result.order.total),
+            currency: result.order.currency || 'USD',
+          }
+        : null,
+    })
+    return serverOrderId
+  }, [cart, shipping, paymentMethod, subtotal, tax, total])
 
   const handlePlaceOrder = async () => {
     setOrderLoading(true)
@@ -147,8 +165,7 @@ export default function Checkout() {
   }
 
   // PayPal Smart Buttons callbacks
-  const handleCreatePaypalOrder = async (_data: unknown, actions: any) => {
-    const paypalActions = actions
+  const handleCreatePaypalOrder = async (_data: unknown, _actions: unknown) => {
     // First create the store order if not already created
     let currentOrderId = createdOrderId
     if (!currentOrderId) {
@@ -165,49 +182,26 @@ export default function Checkout() {
       }
     }
 
-    try {
-      // Create the PayPal order on backend
-      const res = await storefront.payments.createPaypalOrder({ orderId: currentOrderId })
-      return res.paypalOrderId
-    } catch (err: unknown) {
-      // Fallback to client-side order creation if backend is down
-      const e = err as { status?: number; message?: string }
-      const status = e?.status
-      if (status === 502 || status === 503 || status === 504 || e?.message?.includes('Failed to fetch')) {
-        return paypalActions.order.create({
-          purchase_units: [{
-            amount: { value: total.toFixed(2) }
-          }]
-        })
-      }
-      throw err
-    }
+    // No client-side PayPal fallback: the PayPal order must come from the
+    // backend so capture can be verified against the real store order.
+    const res = await storefront.payments.createPaypalOrder({ orderId: currentOrderId })
+    return res.paypalOrderId
   }
 
-  const handleApprovePaypalOrder = async (data: any, actions: any) => {
-    const paypalData = data
-    const paypalActions = actions
+  const handleApprovePaypalOrder = async (data: unknown, _actions: unknown) => {
     setOrderLoading(true)
     setOrderError('')
     try {
+      const paypalData = data as { orderID?: string }
       const orderId = createdOrderId || useStore.getState().orderId
       if (!orderId) throw new Error('Order ID not found')
-      
-      try {
-        await storefront.payments.capturePaypalOrder({
-          paypalOrderId: paypalData.orderID,
-          orderId: orderId as string,
-        })
-      } catch (err: unknown) {
-        // Fallback to client-side capture if backend is down
-        const e = err as { status?: number; message?: string }
-        const status = e?.status
-        if (status === 502 || status === 503 || status === 504 || e?.message?.includes('Failed to fetch')) {
-          await paypalActions.order.capture()
-        } else {
-          throw err
-        }
-      }
+      if (!paypalData.orderID) throw new Error('PayPal order ID missing')
+
+      // No client-side capture fallback: only the backend may confirm payment.
+      await storefront.payments.capturePaypalOrder({
+        paypalOrderId: paypalData.orderID,
+        orderId,
+      })
 
       setOrderPlaced(true)
       clearCart()
@@ -227,6 +221,7 @@ export default function Checkout() {
 
   const handleContinueShopping = () => {
     setOrderPlaced(false)
+    useStore.setState({ orderSkippedItems: [], orderSummary: null })
     setCheckoutStep(1)
     navigate('/products')
   }

@@ -1,32 +1,41 @@
 import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { type ReactNode, useState, useEffect } from 'react'
+import { storefront } from '../lib/api/storefront'
 
 /**
  * Wraps the app with PayPalScriptProvider.
- * Fetches the client ID from the backend so the SDK is initialized with
- * the correct sandbox / live credentials.
+ * Fetches the client ID from the backend (through API_BASE, so it works from
+ * any host) and initializes the SDK with the real sandbox / live credentials.
+ *
+ * No demo fallbacks: if the backend can't be reached or PayPal isn't
+ * configured, the SDK is simply not loaded and PayPal buttons render as
+ * unavailable — the rest of the app keeps working.
  */
 export function PayPalProvider({ children }: { children: ReactNode }) {
   const [clientId, setClientId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/storefront/payments/client-id')
-      .then((r) => {
-        if (!r.ok) throw new Error('not configured')
-        return r.json()
-      })
+    let cancelled = false
+    storefront.payments
+      .clientId()
       .then((data) => {
+        if (cancelled) return
         const id = data.clientId
-        if (!id || id.includes('YOUR_') || id === 'sandbox') {
-          setClientId('test')
+        // A placeholder or sandbox value means PayPal isn't configured on the
+        // backend yet — render without PayPal rather than with a fake ID.
+        if (!id || id.includes('YOUR_') || id === 'sandbox' || id === 'test') {
+          setClientId(null)
           return
         }
         setClientId(id)
       })
       .catch(() => {
-        // Fallback to PayPal's mock 'test' client ID if backend is down
-        setClientId('test')
+        // Backend unreachable → no PayPal. Never fall back to a demo ID.
+        if (!cancelled) setClientId(null)
       })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   // If PayPal isn't configured or errored, render children without the provider

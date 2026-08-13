@@ -11,7 +11,7 @@ import type { NextFunction, Request, Response } from 'express'
  * staleness, and admin/auth/authenticated requests are never cached.
  */
 
-const responseCache = new NodeCache({ stdTTL: 300, checkperiod: 60 }) // 5 min TTL, 1 min cleanup
+const responseCache = new NodeCache({ stdTTL: 300, checkperiod: 60, maxKeys: 500 }) // 5 min TTL, 1 min cleanup, bounded to 500 keys
 
 // Normalized paths (after stripping /api or /api/v1) eligible for caching.
 const CACHEABLE_PATHS = [
@@ -53,9 +53,13 @@ export function cacheGet(req: Request, res: Response, next: NextFunction) {
   }
 
   // Wrap res.json so the first response populates the cache for the TTL.
+  // Only 2xx responses are cached — error responses are never stored, so a
+  // transient 5xx cannot poison the cache for the rest of the TTL window.
   const originalJson = res.json.bind(res)
   res.json = ((body: unknown) => {
-    responseCache.set(key, { status: res.statusCode, body })
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      responseCache.set(key, { status: res.statusCode, body })
+    }
     return originalJson(body)
   }) as typeof res.json
 

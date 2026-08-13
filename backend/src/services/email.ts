@@ -6,19 +6,40 @@
  * Senders: All send* functions (in emailSenders.ts)
  */
 
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 import { prisma } from '../server.js'
 import logger from '../utils/logger.js'
 import { withTimeout } from '../utils/withTimeout.js'
 import type { Prisma } from '@prisma/client'
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null
+// Hostinger SMTP transport (see SMTP_HOST / SMTP_USER / SMTP_PASS / SMTP_PORT
+// / SMTP_SECURE in the hosting panel). Built lazily on first send so tests can
+// set the env before exercising either the configured or the dry-run path.
+let transporter: nodemailer.Transporter | null | undefined
+
+function getTransporter(): nodemailer.Transporter | null {
+  if (transporter !== undefined) return transporter
+  const host = process.env.SMTP_HOST
+  const user = process.env.SMTP_USER
+  const pass = process.env.SMTP_PASS
+  if (!host || !user || !pass) {
+    transporter = null
+    return transporter
+  }
+  transporter = nodemailer.createTransport({
+    host,
+    port: Number(process.env.SMTP_PORT || 465),
+    // Port 465 = implicit TLS (SSL). Set SMTP_SECURE=false to use
+    // STARTTLS on port 587 instead.
+    secure: (process.env.SMTP_SECURE ?? 'true') !== 'false',
+    auth: { user, pass },
+  })
+  return transporter
+}
 
 const emailLog = logger.child({ context: 'email' })
 
-const FROM = process.env.EMAIL_FROM || 'sales@alkatraders.co'
+const FROM = process.env.EMAIL_FROM || 'noreply@alkatraders.co'
 const MAX_EMAIL_ATTEMPTS = 3
 // The processor runs on a timer that does not await previous ticks, so an
 // unreachable database must not leave queries pending and accumulating.
@@ -64,8 +85,9 @@ async function sendEmail(queueId: string): Promise<void> {
   const record = await prisma.emailQueue.findUnique({ where: { id: queueId } })
   if (!record || (record.status !== 'pending' && record.status !== 'retrying')) return
 
-  if (!resend) {
-    emailLog.info({ to: record.toEmail, subject: record.subject }, '[DRY RUN] Would send email')
+  const smtp = getTransporter()
+  if (!smtp) {
+    emailLog.info({ to: record.toEmail, subject: record.subject }, '[DRY RUN] Would send email (SMTP not configured)')
     await prisma.emailQueue.update({
       where: { id: queueId },
       data: { status: 'sent', sentAt: new Date() },
@@ -74,14 +96,15 @@ async function sendEmail(queueId: string): Promise<void> {
   }
 
   try {
-    const { error } = await resend.emails.send({
+    // nodemailer throws on delivery failure (unlike the Resend SDK's
+    // error-object convention) — the catch below handles retries.
+    await smtp.sendMail({
       from: FROM,
       to: record.toEmail,
       subject: record.subject,
       html: record.htmlBody,
       text: record.textBody || undefined,
     })
-    if (error) throw new Error(error.message)
 
     await prisma.emailQueue.update({
       where: { id: queueId },

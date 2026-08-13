@@ -40,11 +40,25 @@ export async function createOrder(input: CreateOrderInput) {
   }
 
   let subtotal = 0
-  const orderItems = []
+  const orderItems: Array<{
+    productId: string; productName: string; productSku: string
+    quantity: number; unitPrice: number; totalPrice: number
+  }> = []
+  const skippedItems: Array<{ productId: string; quantity: number }> = []
 
   for (const item of items) {
     const product = await prisma.product.findUnique({ where: { id: item.productId } })
-    if (!product) throw Object.assign(new Error(`Product ${item.productId} not found`), { status: 400 })
+    if (!product) {
+      // P1-2: a line whose product no longer exists (e.g. the products table is
+      // empty) must not hard-fail the entire checkout. Skip the unavailable
+      // line so the remaining, still-available items can be ordered; skipped
+      // lines are recorded on the timeline for admin visibility. Server-side
+      // price authority is unchanged — every priced line still comes from the
+      // product table, never from the client.
+      logger.warn({ productId: item.productId }, 'Order line skipped — product not found in catalog')
+      skippedItems.push({ productId: item.productId, quantity: item.quantity })
+      continue
+    }
     if (product.stockCount < item.quantity) {
       throw Object.assign(new Error(`Insufficient stock for ${product.name}`), { status: 400 })
     }
@@ -54,6 +68,15 @@ export async function createOrder(input: CreateOrderInput) {
       quantity: item.quantity, unitPrice: price, totalPrice: price * item.quantity,
     })
     subtotal += price * item.quantity
+  }
+
+  // If every line was unavailable (e.g. entirely empty catalog), fail with a
+  // clear, actionable error instead of a confusing 400 crash mid-checkout.
+  if (orderItems.length === 0) {
+    throw Object.assign(
+      new Error('The items in your cart are no longer available. Please review your cart and try again.'),
+      { status: 409 }
+    )
   }
 
   const [shippingCostSetting, taxRateSetting, freeShippingThresholdSetting] = await Promise.all([
@@ -85,7 +108,14 @@ export async function createOrder(input: CreateOrderInput) {
       shippingCountry: shipping.country,
       customerNotes: idempotencyKey ? `[idem:${idempotencyKey}] ${customerNotes || ''}` : (customerNotes || null),
       items: { create: orderItems },
-      timeline: { create: { status: 'pending', note: 'Order placed' } },
+      timeline: {
+        create: {
+          status: 'pending',
+          note: skippedItems.length > 0
+            ? `Order placed. Skipped unavailable item(s): ${skippedItems.map(i => `${i.productId} (x${i.quantity})`).join(', ')}`
+            : 'Order placed',
+        },
+      },
     },
     include: { items: true, timeline: true },
   })

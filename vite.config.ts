@@ -33,15 +33,34 @@ export default defineConfig(({ mode }) => {
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,avif,woff2}'],
-        // Serve the cached app shell for SPA navigations. Once the service
-        // worker controls the page, deep-link refreshes (e.g. /en/shop while
-        // the Hostinger Node process is cold-starting) resolve from the
-        // precached shell instead of waiting on the network. First-time
-        // visitors without the SW are covered by the prerendered static
-        // locale pages (frontend/dist/en/...), which are separate files.
-        navigateFallback: 'index.html',
+        // NOTE: HTML is deliberately NOT precached. The old config precached
+        // index.html and served it from the cache for every navigation
+        // (navigateFallback). After a deploy that was a stale-shell trap: the
+        // SW kept serving OLD index.html → OLD chunk hashes, while
+        // skipWaiting + cleanupOutdatedCaches had already deleted the old
+        // chunks — producing "Failed to fetch dynamically imported module"
+        // white screens on refresh, worst on lazy routes (admin, network,
+        // checkout). Only immutable, hashed assets belong in the precache.
+        globPatterns: ['**/*.{js,css,png,avif,woff2,svg,ico,webmanifest}'],
+        cleanupOutdatedCaches: true,
+        // vite-plugin-pwa defaults navigateFallback to 'index.html' — that
+        // regenerates the stale-shell NavigationRoute we just removed. Null it
+        // out so navigations are handled ONLY by the NetworkFirst route below.
+        navigateFallback: null,
         runtimeCaching: [
+          {
+            // Navigations hit the network first, so a refresh after any
+            // deploy always gets the NEW index.html (with the new chunk
+            // hashes). The last successfully-loaded page is cached as the
+            // offline fallback (7 days / 32 entries).
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 32, maxAgeSeconds: 7 * 24 * 60 * 60 },
+            },
+          },
           {
             urlPattern: /^https?:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/.*/i,
             handler: 'CacheFirst',

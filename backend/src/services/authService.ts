@@ -225,6 +225,8 @@ export async function refreshAdminToken(refreshToken: string | undefined) {
   try {
     const decoded = jwt.verify(refreshToken, JWT_SECRET) as JwtPayload
     if (!decoded.refresh) throw Object.assign(new Error('Invalid refresh token'), { status: 401 })
+    // P0 defense in depth: a customer refresh token must never mint admin tokens.
+    if (decoded.type === 'customer') throw Object.assign(new Error('Invalid refresh token'), { status: 401 })
 
     const user = await prisma.adminUser.findUnique({ where: { id: decoded.id } })
     if (!user || !user.isActive) throw Object.assign(new Error('User not found or deactivated'), { status: 401 })

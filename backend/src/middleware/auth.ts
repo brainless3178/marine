@@ -29,6 +29,12 @@ export function authenticateAdmin(req: AuthRequest, res: Response, next: NextFun
   const token = authHeader.split(' ')[1]
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as AuthUser
+    // P0: a customer JWT must never gain admin access. Customer and admin
+    // tokens share the same secret, so the role must be checked explicitly.
+    if (decoded.type === 'customer') {
+      console.warn('[auth] Customer JWT rejected on admin route')
+      return res.status(403).json({ error: 'Admin access required' })
+    }
     req.user = decoded
     next()
   } catch {

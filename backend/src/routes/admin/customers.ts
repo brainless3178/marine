@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authenticateAdmin, requireRole, AuthRequest } from '../../middleware/auth.js'
-import { asyncHandler, validateBody } from '../../middleware/validate.js'
+import { asyncHandler, validateBody, validateParams } from '../../middleware/validate.js'
 import { z } from 'zod'
 import * as customerService from '../../services/customerService.js'
 import { sendSuccess, sendError } from '../../middleware/response.js'
@@ -40,6 +40,10 @@ const statusUpdateSchema = z.object({
   status: z.enum(['active', 'inactive', 'vip', 'new']),
 })
 
+const customerParamsSchema = z.object({
+  id: z.string().uuid(),
+})
+
 // ─── List All Customers ────────────────────────────────────────
 router.get('/', asyncHandler(async (req, res) => {
   const result = await customerService.listCustomers({
@@ -52,7 +56,7 @@ router.get('/', asyncHandler(async (req, res) => {
 }))
 
 // ─── Get Customer Detail ───────────────────────────────────────
-router.get('/:id', asyncHandler(async (req, res) => {
+router.get('/:id', validateParams(customerParamsSchema), asyncHandler(async (req, res) => {
   try {
     const customer = await customerService.getCustomer(req.params.id as string)
     sendSuccess(res, { customer })
@@ -72,7 +76,7 @@ router.post('/', validateBody(createCustomerSchema), asyncHandler(async (req: Au
 }))
 
 // ─── Update Customer ───────────────────────────────────────────
-router.patch('/:id', validateBody(updateCustomerSchema), asyncHandler(async (req: AuthRequest, res) => {
+router.patch('/:id', validateParams(customerParamsSchema), validateBody(updateCustomerSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const customer = await customerService.updateCustomer(req.params.id as string, req.body, req.user!, req.ip || '')
     sendSuccess(res, { customer })
@@ -82,7 +86,7 @@ router.patch('/:id', validateBody(updateCustomerSchema), asyncHandler(async (req
 }))
 
 // ─── Update Customer Status ────────────────────────────────────
-router.patch('/:id/status', validateBody(statusUpdateSchema), asyncHandler(async (req: AuthRequest, res) => {
+router.patch('/:id/status', validateParams(customerParamsSchema), validateBody(statusUpdateSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const customer = await customerService.updateCustomerStatus(req.params.id as string, req.body.status, req.user!, req.ip || '')
     sendSuccess(res, { customer })
@@ -92,7 +96,7 @@ router.patch('/:id/status', validateBody(statusUpdateSchema), asyncHandler(async
 }))
 
 // ─── Add Internal Note ─────────────────────────────────────────
-router.post('/:id/notes', validateBody(notesSchema), asyncHandler(async (req: AuthRequest, res) => {
+router.post('/:id/notes', validateParams(customerParamsSchema), validateBody(notesSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const result = await customerService.addCustomerNote(req.params.id as string, req.body.notes, req.user!, req.ip || '')
     sendSuccess(res, { customer: result })

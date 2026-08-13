@@ -1,7 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Hoisted so both the vi.mock factory and the test bodies can reference it.
+const { mockSendMail } = vi.hoisted(() => ({ mockSendMail: vi.fn() }))
+
 vi.hoisted(() => {
-  process.env.RESEND_API_KEY = ''
+  // No SMTP config at import time → the initially-imported module exercises
+  // the dry-run path. The SMTP tests below re-import with vars set.
+  process.env.SMTP_HOST = ''
+  process.env.SMTP_USER = ''
+  process.env.SMTP_PASS = ''
   process.env.EMAIL_FROM = 'noreply@test.com'
 })
 
@@ -15,6 +22,12 @@ const mockPrisma = {
 }
 
 vi.mock('../server.js', () => ({ prisma: mockPrisma }))
+
+vi.mock('nodemailer', () => ({
+  default: {
+    createTransport: vi.fn(() => ({ sendMail: mockSendMail })),
+  },
+}))
 
 vi.mock('../utils/logger.js', () => ({
   default: {
@@ -88,5 +101,63 @@ describe('startEmailQueueProcessor / stopEmailQueueProcessor', () => {
     stopEmailQueueProcessor()
 
     expect(mockPrisma.emailQueue.findMany).toHaveBeenCalled()
+  })
+})
+
+describe('SMTP transport', () => {
+  // Re-import email.js with SMTP env set, so getTransporter() builds a real
+  // (mocked) nodemailer transport instead of the dry-run path.
+  async function importWithSmtp() {
+    vi.resetModules()
+    process.env.SMTP_HOST = 'smtp.hostinger.com'
+    process.env.SMTP_USER = 'noreply@test.com'
+    process.env.SMTP_PASS = 'mailbox-password'
+    return import('../services/email.js')
+  }
+
+  beforeEach(() => vi.clearAllMocks())
+
+  it('sends via nodemailer SMTP when configured', async () => {
+    const mod = await importWithSmtp()
+    mockSendMail.mockResolvedValue({ messageId: 'msg-1' })
+
+    mockPrisma.emailQueue.create.mockResolvedValue({ id: 'queue-1', status: 'pending' })
+    mockPrisma.emailQueue.findUnique.mockResolvedValue({
+      id: 'queue-1', status: 'pending', attempts: 0, maxAttempts: 3,
+      toEmail: 'buyer@test.com', subject: 'Order Confirmed', htmlBody: '<p>Hi</p>', textBody: null,
+    })
+    mockPrisma.emailQueue.update.mockResolvedValue({})
+
+    await mod.queueEmail({ to: 'buyer@test.com', subject: 'Order Confirmed', html: '<p>Hi</p>' })
+
+    expect(mockSendMail).toHaveBeenCalledWith(expect.objectContaining({
+      from: 'noreply@test.com',
+      to: 'buyer@test.com',
+      subject: 'Order Confirmed',
+      html: '<p>Hi</p>',
+    }))
+    expect(mockPrisma.emailQueue.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ status: 'sent' }) }),
+    )
+  })
+
+  it('marks email retrying when SMTP delivery fails', async () => {
+    const mod = await importWithSmtp()
+    mockSendMail.mockRejectedValue(new Error('Invalid login: 535 5.7.8'))
+
+    mockPrisma.emailQueue.create.mockResolvedValue({ id: 'queue-1', status: 'pending' })
+    mockPrisma.emailQueue.findUnique.mockResolvedValue({
+      id: 'queue-1', status: 'pending', attempts: 0, maxAttempts: 3,
+      toEmail: 'buyer@test.com', subject: 'Hi', htmlBody: '<p>Hi</p>', textBody: null,
+    })
+    mockPrisma.emailQueue.update.mockResolvedValue({})
+
+    await mod.queueEmail({ to: 'buyer@test.com', subject: 'Hi', html: '<p>Hi</p>' })
+
+    expect(mockPrisma.emailQueue.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: 'retrying', lastError: 'Invalid login: 535 5.7.8' }),
+      }),
+    )
   })
 })

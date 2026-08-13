@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Check, X, Truck } from 'lucide-react'
+import { AlertTriangle, Check, X, Truck } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
 
@@ -23,11 +23,18 @@ export function CheckoutSuccess({
 }: CheckoutSuccessProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { orderId, setCancelRequested } = useStore()
+  const { orderId, orderSummary, orderSkippedItems, setCancelRequested } = useStore()
   const settings = useStoreSettings()
-  const shippingCost = subtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost
-  const tax = Math.round(subtotal * settings.taxRate * 100) / 100
-  const total = subtotal + shippingCost + tax
+  // Prefer the server-authoritative totals from the created order — they differ
+  // from the client estimate when items were skipped and removed.
+  const subtotalDisplay = orderSummary ? orderSummary.subtotal : subtotal
+  const shippingCost = orderSummary
+    ? orderSummary.shippingCost
+    : subtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost
+  const tax = orderSummary
+    ? orderSummary.tax
+    : Math.round(subtotal * settings.taxRate * 100) / 100
+  const total = orderSummary ? orderSummary.total : subtotal + shippingCost + tax
 
   return (
     <div className="py-24">
@@ -45,10 +52,28 @@ export function CheckoutSuccess({
           {t('checkout.orderConfirmation')} <strong className="text-[var(--accent-primary)]">{t('checkout.estimatedDelivery')}</strong>.
         </p>
 
+        {/* Items the server dropped because they're no longer in the catalog */}
+        {orderSkippedItems.length > 0 && (
+          <div className="mt-8 p-5 bg-[var(--surface)] border border-[var(--danger)]/40 rounded-xl text-left">
+            <h4 className="text-sm font-semibold text-[var(--danger)] mb-2 flex items-center gap-2">
+              <AlertTriangle size={16} /> {t('checkout.skippedHeading')}
+            </h4>
+            <p className="text-xs text-[var(--text-secondary)] mb-3">{t('checkout.skippedDesc')}</p>
+            <ul className="space-y-1.5">
+              {orderSkippedItems.map((item) => (
+                <li key={item.productId} className="flex items-center justify-between text-xs text-[var(--text-primary)]">
+                  <span>{item.productName}</span>
+                  <span className="font-mono text-[var(--text-muted)]">×{item.quantity}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="mt-8 bg-[var(--surface)] border border-[var(--border)] p-6 text-left">
           <h3 className="text-sm font-semibold mb-4">{t('checkout.orderSummary')}</h3>
           <div className="flex justify-between text-xs text-[var(--text-secondary)] mb-2">
-            <span>{t('checkout.subtotal')}</span><span>${subtotal.toFixed(2)}</span>
+            <span>{t('checkout.subtotal')}</span><span>${subtotalDisplay.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-xs text-[var(--text-secondary)] mb-2">
             <span>{t('checkout.shipping')}</span><span>${shippingCost.toFixed(2)}</span>

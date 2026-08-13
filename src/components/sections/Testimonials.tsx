@@ -36,7 +36,14 @@ export function Testimonials() {
                   <EBayIcon className="w-full h-full" />
                 </div>
                 <div className="min-w-0">
-                  <strong className="text-label block text-[var(--text-primary)]">{review.name}</strong>
+                  {review.name && (
+                    <strong className="text-label block text-[var(--text-primary)]">{review.name}</strong>
+                  )}
+                  {review.verified && (
+                    <span className="text-[0.625rem] font-semibold text-[var(--success)] block mt-0.5">
+                      ✓ {review.verified}
+                    </span>
+                  )}
                   <span className="text-xs text-[var(--text-secondary)] block">
                     Sold by <span className="font-semibold text-[var(--text-primary)]">Alka Traders</span> on eBay
                   </span>
