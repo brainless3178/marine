@@ -206,7 +206,7 @@ export default function Home() {
       {/* ── NEW ARRIVALS ── */}
       <section className="section-y marine-section" aria-labelledby="new-arrivals-heading">
         <div className="site-container">
-          <div className="mb-10 flex flex-col gap-5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)] md:flex-row md:items-end md:justify-between md:p-8">
+          <div className="mb-6 flex flex-col gap-5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)] md:flex-row md:items-end md:justify-between md:p-8">
             <div>
               <SectionLabel>{t('shop.newArrivals')}</SectionLabel>
               <h2 id="new-arrivals-heading" className="font-display font-bold text-section tracking-tight text-[var(--text-primary)]">

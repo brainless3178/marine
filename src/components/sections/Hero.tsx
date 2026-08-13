@@ -62,7 +62,7 @@ export function Hero() {
         aria-hidden="true"
       />
 
-      <div className="site-container relative z-10 pt-[var(--hero-header-offset)] pb-16 sm:pb-20 lg:pb-24">
+      <div className="site-container relative z-10 pt-[var(--hero-header-offset)] pb-10 sm:pb-12 lg:pb-14">
         <div className="mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
           {/* Copy column */}
           <div className="mx-auto w-full max-w-xl text-center lg:mx-0 lg:text-left">

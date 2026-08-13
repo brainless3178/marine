@@ -71,6 +71,8 @@
   "process": {
     "label": "The Process",
     "title": "From RFQ to Global Delivery.",
+    "desc": "From the first inquiry to dispatch, every step is tracked, transparent, and handled by a dedicated account manager.",
+    "cta": "Start an inquiry",
     "step1Title": "Submit RFQ",
     "step1Desc": "Use our form, email, or WhatsApp — part number, quantity, urgency.",
     "step2Title": "Sourcing & Verification",

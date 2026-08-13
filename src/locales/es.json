@@ -71,6 +71,8 @@
   "process": {
     "label": "El Proceso",
     "title": "De la Cotización a la Entrega Global.",
+    "desc": "Desde la primera consulta hasta el despacho, cada paso está rastreado, es transparente y lo gestiona un gerente de cuenta dedicado.",
+    "cta": "Iniciar consulta",
     "step1Title": "Enviar Cotización",
     "step1Desc": "Use nuestro formulario, correo electrónico o WhatsApp — número de pieza, cantidad, urgencia.",
     "step2Title": "Búsqueda y Verificación",
