@@ -1,51 +1,18 @@
-import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SectionLabel } from '../ui/SectionLabel'
-import { storefront } from '../../lib/api'
+import { EBayIcon } from '../ui/EBayIcon'
 import { Star } from 'lucide-react'
-import { testimonials as staticTestimonials } from '../../data/testimonials'
+import { testimonials } from '../../data/testimonials'
 
-interface Testimonial { id: string; name: string; role: string; company: string; avatar: string; rating: number; text: string; productName?: string; productLink?: string }
-
+/**
+ * Client Feedback — reviews collected from our eBay store.
+ * Pure static data (src/data/testimonials.ts): nothing is read from or
+ * written to the database for this section.
+ */
 export function Testimonials() {
   const { t } = useTranslation()
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    let cancelled = false
-    storefront.testimonials()
-      .then((res) => {
-        if (!cancelled && res.testimonials?.length) {
-          // Merge API data with static data to preserve productName/productLink
-          const apiData = res.testimonials.map((r: any) => {
-            const staticMatch = staticTestimonials.find(s => s.id === r.id)
-            return {
-              id: r.id, name: r.name || 'Anonymous', role: r.role || '', company: r.company || '',
-              avatar: r.avatar || r.name?.charAt(0) || '?', rating: r.rating ?? 5, text: r.text || r.content || '',
-              productName: staticMatch?.productName,
-              productLink: staticMatch?.productLink,
-            }
-          })
-          if (!cancelled) setTestimonials(apiData)
-        } else if (!cancelled) {
-          // API returned empty — use static data directly
-          setTestimonials(staticTestimonials)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          // API unavailable — fall back to static data
-          setTestimonials(staticTestimonials)
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => { cancelled = true }
-  }, [])
-
-  if (loading || testimonials.length === 0) return null
+  if (testimonials.length === 0) return null
 
   return (
     <section className="section-y bg-[var(--secondary-bg)]" id="testimonials">
@@ -65,11 +32,14 @@ export function Testimonials() {
               </div>
               <p className="text-body-sm text-[var(--text-secondary)] leading-relaxed italic mb-6">&ldquo;{review.text}&rdquo;</p>
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-[var(--accent-primary)]/[0.08] border border-[var(--accent-primary)]/15 flex items-center justify-center font-display font-bold text-sm text-[var(--accent-primary-hover)] flex-shrink-0">{review.avatar}</div>
-                <div>
+                <div className="w-12 h-12 rounded-xl bg-white border border-black/10 dark:border-white/15 shadow-sm flex items-center justify-center p-1.5 flex-shrink-0" title="Reviewed on eBay">
+                  <EBayIcon className="w-full h-full" />
+                </div>
+                <div className="min-w-0">
                   <strong className="text-label block text-[var(--text-primary)]">{review.name}</strong>
-                  <span className="font-mono text-xs text-[var(--text-secondary)] block">{review.role}</span>
-                  <span className="text-xs text-[var(--text-secondary)]">{review.company}</span>
+                  <span className="text-xs text-[var(--text-secondary)] block">
+                    Sold by <span className="font-semibold text-[var(--text-primary)]">Alka Traders</span> on eBay
+                  </span>
                   {review.productName && (
                     <a
                       href={review.productLink || '#'}
