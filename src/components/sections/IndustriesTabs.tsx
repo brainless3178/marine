@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SectionLabel } from '../ui/SectionLabel'
 import { storefront } from '../../lib/api'
+import { industries as staticIndustries } from '../../data/industries'
 import { Ship, Anchor, Flame, Zap, Factory, FlaskConical, ArrowRight } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -11,15 +12,23 @@ const iconMap: Record<string, LucideIcon> = {
 
 interface IndustryItem { id: string; name: string; icon: string; description: string; painPoints: string[] }
 
+// Static fallback so the section always renders content, even when the
+// storefront API is slow, empty, or unreachable.
+const FALLBACK_INDUSTRIES: IndustryItem[] = staticIndustries.map((i) => ({
+  id: i.id, name: i.name, icon: i.icon || 'Ship',
+  description: i.description || '', painPoints: i.painPoints || [],
+}))
+
 export function IndustriesTabs() {
   const { t } = useTranslation()
-  const [industries, setIndustries] = useState<IndustryItem[]>([])
-  const [active, setActive] = useState('')
+  const [industries, setIndustries] = useState<IndustryItem[]>(FALLBACK_INDUSTRIES)
+  const [active, setActive] = useState(FALLBACK_INDUSTRIES[0]?.id || '')
 
   useEffect(() => {
     let cancelled = false
     storefront.industries.list()
       .then((res) => {
+        // Prefer live API data when available; otherwise keep the static fallback.
         if (!cancelled && res.industries?.length) {
           const mapped = res.industries.map((i: any) => ({
             id: i.slug || i.id, name: i.name, icon: i.icon || 'Ship',
@@ -29,7 +38,7 @@ export function IndustriesTabs() {
           setActive((prev) => prev || mapped[0].id)
         }
       })
-      .catch(() => { /* API unavailable */ })
+      .catch(() => { /* API unavailable — keep static fallback */ })
     return () => { cancelled = true }
   }, [])
 

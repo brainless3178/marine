@@ -48,17 +48,16 @@ export default function Home() {
   const { whatsappNumber } = useStoreSettings()
 
   // Fetch new arrivals from backend API; fall back to static data if backend is unavailable
-  const { data: newArrivalsData, isLoading } = useNewArrivals()
+  const { data: newArrivalsData } = useNewArrivals()
 
   const apiNewArrivals = newArrivalsData?.products ? apiProductsToFrontend(newArrivalsData.products) : null
 
-  // Use API data if available, otherwise fall back to static products marked as new arrivals
+  // Prefer API data when it arrives; show static products immediately so the
+  // grid is never empty while the API is slow or unavailable.
   const staticNewArrivals = staticProducts.filter(p => p.isNewArrival).slice(0, 8)
-  const displayProducts = isLoading
-    ? []
-    : (apiNewArrivals && apiNewArrivals.length > 0 
-        ? apiNewArrivals.slice(0, 8) 
-        : staticNewArrivals.length > 0 ? staticNewArrivals : staticProducts.slice(0, 8))
+  const displayProducts = apiNewArrivals && apiNewArrivals.length > 0
+    ? apiNewArrivals.slice(0, 8)
+    : staticNewArrivals.length > 0 ? staticNewArrivals : staticProducts.slice(0, 8)
 
   return (
     <>
