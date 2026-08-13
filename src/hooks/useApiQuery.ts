@@ -1,6 +1,9 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
-import { api } from '../lib/api'
+import { api, storefront } from '../lib/api'
+import { apiProductToFrontend } from '../lib/adapters'
+import { products as staticProducts } from '../data/products'
 import type { ApiProduct, Pagination, ProductListFilters } from '../lib/api-types'
+import type { Product } from '../types'
 
 // ─── Query Key Factory ─────────────────────────────────────────
 // Stable, predictable query keys for cache invalidation.
@@ -10,6 +13,7 @@ const queryKeys = {
     list: (params?: Record<string, string>) => ['products', 'list', params] as const,
     featured: () => ['products', 'featured'] as const,
     newArrivals: () => ['products', 'new-arrivals'] as const,
+    detail: (id?: string) => ['products', 'detail', id] as const,
   },
   categories: {
     all: ['categories'] as const,
@@ -45,6 +49,46 @@ export function useNewArrivals() {
     queryKey: queryKeys.products.newArrivals(),
     queryFn: () => api.get<{ products: ApiProduct[] }>('/storefront/products/new-arrivals'),
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Product detail with the same API→static fallback ProductDetail used before,
+ * now as a cacheable query — so hover-prefetching (usePrefetchOnHover) makes
+ * product pages open instantly, and revisits never re-fetch.
+ */
+export function useProductDetail(id?: string) {
+  return useQuery({
+    queryKey: queryKeys.products.detail(id),
+    queryFn: async () => {
+      if (!id) return { product: null as Product | null, related: [] as Product[] }
+      try {
+        const res = await storefront.products.get(id)
+        if (res.product) {
+          return {
+            product: apiProductToFrontend(res.product),
+            related: (res.related || []).map(apiProductToFrontend).slice(0, 4),
+          }
+        }
+      } catch {
+        console.warn('[ProductDetail] API fetch failed — falling back to static product data')
+      }
+      const cleanId = id.toLowerCase().replace(/^prod-/, '')
+      const staticProduct = staticProducts.find(
+        (p) => p.id === id || p.id === `prod-${cleanId}` || p.id.replace('prod-', '') === cleanId,
+      )
+      return {
+        product: staticProduct || null,
+        related: staticProduct
+          ? staticProducts
+              .filter((p) => p.id !== staticProduct.id && p.category === staticProduct.category)
+              .slice(0, 4)
+          : [],
+      }
+    },
+    enabled: Boolean(id),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 

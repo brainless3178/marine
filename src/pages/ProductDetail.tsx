@@ -18,10 +18,8 @@ import { useStore } from '../store/useStore'
 import { useStoreSettings } from '../hooks/useStoreSettings'
 import { SEO } from '../components/seo/SEO'
 import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
-import { storefront } from '../lib/api'
-import { apiProductToFrontend, apiProductsToFrontend } from '../lib/adapters'
+import { useProductDetail } from '../hooks/useApiQuery'
 import { getProductImageUrl } from '../lib/utils'
-import { products as staticProducts } from '../data/products'
 import { ProductImageGallery } from '../components/product/ProductImageGallery'
 import { OfferModal } from '../components/product/OfferModal'
 import { Skeleton } from '../components/ui/Skeleton'
@@ -52,54 +50,16 @@ export default function ProductDetail() {
   const { isLoggedIn, setShowAuthModal, addToCart } = useStore()
   const { whatsappNumber } = useStoreSettings()
 
-  const [product, setProduct] = useState<Product | undefined>(undefined)
-  const [related, setRelated] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
   const [added, setAdded] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const [showOfferModal, setShowOfferModal] = useState(false)
 
-  // Fetch product from API with fallback to static products
-  useEffect(() => {
-    if (!id) return
-    let cancelled = false
-    setLoading(true)
-
-    async function load() {
-      try {
-        const res = await storefront.products.get(id!)
-        if (!cancelled && res.product) {
-          setProduct(apiProductToFrontend(res.product))
-          if (res.related?.length) {
-            setRelated(apiProductsToFrontend(res.related).slice(0, 4))
-          }
-          return
-        }
-      } catch {
-        console.warn('[ProductDetail] API fetch failed — falling back to static product data')
-      }
-
-      const cleanId = id!.toLowerCase().replace(/^prod-/, '')
-      const staticProduct = staticProducts.find(
-        (p) => p.id === id || p.id === `prod-${cleanId}` || p.id.replace('prod-', '') === cleanId
-      )
-      if (!cancelled) {
-        if (staticProduct) {
-          setProduct(staticProduct)
-          setRelated(
-            staticProducts
-              .filter((p) => p.id !== staticProduct.id && p.category === staticProduct.category)
-              .slice(0, 4)
-          )
-        }
-      }
-      if (!cancelled) setLoading(false)
-    }
-    load().finally(() => {
-      if (!cancelled) setLoading(false)
-    })
-    return () => { cancelled = true }
-  }, [id])
+  // React Query: cached + prefetchable product detail (hover-prefetch in
+  // ProductCard makes this page render instantly), same API→static fallback
+  // as before, now with automatic caching and dedup.
+  const { data: productData, isLoading } = useProductDetail(id)
+  const product = productData?.product
+  const related = productData?.related || []
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -107,7 +67,7 @@ export default function ProductDetail() {
     setQuantity(1)
   }, [id])
 
-  if (loading) {
+  if (isLoading) {
     // Skeleton mirrors the real two-column detail layout — no layout jump,
     // no white flash, while the product data resolves.
     return (

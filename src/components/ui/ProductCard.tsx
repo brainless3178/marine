@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { Check, Clock, PackageCheck, ShoppingCart, Sparkles } from 'lucide-react'
 import { WhatsAppIcon } from './WhatsAppIcon'
 import { Link } from 'react-router-dom'
@@ -7,6 +7,8 @@ import type { Product } from '../../types'
 import { OptimizedImage } from './OptimizedImage'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
 import { useSaleCountdown } from '../../hooks/useSaleCountdown'
+import { usePrefetchOnHover } from '../../hooks/usePrefetchOnHover'
+import { storefront } from '../../lib/api'
 import { isLightColor, getProductImageUrl } from '../../lib/utils'
 
 interface ProductCardProps {
@@ -40,6 +42,11 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
   const canBuy = product.inStock && Boolean(onAddToCart)
   const { whatsappNumber } = useStoreSettings()
   const whatsappText = encodeURIComponent('Hi, I need a quote for ' + product.name + ' (SKU: ' + product.sku + ').')
+
+  // Warm the product-detail cache on hover so clicking the card opens the
+  // detail page instantly (no loading screen) — fires once per card.
+  const detailQueryKey = useMemo(() => ['products', 'detail', product.id], [product.id])
+  const prefetchDetail = usePrefetchOnHover(detailQueryKey, () => storefront.products.get(product.id))
   const imageClassName = 'w-full ' + (compact ? 'aspect-[4/3]' : 'aspect-square') + ' object-cover transition duration-700 group-hover:scale-[1.06]'
   const stockClassName = 'rounded-full px-2.5 py-1 text-[11px] font-black ' + (product.inStock ? 'bg-success text-[var(--btn-success-text)]' : 'bg-[var(--navy-deep)] text-white')
   const buttonClassName = 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-xs font-black uppercase tracking-[0.08em] transition ' + (
@@ -51,7 +58,7 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
   )
 
   return (
-    <article className="group card relative flex h-full flex-col overflow-hidden">
+    <article className="group card relative flex h-full flex-col overflow-hidden" onMouseEnter={prefetchDetail}>
       <Link to={'/product/' + product.id} className="relative block overflow-hidden bg-[var(--surface-raised)] no-underline">
         <OptimizedImage
           src={getProductImageUrl(product.filename)}

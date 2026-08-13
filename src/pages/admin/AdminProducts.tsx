@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useToast } from '../../components/admin/toast-context'
+import { useOptimisticMutation } from '../../hooks/useOptimisticMutation'
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog'
 import { AdminProductFilters } from '../../components/admin/AdminProductFilters'
 import { AdminProductTable } from '../../components/admin/AdminProductTable'
@@ -47,7 +48,13 @@ export default function AdminProducts() {
   const [pagination, setPagination] = useState<Pagination | null>(null)
   const [loading, setLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
-  const [deleting, setDeleting] = useState(false)
+
+  // Latest-value refs so the optimistic snapshot always captures the current
+  // list/pagination even inside the async mutation callback.
+  const productListRef = useRef(productList)
+  const paginationRef = useRef(pagination)
+  productListRef.current = productList
+  paginationRef.current = pagination
 
   const [search, setSearch] = useState(searchParams.get('q') || '')
   const [filterCategory, setFilterCategory] = useState(searchParams.get('category') || '')
@@ -267,19 +274,35 @@ export default function AdminProducts() {
     setSelectedIds(new Set())
   }
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return
-    setDeleting(true)
-    try {
-      await admin.products.delete(deleteTarget)
+  // Optimistic delete: the row disappears the moment the admin confirms;
+  // if the API rejects it, the exact previous list/pagination is restored.
+  const { mutate: optimisticDelete, pending: deleting } = useOptimisticMutation<
+    string,
+    { list: AdminProduct[]; pagination: Pagination | null }
+  >({
+    mutationFn: (id) => admin.products.delete(id),
+    optimistic: (id) => {
+      setProductList((prev) => prev.filter((p) => p.id !== id))
+      setPagination((prev) => (prev ? { ...prev, total: Math.max(0, prev.total - 1) } : prev))
+    },
+    snapshot: () => ({ list: productListRef.current, pagination: paginationRef.current }),
+    restore: ({ list, pagination: prevPagination }) => {
+      setProductList(list)
+      setPagination(prevPagination)
+    },
+    onSuccess: () => {
       toast('Product deleted', 'success')
-      fetchProducts()
-    } catch (err: unknown) {
-      toast(err instanceof Error ? err.message : 'Delete failed', 'error')
-    } finally {
-      setDeleting(false)
-      setDeleteTarget(null)
-    }
+      fetchProducts() // Resync server truth — ordering/pagination may shift.
+    },
+    onError: (err) => {
+      toast(err.message || 'Delete failed', 'error')
+    },
+  })
+
+  const handleDelete = () => {
+    if (!deleteTarget) return
+    optimisticDelete(deleteTarget)
+    setDeleteTarget(null) // Close the confirm modal immediately.
   }
 
   const [duplicating, setDuplicating] = useState<string | null>(null)
