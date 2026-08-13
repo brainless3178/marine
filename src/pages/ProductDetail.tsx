@@ -24,6 +24,7 @@ import { getProductImageUrl } from '../lib/utils'
 import { products as staticProducts } from '../data/products'
 import { ProductImageGallery } from '../components/product/ProductImageGallery'
 import { OfferModal } from '../components/product/OfferModal'
+import { Skeleton } from '../components/ui/Skeleton'
 import { RelatedProducts } from '../components/product/RelatedProducts'
 import type { Product } from '../types'
 
@@ -107,9 +108,23 @@ export default function ProductDetail() {
   }, [id])
 
   if (loading) {
+    // Skeleton mirrors the real two-column detail layout — no layout jump,
+    // no white flash, while the product data resolves.
     return (
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-24 text-center">
-        <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin mx-auto" />
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-12" aria-hidden>
+        <div className="grid gap-8 lg:grid-cols-2">
+          <Skeleton className="aspect-square w-full rounded-2xl" />
+          <div className="space-y-4">
+            <Skeleton className="h-3 w-1/4" />
+            <Skeleton className="h-7 w-4/5" />
+            <Skeleton className="h-7 w-3/5" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="mt-6 h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
       </div>
     )
   }

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ShoppingCart, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { OptimizedImage } from '../ui/OptimizedImage'
+import { ProductCardSkeleton } from '../ui/Skeleton'
 import { isLightColor, getProductImageUrl } from '../../lib/utils'
 import type { Product } from '../../types'
 
@@ -107,10 +108,13 @@ function ProductCard({ product, addedIds, onAddToCart }: { product: Product; add
 export function ProductGrid({ products, addedIds, onAddToCart, isLoading }: ProductGridProps) {
 
   if (isLoading) {
+    // Skeleton grid keeps the exact card layout painted while data loads, so
+    // the page never collapses to a spinner or flashes white.
     return (
-      <div className="text-center py-20">
-        <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin mx-auto mb-4" />
-        <p className="text-sm text-[var(--text-muted)]">Loading products...</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5" aria-hidden>
+        {Array.from({ length: 8 }).map((_, i) => (
+          <ProductCardSkeleton key={i} />
+        ))}
       </div>
     )
   }

@@ -121,6 +121,7 @@ const config: Config = {
         shimmer: 'shimmerSweep 2.5s ease-in-out infinite',
         'border-spin': 'borderSpin 1s linear infinite',
         checkmark: 'checkmark 0.6s ease 0.3s both',
+        'danger-pulse': 'dangerPulse 1.6s ease-in-out infinite',
         'word-cycle': 'wordCycle 0.5s ease forwards',
         'scale-in': 'scaleIn 0.3s ease forwards',
         'slide-up': 'slideUp 0.4s ease forwards',
@@ -162,6 +163,10 @@ const config: Config = {
           '0%': { transform: 'scale(0) rotate(45deg)', opacity: '0' },
           '50%': { transform: 'scale(1.2) rotate(45deg)', opacity: '1' },
           '100%': { transform: 'scale(1) rotate(45deg)', opacity: '1' },
+        },
+        dangerPulse: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.55' },
         },
         wordCycle: {
           '0%': { opacity: '0', transform: 'translateY(12px)' },
