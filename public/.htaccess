@@ -1,0 +1,31 @@
+# Alka Traders — SPA fallback for Hostinger (Apache) static hosting.
+#
+# The Vite app is a single-page app: /about, /shop, /products etc. have no
+# physical file on disk. Without this file, direct visits / refreshes on
+# those URLs return 503/404 on hosts that serve frontend/dist statically
+# (the Node server.js fallback only runs when the Hostinger app is in
+# "Application root: frontend" Node mode).
+#
+# Real files (prerendered locale pages, assets) are served as-is; anything
+# else falls back to index.html so React Router renders the right page.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Serve existing files and directories as-is (assets, prerendered pages)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Block common exploit paths
+  RewriteRule ^xmlrpc\.php$ - [R=404,L]
+  RewriteRule ^wp-admin - [R=404,L]
+  RewriteRule ^wp-content - [R=404,L]
+
+  # Everything else → SPA shell
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Protect dotfiles (incl. .env, .git)
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
