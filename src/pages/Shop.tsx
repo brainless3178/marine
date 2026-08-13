@@ -80,12 +80,15 @@ export default function Shop() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,var(--gold-muted),transparent_28rem),radial-gradient(circle_at_85%_20%,var(--teal-soft),transparent_30rem)]" />
         <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-            <div className="max-w-[640px]">
-              <SectionLabel>{t('shop.categories')}</SectionLabel>
-              <h1 className="font-display font-bold text-display-xl tracking-tight mt-2">
+            <div className="max-w-[640px] text-white">
+              {/* The hero sits on an always-dark navy background, so all text
+                  must be light in BOTH themes (--accent-gold is too dark in
+                  light mode, hence the gold-light override on the label). */}
+              <SectionLabel style={{ color: 'var(--gold-light)' }}>{t('shop.categories')}</SectionLabel>
+              <h1 className="font-display font-bold text-display-xl tracking-tight mt-2 text-white">
                 {t('shop.title')}
               </h1>
-              <p className="mt-4 text-body/70">
+              <p className="mt-4 text-body text-white/70">
                 {t('shop.sub')}
               </p>
               <div className="flex flex-wrap gap-6 mt-8">
@@ -99,11 +102,11 @@ export default function Shop() {
                   return (
                     <div key={item.label} className="flex items-center gap-2.5">
                       <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
-                        <Icon size={20} className="text-[var(--accent-primary)]" />
+                        <Icon size={20} className="text-[var(--gold-light)]" />
                       </div>
                       <div>
-                        <span className="block text-xs font-bold">{item.label}</span>
-                        <span className="text-xs/72">{item.sub}</span>
+                        <span className="block text-xs font-bold text-white">{item.label}</span>
+                        <span className="text-xs text-white/70">{item.sub}</span>
                       </div>
                     </div>
                   )
@@ -138,7 +141,7 @@ export default function Shop() {
               >
                 <span className="text-xs font-bold text-center text-[var(--text-primary)] group-hover:text-[var(--accent-gold)] transition-colors leading-tight">
                   {cat.name}
-                </span>                  <span className="text-2xs text-[var(--text-muted)]">{cat.count} {t('shop.items')}</span>
+                </span>                  <span className="text-caption text-[var(--text-muted)]">{cat.count} {t('shop.items')}</span>
               </Link>
             ))}
           </div>
@@ -211,8 +214,10 @@ export default function Shop() {
       {/* ── CTA BANNER ── */}
       <section className="py-16 bg-[var(--secondary-bg)]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="rounded-2xl bg-gradient-to-br from-[var(--navy-deep)] to-[var(--navy-mid)] p-8 md:p-12 text-center">
-            <h2 className="font-display font-bold text-section mb-3">
+          <div className="rounded-2xl bg-gradient-to-br from-[var(--navy-deep)] to-[var(--navy-mid)] p-8 md:p-12 text-center text-white">
+            {/* text-section sets its own color; override it explicitly since
+                this banner is always dark navy in both themes. */}
+            <h2 className="font-display font-bold text-section mb-3 text-white">
               {t('shop.cantFind')}
             </h2>
             <p className="text-white/70 max-w-[560px] mx-auto mb-6 text-sm">

@@ -9,7 +9,7 @@ interface Props {
   products: any[]
 }
 
-export function ExecutiveDashboard({ stats, orders, rfqs, alerts, products }: Props) {
+export function ExecutiveDashboard({ orders, rfqs, alerts, products }: Props) {
   const data = useMemo(() => {
     const now = Date.now()
     const DAY = 86400000
@@ -51,7 +51,7 @@ export function ExecutiveDashboard({ stats, orders, rfqs, alerts, products }: Pr
       topCategory: topCategory ? { name: topCategory[0], revenue: topCategory[1] } : null,
       avgOrderValue: orders.length > 0 ? totalRevenue / orders.filter((o: any) => o.status !== 'cancelled').length : 0,
     }
-  }, [stats, orders, rfqs, alerts, products])
+  }, [orders, rfqs, alerts, products])
 
   const bigStats = [
     { label: 'Total Revenue', value: `$${data.totalRevenue.toLocaleString()}`, icon: DollarSign, color: 'text-[var(--accent-gold)]', bg: 'bg-[var(--accent-gold)]/10' },

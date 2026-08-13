@@ -91,6 +91,20 @@ export async function handleCaptureCompleted(resource: Record<string, unknown>) 
     if (!order) order = await prisma.order.findFirst({ where: { orderNumber: referenceId }, include: { items: true } })
     if (!order || order.paymentStatus === 'paid') return
 
+    // Pre-flight: never confirm an order whose items are no longer available.
+    for (const item of order.items) {
+      if (item.productId) {
+        const product = await prisma.product.findUnique({ where: { id: item.productId }, select: { stockCount: true, name: true } })
+        if (!product || product.stockCount < item.quantity) {
+          hookLog.error({ productId: item.productId, orderId: order.id }, 'Insufficient stock during PayPal webhook capture — order not confirmed')
+          await prisma.orderTimeline.create({
+            data: { orderId: order.id, status: order.status, note: 'Payment received but stock insufficient — order not confirmed. Manual review required.' },
+          })
+          return
+        }
+      }
+    }
+
     // Atomic guard: only transition to paid if not already paid
     const updated = await prisma.order.updateMany({
       where: { id: order.id, paymentStatus: { not: 'paid' } },
@@ -103,6 +117,7 @@ export async function handleCaptureCompleted(resource: Record<string, unknown>) 
     })
 
     // Reduce stock — atomic guard prevents negative stock
+    let stockFailed = false
     for (const item of order.items) {
       if (item.productId) {
         const affected = await prisma.$executeRawUnsafe(
@@ -110,9 +125,24 @@ export async function handleCaptureCompleted(resource: Record<string, unknown>) 
           item.quantity, item.productId
         )
         if (affected === 0) {
-          hookLog.warn({ productId: item.productId, quantity: item.quantity, orderId: order.id }, 'Stock insufficient during webhook capture')
+          stockFailed = true
+          hookLog.error({ productId: item.productId, quantity: item.quantity, orderId: order.id }, 'Stock decrement failed during webhook capture')
         }
       }
+    }
+
+    // Never leave the order silently marked paid when the required stock
+    // decrement failed — revert it so the inconsistency is visible and fixable.
+    if (stockFailed) {
+      await prisma.order.updateMany({
+        where: { id: order.id, paymentStatus: 'paid' },
+        data: { paymentStatus: 'pending', status: 'pending' },
+      })
+      await prisma.orderTimeline.create({
+        data: { orderId: order.id, status: 'pending', note: 'Stock decrement failed after payment — order reverted to pending. Manual review required.' },
+      })
+      hookLog.error({ orderId: order.id }, 'Stock decrement failed after PayPal webhook capture — order reverted to pending')
+      return
     }
 
     await logAudit({
@@ -223,6 +253,16 @@ export async function capturePaypalOrder(paypalOrderId: string, orderId: string,
   const accessToken = await getPaypalAccessToken()
   if (!accessToken) throw Object.assign(new Error('Failed to connect to PayPal'), { status: 502 })
 
+  // Pre-flight: fail before charging the customer if any item is no longer available.
+  for (const item of order.items) {
+    if (item.productId) {
+      const product = await prisma.product.findUnique({ where: { id: item.productId }, select: { stockCount: true, name: true } })
+      if (!product || product.stockCount < item.quantity) {
+        throw Object.assign(new Error(`Insufficient stock for ${product?.name || 'product'}`), { status: 400 })
+      }
+    }
+  }
+
   const captureRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${paypalOrderId}/capture`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
@@ -250,6 +290,7 @@ export async function capturePaypalOrder(paypalOrderId: string, orderId: string,
   await prisma.orderTimeline.create({ data: { orderId, status: 'confirmed', note: 'Payment confirmed via PayPal' } })
 
   // Reduce stock
+  let stockFailed = false
   for (const item of order.items) {
     if (item.productId) {
       const affected = await prisma.$executeRawUnsafe(
@@ -257,9 +298,24 @@ export async function capturePaypalOrder(paypalOrderId: string, orderId: string,
         item.quantity, item.productId
       )
       if (affected === 0) {
-        hookLog.warn({ productId: item.productId, quantity: item.quantity, orderId }, 'Stock insufficient during PayPal capture')
+        stockFailed = true
+        hookLog.error({ productId: item.productId, quantity: item.quantity, orderId }, 'Stock decrement failed during PayPal capture')
       }
     }
+  }
+
+  // Never leave the order silently marked paid when the required stock
+  // decrement failed — revert it and surface the failure to the client.
+  if (stockFailed) {
+    await prisma.order.updateMany({
+      where: { id: orderId, paymentStatus: 'paid' },
+      data: { paymentStatus: 'pending', status: 'pending' },
+    })
+    await prisma.orderTimeline.create({
+      data: { orderId, status: 'pending', note: 'Stock decrement failed after payment — order reverted to pending. Manual review required.' },
+    })
+    hookLog.error({ orderId }, 'Stock decrement failed after PayPal capture — order reverted to pending')
+    throw Object.assign(new Error('Payment captured but stock could not be confirmed. Our team will contact you.'), { status: 409 })
   }
 
   await logAudit({

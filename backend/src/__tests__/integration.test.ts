@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 // ─── Set required env vars BEFORE any imports ──────────────────
 vi.hoisted(() => {
@@ -6,9 +6,6 @@ vi.hoisted(() => {
   process.env.CSRF_SECRET = process.env.CSRF_SECRET || 'test-csrf-secret-for-integration-tests-32c'
   process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/test'
 })
-
-import express from 'express'
-import cookieParser from 'cookie-parser'
 
 // ─── Mock Prisma before importing app ─────────────────────────
 const mockPrisma = {
@@ -28,49 +25,8 @@ const mockPrisma = {
 vi.mock('../server.js', () => ({ prisma: mockPrisma }))
 
 // ─── Import middleware directly for testing ────────────────────
-import { sanitize } from '../middleware/sanitize.js'
 import { verifyCsrf, issueCsrfToken } from '../middleware/csrf.js'
 import { loginLimiter, registerLimiter, passwordResetLimiter } from '../middleware/rateLimit.js'
-
-// ─── Build a minimal test app ─────────────────────────────────
-function buildTestApp() {
-  const app = express()
-  app.use(express.json())
-  app.use(cookieParser())
-  app.use(sanitize)
-
-  // CSRF token endpoint
-  app.get('/api/csrf-token', issueCsrfToken as any)
-  app.use(verifyCsrf)
-
-  // Health check
-  app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok' })
-  })
-
-  // Auth endpoints for rate limit testing
-  app.post('/api/auth/login', loginLimiter, (req, res) => {
-    res.json({ message: 'login attempt' })
-  })
-  app.post('/api/auth/register', registerLimiter, (req, res) => {
-    res.json({ message: 'register attempt' })
-  })
-  app.post('/api/auth/forgot-password', passwordResetLimiter, (req, res) => {
-    res.json({ message: 'reset attempt' })
-  })
-
-  // Storefront RFQ (CSRF-protected)
-  app.post('/api/storefront/rfq', (req, res) => {
-    res.json({ message: 'rfq submitted', data: req.body })
-  })
-
-  // Webhook (should skip CSRF)
-  app.post('/api/webhooks/paypal', (req, res) => {
-    res.json({ received: true })
-  })
-
-  return app
-}
 
 // ─── Tests ────────────────────────────────────────────────────
 

@@ -26,7 +26,7 @@ export function IndustriesTabs() {
             description: i.description || '', painPoints: i.painPoints || [],
           }))
           setIndustries(mapped)
-          if (!active) setActive(mapped[0].id)
+          setActive((prev) => prev || mapped[0].id)
         }
       })
       .catch(() => { /* API unavailable */ })

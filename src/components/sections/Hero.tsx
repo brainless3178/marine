@@ -122,7 +122,7 @@ export function Hero() {
           </div>
 
           {/* Interactive global-network globe (drag to rotate) */}
-          <div className="hero-reveal mx-auto w-full max-w-[540px]" style={{ animationDelay: '140ms' }}>
+          <div className="hero-globe-wrap hero-reveal mx-auto w-full max-w-[540px]" style={{ animationDelay: '140ms' }}>
             <Globe
               markers={MARKERS}
               arcs={ARCS}

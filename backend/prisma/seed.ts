@@ -120,9 +120,9 @@ async function main() {
 
   // ─── Create Testimonials ───────────────────────────────────
   const testimonialData = [
-    { name: 'Verified Buyer', role: '', company: '', text: 'EL PEDIDO FUE ENVIADO A TIEMPO, MUY BIEN EMPACADO Y CORRESPONDE CON LO OBSERVADO EN LAS IMAGENES QUE FUERON EXHIBIDAS EN LA PAGINA, VENDEDOR AMPLIAMENTE RECOMENDADO', rating: 5 },
-    { name: 'Verified Buyer', role: '', company: '', text: 'Absolutt super proffesional we hit a bumb in the road they reaction was lightning fast i will do moore business with these guys', rating: 5 },
-    { name: 'Verified Buyer', role: '', company: '', text: "Excellent communication with the Sellers. I'd happily purchase from them again.", rating: 5 },
+    { name: 'fuegocat77 (276)', role: '', company: '', text: 'Record 91 ½ C Pipe Vise received as pictured on eBay. Shipping was very fast and FREE, with unexpectedly quick delivery from India. Packaging could have been better. Item shipped in corrugated cardboard box completely wrapped in duck tape. Vise itself was heavily covered in bubble wrap. Box was padded with pieces of Styrofoam on the sides and top, but not the bottom. As a result, the front mounting pad wore through the box, resulting in scraped paint. Nothing broken, so not an issue.', rating: 5 },
+    { name: 'noraedward (1104)', role: '', company: '', text: 'Very helpful seller. They investigated the issue I had when the delivery company delivered my parcel to the wrong person. Was very quick to address the situation, keep me informed and get the parcel delivered to me. Would recommend.', rating: 5 },
+    { name: 'b2esurplus (7400)', role: '', company: '', text: 'Five star transaction. Good shipping. Good packaging. Item as described. Good quality product in good condition. Good appearance. Thank you for the good transaction! All five stars. At B2E Surplus (aka Back to Earth Surplus), we buy and sell a lot of similar merchandise. We are always interested in bulk lots and/or good deals on industrial supplies. Look us up anytime!', rating: 5 },
   ]
 
   for (let i = 0; i < testimonialData.length; i++) {

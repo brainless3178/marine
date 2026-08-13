@@ -2,11 +2,11 @@ import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import type { SignOptions } from 'jsonwebtoken'
 
-const _jwtSecret = process.env.JWT_SECRET
-if (!_jwtSecret) {
-  throw new Error('FATAL: JWT_SECRET environment variable is required. Set it in .env before starting the server.')
-}
-const JWT_SECRET = _jwtSecret as string
+// JWT_SECRET availability is guaranteed by backend/src/utils/env.ts, which
+// validates it at startup (refusing to boot in production without a real
+// secret) before any module that reads it is loaded. The old module-load
+// guard here was dead code and has been removed.
+const JWT_SECRET = process.env.JWT_SECRET as string
 
 export interface AuthUser {
   id: string

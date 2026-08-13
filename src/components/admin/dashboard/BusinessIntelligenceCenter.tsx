@@ -18,7 +18,7 @@ interface Insight {
   icon: any
 }
 
-export function BusinessIntelligenceCenter({ stats, orders, rfqs, products, customers }: Props) {
+export function BusinessIntelligenceCenter({ orders, rfqs, products, customers }: Props) {
   const insights = useMemo<Insight[]>(() => {
     const now = Date.now()
     const DAY = 86400000
@@ -156,7 +156,7 @@ export function BusinessIntelligenceCenter({ stats, orders, rfqs, products, cust
     }
 
     return results
-  }, [stats, orders, rfqs, products, customers])
+  }, [orders, rfqs, products, customers])
 
   const positive = insights.filter(i => i.severity === 'positive').length
   const warnings = insights.filter(i => i.severity === 'warning').length

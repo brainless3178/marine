@@ -147,7 +147,7 @@ export async function archiveProduct(id: string, actor: AuthUser, ipAddress = ''
 // ─── Bulk Update ───────────────────────────────────────────────
 
 export async function bulkUpdate(ids: string[], action: string, value: string | undefined, actor: AuthUser, ipAddress = '') {
-  let updateData: any = {}
+  let updateData: any
   switch (action) {
     case 'publish': updateData = { status: 'published' }; break
     case 'unpublish': updateData = { status: 'hidden' }; break

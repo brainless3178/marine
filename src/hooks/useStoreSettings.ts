@@ -5,6 +5,7 @@ interface StoreSettings {
   whatsappNumber: string
   shippingCost: number
   taxRate: number
+  freeShippingThreshold: number
   rfqEmail: string
   emergencyEmail: string
   phoneNumber: string
@@ -14,6 +15,7 @@ const DEFAULTS: StoreSettings = {
   whatsappNumber: '918799095041',
   shippingCost: 25,
   taxRate: 0.08,
+  freeShippingThreshold: 500,
   rfqEmail: 'sales@alkatraders.co',
   emergencyEmail: 'sales@alkatraders.co',
   phoneNumber: '+918799095041',
@@ -36,8 +38,9 @@ async function fetchSettingsAndNotify(): Promise<StoreSettings> {
       const s = res.settings || {}
       cachedSettings = {
         whatsappNumber: String(s['site.whatsappNumber'] || DEFAULTS.whatsappNumber),
-        shippingCost: Number(s['site.shippingCost']) || DEFAULTS.shippingCost,
-        taxRate: Number(s['site.taxRate']) || DEFAULTS.taxRate,
+        shippingCost: Number(s['checkout.shippingCost']) || DEFAULTS.shippingCost,
+        taxRate: Number(s['checkout.taxRate']) || DEFAULTS.taxRate,
+        freeShippingThreshold: Number(s['checkout.freeShippingThreshold']) || DEFAULTS.freeShippingThreshold,
         rfqEmail: String(s['site.rfqEmail'] || DEFAULTS.rfqEmail),
         emergencyEmail: String(s['site.emergencyEmail'] || DEFAULTS.emergencyEmail),
         phoneNumber: String(s['site.phoneNumber'] || DEFAULTS.phoneNumber),

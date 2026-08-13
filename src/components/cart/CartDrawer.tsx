@@ -269,7 +269,7 @@ export function CartDrawer() {
                 </ul>
 
                 {/* ─── Footer ─── */}
-                <div className="border-t border-[var(--border)] bg-[var(--surface)] px-6 pb-6 pt-4">
+                <div className="border-t border-[var(--border)] bg-[var(--surface)] px-6 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
                   {/* Subtotal */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--text-secondary)]">

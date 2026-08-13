@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Search, Users, Eye, DollarSign, ShoppingCart, Star, Loader2, Plus, Globe } from 'lucide-react'
 import { admin } from '../../lib/api'
-import { useToast } from '../../components/admin/Toast'
+import { useToast } from '../../components/admin/toast-context'
 import { AdminPagination } from '../../components/admin/AdminPagination'
 import { CustomerDetailSlideover } from '../../components/admin/customers/CustomerDetailSlideover'
 import { CreateCustomerModal } from '../../components/admin/customers/CreateCustomerModal'

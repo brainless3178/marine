@@ -12,8 +12,8 @@
     "language": "اللغة"
   },
   "topbar": {
-    "freeShipping": "شحن مجاني للطلبات فوق $100",
-    "freeShippingSub": "للطلبات التي تزيد عن $100",
+    "freeShipping": "شحن مجاني للطلبات فوق $500",
+    "freeShippingSub": "للطلبات التي تزيد عن $500",
     "timelyDelivery": "توصيل في الوقت المحدد",
     "timelyDeliverySub": "ضمان الشحن خلال 48 ساعة",
     "securePayment": "دفع آمن",
@@ -245,7 +245,7 @@
     "viewAll": "عرض الكل",
     "items": "عنصر",
     "freeShipping": "شحن مجاني",
-    "freeShippingSub": "أكثر من $100",
+    "freeShippingSub": "أكثر من $500",
     "timelyDelivery": "توصيل في الوقت المحدد",
     "timelyDeliverySub": "شحن خلال 48 ساعة",
     "securePayment": "دفع آمن",

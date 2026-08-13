@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { useToast } from '../../../components/admin/Toast'
+import { useToast } from '../../../components/admin/toast-context'
 import { admin } from '../../../lib/api'
 import type { Order } from './types'
 

@@ -25,7 +25,7 @@ export function CheckoutSuccess({
   const navigate = useNavigate()
   const { orderId, setCancelRequested } = useStore()
   const settings = useStoreSettings()
-  const shippingCost = settings.shippingCost
+  const shippingCost = subtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost
   const tax = Math.round(subtotal * settings.taxRate * 100) / 100
   const total = subtotal + shippingCost + tax
 

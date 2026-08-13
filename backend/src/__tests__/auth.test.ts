@@ -32,8 +32,9 @@ describe('generateToken', () => {
     expect(decoded.exp).toBeLessThan(Math.floor(Date.now() / 1000) + 3600) // 15m expiry
   })
 
-  // JWT_SECRET guard is tested at module import time — can't be re-tested
-  // after the module is already loaded with a valid secret.
+  // JWT_SECRET is validated at startup by backend/src/utils/env.ts (which
+  // refuses to boot in production without a real secret), so there is no
+  // module-load guard to test here.
 })
 
 describe('generateRefreshToken', () => {

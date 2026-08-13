@@ -10,7 +10,7 @@ interface Props {
   alerts: any[]
 }
 
-export function ExecutiveControlTower({ stats, orders, rfqs, products, customers, alerts }: Props) {
+export function ExecutiveControlTower({ orders, rfqs, products, alerts }: Props) {
   const data = useMemo(() => {
     const now = Date.now()
     const DAY = 86400000
@@ -60,7 +60,7 @@ export function ExecutiveControlTower({ stats, orders, rfqs, products, customers
       rapidOrderers, uniqueCustomers,
       dangerAlerts: alerts.filter((a: any) => a.type === 'danger').length,
     }
-  }, [stats, orders, rfqs, products, customers, alerts])
+  }, [orders, rfqs, products, alerts])
 
   const sections = [
     {

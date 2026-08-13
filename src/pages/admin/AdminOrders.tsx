@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Download } from 'lucide-react'
 import { admin } from '../../lib/api'
-import { useToast } from '../../components/admin/Toast'
+import { useToast } from '../../components/admin/toast-context'
 import type { Order, OrderStatus } from './orders/types'
 import { mapApiOrder, getNextStatuses, ITEMS_PER_PAGE } from './orders/types'
 import { OrderFilters } from './orders/OrderFilters'

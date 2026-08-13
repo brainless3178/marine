@@ -12,7 +12,7 @@ interface Props {
 
 type Section = 'all' | 'revenue' | 'operations' | 'inventory' | 'customers' | 'security'
 
-export function MissionControlDashboard({ stats, orders, rfqs, products, customers, alerts }: Props) {
+export function MissionControlDashboard({ orders, rfqs, products, customers, alerts }: Props) {
   const [section, setSection] = useState<Section>('all')
 
   const data = useMemo(() => {
@@ -47,7 +47,7 @@ export function MissionControlDashboard({ stats, orders, rfqs, products, custome
       pendingRfqs, emergencyRfqs,
       uniqueCustomers, dangerAlerts, countries,
     }
-  }, [stats, orders, rfqs, products, customers, alerts])
+  }, [orders, rfqs, products, alerts])
 
   const sections: Array<{ key: Section; label: string; icon: any; color: string; metrics: Array<{ label: string; value: string; color?: string; icon: any }> }> = [
     {

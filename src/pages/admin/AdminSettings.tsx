@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Globe, Truck, CreditCard, Bell, Save, CheckCircle, Loader2 } from 'lucide-react'
 import { admin } from '../../lib/api'
-import { useToast } from '../../components/admin/Toast'
+import { useToast } from '../../components/admin/toast-context'
 import type { SettingsTab, SiteConfig, ShippingZone, PaymentMethod, NotificationPrefs } from './settings/types'
 import { defaultSite, defaultZones, defaultPayments, defaultNotifications } from './settings/types'
 import { SiteConfigTab } from './settings/SiteConfigTab'

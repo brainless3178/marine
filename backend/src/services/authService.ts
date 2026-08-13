@@ -7,11 +7,10 @@ import { sendWelcome, sendPasswordReset } from './email.js'
 import logger from '../utils/logger.js'
 import type { AuthUser } from '../middleware/auth.js'
 
-const _jwtSecret = process.env.JWT_SECRET
-if (!_jwtSecret) {
-  throw new Error('FATAL: JWT_SECRET environment variable is required.')
-}
-const JWT_SECRET = _jwtSecret as string
+// JWT_SECRET availability is guaranteed by backend/src/utils/env.ts, which
+// validates it at startup (refusing to boot in production without a real
+// secret) before any module that reads it is loaded.
+const JWT_SECRET = process.env.JWT_SECRET as string
 
 // ─── Token Generation ─────────────────────────────────────────
 

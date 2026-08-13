@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -36,7 +36,7 @@ const TRUST_ITEMS = [
 
 /** Shared style for the compact icon buttons in the action cluster. */
 const ICON_BTN =
-  'flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--nav-btn-border)] bg-[var(--nav-btn-bg)] text-[var(--nav-text-muted)] transition-colors hover:border-[var(--nav-btn-hover-border)] hover:text-[var(--nav-text)] focus-visible:outline-2 focus-visible:outline-[var(--accent-primary)]'
+  'nav-icon-btn flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--nav-btn-border)] bg-[var(--nav-btn-bg)] text-[var(--nav-text-muted)] transition-colors hover:border-[var(--nav-btn-hover-border)] hover:text-[var(--nav-text)] focus-visible:outline-2 focus-visible:outline-[var(--accent-primary)]'
 
 function BrandLockup() {
   const locale = useLocale()
@@ -73,8 +73,6 @@ export function Navbar() {
   const locale = useLocale()
   const localizedPath = useLocalizedPath()
   const [scrolled, setScrolled] = useState(false)
-  const [hidden, setHidden] = useState(false)
-  const lastScrollY = useRef(0)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -90,16 +88,9 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const y = window.scrollY
-      setScrolled(y > 32)
-      const delta = y - lastScrollY.current
-      // Hide the header on scroll down (past 140px), reveal on scroll up / near top
-      if (y > 140 && delta > 6) {
-        setHidden(true)
-      } else if (delta < -6 || y <= 140) {
-        setHidden(false)
-      }
-      lastScrollY.current = y
+      // Only drives the header shadow. The header itself is never hidden by
+      // scroll position — it stays sticky (top bar + nav) at all times.
+      setScrolled(window.scrollY > 32)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
@@ -109,7 +100,6 @@ export function Navbar() {
     setMobileOpen(false)
     setLangOpen(false)
     setProfileOpen(false)
-    setHidden(false)
   }, [pathname])
 
   // Lock page scroll when the mobile menu is open. Lock the <html> element,
@@ -144,9 +134,7 @@ export function Navbar() {
   // of view after ~100px. The wrapper sticks BOTH the utility bar and the
   // main nav, so the email/phone/trust texts stay visible while scrolling.
   return (
-    <header
-      className={`sticky top-0 z-50 transition-[transform,visibility] duration-300 ease-in-out ${hidden ? '-translate-y-full invisible' : 'translate-y-0 visible'}`}
-    >
+    <header className="sticky top-0 z-50">
       {/* ── TOP UTILITY BAR: email/phone · trust indicators ── */}
       <div className="border-b border-[var(--header-utility-border)] bg-[var(--header-utility-bg)] pt-[env(safe-area-inset-top)] text-[var(--header-utility-text)]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
@@ -246,11 +234,18 @@ export function Navbar() {
                 <Link
                   key={link.path}
                   to={localizedTo}
-                  className={`relative text-sm font-semibold no-underline transition-colors ${
+                  className={`group relative text-sm font-semibold no-underline transition-colors ${
                     isActive ? 'text-[var(--accent-primary)]' : 'text-[var(--nav-text-muted)] hover:text-[var(--nav-text)]'
                   }`}
                 >
-                  {t(`nav.${link.labelKey}`)}
+                  {/* Rounded hover pill — absolutely positioned, so hovering
+                      never shifts the layout. It hugs the link (8px each side)
+                      instead of painting an oversized rectangle. */}
+                  <span
+                    className="absolute inset-y-0 -left-2 -right-2 rounded-lg bg-[var(--surface-soft)] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    aria-hidden="true"
+                  />
+                  <span className="relative">{t(`nav.${link.labelKey}`)}</span>
                   {isActive && (
                     <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 rounded-full bg-[var(--accent-primary)]" aria-hidden="true" />
                   )}
@@ -338,7 +333,7 @@ export function Navbar() {
                 onClick={() => setProfileOpen((v) => !v)}
                 className={`${ICON_BTN} ${
                   isLoggedIn
-                    ? 'border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)]'
+                    ? 'nav-icon-btn-accent border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)]'
                     : ''
                 }`}
                 aria-label="Profile"

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useState } from 'react'
 import { render, screen, act, fireEvent } from '@testing-library/react'
-import { TickerProvider, useTickerNow } from '../components/TickerProvider'
+import { TickerProvider } from '../components/TickerProvider'
+import { useTickerNow } from '../hooks/useTickerNow'
 
 function Probe({ label, active = true }: { label: string; active?: boolean }) {
   const now = useTickerNow(active)

@@ -16,7 +16,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { admin } from '../../lib/api'
-import { useToast } from '../../components/admin/Toast'
+import { useToast } from '../../components/admin/toast-context'
 
 const iconMap: Record<string, typeof Home> = {
   hero: Image,

@@ -49,8 +49,8 @@ describe('useStoreSettings', () => {
     mockSettings.mockResolvedValue({
       settings: {
         'site.whatsappNumber': '1234567890',
-        'site.shippingCost': 50,
-        'site.taxRate': 0.1,
+        'checkout.shippingCost': 50,
+        'checkout.taxRate': 0.1,
         'site.rfqEmail': 'custom@company.com',
         'site.emergencyEmail': 'emergency@company.com',
         'site.phoneNumber': '+1234567890',

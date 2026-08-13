@@ -112,6 +112,51 @@ describe('createOrder', () => {
     expect(callData.total).toBe(295)
   })
 
+  it('charges shipping below the free-shipping threshold', async () => {
+    mockPrisma.product.findUnique.mockResolvedValue({ id: 'prod-1', name: 'Pump', sku: 'HP-200', regularPrice: 499.99, salePrice: null, stockCount: 10 })
+    mockPrisma.storeSetting.findUnique
+      .mockResolvedValueOnce({ value: '25' })   // shipping
+      .mockResolvedValueOnce({ value: '0.08' }) // tax
+      .mockResolvedValueOnce({ value: '500' })  // free shipping threshold
+    mockPrisma.order.create.mockResolvedValue({ id: 'order-1', orderNumber: 'AT-ORD-999' })
+
+    await createOrder({ ...baseInput, items: [{ productId: 'prod-1', quantity: 1 }] })
+
+    const callData = mockPrisma.order.create.mock.calls[0][0].data
+    expect(callData.subtotal).toBe(499.99)
+    expect(callData.shippingCost).toBe(25)
+  })
+
+  it('waives shipping at exactly the free-shipping threshold', async () => {
+    mockPrisma.product.findUnique.mockResolvedValue({ id: 'prod-1', name: 'Pump', sku: 'HP-200', regularPrice: 500, salePrice: null, stockCount: 10 })
+    mockPrisma.storeSetting.findUnique
+      .mockResolvedValueOnce({ value: '25' })
+      .mockResolvedValueOnce({ value: '0.08' })
+      .mockResolvedValueOnce({ value: '500' })
+    mockPrisma.order.create.mockResolvedValue({ id: 'order-1', orderNumber: 'AT-ORD-999' })
+
+    await createOrder({ ...baseInput, items: [{ productId: 'prod-1', quantity: 1 }] })
+
+    const callData = mockPrisma.order.create.mock.calls[0][0].data
+    expect(callData.subtotal).toBe(500)
+    expect(callData.shippingCost).toBe(0)
+  })
+
+  it('waives shipping above the free-shipping threshold', async () => {
+    mockPrisma.product.findUnique.mockResolvedValue({ id: 'prod-1', name: 'Pump', sku: 'HP-200', regularPrice: 600, salePrice: null, stockCount: 10 })
+    mockPrisma.storeSetting.findUnique
+      .mockResolvedValueOnce({ value: '25' })
+      .mockResolvedValueOnce({ value: '0.08' })
+      .mockResolvedValueOnce({ value: '500' })
+    mockPrisma.order.create.mockResolvedValue({ id: 'order-1', orderNumber: 'AT-ORD-999' })
+
+    await createOrder({ ...baseInput, items: [{ productId: 'prod-1', quantity: 1 }] })
+
+    const callData = mockPrisma.order.create.mock.calls[0][0].data
+    expect(callData.subtotal).toBe(600)
+    expect(callData.shippingCost).toBe(0)
+  })
+
   it('returns existing order on idempotency key match', async () => {
     const idempInput = { ...baseInput, idempotencyKey: 'idem-123' }
     mockPrisma.order.findFirst.mockResolvedValue({ id: 'existing-order', items: [] })
@@ -193,6 +238,45 @@ describe('updateOrderStatus', () => {
       'UPDATE products SET stock_count = stock_count + $1 WHERE id = $2::uuid',
       1, 'prod-1'
     )
+  })
+
+  it('reverts the paid status when the stock decrement fails during confirmation', async () => {
+    mockPrisma.order.findUnique.mockResolvedValue({ id: 'order-1', status: 'confirmed', paymentMethod: 'bank-transfer', paymentStatus: 'pending', customerId: 'cust-1' })
+    mockPrisma.order.update.mockResolvedValue({ id: 'order-1', status: 'paid' })
+    mockPrisma.orderItem.findMany.mockResolvedValue([
+      { productId: 'prod-1', quantity: 2 },
+    ])
+    mockPrisma.$executeRawUnsafe.mockResolvedValue(0) // atomic guard rejects the decrement
+
+    await expect(
+      updateOrderStatus('order-1', 'paid', undefined, mockActor)
+    ).rejects.toMatchObject({ status: 409 })
+
+    // The order must be reverted to its previous status — never left silently paid
+    expect(mockPrisma.order.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { status: 'confirmed' } })
+    )
+  })
+
+  it('does not mark the order refunded when the PayPal refund fails', async () => {
+    const { processPaypalRefund } = await import('../utils/paypal.js')
+    ;(processPaypalRefund as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ success: false, error: 'refund rejected' })
+
+    mockPrisma.order.findUnique.mockResolvedValue({
+      id: 'order-1', status: 'paid', paymentStatus: 'paid', paymentMethod: 'paypal',
+      paymentIntentId: 'PAY-1', customerId: 'cust-1', total: 100, currency: 'USD',
+    })
+    mockPrisma.order.update.mockResolvedValue({ id: 'order-1', status: 'cancelled' })
+    mockPrisma.orderItem.findMany.mockResolvedValue([
+      { productId: 'prod-1', quantity: 1 },
+    ])
+    mockPrisma.$executeRawUnsafe.mockResolvedValue(1)
+
+    await updateOrderStatus('order-1', 'cancelled', 'Refund test', mockActor)
+
+    // No update call should set paymentStatus — the order must NOT show as refunded
+    const refundUpdate = mockPrisma.order.update.mock.calls.find((c: any[]) => c[0].data?.paymentStatus)
+    expect(refundUpdate).toBeUndefined()
   })
 })
 

@@ -9,7 +9,14 @@
 export { api } from './api/core'
 
 // Token management
-export { getAdminToken, setAdminToken, setCustomerToken } from './api/core'
+export {
+  getAdminToken,
+  getCustomerToken,
+  setAdminToken,
+  setCustomerToken,
+  refreshAdminSession,
+  refreshCustomerSession,
+} from './api/core'
 
 // Storefront endpoints (public)
 export { storefront } from './api/storefront'

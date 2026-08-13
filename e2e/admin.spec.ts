@@ -2,7 +2,8 @@ import { test, expect, Page } from '@playwright/test'
 
 // ─── Test Credentials ───────────────────────────────────────────────────────
 const ADMIN_EMAIL = 'admin@alkatraders.co'
-const ADMIN_PASSWORD = 'HeyMarineItsMe@007'
+// Read from env so no real password is committed; falls back to the seed placeholder.
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me'
 
 // ─── Reusable Helpers ───────────────────────────────────────────────────────
 

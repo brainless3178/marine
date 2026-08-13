@@ -5,7 +5,7 @@ import {
 import type { Order } from './types'
 import { statusConfig, getNextStatuses, formatDate, formatDateTime } from './types'
 import { getAdminToken } from '../../../lib/api'
-import { useToast } from '../../../components/admin/Toast'
+import { useToast } from '../../../components/admin/toast-context'
 
 interface OrderDetailSlideOverProps {
   order: Order

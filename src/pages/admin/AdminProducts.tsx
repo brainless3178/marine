@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { useToast } from '../../components/admin/Toast'
+import { useToast } from '../../components/admin/toast-context'
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog'
 import { AdminProductFilters } from '../../components/admin/AdminProductFilters'
 import { AdminProductTable } from '../../components/admin/AdminProductTable'

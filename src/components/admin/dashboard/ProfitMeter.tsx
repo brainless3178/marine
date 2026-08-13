@@ -6,7 +6,7 @@ interface Props {
   products: any[]
 }
 
-export function ProfitMeter({ orders, products }: Props) {
+export function ProfitMeter({ orders }: Props) {
   const data = useMemo(() => {
     const completedOrders = orders.filter((o: any) => !['cancelled', 'refunded'].includes(o.status))
 
@@ -42,7 +42,7 @@ export function ProfitMeter({ orders, products }: Props) {
       totalDiscounts, totalTax, totalShipping, cancelledRevenue,
       trendPct, orderCount: completedOrders.length,
     }
-  }, [orders, products])
+  }, [orders])
 
   const circumference = 2 * Math.PI * 45
   const dashOffset = circumference - (circumference * Math.min(data.grossMargin, 100)) / 100

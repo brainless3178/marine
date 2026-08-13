@@ -161,9 +161,9 @@ ON CONFLICT (slug) DO NOTHING;
 -- ============================================================================
 
 INSERT INTO testimonials (id, name, role, company, text, rating, sort_order, is_visible) VALUES
-('a0000001-0000-0000-0000-000000000001', 'Verified Buyer', '', '', 'EL PEDIDO FUE ENVIADO A TIEMPO, MUY BIEN EMPACADO Y CORRESPONDE CON LO OBSERVADO EN LAS IMAGENES QUE FUERON EXHIBIDAS EN LA PAGINA, VENDEDOR AMPLIAMENTE RECOMENDADO', 5, 0, TRUE),
-('a0000002-0000-0000-0000-000000000002', 'Verified Buyer', '', '', 'Absolutt super proffesional we hit a bumb in the road they reaction was lightning fast i will do moore business with these guys', 5, 1, TRUE),
-('a0000003-0000-0000-0000-000000000003', 'Verified Buyer', '', '', 'Excellent communication with the Sellers. I''d happily purchase from them again.', 5, 2, TRUE);
+('a0000001-0000-0000-0000-000000000001', 'fuegocat77 (276)', '', '', 'Record 91 ½ C Pipe Vise received as pictured on eBay. Shipping was very fast and FREE, with unexpectedly quick delivery from India. Packaging could have been better. Item shipped in corrugated cardboard box completely wrapped in duck tape. Vise itself was heavily covered in bubble wrap. Box was padded with pieces of Styrofoam on the sides and top, but not the bottom. As a result, the front mounting pad wore through the box, resulting in scraped paint. Nothing broken, so not an issue.', 5, 0, TRUE),
+('a0000002-0000-0000-0000-000000000002', 'noraedward (1104)', '', '', 'Very helpful seller. They investigated the issue I had when the delivery company delivered my parcel to the wrong person. Was very quick to address the situation, keep me informed and get the parcel delivered to me. Would recommend.', 5, 1, TRUE),
+('a0000003-0000-0000-0000-000000000003', 'b2esurplus (7400)', '', '', 'Five star transaction. Good shipping. Good packaging. Item as described. Good quality product in good condition. Good appearance. Thank you for the good transaction! All five stars. At B2E Surplus (aka Back to Earth Surplus), we buy and sell a lot of similar merchandise. We are always interested in bulk lots and/or good deals on industrial supplies. Look us up anytime!', 5, 2, TRUE);
 
 -- ============================================================================
 -- 6. OFFICES (4)

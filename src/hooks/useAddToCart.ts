@@ -12,9 +12,10 @@ export function useAddToCart() {
   const timerRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   useEffect(() => {
+    const timers = timerRef.current
     return () => {
-      timerRef.current.forEach((t) => clearTimeout(t))
-      timerRef.current.clear()
+      timers.forEach((t) => clearTimeout(t))
+      timers.clear()
     }
   }, [])
 

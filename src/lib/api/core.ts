@@ -68,6 +68,10 @@ export function getAdminToken(): string | null {
   return adminAccessToken
 }
 
+export function getCustomerToken(): string | null {
+  return customerAccessToken
+}
+
 export function setAdminToken(token: string | null) {
   adminAccessToken = token
 }
@@ -127,6 +131,22 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 // ─── Token Refresh ──────────────────────────────────────────────
+
+/**
+ * Restore the in-memory admin access token from the httpOnly refresh cookie.
+ * Used on page reload, when the in-memory token no longer exists.
+ */
+export async function refreshAdminSession(): Promise<boolean> {
+  return tryRefreshAdmin()
+}
+
+/**
+ * Restore the in-memory customer access token from the httpOnly refresh cookie.
+ * Used on page reload, when the in-memory token no longer exists.
+ */
+export async function refreshCustomerSession(): Promise<boolean> {
+  return tryRefreshCustomer()
+}
 
 async function tryRefreshAdmin(): Promise<boolean> {
   try {

@@ -15,7 +15,7 @@ import {
   ArrowDown,
 } from 'lucide-react'
 import { admin } from '../../lib/api'
-import { useToast } from '../../components/admin/Toast'
+import { useToast } from '../../components/admin/toast-context'
 import type { ApiCategory } from '../../lib/api-types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { useToast } from '../../components/admin/Toast'
+import { useToast } from '../../components/admin/toast-context'
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog'
 import { admin } from '../../lib/api'
 import type { ApiAdminUser } from '../../lib/api-types'

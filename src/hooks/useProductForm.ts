@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { admin } from '../lib/api'
-import { useToast } from '../components/admin/Toast'
+import { useToast } from '../components/admin/toast-context'
 import { toLocalInputValue, fromLocalInputValue, isSaleWindowValid, generateProductSku } from '../lib/utils'
 import type { ApiProduct, ApiBrand, ApiCategory, ApiIndustry } from '../lib/api-types'
 

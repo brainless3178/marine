@@ -13,11 +13,37 @@ dotenv.config()
 // we could report the actual cause.
 const REQUIRED_ENV_VARS = ['JWT_SECRET', 'DATABASE_URL'] as const
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 if (!process.env.JWT_SECRET) {
+  if (isProduction) {
+    // Never start production with a known/predictable signing key — the hardcoded
+    // development fallback below would let anyone forge JWTs. Refuse to boot.
+    process.stderr.write(
+      'FATAL [startup] JWT_SECRET is required in production. Refusing to start with a fallback secret.\n' +
+      'Set JWT_SECRET in the hosting panel and redeploy.\n',
+    )
+    process.exit(1)
+  }
   process.stderr.write(
-    'WARN [startup] JWT_SECRET not set in environment. Using fallback secret.\n',
+    'WARN [startup] JWT_SECRET not set in environment. Using development fallback secret (local dev only).\n',
   )
   process.env.JWT_SECRET = '2b83abcc07ed401b23fff63cb06ca816464e8b4a4110adc53640cbc97aac49f8'
+}
+
+// In production the frontend URL and CORS origin drive PayPal return URLs,
+// password-reset links, emails and CORS. Warn loudly instead of silently
+// falling back to localhost, which would break those flows.
+if (isProduction) {
+  for (const urlVar of ['FRONTEND_URL', 'CORS_ORIGIN'] as const) {
+    const value = process.env[urlVar]
+    if (!value || /^https?:\/\/localhost(?:[:/]|$)/.test(value)) {
+      process.stderr.write(
+        `WARN [startup] ${urlVar} is missing or points at localhost in production — ` +
+        'PayPal return URLs, emails and CORS will be incorrect.\n',
+      )
+    }
+  }
 }
 
 const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v])

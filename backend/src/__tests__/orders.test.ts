@@ -55,7 +55,7 @@ describe('Stock Decrement Logic', () => {
 
     // Simulate the storefront order creation logic
     const items = [{ productId: 'prod-1', quantity: 2 }]
-    let stockDecrementCalled = false
+    const stockDecrementCalled = false
 
     for (const item of items) {
       const product = await mockPrisma.product.findUnique({ where: { id: item.productId } })

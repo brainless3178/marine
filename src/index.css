@@ -963,6 +963,15 @@ html.dark {
   }
 }
 
+/* Short viewports (phones held sideways): cap the hero globe so the hero
+   doesn't stretch to several screen-heights. The globe keeps its square
+   aspect ratio — only its max width is reduced. */
+@media (max-height: 520px) {
+  .hero-globe-wrap {
+    max-width: min(55vh, 320px);
+  }
+}
+
 @keyframes heroFadeUp {
   from {
     opacity: 0;
@@ -1054,4 +1063,23 @@ html.dark {
    touch-target minimum so the two-row mobile layout stays compact. */
 .utility-link {
   min-height: 0;
+}
+
+/* Header icon buttons (language, theme, cart, WhatsApp, profile, mobile
+   menu) — one consistent rounded hover fill that fits the 40px button
+   instead of an oversized rectangle. Hover state only; base styles stay
+   in the shared Tailwind class. */
+.site-header .nav-icon-btn {
+  border-radius: 0.5rem;
+}
+
+.site-header .nav-icon-btn:hover,
+.site-header .nav-icon-btn:focus-visible {
+  background: var(--surface-soft);
+}
+
+/* Logged-in profile button keeps its accent tint on hover. */
+.site-header .nav-icon-btn.nav-icon-btn-accent:hover,
+.site-header .nav-icon-btn.nav-icon-btn-accent:focus-visible {
+  background: color-mix(in srgb, var(--accent-primary) 18%, transparent);
 }

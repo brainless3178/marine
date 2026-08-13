@@ -56,12 +56,17 @@ export async function createOrder(input: CreateOrderInput) {
     subtotal += price * item.quantity
   }
 
-  const [shippingCostSetting, taxRateSetting] = await Promise.all([
+  const [shippingCostSetting, taxRateSetting, freeShippingThresholdSetting] = await Promise.all([
     prisma.storeSetting.findUnique({ where: { key: 'checkout.shippingCost' } }),
     prisma.storeSetting.findUnique({ where: { key: 'checkout.taxRate' } }),
+    prisma.storeSetting.findUnique({ where: { key: 'checkout.freeShippingThreshold' } }),
   ])
 
-  const shippingCost = Number(shippingCostSetting?.value) || Number(process.env.DEFAULT_SHIPPING_COST) || 25
+  // Free shipping applies when the subtotal meets the configured threshold.
+  // The server always calculates this — the client can never dictate shipping.
+  const baseShippingCost = Number(shippingCostSetting?.value) || Number(process.env.DEFAULT_SHIPPING_COST) || 25
+  const freeShippingThreshold = Number(freeShippingThresholdSetting?.value) || 500
+  const shippingCost = subtotal >= freeShippingThreshold ? 0 : baseShippingCost
   const taxRate = Number(taxRateSetting?.value) || Number(process.env.DEFAULT_TAX_RATE) || 0.08
   const tax = Math.round(subtotal * taxRate * 100) / 100
   const total = subtotal + shippingCost + tax
@@ -142,6 +147,7 @@ export async function updateOrderStatus(id: string, status: string, note: string
 
   if (status === 'paid' && order.paymentStatus !== 'paid') {
     const items = await prisma.orderItem.findMany({ where: { orderId: id } })
+    let stockFailed = false
     for (const item of items) {
       if (item.productId) {
         const affected = await prisma.$executeRawUnsafe(
@@ -149,9 +155,19 @@ export async function updateOrderStatus(id: string, status: string, note: string
           item.quantity, item.productId
         )
         if (affected === 0) {
-          logger.warn({ productId: item.productId, quantity: item.quantity, orderId: id }, 'Stock insufficient during admin order confirmation')
+          stockFailed = true
+          logger.error({ productId: item.productId, quantity: item.quantity, orderId: id }, 'Stock decrement failed during admin order confirmation')
         }
       }
+    }
+    // Never leave the order marked paid when the required stock decrement failed.
+    // Revert the status and surface the failure instead of silently succeeding.
+    if (stockFailed) {
+      await prisma.order.update({ where: { id }, data: { status: order.status } })
+      await prisma.orderTimeline.create({
+        data: { orderId: id, status: order.status, note: 'Stock decrement failed — order reverted. Manual review required.' },
+      })
+      throw Object.assign(new Error('Order could not be confirmed: stock decrement failed. Manual review required.'), { status: 409 })
     }
   }
 
@@ -284,18 +300,31 @@ async function restoreStockAndRefund(id: string, order: any) {
     }
   }
 
+  let refunded = false
   if (order.paymentIntentId && order.paymentMethod === 'paypal') {
     const refundResult = await processPaypalRefund(
       order.paymentIntentId, Number(order.total), order.currency || 'USD'
     )
     if (refundResult.success) {
+      refunded = true
       logger.info({ orderId: order.id, orderNumber: order.orderNumber }, 'PayPal refund processed')
     } else {
-      logger.error({ orderId: order.id, error: refundResult.error }, 'PayPal refund failed — still marking as refunded')
+      // Never mark the order as refunded when the actual refund failed — the
+      // customer would show as refunded without the money ever being returned.
+      logger.error({ orderId: order.id, error: refundResult.error }, 'PayPal refund failed — order NOT marked as refunded')
+      await prisma.orderTimeline.create({
+        data: { orderId: id, status: 'cancelled', note: 'PayPal refund FAILED — customer has not been refunded. Manual refund required.' },
+      })
     }
+  } else {
+    // No automated PayPal refund needed (bank transfer / card / no intent id) —
+    // preserve the existing behavior of marking the order refunded.
+    refunded = true
   }
 
-  await prisma.order.update({ where: { id }, data: { paymentStatus: 'refunded' } })
+  if (refunded) {
+    await prisma.order.update({ where: { id }, data: { paymentStatus: 'refunded' } })
+  }
 }
 
 async function sendOrderPaidEmail(id: string, order: any) {

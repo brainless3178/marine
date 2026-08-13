@@ -1,4 +1,4 @@
-import { useTickerNow } from '../components/TickerProvider'
+import { useTickerNow } from './useTickerNow'
 
 export interface Countdown {
   days: number

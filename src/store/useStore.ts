@@ -1,7 +1,16 @@
 import { create } from 'zustand'
 import i18n from 'i18next'
 import type { Language, CartItem, Product, User, PriceRange } from '../types'
-import { adminAuth, customerAuth, setAdminToken, setCustomerToken } from '../lib/api'
+import {
+  adminAuth,
+  customerAuth,
+  getAdminToken,
+  getCustomerToken,
+  refreshAdminSession,
+  refreshCustomerSession,
+  setAdminToken,
+  setCustomerToken,
+} from '../lib/api'
 import { resolveInitialTheme, syncThemeColor } from '../lib/theme'
 
 
@@ -186,6 +195,16 @@ export const useStore = create<AppState>((set, get) => ({
     // Don't store admin PII in localStorage — always validate against the API
     if (!localStorage.getItem('alka-admin-auth')) return
     try {
+      // After a page reload the in-memory admin token is gone. Restore it from
+      // the httpOnly refresh cookie before calling /admin/auth/me.
+      if (!getAdminToken()) {
+        const restored = await refreshAdminSession()
+        if (!restored) {
+          localStorage.removeItem('alka-admin-auth')
+          set({ adminUser: null, isAdminLoggedIn: false })
+          return
+        }
+      }
       const { user } = await adminAuth.me()
       const validRoles = ['owner', 'store-manager', 'inventory-manager', 'sales-agent', 'content-manager', 'viewer']
       if (validRoles.includes(user.role)) {
@@ -314,6 +333,16 @@ export const useStore = create<AppState>((set, get) => ({
     if (!localStorage.getItem('alka-auth')) {
       set({ isLoggedIn: false, user: null, isSessionLoading: false })
       return
+    }
+    // After a page reload the in-memory customer token is gone. Restore it from
+    // the httpOnly refresh cookie before calling /auth/me.
+    if (!getCustomerToken()) {
+      const restored = await refreshCustomerSession()
+      if (!restored) {
+        set({ isLoggedIn: false, user: null, isSessionLoading: false })
+        localStorage.removeItem('alka-auth')
+        return
+      }
     }
     try {
       const { user } = await customerAuth.me()

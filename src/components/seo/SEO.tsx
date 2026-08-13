@@ -212,7 +212,6 @@ export function SEO({
       {keywords && <meta name="keywords" content={keywords} />}
       <link rel="canonical" href={canonicalUrl} />
 
-      {/* hreflang alternate links */}
       {hreflangLinks.map(({ hreflang, href }) => (
         <link key={hreflang} rel="alternate" hrefLang={hreflang} href={href} />
       ))}

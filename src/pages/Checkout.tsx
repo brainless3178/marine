@@ -61,7 +61,8 @@ export default function Checkout() {
 
   const settings = useStoreSettings()
   const subtotal = getCartTotal()
-  const shippingCost = settings.shippingCost
+  // Display-only estimate — the server recalculates and enforces the real totals.
+  const shippingCost = subtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost
   const tax = Math.round(subtotal * settings.taxRate * 100) / 100
   const total = subtotal + shippingCost + tax
 

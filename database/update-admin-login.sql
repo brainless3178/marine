@@ -4,7 +4,7 @@
 --
 -- Sets the admin login credentials to:
 --   • Email:    admin@alkatraders.co
---   • Password: HeyMarineItsMe@007  (bcrypt, 12 rounds)
+--   • Password: change-me  (bcrypt, 12 rounds)
 --
 -- Idempotent: safe to run multiple times. If the admin already exists under
 -- admin@alkatraders.co its hash is updated; otherwise the existing owner
