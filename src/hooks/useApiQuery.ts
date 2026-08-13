@@ -1,8 +1,10 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
+import { queryClient } from '../lib/queryClient'
 import { api, storefront } from '../lib/api'
 import { apiProductToFrontend } from '../lib/adapters'
 import { products as staticProducts } from '../data/products'
-import type { ApiProduct, Pagination, ProductListFilters } from '../lib/api-types'
+import { industries as staticIndustries } from '../data/industries'
+import type { ApiOrder, ApiProduct, Pagination, ProductListFilters } from '../lib/api-types'
 import type { Product } from '../types'
 
 // ─── Query Key Factory ─────────────────────────────────────────
@@ -20,6 +22,12 @@ const queryKeys = {
   },
   brands: {
     all: ['brands'] as const,
+  },
+  industries: {
+    all: ['industries'] as const,
+  },
+  orders: {
+    mine: ['orders', 'mine'] as const,
   },
 }
 
@@ -109,6 +117,78 @@ export function useBrands() {
     queryKey: queryKeys.brands.all,
     queryFn: () => api.get<{ brands: any[] }>('/storefront/brands'),
     staleTime: 15 * 60 * 1000,
+  })
+}
+
+/**
+ * Industries with API→static fallback. Shared by the Industries page and the
+ * homepage IndustriesTabs section — one query key, one cache, no duplicate
+ * fetches, and hover-prefetchable from the navbar.
+ */
+export function useIndustries() {
+  return useQuery({
+    queryKey: queryKeys.industries.all,
+    queryFn: async () => {
+      try {
+        const res = await storefront.industries.list()
+        if (res.industries?.length) {
+          return res.industries.map((i: any) => ({
+            id: i.slug || i.id,
+            name: i.name,
+            icon: i.icon || 'Ship',
+            description: i.description || '',
+            painPoints: i.painPoints || [],
+            productCount: i._count?.products ?? i.productCount ?? 0,
+          }))
+        }
+      } catch {
+        // Fall through to static data.
+      }
+      return staticIndustries
+    },
+    // Paint the static industries immediately while the query resolves, so
+    // the section/page never shows a "Loading..." flash.
+    placeholderData: staticIndustries,
+    staleTime: 15 * 60 * 1000,
+  })
+}
+
+/**
+ * Warm the data for a top-level nav page on link hover, so navigating there
+ * renders instantly. Keys must match the hooks' keys for cache sharing.
+ */
+export function prefetchNavData(path: string) {
+  if (path === '/products' || path === '/shop') {
+    void queryClient.prefetchQuery({
+      queryKey: queryKeys.products.list(undefined),
+      queryFn: () => api.get('/storefront/products'),
+      staleTime: 5 * 60 * 1000,
+    })
+  } else if (path === '/brands') {
+    void queryClient.prefetchQuery({
+      queryKey: queryKeys.brands.all,
+      queryFn: () => api.get<{ brands: any[] }>('/storefront/brands'),
+      staleTime: 15 * 60 * 1000,
+    })
+  } else if (path === '/industries') {
+    void queryClient.prefetchQuery({
+      queryKey: queryKeys.industries.all,
+      queryFn: () => storefront.industries.list(),
+      staleTime: 15 * 60 * 1000,
+    })
+  }
+}
+
+/** Current customer's order history — cache for 30s so tracking refreshes feel live. */
+export function useOrders(enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.orders.mine,
+    queryFn: async () => {
+      const res = await storefront.orders.list()
+      return (res.orders || []) as ApiOrder[]
+    },
+    enabled,
+    staleTime: 30 * 1000,
   })
 }
 

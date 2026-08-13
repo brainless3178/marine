@@ -4,8 +4,11 @@ import { MapPin, Clock, Phone, Mail, Send, Check, Loader2 } from 'lucide-react'
 import { offices } from '../data/testimonials'
 import { storefront } from '../lib/api'
 import { useStoreSettings } from '../hooks/useStoreSettings'
+import { usePersistentState } from '../hooks/usePersistentState'
 import { SEO } from '../components/seo/SEO'
 import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
+
+const INITIAL_CONTACT_FORM = { name: '', email: '', subject: '', message: '' }
 
 export default function Contact() {
   const { t } = useTranslation()
@@ -13,7 +16,8 @@ export default function Contact() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { whatsappNumber, phoneNumber, rfqEmail } = useStoreSettings()
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
+  // Draft survives hard refresh — a half-written message is never lost.
+  const [form, setForm] = usePersistentState('alka-contact-draft', INITIAL_CONTACT_FORM)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,8 +31,7 @@ export default function Contact() {
         message: form.message,
       })
       setSubmitted(true)
-      setForm({ name: '', email: '', subject: '', message: '' })
-      // Keep success message visible until user interacts
+      setForm(INITIAL_CONTACT_FORM) // Draft fulfilled — start clean next time.
     } catch (err: any) {
       setError(err.message || 'Failed to send message. Please try again.')
     } finally {

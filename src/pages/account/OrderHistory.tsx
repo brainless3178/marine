@@ -1,20 +1,9 @@
-import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Package, Eye, Clock, Truck, CheckCircle, XCircle, ChevronRight } from 'lucide-react'
-import { storefront } from '../../lib/api'
+import { useOrders } from '../../hooks/useApiQuery'
 import { useStore } from '../../store/useStore'
-
-interface Order {
-  id: string
-  orderNumber: string
-  status: string
-  paymentStatus: string
-  grandTotal: number
-  currency: string
-  createdAt: string
-  items: { productName: string; quantity: number; unitPrice: number }[]
-  shipping: { fullName: string; city: string; country: string }
-}
+import { Skeleton } from '../../components/ui/Skeleton'
 
 const statusConfig: Record<string, { color: string; icon: typeof Package }> = {
   pending: { color: 'text-[var(--text-muted)]', icon: Clock },
@@ -31,22 +20,14 @@ const statusConfig: Record<string, { color: string; icon: typeof Package }> = {
 export default function OrderHistory() {
   const navigate = useNavigate()
   const user = useStore((s) => s.user)
-  const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/')
-      return
-    }
-    storefront.orders.list()
-      .then((res) => setOrders(res.orders))
-      .catch((err) => setError(err.message || 'Failed to load orders'))
-      .finally(() => setLoading(false))
-  }, [user, navigate])
+  if (!user) {
+    navigate('/')
+    return null
+  }
 
-  if (!user) return null
+  const { data: orders, isLoading, isError, error } = useOrders(Boolean(user))
+  const errorMessage = error instanceof Error ? error.message : 'Failed to load orders'
 
   return (
     <div className="min-h-screen bg-[var(--primary-bg)]">
@@ -65,15 +46,21 @@ export default function OrderHistory() {
 
       <section className="py-10">
         <div className="max-w-[1024px] mx-auto px-4 sm:px-6">
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin" />
+          {isLoading ? (
+            <div className="space-y-4" aria-hidden>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
+                  <Skeleton className="h-4 w-1/3 mb-3" />
+                  <Skeleton className="h-3 w-1/2 mb-4" />
+                  <Skeleton className="h-3 w-2/3" />
+                </div>
+              ))}
             </div>
-          ) : error ? (
+          ) : isError ? (
             <div className="text-center py-20">
-              <p className="text-sm text-[var(--danger)]">{error}</p>
+              <p className="text-sm text-[var(--danger)]">{errorMessage}</p>
             </div>
-          ) : orders.length === 0 ? (
+          ) : !orders || orders.length === 0 ? (
             <div className="text-center py-20">
               <Package size={48} className="text-[var(--text-muted)] mx-auto mb-4" />
               <h2 className="font-display text-xl font-bold text-[var(--text-primary)] mb-2">No orders yet</h2>

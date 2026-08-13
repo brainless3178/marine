@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Shield, Clock, Globe, Mail, ChevronDown, Phone, Calendar, Zap, TriangleAlert, Loader2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { useStoreSettings } from '../hooks/useStoreSettings'
+import { usePersistentState } from '../hooks/usePersistentState'
 import { faqItems } from '../data/testimonials'
 import { countries } from '../data/countries'
 import { storefront } from '../lib/api'
@@ -22,27 +23,30 @@ const roles = [
   { value: 'other', label: 'Other' },
 ]
 
+const INITIAL_RFQ_FORM: RFQFormData = {
+  fullName: '',
+  company: '',
+  email: '',
+  phone: '',
+  country: 'IN',
+  role: '',
+  productDesc: '',
+  partNumber: '',
+  brand: '',
+  quantity: 1,
+  deliveryLocation: '',
+  urgency: 'standard',
+  notes: '',
+  source: '',
+  consent: false,
+}
+
 export default function RFQ() {
   const { t } = useTranslation()
   const { rfqStep, setRfqStep, rfqSubmitted, rfqId, setRfqSubmitted, generateRfqId, rfqDeadline, setRfqDeadline } = useStore()
   const { whatsappNumber, phoneNumber, rfqEmail } = useStoreSettings()
-  const [formData, setFormData] = useState<RFQFormData>({
-    fullName: '',
-    company: '',
-    email: '',
-    phone: '',
-    country: 'IN',
-    role: '',
-    productDesc: '',
-    partNumber: '',
-    brand: '',
-    quantity: 1,
-    deliveryLocation: '',
-    urgency: 'standard',
-    notes: '',
-    source: '',
-    consent: false,
-  })
+  // Draft persists across hard refresh — a multi-step inquiry is never lost.
+  const [formData, setFormData] = usePersistentState<RFQFormData>('alka-rfq-page-draft', INITIAL_RFQ_FORM)
   const [errors, setErrors] = useState<Record<string, boolean>>({})
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -112,6 +116,7 @@ export default function RFQ() {
       setRfqDeadline(getRfqResponseDeadline(formData.urgency))
       setRfqSubmitted(true)
       setRfqStep(1) // Reset step for next submission
+      setFormData(INITIAL_RFQ_FORM) // Draft fulfilled — start clean next time.
     } catch (err: any) {
       setSubmitError(err.message || 'Failed to submit RFQ. Please try again or contact us via WhatsApp.')
     } finally {

@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SectionLabel } from '../ui/SectionLabel'
-import { storefront } from '../../lib/api'
-import { industries as staticIndustries } from '../../data/industries'
+import { useIndustries } from '../../hooks/useApiQuery'
 import { Ship, Anchor, Flame, Zap, Factory, FlaskConical, ArrowRight } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -12,37 +11,17 @@ const iconMap: Record<string, LucideIcon> = {
 
 interface IndustryItem { id: string; name: string; icon: string; description: string; painPoints: string[] }
 
-// Static fallback so the section always renders content, even when the
-// storefront API is slow, empty, or unreachable.
-const FALLBACK_INDUSTRIES: IndustryItem[] = staticIndustries.map((i) => ({
-  id: i.id, name: i.name, icon: i.icon || 'Ship',
-  description: i.description || '', painPoints: i.painPoints || [],
-}))
-
 export function IndustriesTabs() {
   const { t } = useTranslation()
-  const [industries, setIndustries] = useState<IndustryItem[]>(FALLBACK_INDUSTRIES)
-  const [active, setActive] = useState(FALLBACK_INDUSTRIES[0]?.id || '')
 
-  useEffect(() => {
-    let cancelled = false
-    storefront.industries.list()
-      .then((res) => {
-        // Prefer live API data when available; otherwise keep the static fallback.
-        if (!cancelled && res.industries?.length) {
-          const mapped = res.industries.map((i: any) => ({
-            id: i.slug || i.id, name: i.name, icon: i.icon || 'Ship',
-            description: i.description || '', painPoints: i.painPoints || [],
-          }))
-          setIndustries(mapped)
-          setActive((prev) => prev || mapped[0].id)
-        }
-      })
-      .catch(() => { /* API unavailable — keep static fallback */ })
-    return () => { cancelled = true }
-  }, [])
+  // Shared react-query cache (same key as the /industries page): API data with
+  // a built-in static fallback, so the section always renders real content.
+  const { data } = useIndustries()
+  const industries: IndustryItem[] = (data || []) as IndustryItem[]
+  const [active, setActive] = useState('')
+  const currentActive = active || industries[0]?.id || ''
 
-  const current = industries.find((i) => i.id === active) || industries[0]
+  const current = industries.find((i) => i.id === currentActive) || industries[0]
   const Icon = current ? (iconMap[current.icon] || Ship) : Ship
 
   return (
@@ -65,7 +44,7 @@ export function IndustriesTabs() {
         {/* Tab buttons */}
         <div className="flex gap-2.5 overflow-x-auto flex-nowrap md:flex-wrap mb-8 -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-none">
           {industries.map((ind) => {
-            const isActive = active === ind.id
+            const isActive = currentActive === ind.id
             return (
               <button
                 key={ind.id}

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { useStoreSettings } from '../../hooks/useStoreSettings'
+import { prefetchNavData } from '../../hooks/useApiQuery'
 import { ThemeToggle } from '../ui/ThemeToggle'
 import { WhatsAppIcon } from '../ui/WhatsAppIcon'
 import { useLocale, useLocalizedPath, switchLocalePath } from '../../lib/locale'
@@ -234,6 +235,7 @@ export function Navbar() {
                 <Link
                   key={link.path}
                   to={localizedTo}
+                  onMouseEnter={() => prefetchNavData(link.path)}
                   className={`group relative text-sm font-semibold no-underline transition-colors ${
                     isActive ? 'text-[var(--accent-primary)]' : 'text-[var(--nav-text-muted)] hover:text-[var(--nav-text)]'
                   }`}

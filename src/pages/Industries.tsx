@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Ship, Anchor, Flame, Zap, Factory, FlaskConical } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { storefront } from '../lib/api'
-import { industries as staticIndustries } from '../data/industries'
+import { useIndustries } from '../hooks/useApiQuery'
 import { SEO } from '../components/seo/SEO'
 import { BreadcrumbJsonLd } from '../components/seo/BreadcrumbJsonLd'
-import type { Industry } from '../types'
+import { Skeleton } from '../components/ui/Skeleton'
 
 const iconMap: Record<string, LucideIcon> = {
   Ship, Anchor, Flame, Zap, Factory, FlaskConical,
@@ -14,30 +13,11 @@ const iconMap: Record<string, LucideIcon> = {
 
 export default function Industries() {
   const { t } = useTranslation()
-  const [industries, setIndustries] = useState<Industry[]>([])
 
-  useEffect(() => {
-    let cancelled = false
-    storefront.industries.list().then((res) => {
-      if (!cancelled && res.industries?.length) {
-        setIndustries(res.industries.map((i: any) => ({
-          id: i.slug || i.id,
-          name: i.name,
-          icon: i.icon || 'Ship',
-          description: i.description || '',
-          painPoints: i.painPoints || [],
-          productCount: i._count?.products ?? i.productCount ?? 0,
-        })))
-      } else if (!cancelled) {
-        // Fall back to static industries if API returns empty
-        setIndustries(staticIndustries)
-      }
-    }).catch(() => {
-      // Fall back to static industries if API is unavailable
-      if (!cancelled) setIndustries(staticIndustries)
-    })
-    return () => { cancelled = true }
-  }, [])
+  // React Query with API→static fallback + shared cache (same key as the
+  // homepage IndustriesTabs), and hover-prefetchable from the navbar.
+  const { data, isLoading } = useIndustries()
+  const industries = data || []
 
   const [active, setActive] = useState('')
 
@@ -73,7 +53,17 @@ export default function Industries() {
 
       <section className="py-16">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          {industries.length === 0 ? (
+          {isLoading && industries.length === 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-hidden>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+                  <Skeleton className="h-6 w-2/3 mb-3" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
+              ))}
+            </div>
+          ) : industries.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-sm text-[var(--text-muted)]">Loading industries...</p>
             </div>

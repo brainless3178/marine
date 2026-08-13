@@ -3,9 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { motion, useInView } from 'framer-motion'
 import { Clock, Phone, Mail, TriangleAlert, Check, Loader2 } from 'lucide-react'
 import { useStoreSettings } from '../hooks/useStoreSettings'
+import { usePersistentState } from '../hooks/usePersistentState'
 import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
 import { storefront } from '../lib/api'
 import { SEO } from '../components/seo/SEO'
+
+const INITIAL_EMERGENCY_FORM = { name: '', phone: '', partDescription: '', vesselName: '' }
 
 export default function Emergency() {
   const { t } = useTranslation()
@@ -15,7 +18,8 @@ export default function Emergency() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { whatsappNumber, phoneNumber, emergencyEmail } = useStoreSettings()
-  const [form, setForm] = useState({ name: '', phone: '', partDescription: '', vesselName: '' })
+  // Draft survives hard refresh — critical for an emergency form.
+  const [form, setForm] = usePersistentState('alka-emergency-draft', INITIAL_EMERGENCY_FORM)
 
   return (
     <div className="relative">
@@ -129,7 +133,7 @@ export default function Emergency() {
                 vesselName: form.vesselName || undefined,
               })
               setSubmitted(true)
-              setForm({ name: '', phone: '', partDescription: '', vesselName: '' })
+              setForm(INITIAL_EMERGENCY_FORM) // Draft fulfilled — start clean next time.
             } catch (err: any) {
               setError(err.message || 'Failed to submit emergency request. Please call us directly.')
             } finally {
