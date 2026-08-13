@@ -38,6 +38,7 @@ const RefundPolicy = lazy(() => import('./pages/RefundPolicy'))
 import { CookieConsent } from './components/CookieConsent'
 import { PayPalProvider } from './components/PayPalProvider'
 import { WhatsAppFloat } from './components/WhatsAppFloat'
+import { PageSkeleton } from './components/ui/Skeleton'
 
 // Admin
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })))
@@ -63,11 +64,9 @@ const AdminProductForm = lazy(() => import('./pages/admin/AdminProductForm'))
 const AdminInsights = lazy(() => import('./pages/admin/AdminInsights'))
 
 function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center min-h-[50vh]">
-      <div className="w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent animate-spin" />
-    </div>
-  )
+  // Skeleton page instead of a bare spinner: the layout (header + product
+  // grid shapes) is already painted, so lazy route loads never flash white.
+  return <PageSkeleton />
 }
 
 /**

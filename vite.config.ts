@@ -87,6 +87,19 @@ export default defineConfig(({ mode }) => {
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
             return 'vendor'
           }
+          // Animation library — big, and shared by many pages; own chunk = one
+          // long-lived cached file instead of re-fetching per page bundle.
+          if (id.includes('node_modules/framer-motion')) {
+            return 'anim'
+          }
+          // Icon library — huge source, tree-shaken at build; isolated so its
+          // cache never invalidates other app code.
+          if (id.includes('node_modules/lucide-react')) {
+            return 'icons'
+          }
+          // NOTE: i18next stays in the entry chunk on purpose — main.tsx
+          // initializes it synchronously at boot, so it's on the critical path.
+
           // Three.js scene (only loaded on /network)
           if (id.includes('node_modules/three/') || id.includes('node_modules/@react-three/')) {
             return 'three'

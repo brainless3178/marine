@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, Phone, MapPin } from 'lucide-react'
 import { WhatsAppIcon } from '../ui/WhatsAppIcon'
@@ -14,7 +15,9 @@ import { useStoreSettings } from '../../hooks/useStoreSettings'
 import { getStaticImageUrl } from '@/lib/utils'
 import { useLocalizedPath } from '../../lib/locale'
 
-export function Footer() {
+// Memoized: Footer reads no route state, so it must not re-render on every
+// navigation — only when its props/settings/i18n actually change.
+export const Footer = memo(function Footer() {
   const { t } = useTranslation()
   const settings = useStoreSettings()
   const lp = useLocalizedPath()
@@ -104,4 +107,4 @@ export function Footer() {
       </div>
     </footer>
   )
-}
+})

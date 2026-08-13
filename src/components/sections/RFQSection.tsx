@@ -6,6 +6,19 @@ import { useStoreSettings } from '../../hooks/useStoreSettings'
 import { WhatsAppIcon } from '../ui/WhatsAppIcon'
 import { ResponseCountdown } from '../ui/ResponseCountdown'
 import { getRfqResponseDeadline } from '../../lib/rfqSla'
+import { usePersistentState } from '../../hooks/usePersistentState'
+
+// Stable initial shape so the persisted draft (usePersistentState) and the
+// reset-on-submit both reference the same defaults.
+const INITIAL_RFQ = {
+  name: '',
+  company: '',
+  email: '',
+  phone: '',
+  productDesc: '',
+  quantity: '1',
+  urgency: 'standard',
+}
 
 export function RFQSection() {
   const { t } = useTranslation()
@@ -18,15 +31,9 @@ export function RFQSection() {
   }, [])
   const { rfqSubmitted, rfqId, setRfqSubmitted, generateRfqId, rfqDeadline, setRfqDeadline } = useStore()
   const settings = useStoreSettings()
-  const [formData, setFormData] = useState({
-    name: '',
-    company: '',
-    email: '',
-    phone: '',
-    productDesc: '',
-    quantity: '1',
-    urgency: 'standard',
-  })
+  // Persisted draft: a customer who hard-refreshes (or fat-fingers F5) keeps
+  // every field they already typed instead of losing the whole form.
+  const [formData, setFormData] = usePersistentState<typeof INITIAL_RFQ>('alka-rfq-draft', INITIAL_RFQ)
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isTouchDevice) return
@@ -39,6 +46,8 @@ export function RFQSection() {
     generateRfqId()
     setRfqDeadline(getRfqResponseDeadline(formData.urgency))
     setRfqSubmitted(true)
+    // Draft fulfilled — clear it so the next visit starts clean.
+    setFormData(INITIAL_RFQ)
   }
 
   if (rfqSubmitted) {

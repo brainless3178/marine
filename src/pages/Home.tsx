@@ -19,6 +19,7 @@ const RFQSection = lazy(() => import('../components/sections/RFQSection').then(m
 const Testimonials = lazy(() => import('../components/sections/Testimonials').then(m => ({ default: m.Testimonials })))
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { ProductCard } from '../components/ui/ProductCard'
+import { ProductCardSkeleton } from '../components/ui/Skeleton'
 
 const ecommerceCategories = [
   { icon: Anchor, label: 'Ship Spares', href: '/products?search=ship%20spares', copy: 'Deck, engine room, bridge, and vessel maintenance parts.' },
@@ -300,7 +301,13 @@ export default function Home() {
         </div>
       </section>
 
-      <Suspense fallback={<div className="h-40 flex items-center justify-center text-sm text-[var(--text-muted)]">Loading sections...</div>}>
+      <Suspense fallback={
+        <div className="site-container grid grid-cols-1 gap-5 py-10 sm:grid-cols-2 lg:grid-cols-3" aria-hidden>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      }>
         <StatsBar />
         <HowItWorks />
         <IndustriesTabs />
