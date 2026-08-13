@@ -69,12 +69,37 @@ if (!fs.existsSync(indexPath)) {
 </body></html>`);
   });
 } else {
-  // Serve the built SPA
-  app.use(express.static(distPath));
+  // Serve the built SPA with cache headers that match Vite's hashed output:
+  //  - /assets/* (content-hashed js/css) + hashed root files: immutable, 1 year
+  //    (the hash changes on every deploy, so a long maxAge is safe — repeat
+  //    visits never re-download unchanged bundles)
+  //  - index.html / sw.js: no-cache (must revalidate so updates ship instantly)
+  const HASHED_FILE = /[0-9a-f]{8}/i;
+  const ONE_YEAR = 60 * 60 * 24 * 365;
+  app.use(
+    express.static(distPath, {
+      etag: true,
+      lastModified: true,
+      index: false, // index.html is handled below with a no-cache header
+      setHeaders(res, filePath) {
+        if (filePath.endsWith("index.html") || filePath.endsWith("sw.js")) {
+          // Shell + service worker gate updates — never long-cache them.
+          res.setHeader("Cache-Control", "no-cache");
+        } else if (filePath.includes("/assets/") || HASHED_FILE.test(filePath)) {
+          // Content-hashed bundles/images are immutable by design.
+          res.setHeader("Cache-Control", `public, max-age=${ONE_YEAR}, immutable`);
+        } else {
+          // Un-hashed static files (manifest, icons): short cache + ETag.
+          res.setHeader("Cache-Control", "public, max-age=3600");
+        }
+      },
+    })
+  );
 
   // SPA fallback — any non-asset route returns index.html so client-side
   // routing (e.g. /products, /admin) works on refresh / deep links.
   app.get("*", (_req, res) => {
+    res.setHeader("Cache-Control", "no-cache");
     res.sendFile(indexPath);
   });
 }

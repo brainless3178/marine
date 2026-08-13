@@ -71,6 +71,7 @@ import { loginLimiter, registerLimiter, passwordResetLimiter } from './middlewar
 import { createUserAwareLimiter } from './middleware/perUserRateLimit.js'
 import { sendSuccess, sendError } from './middleware/response.js'
 import { apiDeprecationMiddleware, API_VERSION } from './middleware/api-version.js'
+import { cacheGet } from './middleware/cacheGet.js'
 
 // ─── Database ──────────────────────────────────────────────────
 // Constructed in ./utils/prismaClient.js so it can select the right driver
@@ -294,6 +295,12 @@ app.get('/api/v1/info', (_req, res) => {
 
 // ─── API Deprecation Middleware ─────────────────────────────────
 app.use(apiDeprecationMiddleware)
+
+// ─── GET Response Cache (before routes) ────────────────────────
+// Serves whitelisted storefront GETs (settings, categories, brands, ...)
+// from an in-memory node-cache for 5 minutes, skipping the database entirely
+// — kills repeat Neon cold-start hits on static data.
+app.use(cacheGet)
 
 // ─── Admin Routes ──────────────────────────────────────────────
 // ─── API Versioning ─────────────────────────────────────────────
