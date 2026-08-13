@@ -154,6 +154,7 @@ function AppContent() {
   const isSessionLoading = useStore((s) => s.isSessionLoading)
   const loadAdminSession = useStore((s) => s.loadAdminSession)
   const loadCustomerSession = useStore((s) => s.loadCustomerSession)
+  const refreshCartPrices = useStore((s) => s.refreshCartPrices)
 
   // Neon free-tier cold-start wake. When the database compute has scaled to
   // zero (~5 min idle), the first API request would otherwise be slow or fail.
@@ -177,7 +178,9 @@ function AppContent() {
   useEffect(() => {
     if (localStorage.getItem('alka-admin-auth')) loadAdminSession()
     if (localStorage.getItem('alka-auth')) loadCustomerSession()
-  }, [loadAdminSession, loadCustomerSession])
+    // Refresh any persisted cart against fresh product prices on boot.
+    refreshCartPrices()
+  }, [loadAdminSession, loadCustomerSession, refreshCartPrices])
 
   if (isSessionLoading) {
     return (

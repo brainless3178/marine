@@ -146,9 +146,9 @@ export default function TermsOfService() {
             <section className="mb-6">
               <h2 className="font-display text-lg font-bold text-[var(--text-primary)] mb-3">Shipping Charges</h2>
               <ul className="list-disc pl-5 space-y-1 text-sm">
-                <li>Orders below $100 will be charged a fixed $15 freight</li>
-                <li>Orders above $100 having weight up to 250 kgs will be charged $0 freight (if agreed)</li>
-                <li>Orders above $100 having weight above 250 kgs may attract extra freight. BUYER has to contact SELLER to choose shipping options from Airport delivery, Door delivery &amp; Sea delivery which may have different freight costs.</li>
+                <li>Orders below $500 will be charged a fixed $15 freight</li>
+                <li>Orders at or above $500 having weight up to 250 kgs will be charged $0 freight</li>
+                <li>Orders at or above $500 having weight above 250 kgs may attract extra freight. BUYER has to contact SELLER to choose shipping options from Airport delivery, Door delivery &amp; Sea delivery which may have different freight costs.</li>
               </ul>
             </section>
 

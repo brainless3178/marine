@@ -10,7 +10,9 @@ import {
   refreshCustomerSession,
   setAdminToken,
   setCustomerToken,
+  storefront,
 } from '../lib/api'
+import { apiProductToFrontend, apiProductsToFrontend } from '../lib/adapters'
 import { resolveInitialTheme, syncThemeColor } from '../lib/theme'
 
 
@@ -101,6 +103,7 @@ interface AppState {
   removeFromCart: (productId: string) => void
   updateQuantity: (productId: string, qty: number) => void
   clearCart: () => void
+  refreshCartPrices: () => Promise<void>
   getCartTotal: () => number
   getCartCount: () => number
   cartTotal: number
@@ -393,6 +396,53 @@ export const useStore = create<AppState>((set, get) => ({
   clearCart: () => {
     set({ cart: [], cartTotal: 0, cartCount: 0 })
     saveState('cart', [])
+  },
+  // Re-validate persisted cart prices against fresh storefront data so a price
+  // or sale change by an admin propagates to the drawer/checkout estimate.
+  // The server recomputes totals on order creation and remains authoritative.
+  refreshCartPrices: async () => {
+    const { cart } = get()
+    if (cart.length === 0) return
+    try {
+      const ids = [...new Set(cart.map((item) => item.product.id))]
+      const res = await storefront.products.list({ limit: '100' })
+      const live = new Map(apiProductsToFrontend(res.products).map((p) => [p.id, p]))
+
+      // Carts can exceed the list page size or reference items filtered out of
+      // the list — fetch those individually through the existing product API.
+      const missing = ids.filter((id) => !live.has(id))
+      if (missing.length > 0) {
+        const fetched = await Promise.all(
+          missing.map((id) =>
+            storefront.products.get(id)
+              .then((r) => r.product)
+              .catch(() => null)
+          )
+        )
+        for (const apiProduct of fetched) {
+          if (apiProduct) {
+            const frontend = apiProductToFrontend(apiProduct)
+            live.set(frontend.id, frontend)
+          }
+        }
+      }
+
+      // Replace each persisted snapshot with the fresh product, dropping items
+      // whose product no longer exists. Quantities are preserved.
+      const newCart = cart
+        .map((item) => {
+          const fresh = live.get(item.product.id)
+          return fresh ? { ...item, product: fresh } : null
+        })
+        .filter((x): x is CartItem => x !== null)
+
+      saveState('cart', newCart)
+      set({ cart: newCart, ...computeCartTotals(newCart) })
+    } catch {
+      // Never block the app on a refresh — the cached estimate is harmless and
+      // the server-side totals stay authoritative.
+      console.warn('[store] Cart price refresh failed — keeping cached prices')
+    }
   },
   cartTotal: 0,
   cartCount: 0,

@@ -3,6 +3,7 @@ import { logAudit } from '../utils/audit.js'
 import { sendOrderConfirmation } from './emailSenders.js'
 import logger from '../utils/logger.js'
 import { getPaypalAccessToken, PAYPAL_BASE, PAYPAL_WEBHOOK_ID } from '../utils/paypal.js'
+import { paypalReturnUrl, paypalCancelUrl } from '../utils/paypalUrls.js'
 import type { Prisma } from '@prisma/client'
 
 const hookLog = logger.child({ context: 'paypal-service' })
@@ -225,8 +226,8 @@ export async function createPaypalOrder(orderId: string, userId: string) {
         brand_name: 'Alka Traders',
         landing_page: 'BILLING',
         user_action: 'PAY_NOW',
-        return_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout?paypal=success&orderId=${orderId}`,
-        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout?paypal=cancelled`,
+        return_url: paypalReturnUrl(orderId),
+        cancel_url: paypalCancelUrl(),
       },
     }),
   })
