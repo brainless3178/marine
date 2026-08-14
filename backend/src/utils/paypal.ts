@@ -5,7 +5,7 @@ const paypalLog = logger.child({ context: 'paypal' })
 export const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || ''
 export const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || ''
 export const PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID || ''
-export const PAYPAL_BASE = process.env.PAYPAL_MODE === 'live'
+export const PAYPAL_BASE = process.env.PAYPAL_MODE?.toLowerCase() === 'live'
   ? 'https://api-m.paypal.com'
   : 'https://api-m.sandbox.paypal.com'
 
