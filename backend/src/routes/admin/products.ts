@@ -38,7 +38,12 @@ const productSchema = z.object({
   sortPriority: z.number().optional(),
   seoTitle: z.string().optional().nullable(),
   seoDescription: z.string().optional().nullable(),
-  seoKeywords: z.string().optional().nullable(),
+  // Accept both a single string and an array of strings (older clients / CSV
+  // imports may send either); normalize to the DB's single Text column.
+  seoKeywords: z.union([z.string(), z.array(z.string())])
+    .optional()
+    .nullable()
+    .transform((v) => Array.isArray(v) ? v.join(', ') : v),
   ogImageUrl: z.string().optional().nullable(),
   canonicalUrl: z.string().optional().nullable(),
   internalNotes: z.string().optional().nullable(),
