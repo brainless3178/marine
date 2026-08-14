@@ -10,6 +10,7 @@ router.use(authenticateAdmin)
 
 const categorySchema = z.object({
   name: z.string().min(1).max(255),
+  slug: z.string().max(255).optional(),
   description: z.string().optional().nullable(),
   parentId: z.string().uuid().optional().nullable(),
   icon: z.string().optional().nullable(),

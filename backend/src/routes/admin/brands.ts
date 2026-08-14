@@ -10,6 +10,7 @@ router.use(authenticateAdmin)
 
 const brandSchema = z.object({
   name: z.string().min(1).max(255),
+  slug: z.string().max(255).optional(),
   logoUrl: z.string().optional().nullable(),
   sectors: z.array(z.string()).optional(),
   description: z.string().optional().nullable(),

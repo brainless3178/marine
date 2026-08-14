@@ -142,7 +142,7 @@ export default function AdminUsers() {
   }
 
   const handleInvite = async () => {
-    if (!inviteForm.email.trim()) return
+    if (!inviteForm.email.trim()) { toast('Email is required', 'error'); return }
     try {
       // Generate a random temporary password
       const tempPassword = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 6).toUpperCase() + '!1'

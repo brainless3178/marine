@@ -256,9 +256,8 @@ export function useProductForm() {
   // ── Helpers ──
 
   const tabErrors: Record<TabId, boolean> = {
-    // Only the product name is mandatory — SKU/brand/category are optional
-    // (SKU is auto-generated from the name when left blank).
-    basics: !form.name.trim(),
+    // No mandatory fields — admins can save partial drafts.
+    basics: false,
     images: false,
     pricing: !!(form.salePrice && form.regularPrice && Number(form.salePrice) >= Number(form.regularPrice))
       || !!(form.salePrice && !isSaleWindowValid(form.saleStartsAt, form.saleEndsAt))
@@ -317,10 +316,8 @@ export function useProductForm() {
 
   const validate = useCallback((): Record<string, string> => {
     const e: Record<string, string> = {}
-    // Only the product name is mandatory. Everything else is optional so an
-    // admin can list a product without being blocked on partial data.
-    if (!form.name.trim()) e.name = 'Product name is required'
     // Pricing rules only fire when the fields are actually filled in.
+    // No required-field blocks — admins can save partial drafts.
     if (form.salePrice && form.regularPrice && Number(form.salePrice) >= Number(form.regularPrice)) {
       e.salePrice = 'Sale price must be lower than regular price'
     }
@@ -331,7 +328,7 @@ export function useProductForm() {
       e.minimumOfferPrice = 'Minimum offer price must be greater than 0'
     }
     return e
-  }, [form.name, form.salePrice, form.regularPrice, form.saleStartsAt, form.saleEndsAt, form.makeOfferEnabled, form.minimumOfferPrice])
+  }, [form.salePrice, form.regularPrice, form.saleStartsAt, form.saleEndsAt, form.makeOfferEnabled, form.minimumOfferPrice])
 
   const isValid = Object.keys(validate()).length === 0
 
@@ -409,20 +406,19 @@ export function useProductForm() {
       }
 
       // Auto-create brand if it's a new name (not a UUID)
+      // Non-blocking: if brand creation fails, save the product without a brand
+      // so the admin isn't stuck losing all their work.
       let brandId = form.brand
       if (brandId && !isUuid(brandId)) {
         try {
           const res = await admin.brands.create({ name: brandId })
           brandId = res.brand.id
-          // Update the brand list so it appears in future suggestions
           setBrandList((prev) => { const exists = prev.find(b => b.id === brandId); return exists ? prev : [...prev, { id: brandId, name: form.brand }] })
-          // Update form with the new brand ID
           updateField('brand', brandId)
         } catch (err: unknown) {
           const msg = (err as { message?: string }).message || 'Failed to create brand'
-          setErrors((prev) => ({ ...prev, brand: msg }))
-          setSaving(false)
-          return
+          toast(`${msg} — saving product without brand`, 'error')
+          brandId = null
         }
       }
 

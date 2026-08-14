@@ -9,8 +9,8 @@ const router = Router()
 router.use(authenticateAdmin)
 
 const productSchema = z.object({
-  name: z.string().min(1).max(500),
-  sku: z.string().min(1).max(100),
+  name: z.string().max(500).optional(),
+  sku: z.string().max(100).optional(),
   brandId: z.string().uuid().optional().nullable(),
   categoryId: z.string().uuid().optional().nullable(),
   status: z.enum(['draft', 'published', 'hidden', 'archived']).optional(),

@@ -255,6 +255,14 @@ export default function AdminMedia() {
         <div
           className={`rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${uploading ? 'border-[var(--accent-gold)] bg-[var(--gold-muted)]' : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-gold)] cursor-pointer'}`}
           onClick={() => { if (!uploading) fileInputEl?.click() }}
+          onDragOver={(e) => { e.preventDefault(); if (!uploading) e.currentTarget.classList.add('border-[var(--accent-gold)]') }}
+          onDragLeave={(e) => e.currentTarget.classList.remove('border-[var(--accent-gold)]')}
+          onDrop={async (e) => {
+            e.preventDefault()
+            e.currentTarget.classList.remove('border-[var(--accent-gold)]')
+            const files = e.dataTransfer.files
+            if (files?.length) handleUpload(files)
+          }}
         >
           {uploading ? (
             <div className="flex items-center justify-center gap-3">

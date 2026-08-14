@@ -10,6 +10,7 @@ router.use(authenticateAdmin)
 
 const industrySchema = z.object({
   name: z.string().min(1).max(255),
+  slug: z.string().max(255).optional(),
   icon: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   painPoints: z.array(z.string()).optional(),
