@@ -402,7 +402,12 @@ async function shutdown(signal: string, exitCode: number) {
 }
 
 async function main() {
+  // Greppable lifecycle markers: these five lines tell the whole startup story
+  // in one log file. Absent SERVER_LISTENING = the process never reached
+  // listen() (crash, missing env, or never launched — Hostinger side).
+  startupLogger.info('SERVER_STARTING')
   httpServer = app.listen(PORT, '0.0.0.0', async () => {
+    startupLogger.info('SERVER_LISTENING')
     startupLogger.info({ port: PORT }, 'Server started')
     startupLogger.info(`Health check: http://localhost:${PORT}/api/health`)
 
@@ -424,11 +429,12 @@ async function main() {
     // Retry DB connection up to 3 times with exponential backoff.
     // Each attempt is bounded: a firewall that silently drops packets would
     // otherwise leave $connect() pending forever and this loop never finishes.
+    dbLogger.info('DATABASE_INITIALIZATION')
     const maxAttempts = 3
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         await withTimeout(prisma.$connect(), DB_CONNECT_TIMEOUT_MS, 'prisma-connect')
-        dbLogger.info('Database connected')
+        dbLogger.info('DATABASE_READY — database connected')
         break // success
       } catch (error) {
         dbLogger.error({ err: error, attempt }, 'Database connection attempt failed')
@@ -437,7 +443,7 @@ async function main() {
           // every route that doesn't touch the database still works. Exiting
           // would take down a partially-healthy API and replace a precise error
           // with an opaque platform-level 503.
-          startupLogger.error('Unable to connect to database after multiple attempts')
+          startupLogger.error('DATABASE_FAILED — unable to connect after multiple attempts')
           process.stderr.write(
             `ERROR: database unreachable after ${maxAttempts} attempts ` +
             `(${describeDbDriver()} → ${getRedactedDbHost()}): ` +
@@ -456,6 +462,14 @@ async function main() {
     // polling or queued mail would never be delivered. Each tick is internally
     // guarded against errors.
     startEmailQueueProcessor()
+    startupLogger.info('APPLICATION_READY')
+
+    // Heartbeat: an alive process prints every 30s, so an empty runtime log
+    // (even though stdout AND stderr both receive it) proves the process never
+    // started — a Hostinger process/routing problem, not an app slowdown.
+    setInterval(() => {
+      startupLogger.info(`[heartbeat] alive — db=${describeDbDriver()} uptime=${Math.round(process.uptime())}s`)
+    }, 30_000).unref()
   })
 
   // Proxy-friendly socket timeouts. Hostinger runs NGINX in front of Node;

@@ -21,6 +21,41 @@ const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, ''
 const apiUrl = rawApiUrl === '/api' ? 'https://api.alkatraders.co' : rawApiUrl
 const API_BASE = apiUrl + '/api/v1'
 
+// ─── Diagnostic Logging ─────────────────────────────────────────
+// Console diagnostics for production triage. Every request that fails logs its
+// URL, method, duration and failure CLASS, so a developer can tell from the
+// browser console alone whether the problem is:
+//   - 'network' → no HTTP response reached the browser: backend process down,
+//                 unreachable, or CORS blocked the response
+//   - 'http'    → the server DID respond with a status code (408/503/5xx):
+//                 the backend is alive, the fault is inside the stack
+// Set VITE_API_DEBUG=1 at build time to also log every successful request.
+const DEBUG_REQUESTS = import.meta.env.VITE_API_DEBUG === '1'
+
+console.info(`[api] API base: ${API_BASE}`)
+
+async function timedFetch(path: string, init: RequestInit): Promise<Response> {
+  const startedAt = Date.now()
+  const method = init.method || 'GET'
+  try {
+    const res = await fetch(`${API_BASE}${path}`, init)
+    const durationMs = Date.now() - startedAt
+    if (DEBUG_REQUESTS) {
+      console.info(`[api] ${method} ${path} -> ${res.status} (${durationMs}ms)`)
+    } else if (res.status === 408 || res.status >= 500) {
+      console.warn(`[api] HTTP ${res.status} ${method} ${path} (${durationMs}ms) — server responded; fault is inside the backend stack`)
+    }
+    return res
+  } catch (err) {
+    const durationMs = Date.now() - startedAt
+    console.warn(
+      `[api] NETWORK FAILURE ${method} ${path} (${durationMs}ms) — no HTTP response: backend down, unreachable, or CORS blocked`,
+      err instanceof Error ? err.message : err,
+    )
+    throw err
+  }
+}
+
 // ─── Token Storage (in-memory, NOT localStorage for security) ───
 
 let adminAccessToken: string | null = null
@@ -44,7 +79,7 @@ async function getCsrfToken(): Promise<string | null> {
 
   csrfTokenPromise = (async () => {
     try {
-      const res = await fetch(`${API_BASE}/csrf-token`, {
+      const res = await timedFetch('/csrf-token', {
         credentials: 'include',
       })
       if (!res.ok) return null
@@ -153,7 +188,7 @@ export async function refreshCustomerSession(): Promise<RefreshResult> {
 
 async function tryRefreshAdmin(): Promise<RefreshResult> {
   try {
-    const res = await fetch(`${API_BASE}/admin/auth/refresh`, {
+    const res = await timedFetch('/admin/auth/refresh', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -174,7 +209,7 @@ async function tryRefreshAdmin(): Promise<RefreshResult> {
 
 async function tryRefreshCustomer(): Promise<RefreshResult> {
   try {
-    const res = await fetch(`${API_BASE}/auth/refresh`, {
+    const res = await timedFetch('/auth/refresh', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -224,7 +259,7 @@ export async function apiFetch<T = unknown>(
     delete headers['Content-Type']
   }
 
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await timedFetch(path, {
     ...rest,
     headers,
     body: body instanceof FormData ? body : body != null ? JSON.stringify(body) : undefined,
@@ -252,7 +287,7 @@ export async function apiFetch<T = unknown>(
       if (body instanceof FormData) {
         delete retryHeaders['Content-Type']
       }
-      const retryRes = await fetch(`${API_BASE}${path}`, {
+      const retryRes = await timedFetch(path, {
         ...rest,
         headers: retryHeaders,
         body: body instanceof FormData ? body : body != null ? JSON.stringify(body) : undefined,
