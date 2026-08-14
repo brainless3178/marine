@@ -33,7 +33,7 @@ let csrfTokenFetchedAt = 0
 let csrfTokenPromise: Promise<string | null> | null = null
 
 // Track ongoing refresh to deduplicate concurrent 401 retries
-let refreshInProgress: Promise<boolean> | null = null
+let refreshInProgress: Promise<RefreshResult> | null = null
 
 async function getCsrfToken(): Promise<string | null> {
   // Return cached token if still fresh (refresh at 50 min, expires at 60 min)
@@ -238,12 +238,12 @@ export async function apiFetch<T = unknown>(
       if (!refreshInProgress) {
         refreshInProgress = tryRefreshAdmin().finally(() => { refreshInProgress = null })
       }
-      refreshed = await refreshInProgress
+      refreshed = (await refreshInProgress) === 'ok'
     } else if (auth === 'customer' && customerAccessToken) {
       if (!refreshInProgress) {
         refreshInProgress = tryRefreshCustomer().finally(() => { refreshInProgress = null })
       }
-      refreshed = await refreshInProgress
+      refreshed = (await refreshInProgress) === 'ok'
     }
     if (refreshed) {
       const token = auth === 'admin' ? adminAccessToken : customerAccessToken

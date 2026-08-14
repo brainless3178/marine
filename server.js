@@ -33,8 +33,50 @@ const PORT = process.env.PORT || 3000
 const distPath = path.join(__dirname, 'frontend', 'dist')
 const indexPath = path.join(distPath, 'index.html')
 
+// ─── Observability ───────────────────────────────────────────────
+// Heartbeat proves the process stays alive / detects restarts when the
+// runtime log shows gaps. Request logging captures duration so a 408 spike
+// can be tied to slow handlers or a dead/hung process.
+setInterval(() => {
+  console.log(`[heartbeat] alive — serving=${serving} uptime=${Math.round(process.uptime())}s`)
+}, 30000).unref()
+
+app.use((req, res, next) => {
+  const start = Date.now()
+  res.on('finish', () => {
+    console.log(`[req] ${req.method} ${req.url} -> ${res.statusCode} (${Date.now() - start}ms)`)
+  })
+  next()
+})
+
 // ─── Non-blocking self-healing build ─────────────────────────────
 let serving = false
+
+// Backoff guard: if dist is missing, spawn the on-the-fly build at most
+// once per BUILD_BACKOFF_MS. Without this, every restart spawns a fresh
+// npm install + vite build; a parent process killed mid-build orphans its
+// children, and overlapping builds (npm installs on the same node_modules)
+// pile up processes until Hostinger's account-wide 120-process cap trips
+// resource protection — the source of the intermittent 408s.
+const BUILD_BACKOFF_MS = 30 * 60 * 1000
+const buildAttemptPath = path.join(__dirname, '.build-attempted')
+
+function selfHealDue() {
+  if (!fs.existsSync(buildAttemptPath)) return true
+  try {
+    return Date.now() - Number(fs.readFileSync(buildAttemptPath, 'utf-8')) > BUILD_BACKOFF_MS
+  } catch {
+    return true
+  }
+}
+
+function markBuildAttempt() {
+  fs.writeFileSync(buildAttemptPath, String(Date.now()))
+}
+
+function clearBuildAttempt() {
+  try { fs.unlinkSync(buildAttemptPath) } catch { /* already gone */ }
+}
 
 function registerStaticHandlers() {
   if (serving) return
@@ -51,7 +93,11 @@ function registerStaticHandlers() {
 
 if (fs.existsSync(indexPath)) {
   registerStaticHandlers()
+} else if (!selfHealDue()) {
+  console.error(`X Build not found at ${distPath}`)
+  console.error(`  Last build attempt too recent — holding the warm-up page (next retry in 30 min or on next deploy)`)
 } else {
+  markBuildAttempt()
   console.error(`X Build not found at ${distPath}`)
   console.error('  Starting on-the-fly build in the background...')
   const viteBin = path.join(__dirname, 'node_modules', 'vite', 'bin', 'vite.js')
@@ -67,10 +113,11 @@ if (fs.existsSync(indexPath)) {
     })
     child.on('exit', (code) => {
       if (code === 0 && fs.existsSync(indexPath)) {
+        clearBuildAttempt()
         console.log(`V Build finished — now serving ${distPath}`)
         registerStaticHandlers()
       } else {
-        console.error(`X On-the-fly build failed (exit code ${code}) — keeping the warm-up page up`)
+        console.error(`X On-the-fly build failed (exit code ${code}) — keeping the warm-up page up (retries in 30 min)`)
       }
     })
   }
@@ -88,7 +135,7 @@ if (fs.existsSync(indexPath)) {
       if (code === 0) {
         runBuild()
       } else {
-        console.error(`X npm install failed (exit code ${code}) — keeping the warm-up page up`)
+        console.error(`X npm install failed (exit code ${code}) — keeping the warm-up page up (retries in 30 min)`)
       }
     })
   } else {
