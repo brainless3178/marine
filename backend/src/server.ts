@@ -72,6 +72,7 @@ import { rateLimit } from 'express-rate-limit'
 import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
+import { pathToFileURL } from 'url'
 import { prisma, rawPrisma, describeDbDriver, getRedactedDbHost } from './utils/prismaClient.js'
 import { withTimeout } from './utils/withTimeout.js'
 import { wakeDatabase } from './utils/dbWake.js'
@@ -128,7 +129,12 @@ import { startEmailQueueProcessor, stopEmailQueueProcessor } from './services/em
 
 // ─── App Setup ─────────────────────────────────────────────────
 const app = express()
-const PORT = parseInt(process.env.PORT || '3000', 10) // Hostinger default port
+const PORT = Number(process.env.PORT || 3000)
+if (!Number.isInteger(PORT) || PORT <= 0 || PORT > 65535) {
+  // Fail fast with a safe message instead of an opaque crash inside listen().
+  process.stderr.write('FATAL [startup] invalid PORT value in environment\n')
+  process.exit(1)
+}
 const DB_CONNECT_TIMEOUT_MS = 10_000
 
 // Neon free tier scales the compute to zero after ~5 minutes idle. The first
@@ -280,6 +286,26 @@ app.get('/api/wake', async (_req, res) => {
   }
 })
 
+// ─── Liveness / Readiness ───────────────────────────────────────
+// /health/live proves the process is alive without touching the database.
+// /health/ready additionally verifies a bounded database round-trip so an
+// uptime monitor can stop routing traffic while the database is unreachable.
+// Required configuration was already enforced at boot (env.ts exits unless
+// JWT_SECRET and DATABASE_URL are present).
+app.get('/health/live', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
+app.get('/health/ready', async (_req, res) => {
+  try {
+    await withTimeout(pingDatabase(), 8_000, 'health-ready')
+    res.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString() })
+  } catch (error) {
+    dbLogger.error({ err: error, driver: describeDbDriver(), host: getRedactedDbHost() }, 'Readiness check failed')
+    res.status(503).json({ status: 'error', database: 'disconnected', timestamp: new Date().toISOString() })
+  }
+})
+
 // ─── Per-User Rate Limiting (applies BEFORE routes) ────────────
 const userAwareAdminLimiter = createUserAwareLimiter({
   windowMs: 60 * 1000,
@@ -362,8 +388,21 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
 })
 
 // ─── Start Server ──────────────────────────────────────────────
+let httpServer: import('http').Server | undefined
+let shuttingDown = false
+
+async function shutdown(signal: string, exitCode: number) {
+  if (shuttingDown) return
+  shuttingDown = true
+  startupLogger.info(`Shutting down (${signal})...`)
+  stopEmailQueueProcessor()
+  httpServer?.close()
+  await prisma.$disconnect().catch(() => {})
+  process.exit(exitCode)
+}
+
 async function main() {
-  app.listen(PORT, '0.0.0.0', async () => {
+  httpServer = app.listen(PORT, '0.0.0.0', async () => {
     startupLogger.info({ port: PORT }, 'Server started')
     startupLogger.info(`Health check: http://localhost:${PORT}/api/health`)
 
@@ -418,23 +457,48 @@ async function main() {
     // guarded against errors.
     startEmailQueueProcessor()
   })
+
+  // Proxy-friendly socket timeouts. Hostinger runs NGINX in front of Node;
+  // Node's default 5s keepAliveTimeout closes idle keep-alive sockets the
+  // proxy still reuses, surfacing as connection resets and 408s. Values are
+  // generous so legitimate long routes (PayPal, DB cold start) are unaffected,
+  // while a hung socket still cannot hold a worker forever.
+  httpServer.keepAliveTimeout = 75_000
+  httpServer.headersTimeout = 80_000
+  httpServer.requestTimeout = 80_000
+
+  httpServer.on('error', (err: Error) => {
+    process.stderr.write(`FATAL [startup] listen failed on port ${PORT}: ${err.message}\n`)
+    process.exit(1)
+  })
+
+  // A crash must be visible and must not leave a half-alive process running:
+  // log the sanitized event, close the database, exit. The platform restarts
+  // one clean process — there is deliberately no in-process restart loop.
+  process.on('uncaughtException', (err) => {
+    logger.error({ err }, 'uncaughtException — shutting down')
+    process.stderr.write(`FATAL [runtime] uncaught exception: ${err.message}\n`)
+    void shutdown('uncaughtException', 1)
+  })
+
+  process.on('unhandledRejection', (reason) => {
+    const message = reason instanceof Error ? reason.message : String(reason)
+    logger.error({ err: reason }, 'unhandledRejection — shutting down')
+    process.stderr.write(`FATAL [runtime] unhandled rejection: ${message}\n`)
+    void shutdown('unhandledRejection', 1)
+  })
+
+  // Graceful shutdown: stop the queue, close the HTTP server so no new
+  // requests are accepted, close the database, then exit.
+  process.on('SIGTERM', () => void shutdown('SIGTERM', 0))
+  process.on('SIGINT', () => void shutdown('SIGINT', 0))
 }
 
-main()
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  startupLogger.info('Shutting down (SIGTERM)...')
-  stopEmailQueueProcessor()
-  await prisma.$disconnect()
-  process.exit(0)
-})
-
-process.on('SIGINT', async () => {
-  startupLogger.info('Shutting down (SIGINT)...')
-  stopEmailQueueProcessor()
-  await prisma.$disconnect()
-  process.exit(0)
-})
+// Listen only when executed directly (node dist/server.js). Importing the app
+// for tests must not bind a port.
+const isMain = !!process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href
+if (isMain) {
+  main()
+}
 
 export default app

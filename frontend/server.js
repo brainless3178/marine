@@ -34,21 +34,46 @@ const indexPath = path.join(distPath, "index.html");
 // ─── Observability ─────────────────────────────────────────────
 // Heartbeat proves the process stays alive / detects restarts when the
 // runtime log shows gaps. Request logging captures duration so a 408 spike
-// can be tied to slow handlers or a dead/hung process.
+// can be tied to slow handlers or a dead/hung process. Writes go to BOTH
+// stdout and stderr: some hosting panels only surface one of the two, and an
+// empty log must never hide a running process.
+function log(line) {
+  const ts = new Date().toISOString();
+  console.log(`[${ts}] ${line}`);
+  process.stderr.write(`[${ts}] ${line}\n`);
+}
+
 setInterval(() => {
-  console.log(`[heartbeat] alive — serving=${serving} uptime=${Math.round(process.uptime())}s`);
+  log(`[heartbeat] alive — serving=${serving} uptime=${Math.round(process.uptime())}s`);
 }, 30000).unref();
 
 app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
-    console.log(`[req] ${req.method} ${req.url} -> ${res.statusCode} (${Date.now() - start}ms)`);
+    log(`[req] ${req.method} ${req.url} -> ${res.statusCode} (${Date.now() - start}ms)`);
   });
   next();
 });
 
 // ─── Non-blocking self-healing build ─────────────────────────────
 let serving = false;
+
+// Liveness / readiness for the hosting proxy and uptime monitors.
+// /health/live answers even while the self-heal build is running (the process
+// is alive); /health/ready reports 503 until the build output is in place.
+// Registered before the warm-up middleware and the SPA fallback so monitors
+// never get swallowed by them.
+app.get("/health/live", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+app.get("/health/ready", (_req, res) => {
+  if (serving && fs.existsSync(indexPath)) {
+    res.json({ status: "ok", serving: true, timestamp: new Date().toISOString() });
+  } else {
+    res.status(503).json({ status: "error", serving: false, timestamp: new Date().toISOString() });
+  }
+});
 
 // Backoff guard: if dist is missing, spawn the on-the-fly build at most
 // once per BUILD_BACKOFF_MS. Without this, every restart spawns a fresh
@@ -159,6 +184,20 @@ app.use((req, res, next) => {
 </body></html>`);
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Frontend serving ${distPath} on port ${PORT}`);
+const server = app.listen(PORT, "0.0.0.0", () => {
+  log(`Frontend serving ${distPath} on port ${PORT}`);
+});
+
+// Proxy-friendly socket timeouts: Node's default 5s keepAliveTimeout closes
+// idle keep-alive sockets the Hostinger NGINX proxy still reuses, surfacing
+// as connection resets and 408s.
+server.keepAliveTimeout = 75_000;
+server.headersTimeout = 80_000;
+server.requestTimeout = 80_000;
+
+// A boot failure (e.g. EADDRINUSE from an orphaned process, invalid PORT)
+// must be visible in the log instead of killing the process silently.
+server.on("error", (err) => {
+  process.stderr.write(`FATAL [startup] listen failed on port ${PORT}: ${err.message}\n`);
+  process.exit(1);
 });
