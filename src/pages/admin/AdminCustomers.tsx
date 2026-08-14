@@ -48,6 +48,7 @@ export default function AdminCustomers() {
   const [statusFilter, setStatusFilter] = useState<CustomerStatus | ''>('')
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerType | null>(null)
   const [page, setPage] = useState(1)
+  const [serverTotal, setServerTotal] = useState(0)
 
   const fetchCustomers = useCallback(async () => {
     setLoading(true)
@@ -59,6 +60,7 @@ export default function AdminCustomers() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.customers.list(params)
       setCustomers((res.customers || []).map(mapApiCustomer))
+      setServerTotal(res.pagination?.total ?? 0)
     } catch (err: unknown) {
       console.error('Failed to load customers:', err)
       toast('Failed to load customers', 'error')
@@ -89,8 +91,9 @@ export default function AdminCustomers() {
     return result
   }, [customers, search, statusFilter])
 
-  const totalPages = Math.ceil(filteredCustomers.length / ITEMS_PER_PAGE)
-  const paginatedCustomers = filteredCustomers.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  // Server paginates/filters; the client pass only refines within the page.
+  const totalPages = Math.max(1, Math.ceil(serverTotal / ITEMS_PER_PAGE))
+  const paginatedCustomers = filteredCustomers.slice(0, ITEMS_PER_PAGE)
 
   const statusCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -111,7 +114,7 @@ export default function AdminCustomers() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Customers</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">{filteredCustomers.length} of {customers.length} customers</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{serverTotal} customer{serverTotal === 1 ? '' : 's'} found</p>
         </div>
         <button onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-gold)] px-4 py-2.5 text-xs font-bold text-[var(--btn-blue-text)] hover:shadow-[0_4px_12px_rgba(232,170,36,0.3)] transition-all">
           <Plus size={14} /> Add Customer

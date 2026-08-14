@@ -28,8 +28,14 @@ jobs:
       - name: TypeScript Check
         run: npx tsc --noEmit
 
+      - name: Lint
+        run: npm run lint
+
       - name: Unit Tests
         run: npm run test
+
+      - name: Coverage Gate
+        run: npm run test:coverage
 
       - name: Build
         run: npm run build
@@ -87,6 +93,10 @@ jobs:
       - name: Unit Tests
         working-directory: backend
         run: npm run test
+
+      - name: Coverage Gate
+        working-directory: backend
+        run: npm run test:coverage
 
       - name: Build
         working-directory: backend

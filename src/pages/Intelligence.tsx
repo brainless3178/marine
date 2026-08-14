@@ -41,10 +41,10 @@ export default function Intelligence() {
       <section className="py-20 bg-[var(--secondary-bg)] text-center">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
-            {t('intelligence.title')}
+            Sourcing Insights
           </span>
           <h1 className="font-display font-bold text-display-xl tracking-tight">
-            {t('intelligence.title')}.
+            {t('intelligence.title')}
           </h1>
           <p className="text-body text-[var(--text-secondary)] max-w-[640px] mx-auto mt-4">
             {t('intelligence.sub')}

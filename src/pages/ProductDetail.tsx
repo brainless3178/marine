@@ -118,7 +118,7 @@ export default function ProductDetail() {
 
   const handleBuyNow = () => {
     if (!isLoggedIn) { setShowAuthModal(true); return }
-    addToCart(product)
+    for (let i = 0; i < quantity; i++) addToCart(product)
     navigate('/checkout')
   }
 
@@ -285,7 +285,7 @@ export default function ProductDetail() {
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-xl bg-transparent border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:text-[var(--btn-blue-text)] transition-all cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 text-xs font-semibold rounded-xl bg-transparent border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-[var(--btn-blue-text)] transition-all cursor-pointer"
                   >
                     {t('product.buyNow')}
                   </button>

@@ -121,6 +121,7 @@ export default function AdminAuditLog() {
   const [typeFilter, setTypeFilter] = useState<ActionType | ''>('')
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null)
   const [page, setPage] = useState(1)
+  const [serverTotal, setServerTotal] = useState(0)
 
   const fetchLogs = useCallback(async () => {
     setLoading(true)
@@ -132,6 +133,7 @@ export default function AdminAuditLog() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.audit.list(params)
       setLog((res.logs || []).map(mapApiLog))
+      setServerTotal(res.pagination?.total ?? 0)
     } catch (err: unknown) {
       console.error('Failed to load audit log:', err)
       toast('Failed to load audit log', 'error')
@@ -156,8 +158,9 @@ export default function AdminAuditLog() {
     return result
   }, [log, search, typeFilter])
 
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
-  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  // Server paginates/filters; the client pass only refines within the page.
+  const totalPages = Math.max(1, Math.ceil(serverTotal / ITEMS_PER_PAGE))
+  const paginated = filtered.slice(0, ITEMS_PER_PAGE)
 
   const formatTime = (d: string) => {
     const date = new Date(d)
@@ -179,7 +182,7 @@ export default function AdminAuditLog() {
     <div className="space-y-5">
       <div>
         <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Audit Log</h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1">{filtered.length} entries</p>
+        <p className="text-sm text-[var(--text-muted)] mt-1">{serverTotal} entr{serverTotal === 1 ? 'y' : 'ies'}</p>
       </div>
 
       {/* Type Filters */}
@@ -277,7 +280,7 @@ export default function AdminAuditLog() {
           </div>
         )}
 
-        <AdminPagination page={page} totalPages={totalPages} totalItems={filtered.length} itemLabel="entries" onPageChange={setPage} />
+        <AdminPagination page={page} totalPages={totalPages} totalItems={serverTotal} itemLabel="entries" onPageChange={setPage} />
       </div>
     </div>
   )

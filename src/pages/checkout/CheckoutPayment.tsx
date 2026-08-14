@@ -39,9 +39,8 @@ export function CheckoutPayment({ paymentMethod, setPaymentMethod, goToStep }: C
   const { t } = useTranslation()
 
   const methods = [
-    { id: 'card', label: t('checkout.paymentCard'), icon: CreditCard },
+    { id: 'bank-transfer', label: t('checkout.paymentBank'), icon: Landmark },
     { id: 'paypal', label: t('checkout.paymentPaypal'), icon: PaypalFullLogo },
-    { id: 'bank', label: t('checkout.paymentBank'), icon: Landmark },
   ]
 
   return (
@@ -82,27 +81,19 @@ export function CheckoutPayment({ paymentMethod, setPaymentMethod, goToStep }: C
         })}
       </div>
 
-      {/* Card fields */}
-      {paymentMethod === 'card' && (
-        <div className="p-6 bg-[var(--primary-bg)] border border-[var(--border)] text-center rounded-xl">
-          <CreditCard size={32} className="mx-auto text-[var(--text-muted)] mb-3" />
-          <p className="text-sm font-medium text-[var(--text-primary)] mb-1">Card payments coming soon</p>
-          <p className="text-xs text-[var(--text-secondary)]">Please select PayPal or bank transfer for now.</p>
-        </div>
-      )}
-
-      {paymentMethod === 'paypal' && (
-        <div className="p-8 bg-[var(--primary-bg)] border border-[var(--border)] text-center">
+      {/* Bank transfer details */}
+      {paymentMethod === 'bank-transfer' && (
+        <div className="p-8 bg-[var(--primary-bg)] border border-[var(--border)] text-center rounded-xl">
           <p className="text-sm text-[var(--text-secondary)]">
-            {t('checkout.paypalDesc')}
+            {t('checkout.bankDesc')}
           </p>
         </div>
       )}
 
-      {paymentMethod === 'bank' && (
-        <div className="p-8 bg-[var(--primary-bg)] border border-[var(--border)] text-center">
+      {paymentMethod === 'paypal' && (
+        <div className="p-8 bg-[var(--primary-bg)] border border-[var(--border)] text-center rounded-xl">
           <p className="text-sm text-[var(--text-secondary)]">
-            {t('checkout.bankDesc')}
+            {t('checkout.paypalDesc')}
           </p>
         </div>
       )}

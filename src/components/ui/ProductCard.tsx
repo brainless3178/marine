@@ -86,7 +86,7 @@ export const ProductCard = memo(function ProductCard({ product, added = false, o
             </span>
           )}
           {product.availability === 'emergency' && (
-            <span className="rounded-full border border-danger/30/30 bg-danger/95 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--btn-danger-text)] shadow-lg">
+            <span className="rounded-full border border-[var(--danger)]/30 bg-[var(--danger)]/95 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--btn-danger-text)] shadow-lg">
               {t('product.emergency')}
             </span>
           )}

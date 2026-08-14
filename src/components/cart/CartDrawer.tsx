@@ -213,7 +213,7 @@ export function CartDrawer() {
                               </div>
                               <button
                                 onClick={() => removeFromCart(product.id)}
-                                className="group flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md transition-colors hover:bg-danger/50/10"
+                                className="group flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md transition-colors hover:bg-[var(--danger)]/10"
                                 aria-label={`Remove ${product.name}`}
                               >
                                 <Trash2

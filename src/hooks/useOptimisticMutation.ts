@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface UseOptimisticMutationOptions<TArgs, TSnapshot> {
   /** The real API call. Runs after the optimistic UI change is applied. */
@@ -44,9 +44,12 @@ export function useOptimisticMutation<TArgs, TSnapshot>({
   const snapshotRef = useRef<TSnapshot | undefined>(undefined)
 
   // Keep the latest options in a ref so `mutate` never closes over stale
-  // state (list state, callbacks) captured at hook creation time.
+  // state (list state, callbacks) captured at hook creation time. The ref is
+  // synced in an effect (after commit), never during render.
   const optsRef = useRef({ mutationFn, optimistic, snapshot, restore, onSuccess, onError })
-  optsRef.current = { mutationFn, optimistic, snapshot, restore, onSuccess, onError }
+  useEffect(() => {
+    optsRef.current = { mutationFn, optimistic, snapshot, restore, onSuccess, onError }
+  })
 
   const mutate = useCallback(async (args: TArgs) => {
     const { mutationFn: run, optimistic: apply, snapshot: snap, restore: rollback, onSuccess: success, onError: fail } = optsRef.current

@@ -50,11 +50,14 @@ export default function AdminProducts() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   // Latest-value refs so the optimistic snapshot always captures the current
-  // list/pagination even inside the async mutation callback.
+  // list/pagination even inside the async mutation callback. Synced in an
+  // effect (after commit), never during render.
   const productListRef = useRef(productList)
   const paginationRef = useRef(pagination)
-  productListRef.current = productList
-  paginationRef.current = pagination
+  useEffect(() => {
+    productListRef.current = productList
+    paginationRef.current = pagination
+  })
 
   const [search, setSearch] = useState(searchParams.get('q') || '')
   const [filterCategory, setFilterCategory] = useState(searchParams.get('category') || '')
@@ -118,7 +121,14 @@ export default function AdminProducts() {
 
       const res = await admin.products.list(params)
       setPagination(res.pagination || null)
-      setProductList((res.products || []).map((p: any) => ({
+      setProductList((res.products || []).map((p: {
+        id: string; name: string; sku: string; brand?: string | { name: string } | null;
+        category?: string | { name: string } | null; regularPrice?: number | null; price?: number | null;
+        salePrice?: number | null; onSale?: boolean | null; stockCount?: number | null;
+        condition?: string | null; availability?: string | null; status?: string | null;
+        isNewArrival?: boolean | null; images?: { url?: string; alt?: string; label?: string }[];
+        customLabel?: string | null;
+      }) => ({
         id: p.id,
         name: p.name || '',
         sku: p.sku || '',
@@ -132,7 +142,7 @@ export default function AdminProducts() {
         availability: p.availability || 'in-stock',
         status: p.status || 'draft',
         isNewArrival: p.isNewArrival ?? false,
-        images: p.images || [],
+        images: (p.images || []).map((i) => ({ url: i.url || '', alt: i.alt || i.label || '' })),
         customLabel: p.customLabel || '',
       })))
     } catch (err: unknown) {

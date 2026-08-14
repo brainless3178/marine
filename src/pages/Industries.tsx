@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Ship, Anchor, Flame, Zap, Factory, FlaskConical } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -17,7 +17,7 @@ export default function Industries() {
   // React Query with API→static fallback + shared cache (same key as the
   // homepage IndustriesTabs), and hover-prefetchable from the navbar.
   const { data, isLoading } = useIndustries()
-  const industries = data || []
+  const industries = useMemo(() => data || [], [data])
 
   const [active, setActive] = useState('')
 

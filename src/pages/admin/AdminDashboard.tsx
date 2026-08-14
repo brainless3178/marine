@@ -150,7 +150,7 @@ export default function AdminDashboard() {
               to={alert.link}
               className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold no-underline transition-all hover:-translate-y-0.5 ${
                 alert.type === 'danger'
-                  ? 'border-danger/20 bg-danger/50/5 text-danger hover:bg-danger/50/10'
+                  ? 'border-danger/20 bg-[var(--danger)]/10 text-danger hover:bg-[var(--danger)]/15'
                   : alert.type === 'warning'
                   ? 'border-[var(--accent-gold)]/20 bg-[var(--accent-gold)]/5 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/10'
                   : 'border-[var(--accent-blue)]/20 bg-[var(--accent-blue)]/5 text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10'

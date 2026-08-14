@@ -20,7 +20,7 @@ export default function TermsOfService() {
             <p className="text-sm leading-relaxed mt-3">
               The following terms and conditions govern the sale by Alka Traders – SELLER to the BUYER on orders for the listed products on website. These terms and conditions change occasionally. Please read carefully before submitting your order. By ordering from Alka Traders, you agree to the following terms. Please print this page and retain for your records so that you have a copy of the TOC at the time of your purchase.
             </p>
-            <p className="text-sm font-semibold mt-3 text-[var(--accent-alert)]">
+            <p className="text-sm font-semibold mt-3 text-[var(--danger)]">
               ACTUAL PHOTOS OF ORIGINAL ITEMS AND ITS DESCRIPTIONS ARE UPLOADED ON THE PRODUCT LISTINGS. BUYERS ARE KINDLY REQUESTED TO GO THROUGH THE SAME BEFORE BUYING.
             </p>
           </section>

@@ -9,6 +9,13 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       exclude: ['src/**/*.test.ts', 'src/migrate-products.ts'],
+      reporter: ['text'],
+      thresholds: {
+        statements: 50,
+        branches: 60,
+        functions: 45,
+        lines: 50,
+      },
     },
     // Increase test timeout for integration tests that hit the DB
     testTimeout: 30000,

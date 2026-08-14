@@ -68,12 +68,12 @@ describe('useAdminDashboard', () => {
         { id: 'p2', name: 'No Image', sku: 'NI-001', brand: 'Siemens', category: 'Hydraulic', stockCount: 10, availability: 'in-stock', images: [] },
       ],
       categoryBreakdown: [
-        { id: 'c1', name: 'Marine', _count: 100 },
-        { id: 'c2', name: 'Hydraulic', _count: 80 },
+        { id: 'c1', name: 'Marine', count: 100 },
+        { id: 'c2', name: 'Hydraulic', count: 80 },
       ],
       brandBreakdown: [
-        { name: 'ABB', _count: 50 },
-        { name: 'Siemens', _count: 30 },
+        { name: 'ABB', count: 50 },
+        { name: 'Siemens', count: 30 },
       ],
       conditionBreakdown: [
         { condition: 'used', count: 150 },
@@ -113,8 +113,8 @@ describe('useAdminDashboard', () => {
       lowStockProducts: [
         {
           id: 'p1', name: 'Item', sku: 'SKU-1', stockCount: 1, availability: 'in-stock',
-          brand: { name: 'ABB' },
-          category: { name: 'Marine' },
+          brand: 'ABB',
+          category: 'Marine',
           images: [{ url: '/img.jpg' }],
         },
       ],
@@ -123,7 +123,7 @@ describe('useAdminDashboard', () => {
       brandBreakdown: [],
       conditionBreakdown: [],
     })
-    mockAlerts.mockResolvedValue({ alerts: [] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({ logs: [] })
 
     const { result } = renderHook(() => useAdminDashboard())
@@ -171,7 +171,7 @@ describe('useAdminDashboard', () => {
       brandBreakdown: [],
       conditionBreakdown: [],
     })
-    mockAlerts.mockResolvedValue({ alerts: [] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({
       logs: [
         { id: 'a1', action: 'product.create', entityType: 'product', entityName: 'GPS', actorEmail: 'admin@test.com', createdAt: '2024-01-01' },
@@ -195,14 +195,14 @@ describe('useAdminDashboard', () => {
       lowStockProducts: [],
       missingImageProducts: [],
       categoryBreakdown: [
-        { id: 'c1', name: 'Small', _count: 10 },
-        { id: 'c2', name: 'Large', _count: 50 },
-        { id: 'c3', name: 'Medium', _count: 30 },
+        { id: 'c1', name: 'Small', count: 10 },
+        { id: 'c2', name: 'Large', count: 50 },
+        { id: 'c3', name: 'Medium', count: 30 },
       ],
       brandBreakdown: [],
       conditionBreakdown: [],
     })
-    mockAlerts.mockResolvedValue({ alerts: [] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({ logs: [] })
 
     const { result } = renderHook(() => useAdminDashboard())
@@ -220,12 +220,12 @@ describe('useAdminDashboard', () => {
       lowStockProducts: [],
       missingImageProducts: [],
       categoryBreakdown: [
-        { id: 'c1', name: 'A', _count: 50 },
+        { id: 'c1', name: 'A', count: 50 },
       ],
       brandBreakdown: [],
       conditionBreakdown: [],
     })
-    mockAlerts.mockResolvedValue({ alerts: [] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({ logs: [] })
 
     const { result } = renderHook(() => useAdminDashboard())
@@ -236,7 +236,7 @@ describe('useAdminDashboard', () => {
   })
 
   it('limits brandBreakdown to top 15', async () => {
-    const brands = Array.from({ length: 20 }, (_, i) => ({ name: `Brand ${i}`, _count: 20 - i }))
+    const brands = Array.from({ length: 20 }, (_, i) => ({ name: `Brand ${i}`, count: 20 - i }))
     mockStats.mockResolvedValue({
       totalProducts: 100,
       lowStockProducts: [],
@@ -245,7 +245,7 @@ describe('useAdminDashboard', () => {
       brandBreakdown: brands,
       conditionBreakdown: [],
     })
-    mockAlerts.mockResolvedValue({ alerts: [] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({ logs: [] })
 
     const { result } = renderHook(() => useAdminDashboard())
@@ -257,7 +257,7 @@ describe('useAdminDashboard', () => {
 
   it('handles stats API failure gracefully', async () => {
     mockStats.mockRejectedValue(new Error('Stats API down'))
-    mockAlerts.mockResolvedValue({ alerts: [] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({ logs: [] })
 
     const { result } = renderHook(() => useAdminDashboard())

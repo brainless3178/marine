@@ -2,43 +2,159 @@ import { prisma } from '../server.js'
 
 // ─── Queries ──────────────────────────────────────────────────
 
+// Returns the flat DashboardStats shape defined in shared/types.ts — the
+// canonical contract consumed by the admin dashboard (AdminDashboard,
+// AdminSidebar badge counts, AdminInsights). Kept flat because the shared
+// type and all frontend consumers read top-level fields.
 export async function getDashboardStats() {
   const [
-    totalProducts, publishedProducts, draftProducts, outOfStock, emergencyProducts,
-    totalOrders, pendingOrders, shippedOrders,
-    totalRfqs, emergencyRfqs, newRfqs,
-    totalOffers, pendingOffers,
-    totalCustomers, newMessages,
+    totalProducts,
+    publishedProducts,
+    draftProducts,
+    hiddenProducts,
+    inStockProducts,
+    outOfStockProducts,
+    emergencyProducts,
+    newArrivals,
+    totalBrands,
+    totalCategories,
+    totalIndustries,
+    totalStockUnits,
+    totalOrders,
+    pendingOrders,
+    totalCustomers,
+    totalRfqs,
+    newRfqs,
+    urgentRfqs,
+    emergencyRfqs,
+    totalOffers,
+    newOffers,
+    revenue,
   ] = await Promise.all([
     prisma.product.count(),
     prisma.product.count({ where: { status: 'published' } }),
     prisma.product.count({ where: { status: 'draft' } }),
+    prisma.product.count({ where: { status: 'hidden' } }),
+    prisma.product.count({ where: { availability: 'in-stock' } }),
     prisma.product.count({ where: { availability: 'out-of-stock' } }),
     prisma.product.count({ where: { availability: 'emergency' } }),
+    prisma.product.count({ where: { isNewArrival: true } }),
+    prisma.brand.count(),
+    prisma.category.count(),
+    prisma.industry.count(),
+    prisma.product.aggregate({ _sum: { stockCount: true } }),
     prisma.order.count(),
     prisma.order.count({ where: { status: 'pending' } }),
-    prisma.order.count({ where: { status: 'shipped' } }),
-    prisma.rfq.count(),
-    prisma.rfq.count({ where: { urgency: 'emergency' } }),
-    prisma.rfq.count({ where: { status: 'new' } }),
-    prisma.offer.count(),
-    prisma.offer.count({ where: { status: 'pending' } }),
     prisma.customer.count(),
-    prisma.contactMessage.count({ where: { status: 'new' } }),
+    prisma.rfq.count(),
+    prisma.rfq.count({ where: { status: 'new' } }),
+    prisma.rfq.count({ where: { urgency: 'urgent' } }),
+    prisma.rfq.count({ where: { urgency: 'emergency' } }),
+    prisma.offer.count(),
+    prisma.offer.count({ where: { status: 'new' } }),
+    prisma.order.aggregate({ _sum: { total: true }, where: { paymentStatus: 'paid' } }),
   ])
 
+  // "On sale" = a published product whose sale price is actually lower than
+  // its regular price. Prisma cannot compare two columns in a count filter,
+  // so this one is a single precise raw query.
+  const saleRow = await prisma.$queryRaw<Array<{ count: bigint }>>`
+    SELECT count(*)::bigint AS count FROM products
+    WHERE status = 'published' AND sale_price IS NOT NULL AND sale_price < regular_price`
+  const saleProducts = Number(saleRow[0]?.count || 0)
+
+  const [lowStockProducts, missingImageProducts] = await Promise.all([
+    prisma.product.findMany({
+      where: { stockCount: { lte: 10 }, status: 'published', availability: 'in-stock' },
+      select: {
+        id: true, name: true, sku: true, stockCount: true, lowStockThreshold: true,
+        availability: true, brand: { select: { name: true } }, category: { select: { name: true } },
+        images: { select: { media: { select: { url: true } } }, take: 1 },
+      },
+      orderBy: { stockCount: 'asc' },
+      take: 20,
+    }),
+    prisma.product.findMany({
+      where: { status: 'published', images: { none: {} } },
+      select: {
+        id: true, name: true, sku: true, stockCount: true,
+        availability: true, brand: { select: { name: true } }, category: { select: { name: true } },
+      },
+      take: 20,
+    }),
+  ])
+
+  const [categoryBreakdown, brandBreakdown, conditionBreakdown] = await Promise.all([
+    prisma.product.groupBy({ by: ['categoryId'], _count: { _all: true }, where: { status: 'published' } }),
+    prisma.product.groupBy({ by: ['brandId'], _count: { _all: true }, where: { status: 'published' } }),
+    prisma.product.groupBy({ by: ['condition'], _count: { _all: true }, where: { status: 'published' } }),
+  ])
+
+  const [categories, brands] = await Promise.all([
+    prisma.category.findMany({ select: { id: true, name: true } }),
+    prisma.brand.findMany({ select: { id: true, name: true } }),
+  ])
+  const categoryName = new Map(categories.map((c) => [c.id, c.name]))
+  const brandName = new Map(brands.map((b) => [b.id, b.name]))
+
   return {
-    products: { total: totalProducts, published: publishedProducts, draft: draftProducts, outOfStock, emergency: emergencyProducts },
-    orders: { total: totalOrders, pending: pendingOrders, shipped: shippedOrders },
-    rfqs: { total: totalRfqs, emergency: emergencyRfqs, new: newRfqs },
-    offers: { total: totalOffers, pending: pendingOffers },
-    customers: { total: totalCustomers },
-    messages: { new: newMessages },
+    totalProducts,
+    publishedProducts,
+    draftProducts,
+    hiddenProducts,
+    outOfStockProducts,
+    emergencyProducts,
+    totalOrders,
+    pendingOrders,
+    totalRevenue: Number(revenue._sum.total || 0),
+    totalCustomers,
+    totalRfqs,
+    newRfqs,
+    urgentRfqs,
+    emergencyRfqs,
+    totalOffers,
+    newOffers,
+    inStockProducts,
+    saleProducts,
+    newArrivals,
+    totalBrands,
+    totalCategories,
+    totalIndustries,
+    totalStockUnits: totalStockUnits._sum.stockCount || 0,
+    lowStockProducts: lowStockProducts.map((p) => ({
+      id: p.id,
+      name: p.name,
+      sku: p.sku,
+      brand: p.brand?.name,
+      category: p.category?.name,
+      stockCount: p.stockCount,
+      availability: p.availability,
+      images: p.images.map((i) => ({ url: i.media?.url })).filter((i): i is { url: string } => Boolean(i.url)),
+    })),
+    missingImageProducts: missingImageProducts.map((p) => ({
+      id: p.id,
+      name: p.name,
+      sku: p.sku,
+      brand: p.brand?.name,
+      category: p.category?.name,
+      stockCount: p.stockCount,
+      availability: p.availability,
+      images: [],
+    })),
+    categoryBreakdown: categoryBreakdown
+      .map((c) => ({ id: c.categoryId || '', name: (c.categoryId && categoryName.get(c.categoryId)) || 'Uncategorized', count: c._count._all }))
+      .sort((a, b) => b.count - a.count),
+    brandBreakdown: brandBreakdown
+      .map((b) => ({ name: (b.brandId && brandName.get(b.brandId)) || 'Unknown', count: b._count._all }))
+      .sort((a, b) => b.count - a.count),
+    conditionBreakdown: conditionBreakdown
+      .map((c) => ({ condition: c.condition || 'unknown', count: c._count._all }))
+      .sort((a, b) => b.count - a.count),
   }
 }
 
 export async function getDashboardAlerts() {
-  const [lowStock, overdueRfqs] = await Promise.all([
+  const [lowStock, overdueRfqs, outOfStockCount] = await Promise.all([
     prisma.product.findMany({
       where: { stockCount: { lte: 10 }, status: 'published', availability: 'in-stock' },
       select: { id: true, name: true, sku: true, stockCount: true, lowStockThreshold: true },
@@ -50,8 +166,9 @@ export async function getDashboardAlerts() {
       select: { id: true, rfqNumber: true, fullName: true, urgency: true, createdAt: true },
       orderBy: { createdAt: 'asc' },
     }),
+    prisma.product.count({ where: { availability: 'out-of-stock' } }),
   ])
-  return { lowStock, overdueRfqs }
+  return { lowStockProducts: lowStock, overdueRfqs, outOfStockCount }
 }
 
 export async function getRecentActivity(limit = 20) {
@@ -60,5 +177,5 @@ export async function getRecentActivity(limit = 20) {
     take: limit,
     select: { id: true, actorEmail: true, action: true, entityType: true, entityName: true, createdAt: true },
   })
-  return { activity: logs }
+  return { logs }
 }

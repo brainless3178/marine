@@ -396,11 +396,11 @@ export interface DashboardStats {
   totalCategories?: number
   totalIndustries?: number
   totalStockUnits?: number
-  lowStockProducts?: { id: string; name: string; sku: string; stockCount: number; brand?: string; category?: string; availability?: string; images?: string[] }[]
-  missingImageProducts?: { id: string; name: string; sku: string; brand?: string; category?: string; stockCount?: number; availability?: string; images?: string[] }[]
+  lowStockProducts?: { id: string; name: string; sku: string; stockCount: number; brand?: string; category?: string; availability?: string; images?: { url: string }[] }[]
+  missingImageProducts?: { id: string; name: string; sku: string; brand?: string; category?: string; stockCount?: number; availability?: string; images?: { url: string }[] }[]
   categoryBreakdown?: { name: string; count: number; id?: string; category?: string; _count?: { products: number }; condition?: string }[]
   brandBreakdown?: { name: string; count: number; id?: string; _count?: { products: number } }[]
-  conditionBreakdown?: { name: string; count: number }[]
+  conditionBreakdown?: { condition: string; count: number }[]
   outOfStockCount?: number
 }
 

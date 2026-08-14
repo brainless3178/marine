@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { admin } from '../lib/api'
+import type { DashboardAlertsResponse, DashboardActivityResponse } from '../lib/api/admin'
 import type {
   ApiDashboardStats, ApiOrder, ApiRfq, ApiOffer, ApiProduct, ApiCustomer,
 } from '../lib/api-types'
@@ -65,12 +66,29 @@ export function useDashboardData(): DashboardInsightData {
 
       if (results[0].status === 'fulfilled') setStats(results[0].value as ApiDashboardStats)
       if (results[1].status === 'fulfilled') {
-        const val = results[1].value as { alerts?: DashboardAlert[] }
-        setAlerts(val?.alerts || [])
+        const a = results[1].value as DashboardAlertsResponse
+        const built: DashboardAlert[] = []
+        if (a.lowStockProducts?.length) {
+          built.push({ id: 'low-stock', type: 'warning', message: `${a.lowStockProducts.length} products are low on stock`, entityType: 'product' })
+        }
+        if (a.overdueRfqs?.length) {
+          built.push({ id: 'overdue-rfqs', type: 'danger', message: `${a.overdueRfqs.length} RFQs have exceeded response SLA`, entityType: 'rfq' })
+        }
+        if ((a.outOfStockCount ?? 0) > 0) {
+          built.push({ id: 'out-of-stock', type: 'danger', message: `${a.outOfStockCount} products are out of stock`, entityType: 'product' })
+        }
+        setAlerts(built)
       }
       if (results[2].status === 'fulfilled') {
-        const val = results[2].value as { logs?: DashboardActivityLog[] } | DashboardActivityLog[]
-        setActivity(Array.isArray(val) ? val : (val?.logs || []))
+        const val = results[2].value as DashboardActivityResponse
+        setActivity((val?.logs || []).map((l) => ({
+          id: l.id,
+          action: l.action,
+          actorEmail: l.actorEmail || undefined,
+          entityType: l.entityType || undefined,
+          entityName: l.entityName || undefined,
+          createdAt: l.createdAt,
+        })))
       }
       if (results[3].status === 'fulfilled') {
         const val = results[3].value as { orders?: ApiOrder[] }

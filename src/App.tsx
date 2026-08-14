@@ -152,6 +152,7 @@ function RootRedirect() {
 
 function AppContent() {
   const isSessionLoading = useStore((s) => s.isSessionLoading)
+  const adminSessionLoading = useStore((s) => s.adminSessionLoading)
   const loadAdminSession = useStore((s) => s.loadAdminSession)
   const loadCustomerSession = useStore((s) => s.loadCustomerSession)
   const refreshCartPrices = useStore((s) => s.refreshCartPrices)
@@ -182,7 +183,7 @@ function AppContent() {
     refreshCartPrices()
   }, [loadAdminSession, loadCustomerSession, refreshCartPrices])
 
-  if (isSessionLoading) {
+  if (isSessionLoading || adminSessionLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--primary-bg)]">
         <div className="flex flex-col items-center gap-4">

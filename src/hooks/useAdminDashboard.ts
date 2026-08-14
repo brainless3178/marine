@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { admin } from '../lib/api'
-import type { ApiDashboardStats, ApiAuditLog } from '../lib/api-types'
+import type { DashboardAlertsResponse, DashboardActivityResponse } from '../lib/api/admin'
+import type { ApiDashboardStats } from '../lib/api-types'
 
 export interface DashboardStats {
   totalProducts: number
@@ -97,46 +98,46 @@ export function useAdminDashboard() {
           totalCategories: s.totalCategories || 0,
           totalIndustries: s.totalIndustries || 0,
           totalStockUnits: s.totalStockUnits || 0,
-          lowStockProducts: (s.lowStockProducts || []).map((p: any) => {
+          lowStockProducts: (s.lowStockProducts || []).map((p) => {
             return {
               id: p.id,
               name: p.name,
               sku: p.sku,
-              brand: p.brand?.name || p.brand || 'Unknown',
-              category: p.category?.name || p.category || 'Unknown',
+              brand: p.brand || 'Unknown',
+              category: p.category || 'Unknown',
               stockCount: p.stockCount ?? 0,
               availability: p.availability || 'unknown',
               hasImage: !!(p.images?.length && p.images[0]?.url),
             }
           }),
-          missingImageProducts: (s.missingImageProducts || []).map((p: any) => {
+          missingImageProducts: (s.missingImageProducts || []).map((p) => {
             return {
               id: p.id,
               name: p.name,
               sku: p.sku,
-              brand: p.brand?.name || p.brand || 'Unknown',
-              category: p.category?.name || p.category || 'Unknown',
+              brand: p.brand || 'Unknown',
+              category: p.category || 'Unknown',
               stockCount: p.stockCount ?? 0,
               availability: p.availability || 'unknown',
               hasImage: false,
             }
           }),
-          categoryBreakdown: (s.categoryBreakdown || []).map((c: any, i) => {
+          categoryBreakdown: (s.categoryBreakdown || []).map((c, i) => {
             return {
               id: c.id || `cat-${i}`,
-              name: c.name || c.category || 'Unknown',
-              count: c.count || c._count?.products || c._count || 0,
-              percentage: total > 0 ? Math.round(((c.count || c._count?.products || c._count || 0) / total) * 100) : 0,
+              name: c.name || 'Unknown',
+              count: c.count || 0,
+              percentage: total > 0 ? Math.round(((c.count || 0) / total) * 100) : 0,
             }
           }).sort((a: CategoryBreakdown, b: CategoryBreakdown) => b.count - a.count),
-          brandBreakdown: (s.brandBreakdown || []).map((b: any) => {
+          brandBreakdown: (s.brandBreakdown || []).map((b) => {
             return {
               name: b.name || 'Unknown',
-              count: b.count || b._count?.products || b._count || 0,
-              percentage: total > 0 ? Math.round(((b.count || b._count?.products || b._count || 0) / total) * 100) : 0,
+              count: b.count || 0,
+              percentage: total > 0 ? Math.round(((b.count || 0) / total) * 100) : 0,
             }
           }).sort((a: BrandBreakdown, b: BrandBreakdown) => b.count - a.count).slice(0, 15),
-          conditionBreakdown: (s.conditionBreakdown || []).map((c: any) => {
+          conditionBreakdown: (s.conditionBreakdown || []).map((c) => {
             return {
               condition: c.condition || 'unknown',
               count: c.count || 0,
@@ -157,7 +158,7 @@ export function useAdminDashboard() {
 
       // Process alerts
       if (alertsRes.status === 'fulfilled') {
-        const a = alertsRes.value as { lowStockProducts?: unknown[]; overdueRfqs?: unknown[]; outOfStockCount?: number }
+        const a = alertsRes.value as DashboardAlertsResponse
         const result: DashboardAlert[] = []
         if (a.lowStockProducts?.length) {
           result.push({ type: 'warning', message: `${a.lowStockProducts.length} products are low on stock`, entityType: 'product' })
@@ -173,9 +174,8 @@ export function useAdminDashboard() {
 
       // Process activity
       if (activityRes.status === 'fulfilled') {
-        const act = activityRes.value as { logs?: ApiAuditLog[] } | ApiAuditLog[]
-        const logs = Array.isArray(act) ? act : (act?.logs || [])
-        setActivity(logs.map((l) => ({
+        const act = activityRes.value as DashboardActivityResponse
+        setActivity((act?.logs || []).map((l) => ({
           id: l.id,
           action: l.action || 'unknown',
           entityType: l.entityType || 'unknown',

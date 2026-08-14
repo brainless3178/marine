@@ -20,14 +20,13 @@ const statusConfig: Record<string, { color: string; icon: typeof Package }> = {
 export default function OrderHistory() {
   const navigate = useNavigate()
   const user = useStore((s) => s.user)
+  const { data: orders, isLoading, isError, error } = useOrders(Boolean(user))
+  const errorMessage = error instanceof Error ? error.message : 'Failed to load orders'
 
   if (!user) {
     navigate('/')
     return null
   }
-
-  const { data: orders, isLoading, isError, error } = useOrders(Boolean(user))
-  const errorMessage = error instanceof Error ? error.message : 'Failed to load orders'
 
   return (
     <div className="min-h-screen bg-[var(--primary-bg)]">

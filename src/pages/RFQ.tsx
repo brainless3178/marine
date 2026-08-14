@@ -201,9 +201,9 @@ export default function RFQ() {
                     <div className="flex items-center gap-2.5">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-sm border-2 transition-all ${
                         step === rfqStep
-                          ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]'
+                          ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--btn-blue-text)]'
                           : step < rfqStep
-                          ? 'border-[var(--success)] bg-[var(--success)]'
+                          ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
                           : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]'
                       }`}>
                         {step}
@@ -393,7 +393,7 @@ export default function RFQ() {
                         {t('rfq.back')}
                       </button>
                       <button type="submit" disabled={submitting}
-                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all shimmer-btn relative overflow-hidden disabled:opacity-50 rounded-xl">
+                        className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all relative overflow-hidden disabled:opacity-50 rounded-xl">
                         {submitting ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : t('rfq.submit')}
                       </button>
                     </div>

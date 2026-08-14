@@ -49,7 +49,7 @@ describe('useDashboardData', () => {
 
   it('fetches all dashboard data on mount', async () => {
     mockStats.mockResolvedValue({ totalProducts: 100, inStockProducts: 80 })
-    mockAlerts.mockResolvedValue({ alerts: [{ type: 'warning', message: 'Low stock' }] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [{ id: 'p1' }], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({ logs: [{ id: 'a1', action: 'product.create' }] })
     mockOrdersList.mockResolvedValue({ orders: [{ id: 'o1' }] })
     mockRfqsList.mockResolvedValue({ rfqs: [{ id: 'r1' }] })
@@ -63,7 +63,7 @@ describe('useDashboardData', () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.stats).toEqual({ totalProducts: 100, inStockProducts: 80 })
-    expect(result.current.alerts).toEqual([{ type: 'warning', message: 'Low stock' }])
+    expect(result.current.alerts).toEqual([{ id: 'low-stock', type: 'warning', message: '1 products are low on stock', entityType: 'product' }])
     expect(result.current.activity).toEqual([{ id: 'a1', action: 'product.create' }])
     expect(result.current.orders).toEqual([{ id: 'o1' }])
     expect(result.current.rfqs).toEqual([{ id: 'r1' }])
@@ -120,7 +120,7 @@ describe('useDashboardData', () => {
 
   it('refresh function reloads all data', async () => {
     mockStats.mockResolvedValue({ totalProducts: 10 })
-    mockAlerts.mockResolvedValue({ alerts: [] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({ logs: [] })
     mockOrdersList.mockResolvedValue({ orders: [] })
     mockRfqsList.mockResolvedValue({ rfqs: [] })
@@ -143,15 +143,12 @@ describe('useDashboardData', () => {
     expect(result.current.stats?.totalProducts).toBe(25)
   })
 
-  it('extracts alerts from nested response', async () => {
+  it('extracts alerts from the alerts endpoint', async () => {
     mockStats.mockResolvedValue({ totalProducts: 0, lowStockProducts: [], missingImageProducts: [], categoryBreakdown: [], brandBreakdown: [], conditionBreakdown: [] })
-    // The hook reads (value as any)?.alerts || [], so the response must have an alerts array
     mockAlerts.mockResolvedValue({
-      alerts: [
-        { type: 'warning', message: '2 products are low on stock', entityType: 'product' },
-        { type: 'danger', message: '1 RFQs have exceeded response SLA', entityType: 'rfq' },
-        { type: 'danger', message: '5 products are out of stock', entityType: 'product' },
-      ],
+      lowStockProducts: [{ id: 'p1' }, { id: 'p2' }],
+      overdueRfqs: [{ id: 'r1' }],
+      outOfStockCount: 5,
     })
     mockActivity.mockResolvedValue({ logs: [] })
     mockOrdersList.mockResolvedValue({ orders: [] })
@@ -175,7 +172,7 @@ describe('useDashboardData', () => {
 
   it('handles activity with logs key', async () => {
     mockStats.mockResolvedValue({ totalProducts: 0 })
-    mockAlerts.mockResolvedValue({ alerts: [] })
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
     mockActivity.mockResolvedValue({ logs: [{ id: 'a1', action: 'login' }, { id: 'a2', action: 'create' }] })
     mockOrdersList.mockResolvedValue({ orders: [] })
     mockRfqsList.mockResolvedValue({ rfqs: [] })
@@ -190,10 +187,10 @@ describe('useDashboardData', () => {
     expect(result.current.activity).toHaveLength(2)
   })
 
-  it('handles activity as direct array (no logs key)', async () => {
+  it('handles activity responses without a logs key as empty', async () => {
     mockStats.mockResolvedValue({ totalProducts: 0 })
-    mockAlerts.mockResolvedValue({ alerts: [] })
-    mockActivity.mockResolvedValue([{ id: 'a1', action: 'login' }])
+    mockAlerts.mockResolvedValue({ lowStockProducts: [], overdueRfqs: [], outOfStockCount: 0 })
+    mockActivity.mockResolvedValue({ other: 'shape' })
     mockOrdersList.mockResolvedValue({ orders: [] })
     mockRfqsList.mockResolvedValue({ rfqs: [] })
     mockOffersList.mockResolvedValue({ offers: [] })
@@ -204,6 +201,6 @@ describe('useDashboardData', () => {
 
     await act(async () => {})
 
-    expect(result.current.activity).toHaveLength(1)
+    expect(result.current.activity).toEqual([])
   })
 })

@@ -47,6 +47,7 @@ interface AppState {
   // Admin Auth
   adminUser: AdminUser | null
   isAdminLoggedIn: boolean
+  adminSessionLoading: boolean
   adminLoginError: string | null
   adminLogin: (email: string, password: string) => Promise<boolean>
   adminLogout: () => Promise<void>
@@ -194,6 +195,7 @@ export const useStore = create<AppState>((set, get) => ({
   // Admin Auth
   adminUser: null,
   isAdminLoggedIn: false,
+  adminSessionLoading: typeof window !== 'undefined' && !!localStorage.getItem('alka-admin-auth'),
   adminLoginError: null,
   adminLogin: async (email: string, password: string) => {
     set({ adminLoginError: null })
@@ -216,7 +218,10 @@ export const useStore = create<AppState>((set, get) => ({
   },
   loadAdminSession: async () => {
     // Don't store admin PII in localStorage — always validate against the API
-    if (!localStorage.getItem('alka-admin-auth')) return
+    if (!localStorage.getItem('alka-admin-auth')) {
+      set({ adminSessionLoading: false })
+      return
+    }
     try {
       // After a page reload the in-memory admin token is gone. Restore it from
       // the httpOnly refresh cookie before calling /admin/auth/me.
@@ -224,21 +229,22 @@ export const useStore = create<AppState>((set, get) => ({
         const restored = await refreshAdminSession()
         if (!restored) {
           localStorage.removeItem('alka-admin-auth')
-          set({ adminUser: null, isAdminLoggedIn: false })
+          set({ adminUser: null, isAdminLoggedIn: false, adminSessionLoading: false })
           return
         }
       }
       const { user } = await adminAuth.me()
       const validRoles = ['owner', 'store-manager', 'inventory-manager', 'sales-agent', 'content-manager', 'viewer']
       if (validRoles.includes(user.role)) {
-        set({ adminUser: user as AdminUser, isAdminLoggedIn: true })
+        set({ adminUser: user as AdminUser, isAdminLoggedIn: true, adminSessionLoading: false })
       } else {
         localStorage.removeItem('alka-admin-auth')
+        set({ adminSessionLoading: false })
       }
     } catch {
       console.warn('[store] Admin session token expired or invalid — clearing session')
       localStorage.removeItem('alka-admin-auth')
-      set({ adminUser: null, isAdminLoggedIn: false })
+      set({ adminUser: null, isAdminLoggedIn: false, adminSessionLoading: false })
     }
   },
 

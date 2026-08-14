@@ -19,6 +19,7 @@ export default function AdminOrders() {
   const [dateTo, setDateTo] = useState('')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [page, setPage] = useState(1)
+  const [serverTotal, setServerTotal] = useState(0)
   const [showTrackingModal, setShowTrackingModal] = useState(false)
 
   const fetchOrders = useCallback(async () => {
@@ -33,6 +34,7 @@ export default function AdminOrders() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.orders.list(params)
       setOrders((res.orders || []).map(mapApiOrder))
+      setServerTotal(res.pagination?.total ?? 0)
     } catch (err: unknown) {
       console.error('Failed to load orders:', err)
       toast('Failed to load orders', 'error')
@@ -67,8 +69,11 @@ export default function AdminOrders() {
     return result
   }, [orders, search, statusFilter, dateFrom, dateTo])
 
-  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE)
-  const paginatedOrders = filteredOrders.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  // The server paginates and filters; the client-side pass above only refines
+  // within the already-loaded page. Total pages come from the server so
+  // pagination works past the first page.
+  const totalPages = Math.max(1, Math.ceil(serverTotal / ITEMS_PER_PAGE))
+  const paginatedOrders = filteredOrders.slice(0, ITEMS_PER_PAGE)
 
   const statusCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -126,7 +131,7 @@ export default function AdminOrders() {
             Orders
           </h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">
-            {filteredOrders.length} of {orders.length} orders
+            {serverTotal} order{serverTotal === 1 ? '' : 's'} found
           </p>
         </div>
         <button

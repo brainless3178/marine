@@ -142,9 +142,7 @@ export function CheckoutReview({
           </button>
         </div>
         <p className="text-xs text-[var(--text-secondary)]">
-          {paymentMethod === 'card'
-            ? t('checkout.paymentCard')
-            : paymentMethod === 'paypal'
+          {paymentMethod === 'paypal'
             ? t('checkout.paymentPaypal')
             : t('checkout.paymentBank')}
         </p>
@@ -185,7 +183,7 @@ export function CheckoutReview({
             type="button"
             onClick={handlePlaceOrder}
             disabled={orderLoading}
-            className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all rounded-xl cursor-pointer relative overflow-hidden shimmer-btn disabled:opacity-50"
+            className="flex items-center justify-center gap-2 px-7 py-3.5 bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-sm border border-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] transition-all rounded-xl cursor-pointer relative overflow-hidden disabled:opacity-50"
           >
             {orderLoading ? <><Loader2 size={16} className="animate-spin" /> Processing...</> : <><ClipboardCheck size={16} /> {t('checkout.placeOrder')}</>}
           </button>

@@ -3,9 +3,12 @@ import { escapeHtml } from '../utils/html-escape.js'
 const WHATSAPP = process.env.WHATSAPP_NUMBER || '918799095041'
 const COMPANY = process.env.COMPANY_EMAIL || 'sales@alkatraders.co'
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
-const RFQ_EMAIL = process.env.RFQ_EMAIL || 'sales@alkatraders.co'
-const EMERGENCY_EMAIL = process.env.EMERGENCY_EMAIL || 'sales@alkatraders.co'
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alkatraders.co'
+// Single inbox for ALL inbound form submissions — contact form, RFQ,
+// emergency request, and make-offer. Hard-defaults to sales@alkatraders.co
+// so user submissions always land in the sales inbox regardless of other
+// env vars (previously RFQ_EMAIL / EMERGENCY_EMAIL / ADMIN_EMAIL could
+// redirect them to separate addresses). Override only via SALES_EMAIL.
+const SALES_EMAIL = process.env.SALES_EMAIL || 'sales@alkatraders.co'
 
 // ─── Template Helpers ──────────────────────────────────────────
 
@@ -128,7 +131,7 @@ export const emailTemplates = {
       </table>
       ${btn(`${FRONTEND_URL}/admin/rfqs`, 'View RFQ in Admin Panel', urgencyColor)}
     `)
-    return { to: RFQ_EMAIL, subject: `[RFQ ${data.urgency.toUpperCase()}] ${data.rfqNumber} — ${escapeHtml(data.customerName)}`, html, template: 'rfq-received', templateData: data as Record<string, unknown> }
+    return { to: SALES_EMAIL, subject: `[RFQ ${data.urgency.toUpperCase()}] ${data.rfqNumber} — ${escapeHtml(data.customerName)}`, html, template: 'rfq-received', templateData: data as Record<string, unknown> }
   },
 
   rfqResponse(data: { rfqNumber: string; customerName: string; message: string }): QueueEmail {
@@ -153,7 +156,7 @@ export const emailTemplates = {
       ${btn(`tel:${data.phone}`, '📞 Call Customer Now', '#dc2626')}
       ${btn(`https://wa.me/${data.phone.replace(/[^0-9]/g, '')}`, '💬 WhatsApp Now', '#25d366')}
     `)
-    return { to: EMERGENCY_EMAIL, subject: `🚨 EMERGENCY RFQ ${data.rfqNumber} — ${data.customerName} — ${data.vesselName || 'Vessel Unknown'}`, html, template: 'emergency-rfq', templateData: data as Record<string, unknown> }
+    return { to: SALES_EMAIL, subject: `🚨 EMERGENCY RFQ ${data.rfqNumber} — ${data.customerName} — ${data.vesselName || 'Vessel Unknown'}`, html, template: 'emergency-rfq', templateData: data as Record<string, unknown> }
   },
 
   offerReceived(data: { offerNumber: string; productName: string; offeredPrice: number; customerEmail: string }): QueueEmail {
@@ -164,7 +167,7 @@ export const emailTemplates = {
       </table>
       ${btn(`${FRONTEND_URL}/admin/offers`, 'Review Offer in Admin', '#059669')}
     `)
-    return { to: ADMIN_EMAIL, subject: `[OFFER] ${data.offerNumber} — $${data.offeredPrice.toFixed(2)} — ${data.productName}`, html, template: 'offer-received', templateData: data as Record<string, unknown> }
+    return { to: SALES_EMAIL, subject: `[OFFER] ${data.offerNumber} — $${data.offeredPrice.toFixed(2)} — ${data.productName}`, html, template: 'offer-received', templateData: data as Record<string, unknown> }
   },
 
   offerDecision(data: { offerNumber: string; productName: string; decision: 'accepted' | 'rejected' | 'countered'; counterPrice?: number }): QueueEmail {
@@ -189,7 +192,7 @@ export const emailTemplates = {
       <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;color:#1e293b;font-size:14px;line-height:1.6;">${escapeHtml(data.message)}</div>
       ${btn(`mailto:${data.email}?subject=Re: ${data.subject || 'Your Message'}`, 'Reply via Email', '#0ea5e9')}
     `)
-    return { to: ADMIN_EMAIL, subject: `[CONTACT] ${data.subject || 'New message from ' + data.name}`, html, template: 'contact-notification', templateData: data as Record<string, unknown> }
+    return { to: SALES_EMAIL, subject: `[CONTACT] ${data.subject || 'New message from ' + data.name}`, html, template: 'contact-notification', templateData: data as Record<string, unknown> }
   },
 
   passwordReset(data: { name: string; resetUrl: string; isAdmin?: boolean }): QueueEmail {

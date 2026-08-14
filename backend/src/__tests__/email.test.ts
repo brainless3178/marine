@@ -108,11 +108,11 @@ describe('emailTemplates.rfqReceived', () => {
     expect(urgent.html).toContain('#f59e0b') // Amber for urgent
   })
 
-  it('routes to RFQ_EMAIL by default', () => {
+  it('routes to SALES_EMAIL (default sales@alkatraders.co)', () => {
     const result = emailTemplates.rfqReceived({
       rfqNumber: 'RFQ-001', customerName: 'John', productDescription: 'Pump', urgency: 'normal',
     })
-    // The 'to' field is set by the sender function, not the template
+    expect(result.to).toBe('sales@alkatraders.co')
     expect(result.subject).toContain('[RFQ NORMAL]')
   })
 })

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
-import { ProductPreviewModal, buildPreviewProduct } from '../components/admin/ProductPreviewModal'
+import { ProductPreviewModal } from '../components/admin/ProductPreviewModal'
+import { buildPreviewProduct } from '../components/admin/buildPreviewProduct'
 import type { ProductFormData } from '../hooks/useProductForm'
 
 // i18n — ProductCard receives the real t from the modal's useTranslation

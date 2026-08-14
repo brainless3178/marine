@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import noCommentsInHelmet from './eslint-rules/no-comments-in-helmet.js'
 
 export default tseslint.config(
-  { ignores: ['dist', 'backend', 'test-results', 'node_modules', 'e2e/**', 'playwright.config.ts', 'tailwind.config.ts', 'vitest.config.ts', 'vite.config.ts', 'postcss.config.js'] },
+  { ignores: ['dist', 'backend', 'test-results', 'coverage', 'node_modules', 'e2e/**', 'playwright.config.ts', 'tailwind.config.ts', 'vitest.config.ts', 'vite.config.ts', 'postcss.config.js'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

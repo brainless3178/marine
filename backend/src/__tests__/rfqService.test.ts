@@ -4,9 +4,7 @@ vi.hoisted(() => {
   process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-for-unit-tests'
   process.env.COMPANY_EMAIL = 'info@test.com'
   process.env.FRONTEND_URL = 'http://localhost:5173'
-  process.env.RFQ_EMAIL = 'rfq@test.com'
-  process.env.EMERGENCY_EMAIL = 'emergency@test.com'
-  process.env.ADMIN_EMAIL = 'admin@test.com'
+  process.env.SALES_EMAIL = 'sales@test.com'
   process.env.WHATSAPP_NUMBER = '918799095041'
 })
 

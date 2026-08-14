@@ -149,8 +149,17 @@ export default function Brands() {
             {filtered.map((brand) => (
               <div
                 key={brand.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`View products from ${brand.name}`}
                 onClick={() => navigate(`/products?brand=${brand.slug}`)}
-                className="bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 cursor-pointer transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    navigate(`/products?brand=${brand.slug}`)
+                  }
+                }}
+                className="bg-[var(--secondary-bg)] border border-[var(--border)] border-l-[3px] border-l-transparent p-6 cursor-pointer transition-all duration-300 hover:border-l-[var(--accent-primary)] hover:-translate-y-1 focus-visible:border-l-[var(--accent-primary)]"
               >
                 <h3 className="heading-xl mb-2">{brand.name}</h3>
                 <div className="flex gap-1.5 flex-wrap mb-3">

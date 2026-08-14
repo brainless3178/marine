@@ -114,6 +114,7 @@ export default function AdminMessages() {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
   const [composing, setComposing] = useState(false)
   const [page, setPage] = useState(1)
+  const [serverTotal, setServerTotal] = useState(0)
 
   const fetchMessages = useCallback(async () => {
     setLoading(true)
@@ -125,6 +126,7 @@ export default function AdminMessages() {
       if (folder === 'inbox' || folder === 'sent') params.folder = folder
       const res = await admin.messages.list(params)
       setMessages((res.messages || []).map(mapApiMessage))
+      setServerTotal(res.pagination?.total ?? 0)
     } catch (err: unknown) {
       console.error('Failed to load messages:', err)
       toast('Failed to load messages', 'error')
@@ -150,8 +152,9 @@ export default function AdminMessages() {
     return result
   }, [messages, search, folder])
 
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
-  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  // Server paginates/filters; the client pass only refines within the page.
+  const totalPages = Math.max(1, Math.ceil(serverTotal / ITEMS_PER_PAGE))
+  const paginated = filtered.slice(0, ITEMS_PER_PAGE)
 
   const unreadCount = messages.filter((m) => m.folder === 'inbox' && !m.read).length
   const starredCount = messages.filter((m) => m.starred).length
@@ -284,7 +287,7 @@ export default function AdminMessages() {
           </div>
         )}
 
-        <AdminPagination page={page} totalPages={totalPages} totalItems={filtered.length} itemLabel="messages" onPageChange={setPage} />
+        <AdminPagination page={page} totalPages={totalPages} totalItems={serverTotal} itemLabel="messages" onPageChange={setPage} />
       </div>
 
       {/* Message Detail Slide-over */}

@@ -12,14 +12,27 @@ import type {
   ApiMediaAsset, ApiAdminUser, ApiAuditLog,
   ApiStoreSettings, ApiHomepageSection, Pagination,
 } from '../api-types'
+import type { ApiDashboardStats } from '../api-types'
+
+// Shapes returned by the admin dashboard endpoints (see backend
+// services/dashboardService.ts — kept in sync with the canonical DashboardStats).
+export interface DashboardAlertsResponse {
+  lowStockProducts: { id: string; name: string; sku: string; stockCount: number; lowStockThreshold: number }[]
+  overdueRfqs: { id: string; rfqNumber: string; fullName: string; urgency: string; createdAt: string }[]
+  outOfStockCount: number
+}
+
+export interface DashboardActivityResponse {
+  logs: ApiAuditLog[]
+}
 
 export const admin = {
   // Dashboard
   dashboard: {
-    stats: () => api.get<any>('/admin/dashboard/stats', { auth: 'admin' }),
-    alerts: () => api.get<any>('/admin/dashboard/alerts', { auth: 'admin' }),
+    stats: () => api.get<ApiDashboardStats>('/admin/dashboard/stats', { auth: 'admin' }),
+    alerts: () => api.get<DashboardAlertsResponse>('/admin/dashboard/alerts', { auth: 'admin' }),
     activity: (limit?: number) =>
-      api.get<any>(`/admin/dashboard/activity${limit ? `?limit=${limit}` : ''}`, { auth: 'admin' }),
+      api.get<DashboardActivityResponse>(`/admin/dashboard/activity${limit ? `?limit=${limit}` : ''}`, { auth: 'admin' }),
   },
 
   // Products
@@ -40,7 +53,7 @@ export const admin = {
       api.patch<{ updated: number }>('/admin/products/bulk', { ids, action, value }, { auth: 'admin' }),
     duplicate: (id: string) =>
       api.post<{ product: ApiProduct }>(`/admin/products/${id}/duplicate`, undefined, { auth: 'admin' }),
-    importCsv: (rows: any[]) =>
+    importCsv: (rows: Record<string, string>[]) =>
       api.post<{ created: number; skipped: number; errors: string[] }>('/admin/products/import/csv', { rows }, { auth: 'admin' }),
     exportCsv: async () => {
       const res = await fetch(`${API_BASE}/admin/products/export/csv`, {
@@ -169,7 +182,7 @@ export const admin = {
     upload: (file: File) => {
       const formData = new FormData()
       formData.append('file', file)
-      return apiFetch<{ asset: any }>('/admin/media/upload', {
+      return apiFetch<{ asset: ApiMediaAsset; message?: string }>('/admin/media/upload', {
         method: 'POST',
         body: formData,
         auth: 'admin',

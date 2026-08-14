@@ -94,6 +94,7 @@ export default function AdminOffers() {
   const [statusFilter, setStatusFilter] = useState<OfferStatus | ''>('')
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null)
   const [page, setPage] = useState(1)
+  const [serverTotal, setServerTotal] = useState(0)
   const [rejectTarget, setRejectTarget] = useState<string | null>(null)
   const [convertingOffer, setConvertingOffer] = useState<string | null>(null)
 
@@ -107,6 +108,7 @@ export default function AdminOffers() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.offers.list(params)
       setOffers((res.offers || []).map(mapApiOffer))
+      setServerTotal(res.pagination?.total ?? 0)
     } catch (err: unknown) {
       console.error('Failed to load offers:', err)
       toast('Failed to load offers', 'error')
@@ -127,8 +129,9 @@ export default function AdminOffers() {
     return result
   }, [offers, search, statusFilter])
 
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
-  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  // Server paginates/filters; the client pass only refines within the page.
+  const totalPages = Math.max(1, Math.ceil(serverTotal / ITEMS_PER_PAGE))
+  const paginated = filtered.slice(0, ITEMS_PER_PAGE)
 
   const statusCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -192,7 +195,7 @@ export default function AdminOffers() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Offers</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">{filtered.length} of {offers.length} offers</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{serverTotal} offer{serverTotal === 1 ? '' : 's'}</p>
         </div>
         <button onClick={handleExportCsv} className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] transition-all hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]">
           <Download size={14} /> Export CSV
@@ -201,7 +204,7 @@ export default function AdminOffers() {
 
       <div className="flex gap-2 overflow-x-auto pb-1">
         <button onClick={() => { setStatusFilter(''); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${statusFilter === '' ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)] shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
-          All ({offers.length})
+          All ({serverTotal})
         </button>
         {(Object.keys(statusConfig) as OfferStatus[]).map((s) => (
           <button key={s} onClick={() => { setStatusFilter(s === statusFilter ? '' : s); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${statusFilter === s ? `${statusConfig[s].bg} ${statusConfig[s].color} border border-current/20` : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>

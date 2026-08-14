@@ -81,6 +81,7 @@ export default function AdminMedia() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [page, setPage] = useState(1)
+  const [serverTotal, setServerTotal] = useState(0)
   const [fileInputEl, setFileInputEl] = useState<HTMLInputElement | null>(null)
   const [usageMap, setUsageMap] = useState<Map<string, { productId: string; productName: string; productSku: string }[]>>(new Map())
 
@@ -94,6 +95,7 @@ export default function AdminMedia() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.media.list(params)
       setMediaList((res.assets || []).map(mapApiAsset))
+      setServerTotal(res.pagination?.total ?? 0)
     } catch (err: unknown) {
       console.error('Failed to load media:', err)
       toast('Failed to load media assets', 'error')
@@ -132,8 +134,9 @@ export default function AdminMedia() {
     return result
   }, [mediaList, search, filterLabel, sortBy])
 
-  const totalPages = Math.ceil(filteredMedia.length / ITEMS_PER_PAGE)
-  const paginatedMedia = filteredMedia.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  // Server paginates/filters; the client pass only refines within the page.
+  const totalPages = Math.max(1, Math.ceil(serverTotal / ITEMS_PER_PAGE))
+  const paginatedMedia = filteredMedia.slice(0, ITEMS_PER_PAGE)
 
   const uniqueLabels = useMemo(() => Array.from(new Set(mediaList.map((m) => m.label))).sort(), [mediaList])
   const totalSize = useMemo(() => mediaList.reduce((s, m) => s + m.fileSize, 0), [mediaList])
@@ -238,7 +241,7 @@ export default function AdminMedia() {
           <div>
             <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">Media Library</h1>
             <p className="text-sm text-[var(--text-muted)] mt-1">
-              {mediaList.length} images · {formatFileSize(totalSize)}
+              {serverTotal} images · {formatFileSize(totalSize)}
               {selectedIds.size > 0 && ` · ${selectedIds.size} selected`}
             </p>
           </div>
@@ -342,7 +345,7 @@ export default function AdminMedia() {
                 })}
               </div>
             )}
-            <AdminPagination page={page} totalPages={totalPages} totalItems={filteredMedia.length} itemLabel="images" onPageChange={setPage} />
+            <AdminPagination page={page} totalPages={totalPages} totalItems={serverTotal} itemLabel="images" onPageChange={setPage} />
           </div>
         )}
 
@@ -391,7 +394,7 @@ export default function AdminMedia() {
                 </tbody>
               </table>
             </div>
-            <AdminPagination page={page} totalPages={totalPages} totalItems={filteredMedia.length} itemLabel="images" onPageChange={setPage} />
+            <AdminPagination page={page} totalPages={totalPages} totalItems={serverTotal} itemLabel="images" onPageChange={setPage} />
           </div>
         )}
 

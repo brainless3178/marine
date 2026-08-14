@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { usePayPalScriptReducer } from '@paypal/react-paypal-js'
@@ -33,7 +33,7 @@ export default function Checkout() {
     postalCode: '',
     country: 'IN',
   })
-  const [paymentMethod, setPaymentMethod] = useState('card')
+  const [paymentMethod, setPaymentMethod] = useState('bank-transfer')
   const [errors, setErrors] = useState<Record<string, boolean>>({})
   const [cancelSubmitted, setCancelSubmitted] = useState(false)
   const [orderLoading, setOrderLoading] = useState(false)
@@ -43,6 +43,10 @@ export default function Checkout() {
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
   const [creatingOrder, setCreatingOrder] = useState(false)
   const [{ isPending: paypalScriptLoading }] = usePayPalScriptReducer()
+
+  // Idempotency key for this checkout session: lets the backend dedupe a
+  // double-submitted order creation (see backend createOrder `[idem:...]`).
+  const idempotencyKeyRef = useRef(`ck-${Date.now()}-${Math.random().toString(36).slice(2)}`)
 
   // Pre-fill name and email from user
   useEffect(() => {
@@ -107,6 +111,10 @@ export default function Checkout() {
         country: shipping.country,
       },
       paymentMethod,
+      // Server-side idempotency: a retried/double-submitted checkout with the
+      // same key returns the already-created order instead of creating a second
+      // one. Fresh key per checkout session (regenerated after each success).
+      idempotencyKey: idempotencyKeyRef.current,
       subtotal,
       tax,
       total,
@@ -156,6 +164,7 @@ export default function Checkout() {
       setOrderPlaced(true)
       clearCart()
       setCheckoutStep(1)
+      idempotencyKeyRef.current = `ck-${Date.now()}-${Math.random().toString(36).slice(2)}`
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err: unknown) {
       setOrderError(err instanceof Error ? err.message : 'Failed to place order. Please try again.')
@@ -206,6 +215,7 @@ export default function Checkout() {
       setOrderPlaced(true)
       clearCart()
       setCheckoutStep(1)
+      idempotencyKeyRef.current = `ck-${Date.now()}-${Math.random().toString(36).slice(2)}`
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err: unknown) {
       setOrderError(err instanceof Error ? err.message : 'Payment failed. Please try again.')
@@ -282,9 +292,9 @@ export default function Checkout() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-sm border-2 transition-all ${
                       step === checkoutStep
-                        ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]'
+                        ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--btn-blue-text)]'
                         : step < checkoutStep
-                        ? 'border-[var(--success)] bg-[var(--success)]'
+                        ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
                         : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]'
                     }`}
                   >

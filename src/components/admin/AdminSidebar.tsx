@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { admin } from '../../lib/api'
+import type { ApiDashboardStats } from '../../lib/api-types'
 
 type BadgeConfig = {
   count?: number
@@ -72,7 +73,7 @@ export function AdminSidebar() {
 
   useEffect(() => {
     let cancelled = false
-    admin.dashboard.stats().then((stats: any) => {
+    admin.dashboard.stats().then((stats: ApiDashboardStats) => {
       if (cancelled) return
       setBadges({
         '/admin/orders': { count: stats.pendingOrders || 0, color: 'gold' },

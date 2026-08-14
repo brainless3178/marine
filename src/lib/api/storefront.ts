@@ -118,7 +118,7 @@ export const storefront = {
         fullName: string; addressLine1: string; addressLine2?: string
         city: string; state?: string; postalCode?: string; country: string
       }
-      paymentMethod: string; customerNotes?: string
+      paymentMethod: string; customerNotes?: string; idempotencyKey?: string
       subtotal?: number; tax?: number; total?: number
     }) => api.post<{ order: ApiOrder }>('/storefront/orders', data, { auth: 'customer' }),
 

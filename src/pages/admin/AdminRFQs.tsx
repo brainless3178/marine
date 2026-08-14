@@ -108,6 +108,7 @@ export default function AdminRFQs() {
   const [statusFilter, setStatusFilter] = useState<RFQStatus | ''>('')
   const [selectedRFQ, setSelectedRFQ] = useState<RFQ | null>(null)
   const [page, setPage] = useState(1)
+  const [serverTotal, setServerTotal] = useState(0)
 
   const fetchRfqs = useCallback(async () => {
     setLoading(true)
@@ -120,6 +121,7 @@ export default function AdminRFQs() {
       params.limit = String(ITEMS_PER_PAGE)
       const res = await admin.rfqs.list(params)
       setRfqs((res.rfqs || []).map(mapApiRfq))
+      setServerTotal(res.pagination?.total ?? 0)
     } catch (err: unknown) {
       console.error('Failed to load RFQs:', err)
       toast('Failed to load RFQs', 'error')
@@ -146,8 +148,9 @@ export default function AdminRFQs() {
     return result
   }, [rfqs, search, urgencyFilter, statusFilter])
 
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
-  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  // Server paginates/filters; the client pass only refines within the page.
+  const totalPages = Math.max(1, Math.ceil(serverTotal / ITEMS_PER_PAGE))
+  const paginated = filtered.slice(0, ITEMS_PER_PAGE)
 
   const statusCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -190,14 +193,14 @@ export default function AdminRFQs() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-extrabold text-[var(--text-primary)]">RFQ Inbox</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">{filtered.length} of {rfqs.length} requests</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{serverTotal} request{serverTotal === 1 ? '' : 's'}</p>
         </div>
       </div>
 
       {/* Urgency Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         <button onClick={() => { setUrgencyFilter(''); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${urgencyFilter === '' ? 'bg-[var(--accent-gold)] text-[var(--btn-blue-text)] shadow-[0_4px_12px_rgba(232,170,36,0.2)]' : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
-          All ({rfqs.length})
+          All ({serverTotal})
         </button>
         {(Object.keys(urgencyConfig) as RFQUrgency[]).map((u) => (
           <button key={u} onClick={() => { setUrgencyFilter(u === urgencyFilter ? '' : u); setPage(1) }} className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${urgencyFilter === u ? `${urgencyConfig[u].bg} ${urgencyConfig[u].color} border border-current/20` : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent-gold)]'}`}>
