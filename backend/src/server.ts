@@ -72,7 +72,6 @@ import { rateLimit } from 'express-rate-limit'
 import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
-import { pathToFileURL } from 'url'
 import { prisma, rawPrisma, describeDbDriver, getRedactedDbHost } from './utils/prismaClient.js'
 import { withTimeout } from './utils/withTimeout.js'
 import { wakeDatabase } from './utils/dbWake.js'
@@ -508,11 +507,12 @@ async function main() {
   process.on('SIGINT', () => void shutdown('SIGINT', 0))
 }
 
-// Listen only when executed directly (node dist/server.js). Importing the app
-// for tests must not bind a port.
-const isMain = !!process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href
-if (isMain) {
-  main()
-}
+// Hostinger's Node.js runtime does not execute the entry file as a plain
+// `node dist/server.js` invocation, so any "run only when executed directly"
+// guard (require.main === module / import.meta.url === process.argv[1]) can
+// evaluate false and listen() is never called — Hostinger kills the app after
+// a 3-second watchdog. There is no import-without-binding use case anymore
+// (tests were removed), so main() runs unconditionally.
+main()
 
 export default app
