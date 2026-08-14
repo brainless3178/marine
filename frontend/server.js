@@ -15,60 +15,28 @@
  * an SPA fallback.
  *
  * Self-healing: if the build output is missing at startup (e.g. the deploy
- * build step was skipped or failed), we run the Vite build on the fly and,
- * only if that fails too, serve a clear diagnostic page instead of crashing.
+ * build step was skipped or failed), we kick the build off in the background
+ * and start listening immediately, serving a warm-up page until index.html
+ * exists. Blocking the process here made Hostinger's proxy time out and every
+ * request came back 408. If the background build fails too, the warm-up page
+ * stays up with a hint instead of crashing.
  */
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const { execSync } = require("child_process");
+const { spawn } = require("child_process");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const distPath = path.join(__dirname, "dist");
 const indexPath = path.join(distPath, "index.html");
-const projectRoot = path.join(__dirname, "..");
-const buildTimeoutMs = 300 * 1000;
 
-// ─── Ensure the production build exists ──────────────────────────
-if (!fs.existsSync(indexPath)) {
-  console.error(`✖ Build not found at ${distPath}`);
-  console.error("  Attempting on-the-fly build...");
-  try {
-    // If dependencies are missing at the repo root, install them first so the
-    // Vite build (run from the root) can execute.
-    if (!fs.existsSync(path.join(projectRoot, "node_modules", "vite", "bin", "vite.js"))) {
-      console.error("  vite not installed — running npm install (may take a few minutes)...");
-      execSync("npm install --no-audit --no-fund", {
-        cwd: projectRoot,
-        stdio: "inherit",
-        timeout: buildTimeoutMs,
-      });
-    }
-    execSync("node ./node_modules/vite/bin/vite.js build", {
-      cwd: projectRoot,
-      stdio: "inherit",
-      timeout: buildTimeoutMs,
-    });
-  } catch (err) {
-    console.error("  On-the-fly build failed:", err.message);
-  }
-}
+// ─── Non-blocking self-healing build ─────────────────────────────
+let serving = false;
 
-if (!fs.existsSync(indexPath)) {
-  // Serve a diagnostic page instead of crash-looping, so the site is never
-  // a confusing 404/500 and the cause is visible in the browser.
-  console.error(`✖ Build still missing at ${distPath}`);
-  app.get("*", (_req, res) => {
-    res.status(503).type("html").send(`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Build missing</title></head>
-<body style="font-family:system-ui;max-width:640px;margin:80px auto;padding:0 20px">
-<h1>Frontend build not found</h1>
-<p>The production build is missing at <code>${distPath}</code>.</p>
-<p>Check the Hostinger deployment log for build errors, then redeploy.</p>
-</body></html>`);
-  });
-} else {
+function registerStaticHandlers() {
+  if (serving) return;
+  serving = true;
   // Serve the built SPA with cache headers that match Vite's hashed output:
   //  - /assets/* (content-hashed js/css) + hashed root files: immutable, 1 year
   //    (the hash changes on every deploy, so a long maxAge is safe — repeat
@@ -103,6 +71,46 @@ if (!fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
   });
 }
+
+if (fs.existsSync(indexPath)) {
+  registerStaticHandlers();
+} else {
+  console.error(`X Build not found at ${distPath}`);
+  console.error("  Starting on-the-fly build in the background...");
+  // frontend/package.json's "build" script installs root deps (if needed),
+  // runs Vite from the repo root, then prerenders and regenerates the sitemap.
+  // shell:true — npm is npm.cmd on Windows and a shell script on Linux.
+  const child = spawn("npm", ["run", "build"], {
+    cwd: __dirname,
+    stdio: "inherit",
+    shell: process.platform === "win32",
+  });
+  child.on("error", (err) => {
+    console.error(`X Could not start on-the-fly build: ${err.message}`);
+  });
+  child.on("exit", (code) => {
+    if (code === 0 && fs.existsSync(indexPath)) {
+      console.log(`V Build finished — now serving ${distPath}`);
+      registerStaticHandlers();
+    } else {
+      console.error(`X On-the-fly build failed (exit code ${code}) — keeping the warm-up page up`);
+    }
+  });
+}
+
+// While the build is running, answer instantly instead of hanging so the
+// proxy never times out: fast 204 for /favicon.ico, warm-up page elsewhere.
+app.use((req, res, next) => {
+  if (serving) return next();
+  if (req.url === "/favicon.ico") return res.status(204).end();
+  res.status(503).type("html").send(`<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta http-equiv="refresh" content="10"><title>Starting...</title></head>
+<body style="font-family:system-ui;max-width:640px;margin:80px auto;padding:0 20px">
+<h1>Alka Traders is starting up</h1>
+<p>The production build is being generated right now. This page refreshes automatically and the site will appear when it is ready.</p>
+<p>If this page persists, check the Hostinger deployment log for build errors, then redeploy.</p>
+</body></html>`);
+});
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Frontend serving ${distPath} on port ${PORT}`);
