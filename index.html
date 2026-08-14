@@ -15,6 +15,38 @@
     <meta name="keywords" content="marine equipment, industrial spares, ship parts, hydraulic systems, electrical automation, surplus machinery, emergency procurement, marine pumps, engine parts, navigation equipment, ABB drives, Siemens PLC, Parker hydraulics" />
     <meta name="theme-color" content="#0c2d48" />
 
+    <!-- The build-time prerenderer injects an SEO shell (h1/p) inside #root
+         for crawlers. Hide it from humans so it never flashes before React
+         mounts; the shell class only exists in prerendered files.
+         The app-loading spinner is the visible pre-React state: it paints
+         immediately from the static HTML and is wiped by React on mount. -->
+    <style>
+      #root .seo-shell { display: none; }
+      .app-loading {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f6f4ef;
+      }
+      .app-loading::after {
+        content: '';
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(0, 121, 107, 0.2);
+        border-top-color: #00796b;
+        border-radius: 50%;
+        animation: app-loading-spin 0.8s linear infinite;
+      }
+      html.dark .app-loading { background: #111816; }
+      html.dark .app-loading::after {
+        border-color: rgba(93, 213, 191, 0.2);
+        border-top-color: #5dd5bf;
+      }
+      @keyframes app-loading-spin { to { transform: rotate(360deg); } }
+    </style>
+
     <!-- Apply the saved theme before first paint to avoid a light-mode flash.
          Falls back to the VITE_DEFAULT_THEME env var ("dark" or "light").
          %VITE_DEFAULT_THEME% is replaced by Vite at build time. -->
@@ -124,7 +156,9 @@
 
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="app-loading" role="status" aria-label="Loading"></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

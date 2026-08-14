@@ -227,9 +227,15 @@ export const useStore = create<AppState>((set, get) => ({
       // the httpOnly refresh cookie before calling /admin/auth/me.
       if (!getAdminToken()) {
         const restored = await refreshAdminSession()
-        if (!restored) {
+        if (restored === 'invalid') {
           localStorage.removeItem('alka-admin-auth')
           set({ adminUser: null, isAdminLoggedIn: false, adminSessionLoading: false })
+          return
+        }
+        if (restored !== 'ok') {
+          // API temporarily unreachable (cold start / outage) — keep the
+          // marker so the session can be restored on the next page load.
+          set({ adminSessionLoading: false })
           return
         }
       }
@@ -367,9 +373,15 @@ export const useStore = create<AppState>((set, get) => ({
     // the httpOnly refresh cookie before calling /auth/me.
     if (!getCustomerToken()) {
       const restored = await refreshCustomerSession()
-      if (!restored) {
+      if (restored === 'invalid') {
         set({ isLoggedIn: false, user: null, isSessionLoading: false })
         localStorage.removeItem('alka-auth')
+        return
+      }
+      if (restored !== 'ok') {
+        // API temporarily unreachable (cold start / outage) — keep the
+        // marker so the session can be restored on the next page load.
+        set({ isSessionLoading: false })
         return
       }
     }

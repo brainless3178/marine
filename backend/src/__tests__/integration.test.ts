@@ -137,6 +137,28 @@ describe('Integration: CSRF Protection', () => {
 
     expect(res.status).toHaveBeenCalledWith(403)
   })
+
+  it('should skip CSRF for admin refresh under the /api/v1 prefix', () => {
+    const req = { method: 'POST', path: '/api/v1/admin/auth/refresh', originalUrl: '/api/v1/admin/auth/refresh', cookies: { 'csrf-token': 'some-token' }, headers: {} } as any
+    const res = {} as any
+    const next = vi.fn()
+
+    verifyCsrf(req, res, next)
+
+    expect(next).toHaveBeenCalled()
+  })
+
+  it('should skip CSRF for customer refresh under both prefixes', () => {
+    for (const originalUrl of ['/api/auth/refresh', '/api/v1/auth/refresh']) {
+      const req = { method: 'POST', path: originalUrl, originalUrl, cookies: { 'csrf-token': 'some-token' }, headers: {} } as any
+      const res = {} as any
+      const next = vi.fn()
+
+      verifyCsrf(req, res, next)
+
+      expect(next).toHaveBeenCalled()
+    }
+  })
 })
 
 describe('Integration: Rate Limiting', () => {

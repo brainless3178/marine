@@ -132,11 +132,14 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 // ─── Token Refresh ──────────────────────────────────────────────
 
+/** Result of a refresh attempt: renewed, definitively rejected, or temporarily unavailable. */
+export type RefreshResult = 'ok' | 'invalid' | 'unavailable'
+
 /**
  * Restore the in-memory admin access token from the httpOnly refresh cookie.
  * Used on page reload, when the in-memory token no longer exists.
  */
-export async function refreshAdminSession(): Promise<boolean> {
+export async function refreshAdminSession(): Promise<RefreshResult> {
   return tryRefreshAdmin()
 }
 
@@ -144,11 +147,11 @@ export async function refreshAdminSession(): Promise<boolean> {
  * Restore the in-memory customer access token from the httpOnly refresh cookie.
  * Used on page reload, when the in-memory token no longer exists.
  */
-export async function refreshCustomerSession(): Promise<boolean> {
+export async function refreshCustomerSession(): Promise<RefreshResult> {
   return tryRefreshCustomer()
 }
 
-async function tryRefreshAdmin(): Promise<boolean> {
+async function tryRefreshAdmin(): Promise<RefreshResult> {
   try {
     const res = await fetch(`${API_BASE}/admin/auth/refresh`, {
       method: 'POST',
@@ -157,19 +160,19 @@ async function tryRefreshAdmin(): Promise<boolean> {
     })
     if (!res.ok) {
       adminAccessToken = null
-      return false
+      return res.status === 401 || res.status === 403 ? 'invalid' : 'unavailable'
     }
     const data = await res.json()
     adminAccessToken = data.accessToken
-    return true
+    return 'ok'
   } catch {
     console.warn('[api] Admin token refresh failed — session may expire soon')
     adminAccessToken = null
-    return false
+    return 'unavailable'
   }
 }
 
-async function tryRefreshCustomer(): Promise<boolean> {
+async function tryRefreshCustomer(): Promise<RefreshResult> {
   try {
     const res = await fetch(`${API_BASE}/auth/refresh`, {
       method: 'POST',
@@ -178,15 +181,15 @@ async function tryRefreshCustomer(): Promise<boolean> {
     })
     if (!res.ok) {
       customerAccessToken = null
-      return false
+      return res.status === 401 || res.status === 403 ? 'invalid' : 'unavailable'
     }
     const data = await res.json()
     customerAccessToken = data.accessToken
-    return true
+    return 'ok'
   } catch {
     console.warn('[api] Customer token refresh failed — session may expire soon')
     customerAccessToken = null
-    return false
+    return 'unavailable'
   }
 }
 

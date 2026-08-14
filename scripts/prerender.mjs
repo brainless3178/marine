@@ -229,8 +229,10 @@ function seoHeadTags({ path, title, description, locale = 'en', extraJsonLd, bre
 function generateBodyHtml({ title, description }) {
   const heading = title || 'Alka Traders'
   const desc = description || DEFAULT_DESC
-  // React will replace this content on hydration for human visitors
-  return `<div>\n      <h1>${esc(heading)}</h1>\n      <p>${esc(desc)}</p>\n    </div>`
+  // React will replace this content on hydration for human visitors. The
+  // seo-shell class is hidden via inline CSS in index.html so it never
+  // flashes before React mounts, while crawlers still read the markup.
+  return `<div class="seo-shell">\n      <h1>${esc(heading)}</h1>\n      <p>${esc(desc)}</p>\n    </div>`
 }
 
 // ─── Template Injection ─────────────────────────────────────────

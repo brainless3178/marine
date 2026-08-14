@@ -106,9 +106,16 @@ export function verifyCsrf(req: Request, res: Response, next: NextFunction) {
     return next()
   }
 
-  // Skip CSRF for pure Bearer-token auth endpoints that never use cookies for state
-  // (admin routes use httpOnly refresh cookies + Bearer access tokens — CSRF still applies)
-  if (req.path.startsWith('/api/admin/auth/refresh')) {
+  // Skip CSRF for token-refresh endpoints. They are authenticated by the
+  // httpOnly refresh cookie alone and are not state-changing in a way CSRF
+  // could abuse (a forged refresh only re-issues a token for the victim's own
+  // account). The SPA calls them without an X-CSRF-Token header.
+  // NOTE: verifyCsrf is mounted at app level, so req.originalUrl carries the
+  // full prefix — match BOTH the legacy /api and the /api/v1 paths.
+  if (
+    /^\/(?:api|api\/v1)\/admin\/auth\/refresh$/.test(req.originalUrl) ||
+    /^\/(?:api|api\/v1)\/auth\/refresh$/.test(req.originalUrl)
+  ) {
     return next()
   }
 
