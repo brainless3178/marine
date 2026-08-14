@@ -4,5 +4,5 @@
   "rootDir": ".",
   "buildCommand": "npm install --include=dev && npx prisma generate && npx tsc",
   "startCommand": "node dist/server.js",
-  "entryFile": "server.js"
+  "entryFile": "dist/server.js"
 }
