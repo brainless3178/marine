@@ -24,6 +24,7 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
 const { spawn } = require("child_process");
 
 const app = express();
@@ -46,6 +47,85 @@ function log(line) {
 setInterval(() => {
   log(`[heartbeat] alive — serving=${serving} uptime=${Math.round(process.uptime())}s`);
 }, 30000).unref();
+
+// ─── Content Security Policy (report-only) ──────────────────────
+// Sent as Content-Security-Policy-Report-Only: the browser enforces nothing
+// but logs every violation it WOULD have blocked (DevTools console), so the
+// policy can be validated against the real site before it is enforced.
+// To enforce later, rename the header below to "Content-Security-Policy".
+//
+// What the policy allows (drawn from the actual production build):
+//   - Google Fonts:  stylesheets from fonts.googleapis.com, woff2 from
+//                    fonts.gstatic.com (index.html preloads them)
+//   - Cloudinary:    product/brand/category images from res.cloudinary.com
+//   - API:           fetch() to api.alkatraders.co only
+//   - PayPal:        SDK script + frames (www.paypal.com, sandbox.paypal.com)
+//                    + static assets (www.paypalobjects.com)
+//   - Inline scripts: the Vite theme bootstrap in index.html. Hashed with
+//                    sha256 at startup so 'unsafe-inline' stays out of the
+//                    policy; the inline onload on the font preload link is
+//                    covered via 'unsafe-hashes' + its hash.
+//   - Inline styles: React / framer-motion set style attributes at runtime,
+//                    so style-src needs 'unsafe-inline' (styles are far less
+//                    dangerous than scripts; XSS protection comes from the
+//                    script policy).
+//
+// If Sentry is enabled later (VITE_SENTRY_DSN), add its ingest host to
+// connect-src (e.g. https://oXXXXX.ingest.sentry.io).
+function sha256Base64(value) {
+  return crypto.createHash("sha256").update(value).digest("base64");
+}
+
+function computeInlineHashes() {
+  const scripts = [];
+  const handlers = [];
+  try {
+    const html = fs.readFileSync(indexPath, "utf-8");
+    const scriptRe = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g;
+    let m;
+    while ((m = scriptRe.exec(html))) scripts.push(`'sha256-${sha256Base64(m[1])}'`);
+    const handlerRe = /\b(?:onload|onerror|onclick|onchange|oninput)="([^"]*)"/g;
+    while ((m = handlerRe.exec(html))) handlers.push(`'sha256-${sha256Base64(m[1])}'`);
+  } catch {
+    // Build output not present yet — the warm-up page has no inline scripts.
+  }
+  return { scripts, handlers };
+}
+
+const inlineHashes = computeInlineHashes();
+
+function cspPolicy() {
+  const scriptSrc = [
+    "'self'",
+    "https://www.paypal.com",
+    "https://www.paypalobjects.com",
+    ...inlineHashes.scripts,
+  ].join(" ");
+  const unsafeHashes = inlineHashes.handlers.length
+    ? ` 'unsafe-hashes' ${inlineHashes.handlers.join(" ")}`
+    : "";
+  return [
+    "default-src 'self'",
+    `script-src ${scriptSrc}${unsafeHashes}`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https://res.cloudinary.com https://www.paypalobjects.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "connect-src 'self' https://api.alkatraders.co https://*.paypal.com https://*.paypalobjects.com",
+    "frame-src https://www.paypal.com https://sandbox.paypal.com",
+    "worker-src 'self' blob:",
+    "manifest-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
+
+app.use((_req, res, next) => {
+  res.setHeader("Content-Security-Policy-Report-Only", cspPolicy());
+  next();
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
