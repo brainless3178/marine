@@ -118,31 +118,7 @@ async function main() {
   const productCount = 0
   console.log(`✅ ${productCount} products (catalog intentionally empty)`)
 
-  // ─── Create Testimonials ───────────────────────────────────
-  const testimonialData = [
-    { name: 'fuegocat77 (276)', role: '', company: '', text: 'Record 91 ½ C Pipe Vise received as pictured on eBay. Shipping was very fast and FREE, with unexpectedly quick delivery from India. Packaging could have been better. Item shipped in corrugated cardboard box completely wrapped in duck tape. Vise itself was heavily covered in bubble wrap. Box was padded with pieces of Styrofoam on the sides and top, but not the bottom. As a result, the front mounting pad wore through the box, resulting in scraped paint. Nothing broken, so not an issue.', rating: 5 },
-    { name: 'noraedward (1104)', role: '', company: '', text: 'Very helpful seller. They investigated the issue I had when the delivery company delivered my parcel to the wrong person. Was very quick to address the situation, keep me informed and get the parcel delivered to me. Would recommend.', rating: 5 },
-    { name: 'b2esurplus (7400)', role: '', company: '', text: 'Five star transaction. Good shipping. Good packaging. Item as described. Good quality product in good condition. Good appearance. Thank you for the good transaction! All five stars. At B2E Surplus (aka Back to Earth Surplus), we buy and sell a lot of similar merchandise. We are always interested in bulk lots and/or good deals on industrial supplies. Look us up anytime!', rating: 5 },
-  ]
-
-  for (let i = 0; i < testimonialData.length; i++) {
-    await prisma.testimonial.create({
-      data: { ...testimonialData[i], sortOrder: i, isVisible: true },
-    })
-  }
-  console.log(`✅ ${testimonialData.length} testimonials`)
-
-  // ─── Create Offices ────────────────────────────────────────
-  const officeData = [
-    { city: 'BHAVNAGAR', country: 'India', address: 'PLOT - 7 ALANG HOUSE, MOTITALAV ROAD, KHUMBHARWADA', timezone: 'Asia/Kolkata', phone: '+91 87990 95041', email: 'sales@alkatraders.co', coordinatesLat: 21.7645, coordinatesLng: 72.1519 },
-  ]
-
-  for (let i = 0; i < officeData.length; i++) {
-    await prisma.office.create({ data: { ...officeData[i], sortOrder: i, isVisible: true } })
-  }
-  console.log(`✅ ${officeData.length} offices`)
-
-  // ─── Create Store Settings ──────────────────────────────────
+  // ─── Store Settings ──────────────────────────────────────────
   const settings = [
     { key: 'site.companyName', value: 'Alka Traders', category: 'site' },
     { key: 'site.tagline', value: 'Marine and Industrial Equipment', category: 'site' },
@@ -165,23 +141,6 @@ async function main() {
     })
   }
   console.log(`✅ ${settings.length} store settings`)
-
-  // ─── Create Homepage Sections ───────────────────────────────
-  const homepageSections = [
-    { sectionType: 'hero', label: 'Hero Banner', sortOrder: 0, config: {} },
-    { sectionType: 'featured', label: 'Featured Products', sortOrder: 1, config: {} },
-    { sectionType: 'stats', label: 'Stats Bar', sortOrder: 2, config: {} },
-    { sectionType: 'categories', label: 'Categories Grid', sortOrder: 3, config: {} },
-    { sectionType: 'brands', label: 'Brand Marquee', sortOrder: 4, config: {} },
-    { sectionType: 'testimonials', label: 'Testimonials', sortOrder: 5, config: {} },
-    { sectionType: 'industries', label: 'Industries Tabs', sortOrder: 6, config: {} },
-    { sectionType: 'cta', label: 'RFQ CTA', sortOrder: 7, config: {} },
-  ]
-
-  for (const s of homepageSections) {
-    await prisma.homepageSection.create({ data: { ...s, isEnabled: true } })
-  }
-  console.log(`✅ ${homepageSections.length} homepage sections`)
 
   console.log('\n🎉 Seed complete!')
   console.log(`   Admin: ${adminEmail} / [REDACTED]`)

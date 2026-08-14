@@ -5,7 +5,7 @@ import type { NextFunction, Request, Response } from 'express'
  * In-memory GET response cache (node-cache).
  *
  * Only static, high-traffic, rarely-changing storefront endpoints are cached
- * (settings, categories, brands, industries, offices, testimonials, homepage).
+ * (settings, categories, brands, industries).
  * Every hit skips the database entirely — critical on Neon's free tier, where
  * a cold-start database connection can take seconds. A 5-minute TTL bounds
  * staleness, and admin/auth/authenticated requests are never cached.
@@ -19,9 +19,6 @@ const CACHEABLE_PATHS = [
   '/storefront/categories',
   '/storefront/brands',
   '/storefront/industries',
-  '/storefront/offices',
-  '/storefront/testimonials',
-  '/storefront/homepage',
 ]
 
 function isCacheable(path: string): boolean {

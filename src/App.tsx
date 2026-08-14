@@ -57,7 +57,6 @@ const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'))
 const AdminRFQs = lazy(() => import('./pages/admin/AdminRFQs'))
 const AdminOffers = lazy(() => import('./pages/admin/AdminOffers'))
 const AdminMessages = lazy(() => import('./pages/admin/AdminMessages'))
-const AdminHomepage = lazy(() => import('./pages/admin/AdminHomepage'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
 const AdminAuditLog = lazy(() => import('./pages/admin/AdminAuditLog'))
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'))
@@ -221,7 +220,6 @@ function AppContent() {
         <Route path="rfqs" element={<AdminRFQs />} />
         <Route path="offers" element={<AdminOffers />} />
         <Route path="messages" element={<AdminMessages />} />
-        <Route path="homepage" element={<AdminHomepage />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="audit-log" element={<AdminAuditLog />} />
         <Route path="settings" element={<AdminSettings />} />

@@ -8,8 +8,8 @@
 import { api } from './core'
 import type {
   ApiProduct, ApiBrand, ApiCategory, ApiIndustry,
-  ApiOrder, ApiStoreSettings, ApiHomepageSection,
-  ApiTestimonial, ApiSearchResult, Pagination, ProductListResponse,
+  ApiOrder, ApiStoreSettings,
+  ApiSearchResult, Pagination, ProductListResponse,
 } from '../api-types'
 
 export const storefront = {
@@ -64,14 +64,6 @@ export const storefront = {
   // Settings
   settings: () =>
     api.get<{ settings: ApiStoreSettings }>('/storefront/settings'),
-
-  // Testimonials
-  testimonials: () =>
-    api.get<{ testimonials: ApiTestimonial[] }>('/storefront/testimonials'),
-
-  // Homepage
-  homepage: () =>
-    api.get<{ sections: ApiHomepageSection[] }>('/storefront/homepage'),
 
   // RFQ
   rfq: {

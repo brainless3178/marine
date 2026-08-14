@@ -102,11 +102,9 @@ import adminCustomerRoutes from './routes/admin/customers.js'
 import adminMessageRoutes from './routes/admin/messages.js'
 import adminMediaRoutes from './routes/admin/media.js'
 import adminSettingsRoutes from './routes/admin/settings.js'
-import adminHomepageRoutes from './routes/admin/homepage.js'
 import adminUserRoutes from './routes/admin/users.js'
 import adminDashboardRoutes from './routes/admin/dashboard.js'
 import adminAuditRoutes from './routes/admin/audit.js'
-import adminTestimonialRoutes from './routes/admin/testimonials.js'
 import adminBrandLogoRoutes from './routes/admin/brand-logo.js'
 
 import storefrontProductRoutes from './routes/storefront/products.js'
@@ -118,10 +116,7 @@ import storefrontRfqRoutes from './routes/storefront/rfq.js'
 import storefrontOfferRoutes from './routes/storefront/offers.js'
 import storefrontContactRoutes from './routes/storefront/contact.js'
 import storefrontSearchRoutes from './routes/storefront/search.js'
-import storefrontHomepageRoutes from './routes/storefront/homepage.js'
 import storefrontSettingsRoutes from './routes/storefront/settings.js'
-import storefrontTestimonialRoutes from './routes/storefront/testimonials.js'
-import storefrontOfficeRoutes from './routes/storefront/offices.js'
 import storefrontPaymentRoutes from './routes/storefront/payments.js'
 import storefrontSitemapRoutes from './routes/storefront/sitemap.js'
 
@@ -332,11 +327,9 @@ for (const prefix of API_PREFIXES) {
   app.use(`${prefix}/admin/messages`, adminLimiter, userAwareAdminLimiter, adminMessageRoutes)
   app.use(`${prefix}/admin/media`, adminLimiter, userAwareAdminLimiter, adminMediaRoutes)
   app.use(`${prefix}/admin/settings`, adminLimiter, userAwareAdminLimiter, adminSettingsRoutes)
-  app.use(`${prefix}/admin/homepage`, adminLimiter, userAwareAdminLimiter, adminHomepageRoutes)
   app.use(`${prefix}/admin/users`, adminLimiter, userAwareAdminLimiter, adminUserRoutes)
   app.use(`${prefix}/admin/dashboard`, adminLimiter, userAwareAdminLimiter, adminDashboardRoutes)
   app.use(`${prefix}/admin/audit`, adminLimiter, userAwareAdminLimiter, adminAuditRoutes)
-  app.use(`${prefix}/admin/testimonials`, adminLimiter, userAwareAdminLimiter, adminTestimonialRoutes)
 
   app.use(`${prefix}/storefront/products`, publicLimiter, storefrontProductRoutes)
   app.use(`${prefix}/storefront/categories`, publicLimiter, storefrontCategoryRoutes)
@@ -347,10 +340,7 @@ for (const prefix of API_PREFIXES) {
   app.use(`${prefix}/storefront/offers`, publicLimiter, storefrontOfferRoutes)
   app.use(`${prefix}/storefront/contact`, publicLimiter, storefrontContactRoutes)
   app.use(`${prefix}/storefront/search`, publicLimiter, storefrontSearchRoutes)
-  app.use(`${prefix}/storefront/homepage`, publicLimiter, storefrontHomepageRoutes)
   app.use(`${prefix}/storefront/settings`, publicLimiter, storefrontSettingsRoutes)
-  app.use(`${prefix}/storefront/testimonials`, publicLimiter, storefrontTestimonialRoutes)
-  app.use(`${prefix}/storefront/offices`, publicLimiter, storefrontOfficeRoutes)
   app.use(`${prefix}/storefront/payments`, publicLimiter, storefrontPaymentRoutes)
   app.use(`${prefix}/sitemap.xml`, publicLimiter, storefrontSitemapRoutes)
 

@@ -47,7 +47,6 @@ function mapEntityType(entityType: string): ActionType {
     category: 'product',
     media: 'product',
     offer: 'order',
-    homepage: 'settings',
   }
   return map[entityType] || 'other'
 }

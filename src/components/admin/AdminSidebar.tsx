@@ -12,7 +12,6 @@ import {
   HandCoins,
   Users,
   Mail,
-  Home,
   Settings,
   Shield,
   ClipboardList,
@@ -51,7 +50,6 @@ const adminNavItems: NavItem[] = [
   { type: 'nav', to: '/admin/customers', label: 'Customers', icon: <Users size={18} /> },
   { type: 'nav', to: '/admin/messages', label: 'Messages', icon: <Mail size={18} /> },
   { type: 'section', section: 'Content' },
-  { type: 'nav', to: '/admin/homepage', label: 'Homepage', icon: <Home size={18} /> },
   { type: 'nav', to: '/admin/settings', label: 'Store Settings', icon: <Settings size={18} /> },
   { type: 'nav', to: '/admin/users', label: 'Users & Roles', icon: <Shield size={18} /> },
   { type: 'nav', to: '/admin/audit-log', label: 'Audit Log', icon: <ClipboardList size={18} /> },
@@ -87,13 +85,11 @@ export function AdminSidebar() {
   // Role-based visibility — using actual role names from Prisma schema
   const ownerRoles = ['owner']
   const managerRoles = ['owner', 'store-manager', 'inventory-manager']
-  const contentRoles = ['owner', 'store-manager', 'content-manager']
   
   const canView = (path: string): boolean => {
     const role = adminUser?.role || 'owner'
     if (path === '/admin/users' || path === '/admin/audit-log') return ownerRoles.includes(role)
     if (path === '/admin/settings') return managerRoles.includes(role)
-    if (path === '/admin/homepage') return contentRoles.includes(role)
     if (path === '/admin/media' || path === '/admin/categories' || path === '/admin/brands' || path === '/admin/industries') return managerRoles.includes(role)
     return true
   }

@@ -499,40 +499,6 @@ model MediaAsset {
   @@map("media_assets")
 }
 
-// ─── Testimonials ──────────────────────────────────────────────
-model Testimonial {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String   @db.VarChar(255)
-  role      String?  @db.VarChar(255)
-  company   String?  @db.VarChar(255)
-  avatarUrl String?  @map("avatar_url") @db.Text
-  text      String   @db.Text
-  rating    Int      @default(5)
-  sortOrder Int      @default(0) @map("sort_order")
-  isVisible Boolean  @default(true) @map("is_visible")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map("testimonials")
-}
-
-// ─── Offices ───────────────────────────────────────────────────
-model Office {
-  id             String   @id @default(uuid()) @db.Uuid
-  city           String   @db.VarChar(255)
-  country        String   @db.VarChar(255)
-  address        String?  @db.Text
-  timezone       String?  @db.VarChar(100)
-  phone          String?  @db.VarChar(50)
-  email          String?  @db.VarChar(255)
-  coordinatesLat Decimal? @map("coordinates_lat") @db.Decimal(10, 7)
-  coordinatesLng Decimal? @map("coordinates_lng") @db.Decimal(10, 7)
-  sortOrder      Int      @default(0) @map("sort_order")
-  isVisible      Boolean  @default(true) @map("is_visible")
-  createdAt      DateTime @default(now()) @map("created_at")
-
-  @@map("offices")
-}
-
 // ─── Store Settings ────────────────────────────────────────────
 model StoreSetting {
   id        String   @id @default(uuid()) @db.Uuid
@@ -545,20 +511,6 @@ model StoreSetting {
   updater AdminUser? @relation(fields: [updatedBy], references: [id])
 
   @@map("store_settings")
-}
-
-// ─── Homepage Sections ─────────────────────────────────────────
-model HomepageSection {
-  id          String   @id @default(uuid()) @db.Uuid
-  sectionType String   @map("section_type") @db.VarChar(50)
-  label       String   @db.VarChar(255)
-  isEnabled   Boolean  @default(true) @map("is_enabled")
-  sortOrder   Int      @default(0) @map("sort_order")
-  config      Json     @default("{}") @db.JsonB
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("homepage_sections")
 }
 
 // ─── Audit Log ─────────────────────────────────────────────────

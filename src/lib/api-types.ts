@@ -27,8 +27,6 @@ import type {
   AuditLog,
   DashboardStats,
   StoreSettings,
-  HomepageSection,
-  Testimonial,
   SearchResult,
 } from '@shared/types'
 
@@ -99,14 +97,6 @@ export type ApiDashboardStats = DashboardStats
 // ─── Settings ────────────────────────────────────────────────
 
 export type ApiStoreSettings = StoreSettings
-
-// ─── Homepage Section ────────────────────────────────────────
-
-export type ApiHomepageSection = HomepageSection
-
-// ─── Testimonial ─────────────────────────────────────────────
-
-export type ApiTestimonial = Testimonial
 
 // ─── Search ─────────────────────────────────────────────────
 

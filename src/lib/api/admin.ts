@@ -10,7 +10,7 @@ import type {
   ApiProduct, ApiCategory, ApiBrand, ApiIndustry,
   ApiOrder, ApiRfq, ApiOffer, ApiCustomer, ApiMessage,
   ApiMediaAsset, ApiAdminUser, ApiAuditLog,
-  ApiStoreSettings, ApiHomepageSection, Pagination,
+  ApiStoreSettings, Pagination,
 } from '../api-types'
 import type { ApiDashboardStats } from '../api-types'
 
@@ -195,13 +195,6 @@ export const admin = {
     get: () => api.get<{ settings: ApiStoreSettings; flat: { key: string; value: string; category: string }[] }>('/admin/settings', { auth: 'admin' }),
     update: (settings: ApiStoreSettings) =>
       api.put<{ message: string; count: number }>('/admin/settings', { settings }, { auth: 'admin' }),
-  },
-
-  // Homepage
-  homepage: {
-    get: () => api.get<{ sections: ApiHomepageSection[] }>('/admin/homepage', { auth: 'admin' }),
-    update: (sections: ApiHomepageSection[]) =>
-      api.put<{ sections: ApiHomepageSection[] }>('/admin/homepage', { sections }, { auth: 'admin' }),
   },
 
   // Users (owner only)
