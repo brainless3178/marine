@@ -100,18 +100,31 @@ export async function convertOfferToOrder(id: string, actor: AuthUser) {
       currency: 'USD',
       customerNotes: `Converted from offer ${offer.offerNumber}`,
       customerId: offer.customerId || undefined,
-      items: {
-        create: [{
-          productId: offer.productId || undefined,
-          productName: offer.product?.name || 'Unknown Product',
-          productSku: offer.product?.sku || '',
-          quantity: offer.quantity,
-          unitPrice: price,
-          totalPrice: price * offer.quantity,
-        }],
-      },
-      timeline: { create: { status: 'pending', note: `Converted from offer ${offer.offerNumber}` } },
     },
+  })
+
+  try {
+    await prisma.orderItem.create({
+      data: {
+        orderId: order.id,
+        productId: offer.productId || undefined,
+        productName: offer.product?.name || 'Unknown Product',
+        productSku: offer.product?.sku || '',
+        quantity: offer.quantity,
+        unitPrice: price,
+        totalPrice: price * offer.quantity,
+      },
+    })
+    await prisma.orderTimeline.create({
+      data: { orderId: order.id, status: 'pending', note: `Converted from offer ${offer.offerNumber}` },
+    })
+  } catch (error) {
+    await prisma.order.delete({ where: { id: order.id } }).catch(() => {})
+    throw error
+  }
+
+  const fullOrder = await prisma.order.findUnique({
+    where: { id: order.id },
     include: { items: true },
   })
 
@@ -122,5 +135,5 @@ export async function convertOfferToOrder(id: string, actor: AuthUser) {
     newValue: { orderId: order.id, orderNumber: order.orderNumber },
   })
 
-  return { order }
+  return { order: fullOrder }
 }

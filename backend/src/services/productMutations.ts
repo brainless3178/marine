@@ -30,16 +30,32 @@ export async function createProduct(data: any, actor: AuthUser, ipAddress = '') 
     data: {
       ...fields, slug,
       createdBy: actor.id, updatedBy: actor.id,
-      ...(specs?.length ? {
-        specs: { create: specs.map((s: any, i: number) => ({ name: s.name, value: s.value, isPublic: s.isPublic ?? true, sortOrder: i })) },
-      } : {}),
-      ...(images?.length ? {
-        images: { create: images.map((img: any, i: number) => ({ url: img.url, altText: img.altText, label: img.label, isMain: img.isMain ?? (i === 0), sortOrder: i })) },
-      } : {}),
-      ...(industryIds?.length ? {
-        industries: { create: industryIds.map((id: string) => ({ industryId: id })) },
-      } : {}),
     },
+  })
+
+  try {
+    if (specs?.length) {
+      for (const [i, s] of specs.entries()) {
+        await prisma.productSpec.create({ data: { productId: product.id, name: s.name, value: s.value, isPublic: s.isPublic ?? true, sortOrder: i } })
+      }
+    }
+    if (images?.length) {
+      for (const [i, img] of images.entries()) {
+        await prisma.productImage.create({ data: { productId: product.id, url: img.url, altText: img.altText, label: img.label, isMain: img.isMain ?? (i === 0), sortOrder: i } })
+      }
+    }
+    if (industryIds?.length) {
+      for (const industryId of industryIds) {
+        await prisma.productIndustry.create({ data: { productId: product.id, industryId } })
+      }
+    }
+  } catch (error) {
+    await prisma.product.delete({ where: { id: product.id } }).catch(() => {})
+    throw error
+  }
+
+  const fullProduct = await prisma.product.findUnique({
+    where: { id: product.id },
     include: productAdminInclude,
   })
 
@@ -50,7 +66,7 @@ export async function createProduct(data: any, actor: AuthUser, ipAddress = '') 
     ipAddress,
   })
 
-  return product
+  return fullProduct
 }
 
 // ─── Update Product ────────────────────────────────────────────
@@ -82,33 +98,40 @@ export async function updateProduct(id: string, data: any, actor: AuthUser, ipAd
   if (specs) {
     await prisma.productSpec.deleteMany({ where: { productId: id } })
     if (specs.length) {
-      await prisma.productSpec.createMany({
-        data: specs.map((s: any, i: number) => ({ productId: id, name: s.name, value: s.value, isPublic: s.isPublic ?? true, sortOrder: i })),
-      })
+      for (const [i, s] of specs.entries()) {
+        await prisma.productSpec.create({ data: { productId: id, name: s.name, value: s.value, isPublic: s.isPublic ?? true, sortOrder: i } })
+      }
     }
   }
   if (images) {
     await prisma.productImage.deleteMany({ where: { productId: id } })
     if (images.length) {
-      await prisma.productImage.createMany({
-        data: images.map((img: any, i: number) => ({ productId: id, url: img.url, altText: img.altText, label: img.label, isMain: img.isMain ?? (i === 0), sortOrder: i })),
-      })
+      for (const [i, img] of images.entries()) {
+        await prisma.productImage.create({ data: { productId: id, url: img.url, altText: img.altText, label: img.label, isMain: img.isMain ?? (i === 0), sortOrder: i } })
+      }
     }
   }
   if (industryIds) {
     await prisma.productIndustry.deleteMany({ where: { productId: id } })
     if (industryIds.length) {
-      await prisma.productIndustry.createMany({
-        data: industryIds.map((industryId: string) => ({ productId: id, industryId })),
-      })
+      for (const industryId of industryIds) {
+        await prisma.productIndustry.create({ data: { productId: id, industryId } })
+      }
     }
   }
 
-  const product = await prisma.product.update({
+  await prisma.product.update({
     where: { id },
     data: { ...fields, updatedBy: actor.id },
+  })
+
+  const product = await prisma.product.findUnique({
+    where: { id },
     include: productAdminInclude,
   })
+  if (!product) {
+    throw Object.assign(new Error('Product not found'), { status: 404 })
+  }
 
   await logAudit({
     actor, action: 'product.update', entityType: 'product',
@@ -215,10 +238,32 @@ export async function duplicateProduct(id: string, actor: AuthUser, ipAddress = 
       includedItems: source.includedItems, excludedItems: source.excludedItems,
       productType: source.productType,
       createdBy: actor.id, updatedBy: actor.id,
-      specs: { create: source.specs.map((s, i) => ({ name: s.name, value: s.value, isPublic: s.isPublic, sortOrder: i })) },
-      images: { create: source.images.map((img, i) => ({ url: img.url, altText: img.altText, label: img.label, isMain: img.isMain, sortOrder: i })) },
-      ...(source.industries.length ? { industries: { create: source.industries.map((ind) => ({ industryId: ind.industryId })) } } : {}),
     },
+  })
+
+  try {
+    if (source.specs.length) {
+      for (const [i, s] of source.specs.entries()) {
+        await prisma.productSpec.create({ data: { productId: product.id, name: s.name, value: s.value, isPublic: s.isPublic, sortOrder: i } })
+      }
+    }
+    if (source.images.length) {
+      for (const [i, img] of source.images.entries()) {
+        await prisma.productImage.create({ data: { productId: product.id, url: img.url, altText: img.altText, label: img.label, isMain: img.isMain, sortOrder: i } })
+      }
+    }
+    if (source.industries.length) {
+      for (const ind of source.industries) {
+        await prisma.productIndustry.create({ data: { productId: product.id, industryId: ind.industryId } })
+      }
+    }
+  } catch (error) {
+    await prisma.product.delete({ where: { id: product.id } }).catch(() => {})
+    throw error
+  }
+
+  const fullProduct = await prisma.product.findUnique({
+    where: { id: product.id },
     include: productAdminInclude,
   })
 
@@ -229,5 +274,5 @@ export async function duplicateProduct(id: string, actor: AuthUser, ipAddress = 
     ipAddress,
   })
 
-  return product
+  return fullProduct
 }

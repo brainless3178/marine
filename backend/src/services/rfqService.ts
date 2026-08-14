@@ -243,17 +243,30 @@ export async function convertRfqToOrder(id: string, total: number, unitPrice: nu
       shippingCity: rfq.deliveryLocation || '',
       shippingCountry: rfq.country || '',
       customerNotes: `Converted from RFQ ${rfq.rfqNumber}`,
-      items: {
-        create: [{
-          productName: rfq.productDescription.slice(0, 500),
-          productSku: rfq.partNumber || '',
-          quantity: rfq.quantity,
-          unitPrice: unitPrice || 0,
-          totalPrice: (unitPrice || 0) * rfq.quantity,
-        }],
-      },
-      timeline: { create: { status: 'pending', note: `Converted from RFQ ${rfq.rfqNumber}` } },
     },
+  })
+
+  try {
+    await prisma.orderItem.create({
+      data: {
+        orderId: order.id,
+        productName: rfq.productDescription.slice(0, 500),
+        productSku: rfq.partNumber || '',
+        quantity: rfq.quantity,
+        unitPrice: unitPrice || 0,
+        totalPrice: (unitPrice || 0) * rfq.quantity,
+      },
+    })
+    await prisma.orderTimeline.create({
+      data: { orderId: order.id, status: 'pending', note: `Converted from RFQ ${rfq.rfqNumber}` },
+    })
+  } catch (error) {
+    await prisma.order.delete({ where: { id: order.id } }).catch(() => {})
+    throw error
+  }
+
+  const fullOrder = await prisma.order.findUnique({
+    where: { id: order.id },
     include: { items: true },
   })
 
@@ -266,5 +279,5 @@ export async function convertRfqToOrder(id: string, total: number, unitPrice: nu
     ipAddress,
   })
 
-  return order
+  return fullOrder
 }

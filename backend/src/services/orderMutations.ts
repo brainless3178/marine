@@ -107,16 +107,29 @@ export async function createOrder(input: CreateOrderInput) {
       shippingPostalCode: shipping.postalCode || null,
       shippingCountry: shipping.country,
       customerNotes: idempotencyKey ? `[idem:${idempotencyKey}] ${customerNotes || ''}` : (customerNotes || null),
-      items: { create: orderItems },
-      timeline: {
-        create: {
-          status: 'pending',
-          note: skippedItems.length > 0
-            ? `Order placed. Skipped unavailable item(s): ${skippedItems.map(i => `${i.productId} (x${i.quantity})`).join(', ')}`
-            : 'Order placed',
-        },
-      },
     },
+  })
+
+  try {
+    for (const i of orderItems) {
+      await prisma.orderItem.create({ data: { orderId: order.id, ...i } })
+    }
+    await prisma.orderTimeline.create({
+      data: {
+        orderId: order.id,
+        status: 'pending',
+        note: skippedItems.length > 0
+          ? `Order placed. Skipped unavailable item(s): ${skippedItems.map(i => `${i.productId} (x${i.quantity})`).join(', ')}`
+          : 'Order placed',
+      },
+    })
+  } catch (error) {
+    await prisma.order.delete({ where: { id: order.id } }).catch(() => {})
+    throw error
+  }
+
+  const fullOrder = await prisma.order.findUnique({
+    where: { id: order.id },
     include: { items: true, timeline: true },
   })
 
@@ -126,7 +139,7 @@ export async function createOrder(input: CreateOrderInput) {
     newValue: order,
   })
 
-  return order
+  return fullOrder
 }
 
 // ─── Request Cancellation ──────────────────────────────────────
