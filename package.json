@@ -15,7 +15,6 @@
     "typecheck": "node ./node_modules/typescript/bin/tsc -b --noEmit",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "preview": "node ./node_modules/vite/bin/vite.js preview",
-    "deploy:netlify": "npx -y netlify-cli deploy --prod --dir=dist --site 2bf187c6-9d37-462f-a61d-83af462c2e73",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest"

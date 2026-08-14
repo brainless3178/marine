@@ -11,7 +11,7 @@
  */
 
 const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '')
-// '/api' is a legacy value (old Netlify dev proxy / old env files). The
+// '/api' is a legacy value (old dev proxy / old env files). The
 // Hostinger frontend has no /api proxy, so that value would silently break
 // every API call — fall back to the production API instead. An empty value is
 // left untouched so the Vite dev-server proxy keeps working during local

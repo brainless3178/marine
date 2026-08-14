@@ -5,6 +5,7 @@ import { prisma } from '../server.js'
 import { logAudit } from '../utils/audit.js'
 import { sendWelcome, sendPasswordReset } from './email.js'
 import logger from '../utils/logger.js'
+import { getFrontendUrl } from '../utils/env.js'
 import type { AuthUser } from '../middleware/auth.js'
 
 // JWT_SECRET availability is guaranteed by backend/src/utils/env.ts, which
@@ -146,7 +147,7 @@ export async function forgotPassword(email: string) {
     { expiresIn: '1h' }
   )
 
-  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`
+  const resetUrl = `${getFrontendUrl()}/reset-password?token=${resetToken}`
 
   sendPasswordReset({ to: customer.email, name: customer.name, resetUrl }).catch(err => {
     logger.error({ err }, 'Password reset email failed')

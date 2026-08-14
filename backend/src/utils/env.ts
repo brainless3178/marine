@@ -46,6 +46,17 @@ if (isProduction) {
   }
 }
 
+// ─── Frontend URL Resolver ───────────────────────────────────────
+// The Hostinger frontend lives at https://alkatraders.co (API at
+// api.alkatraders.co). Production must NEVER fall back to localhost, or
+// PayPal return URLs, password-reset links and email buttons would point at
+// the admin's machine. Dev keeps the localhost fallback for local testing.
+export function getFrontendUrl(): string {
+  const explicit = process.env.FRONTEND_URL?.trim()
+  if (explicit) return explicit
+  return isProduction ? 'https://alkatraders.co' : 'http://localhost:5173'
+}
+
 const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v])
 if (missingVars.length > 0) {
   // Written to stderr rather than through pino: the logger writes to stdout, so a

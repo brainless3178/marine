@@ -13,7 +13,7 @@ import { applyImageFallback } from '../../lib/utils'
 
 /**
  * OptimizedImage renders a clean, high-performance <img> element.
- * Bypasses fragile <picture> type negotiation that can break in browsers or Netlify header edge cases.
+ * Bypasses fragile <picture> type negotiation that can break in browsers or edge-case header caching.
  *
  * On error: applies a graceful fallback chain directly on the DOM element
  * (avoids React state re-render flicker):

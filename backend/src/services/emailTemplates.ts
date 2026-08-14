@@ -1,8 +1,9 @@
 import { escapeHtml } from '../utils/html-escape.js'
+import { getFrontendUrl } from '../utils/env.js'
 
 const WHATSAPP = process.env.WHATSAPP_NUMBER || '918799095041'
 const COMPANY = process.env.COMPANY_EMAIL || 'sales@alkatraders.co'
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+const FRONTEND_URL = getFrontendUrl()
 // Single inbox for ALL inbound form submissions — contact form, RFQ,
 // emergency request, and make-offer. Hard-defaults to sales@alkatraders.co
 // so user submissions always land in the sales inbox regardless of other

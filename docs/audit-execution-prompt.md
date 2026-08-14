@@ -19,8 +19,8 @@ unless a task below explicitly requires it.
    a missing guard or an inconsistency, fix it with the smallest change that
    uses existing mechanisms.
 3. **Do not change deployment configuration or architecture.** Hostinger
-   (primary), Netlify (fallback), and Render (blueprint) are out of scope except
-   to verify nothing you touch breaks them (task L).
+   (frontend + backend) is out of scope except to verify nothing you touch
+   breaks it (task L).
 4. **Do not delete unrelated uncommitted work.** The working tree intentionally
    contains untracked files (`backend/eslint.config.js`,
    `src/components/admin/toast-context.ts`, `src/hooks/useTickerNow.ts`) and many
@@ -194,7 +194,7 @@ unless a task below explicitly requires it.
 - `backend/src/utils/env.ts` already warns in production when `FRONTEND_URL` or
   `CORS_ORIGIN` is missing or points at localhost. Verify that warning covers
   all the consumers above and that production config files (`.env.production`,
-  `render.yaml`, Netlify/Hostinger env) actually set real `https://` values.
+  Hostinger env) actually set real `https://` values.
 - Add tests for URL construction where practical (e.g. PayPal return URL uses
   the configured `FRONTEND_URL`, not the localhost fallback, when set).
 
@@ -207,11 +207,9 @@ unless a task below explicitly requires it.
 
 ## Task L — No accidental deployment changes
 
-- Verify the fixes do not break any deployment path:
-  - **Hostinger** (primary — `backend/` service + built frontend),
-  - **Netlify** (`netlify.toml` fallback),
-  - **Render** (`render.yaml` blueprint, incl. its `FRONTEND_URL`/`CORS_ORIGIN`
-    env block).
+- Verify the fixes do not break the deployment path:
+  - **Hostinger** (primary — `backend/` service + built frontend,
+    incl. `.hostinger/config.json` env).
 - Do not change deployment architecture, build commands, or runtime settings.
   If a fix touches a file consumed by deployment (env defaults, build output,
   settings seeds), confirm the deployment still functions with the change.

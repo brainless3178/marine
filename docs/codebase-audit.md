@@ -37,7 +37,7 @@
 | Unit tests passing | 662 (387 frontend + 275 backend) |
 | Playwright e2e specs | 9 (smoke, auth, admin, api, cart-checkout, rfq-search, storefront, responsive, accessibility) |
 | Commits | 179, conventional prefixes (`feat/fix/chore/perf`) |
-| Deploy targets | Hostinger (primary), Netlify (fallback), Render (blueprint) |
+| Deploy targets | Hostinger (primary — frontend + backend) |
 
 ---
 
