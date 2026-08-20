@@ -449,7 +449,8 @@ export function Navbar() {
           style={{
             // The menu drops below the FULL sticky header (utility bar + nav),
             // so keep a comfortable bottom margin and reserve room for the iOS
-            // home indicator — otherwise the last items sit under it.              maxHeight: mobileOpen
+            // home indicator — otherwise the last items sit under it.
+            maxHeight: mobileOpen
               ? (topBarHidden
                   ? 'calc(100dvh - 52px - 2.5rem - env(safe-area-inset-bottom, 0px))'
                   : 'calc(100dvh - var(--hero-header-offset) - 2.5rem - env(safe-area-inset-bottom, 0px))')
