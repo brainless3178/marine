@@ -1,7 +1,7 @@
 {
   "runtime": "node",
   "nodeVersion": "22",
-  "rootDir": "frontend",
+  "rootDir": ".",
   "buildCommand": "npm install && npm run build",
   "startCommand": "npm start",
   "entryFile": "server.js"
