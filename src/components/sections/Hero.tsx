@@ -1,16 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Check, Search, ShoppingCart } from 'lucide-react'
-import { Typewriter } from '@/components/ui/Typewriter'
 import { Globe } from '@/components/ui/cobe-globe'
 import { useLocalizedPath } from '@/lib/locale'
 import { useStore } from '@/store/useStore'
-
-const TYPED_PHRASES = [
-  'Delivered Worldwide.',
-  'Sourced Within Hours.',
-  'Certified & Tested.',
-  'Shipped to 50+ Countries.',
-]
 
 const TRUST_BADGES = [
   'Worldwide Shipping',
@@ -19,10 +11,9 @@ const TRUST_BADGES = [
   'RFQ Support',
 ]
 
-// Alka Traders global network — HQ (Bhavnagar) plus the major shipping
-// corridors the storefront serves. Rendered as markers + arcs on the globe.
+// Alka Traders global network — major shipping corridors the storefront
+// serves. Rendered as markers + arcs on the globe.
 const MARKERS = [
-  { id: 'bhavnagar', location: [21.7645, 72.1519] as [number, number], label: 'Bhavnagar' },
   { id: 'dubai', location: [25.2048, 55.2708] as [number, number], label: 'Dubai' },
   { id: 'singapore', location: [1.3521, 103.8198] as [number, number], label: 'Singapore' },
   { id: 'rotterdam', location: [51.9225, 4.4792] as [number, number], label: 'Rotterdam' },
@@ -34,9 +25,6 @@ const MARKERS = [
 ]
 
 const ARCS = [
-  { id: 'bhv-dxb', from: [21.7645, 72.1519] as [number, number], to: [25.2048, 55.2708] as [number, number], label: 'Bhavnagar → Dubai' },
-  { id: 'bhv-sin', from: [21.7645, 72.1519] as [number, number], to: [1.3521, 103.8198] as [number, number], label: 'Bhavnagar → Singapore' },
-  { id: 'bhv-hou', from: [21.7645, 72.1519] as [number, number], to: [29.7604, -95.3698] as [number, number], label: 'Bhavnagar → Houston' },
   { id: 'dxb-rtm', from: [25.2048, 55.2708] as [number, number], to: [51.9225, 4.4792] as [number, number], label: 'Dubai → Rotterdam' },
 ]
 
@@ -76,10 +64,7 @@ export function Hero() {
               style={{ animationDelay: '60ms' }}
             >
               Trusted Marine Spare Parts.
-              <Typewriter
-                phrases={TYPED_PHRASES}
-                className="mt-1 block text-[var(--hero-accent-hover)]"
-              />
+              <span className="mt-1 block text-[var(--hero-accent-hover)]">Delivered Worldwide.</span>
             </h1>
 
             <p
