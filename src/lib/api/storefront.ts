@@ -112,7 +112,7 @@ export const storefront = {
       }
       paymentMethod: string; customerNotes?: string; idempotencyKey?: string
       subtotal?: number; tax?: number; total?: number
-    }) => api.post<{ order: ApiOrder }>('/storefront/orders', data, { auth: 'customer' }),
+    }) => api.post<{ order: ApiOrder }>('/storefront/orders', data),
 
     get: (id: string) =>
       api.get<{ order: ApiOrder }>(`/storefront/orders/${id}`, { auth: 'customer' }),

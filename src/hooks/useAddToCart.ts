@@ -7,7 +7,7 @@ import type { Product } from '../types'
  * Eliminates ~80 lines of duplicated code across Home, Shop, Products, ProductDetail.
  */
 export function useAddToCart() {
-  const { isLoggedIn, setShowAuthModal, addToCart } = useStore()
+  const { addToCart } = useStore()
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
   const timerRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
@@ -22,10 +22,6 @@ export function useAddToCart() {
   const handleAddToCart = useCallback(
     (product: Product, quantity = 1) => {
       if (!product.inStock) return
-      if (!isLoggedIn) {
-        setShowAuthModal(true)
-        return
-      }
       for (let i = 0; i < quantity; i++) {
         addToCart(product)
       }
@@ -45,7 +41,7 @@ export function useAddToCart() {
         }, 1500),
       )
     },
-    [isLoggedIn, setShowAuthModal, addToCart],
+    [addToCart],
   )
 
   return { handleAddToCart, addedIds }

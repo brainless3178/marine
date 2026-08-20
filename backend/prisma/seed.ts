@@ -130,7 +130,7 @@ async function main() {
     { key: 'site.emergencyEmail', value: process.env.EMERGENCY_EMAIL || 'sales@alkatraders.co', category: 'site' },
     { key: 'checkout.shippingCost', value: Number(process.env.DEFAULT_SHIPPING_COST) || 25, category: 'checkout' },
     { key: 'checkout.taxRate', value: Number(process.env.DEFAULT_TAX_RATE) || 0.08, category: 'checkout' },
-    { key: 'checkout.freeShippingThreshold', value: 500, category: 'checkout' },
+    { key: 'checkout.freeShippingThreshold', value: 100, category: 'checkout' },
   ]
 
   for (const s of settings) {

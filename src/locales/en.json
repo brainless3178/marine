@@ -12,8 +12,8 @@
     "language": "Language"
   },
   "topbar": {
-    "freeShipping": "Free shipping above $500",
-    "freeShippingSub": "On orders above $500",
+    "freeShipping": "Free shipping above $100",
+    "freeShippingSub": "On orders above $100",
     "timelyDelivery": "Timely delivery",
     "timelyDeliverySub": "48-hour dispatch guarantee",
     "securePayment": "Secure payment",
@@ -250,7 +250,7 @@
     "viewAll": "View All",
     "items": "items",
     "freeShipping": "Free Shipping",
-    "freeShippingSub": "Above $500",
+    "freeShippingSub": "Above $100",
     "timelyDelivery": "Timely Delivery",
     "timelyDeliverySub": "48hr dispatch",
     "securePayment": "Secure Payment",

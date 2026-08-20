@@ -36,7 +36,7 @@ export async function getPublicSettings() {
   result['site.whatsappNumber'] = result['site.whatsappNumber'] || process.env.WHATSAPP_NUMBER || '918799095041'
   result['checkout.shippingCost'] = result['checkout.shippingCost'] || Number(process.env.DEFAULT_SHIPPING_COST) || 25
   result['checkout.taxRate'] = result['checkout.taxRate'] || Number(process.env.DEFAULT_TAX_RATE) || 0.08
-  result['checkout.freeShippingThreshold'] = result['checkout.freeShippingThreshold'] || 500
+  result['checkout.freeShippingThreshold'] = result['checkout.freeShippingThreshold'] || 100
 
   return { settings: result }
 }

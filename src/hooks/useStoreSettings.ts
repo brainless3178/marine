@@ -15,7 +15,7 @@ const DEFAULTS: StoreSettings = {
   whatsappNumber: '918799095041',
   shippingCost: 25,
   taxRate: 0.08,
-  freeShippingThreshold: 500,
+  freeShippingThreshold: 100,
   rfqEmail: 'sales@alkatraders.co',
   emergencyEmail: 'sales@alkatraders.co',
   phoneNumber: '+918799095041',

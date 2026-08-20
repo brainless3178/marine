@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -74,6 +74,7 @@ export function Navbar() {
   const locale = useLocale()
   const localizedPath = useLocalizedPath()
   const [scrolled, setScrolled] = useState(false)
+  const [topBarHidden, setTopBarHidden] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -87,11 +88,36 @@ export function Navbar() {
   const cartCount = getCartCount()
   const settings = useStoreSettings()
 
+  // ── Scroll tracking: shadow + mobile top-bar hide ──────────────
+  const lastScrollY = useRef(0)
+  const ticking = useRef(false)
+
   useEffect(() => {
     const handleScroll = () => {
-      // Only drives the header shadow. The header itself is never hidden by
-      // scroll position — it stays sticky (top bar + nav) at all times.
-      setScrolled(window.scrollY > 32)
+      if (ticking.current) return
+      ticking.current = true
+      requestAnimationFrame(() => {
+        const scrollY = window.scrollY
+        setScrolled(scrollY > 32)
+
+        // On mobile: hide the utility bar when scrolling down past the
+        // threshold, show it again when scrolling back up. Only kicks in
+        // after the user has scrolled enough that the top bar is off-screen
+        // anyway — no visible flicker.
+        if (window.innerWidth < 1024) {
+          const THRESHOLD = 80
+          if (scrollY > lastScrollY.current && scrollY > THRESHOLD) {
+            setTopBarHidden(true)
+          } else if (scrollY < lastScrollY.current) {
+            setTopBarHidden(false)
+          }
+        } else {
+          setTopBarHidden(false)
+        }
+
+        lastScrollY.current = scrollY
+        ticking.current = false
+      })
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
@@ -137,7 +163,11 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50">
       {/* ── TOP UTILITY BAR: email/phone · trust indicators ── */}
-      <div className="border-b border-[var(--header-utility-border)] bg-[var(--header-utility-bg)] pt-[env(safe-area-inset-top)] text-[var(--header-utility-text)]">
+      <div
+        className={`navbar-top-bar border-b border-[var(--header-utility-border)] bg-[var(--header-utility-bg)] pt-[env(safe-area-inset-top)] text-[var(--header-utility-text)]${
+          topBarHidden ? ' navbar-top-bar-hidden' : ''
+        }`}
+      >
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
           {/* Desktop / tablet: single 40px row */}
           <div className="hidden h-10 items-center justify-between text-[13px] font-medium sm:flex">
@@ -219,6 +249,8 @@ export function Navbar() {
       <nav
         className={`site-header relative border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-[24px] backdrop-saturate-150 transition-shadow duration-300 ${
           scrolled ? 'shadow-[0_6px_24px_rgba(0,0,0,0.16)]' : 'shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
+        }${
+          topBarHidden ? ' border-t border-t-[var(--header-utility-border)]' : ''
         }`}
       >
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-5 px-4 py-3 sm:px-6">
@@ -417,9 +449,10 @@ export function Navbar() {
           style={{
             // The menu drops below the FULL sticky header (utility bar + nav),
             // so keep a comfortable bottom margin and reserve room for the iOS
-            // home indicator — otherwise the last items sit under it.
-            maxHeight: mobileOpen
-              ? 'calc(100dvh - var(--hero-header-offset) - 2.5rem - env(safe-area-inset-bottom, 0px))'
+            // home indicator — otherwise the last items sit under it.              maxHeight: mobileOpen
+              ? (topBarHidden
+                  ? 'calc(100dvh - 52px - 2.5rem - env(safe-area-inset-bottom, 0px))'
+                  : 'calc(100dvh - var(--hero-header-offset) - 2.5rem - env(safe-area-inset-bottom, 0px))')
               : '0',
             overflowY: mobileOpen ? 'auto' : 'hidden',
             overscrollBehavior: 'contain',

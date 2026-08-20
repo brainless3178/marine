@@ -1065,6 +1065,26 @@ html.dark {
   min-height: 0;
 }
 
+/* ── Mobile top-bar hide-on-scroll ────────────────────────────────
+   On mobile (<1024px) the utility bar smoothly collapses to zero
+   height when the user scrolls down, while the main nav stays sticky
+   at top:0. On desktop the top bar always stays visible. */
+.navbar-top-bar {
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+  max-height: 200px; /* generous upper bound for the two-row mobile layout */
+  opacity: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 1023px) {
+  .navbar-top-bar.navbar-top-bar-hidden {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    border-bottom-width: 0;
+  }
+}
+
 /* Header icon buttons (language, theme, cart, WhatsApp, profile, mobile
    menu) — one consistent rounded hover fill that fits the 40px button
    instead of an oversized rectangle. Hover state only; base styles stay

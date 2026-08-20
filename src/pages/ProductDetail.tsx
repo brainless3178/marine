@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
@@ -47,7 +47,7 @@ export default function ProductDetail() {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { isLoggedIn, setShowAuthModal, addToCart } = useStore()
+  const { addToCart } = useStore()
   const { whatsappNumber } = useStoreSettings()
 
   const [added, setAdded] = useState(false)
@@ -109,7 +109,6 @@ export default function ProductDetail() {
   const productSeoDescription = `${product.name} (${product.sku}) by ${product.brand}. ${product.condition} ${readableCategory} for marine spare parts, ship spares, industrial MRO, and export supply from Bhavnagar, India.`
 
   const handleAddToCart = () => {
-    if (!isLoggedIn) { setShowAuthModal(true); return }
     if (!product.inStock) return
     for (let i = 0; i < quantity; i++) addToCart(product)
     setAdded(true)
@@ -117,10 +116,40 @@ export default function ProductDetail() {
   }
 
   const handleBuyNow = () => {
-    if (!isLoggedIn) { setShowAuthModal(true); return }
     for (let i = 0; i < quantity; i++) addToCart(product)
     navigate('/checkout')
   }
+
+  // ── Sticky mobile add-to-cart bar ─────────────────────────────
+  // Shows a fixed bottom bar on mobile when the main CTA scrolls
+  // out of view, so users never have to scroll back up.
+  const ctaRef = useRef<HTMLDivElement>(null)
+  const [showStickyBar, setShowStickyBar] = useState(false)
+
+  const handleCtaIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    // Only on mobile — hide sticky bar when CTA is visible, show when hidden
+    if (window.innerWidth >= 1024) return
+    const entry = entries[0]
+    if (entry) {
+      setShowStickyBar(!entry.isIntersecting)
+    }
+  }, [])
+
+  useEffect(() => {
+    const el = ctaRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(handleCtaIntersection, {
+      threshold: 0,
+      rootMargin: '0px 0px -80px 0px', // trigger before fully leaving viewport
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [handleCtaIntersection])
+
+  // Reset sticky bar visibility on product change
+  useEffect(() => {
+    setShowStickyBar(false)
+  }, [id])
 
   return (
     <div className="py-8">
@@ -250,24 +279,24 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* In Stock Actions */}
+            {/* In Stock Actions — ref for sticky mobile bar */}
             {product.inStock && (
-              <>
+              <div ref={ctaRef}>
                 <div className="flex items-center gap-4 border border-[var(--border)] bg-[var(--secondary-bg)] p-2 rounded-xl justify-between">
                   <span className="text-xs font-semibold text-[var(--text-secondary)] pl-2">{t('product.quantity')}</span>
                   <div className="flex items-center gap-1 bg-[var(--primary-bg)] p-0.5 rounded-full">
                     <button
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[var(--border)] transition-colors border-none cursor-pointer font-bold text-[var(--text-secondary)] text-sm"
+                      className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center hover:bg-[var(--border)] transition-colors border-none cursor-pointer font-bold text-[var(--text-secondary)] text-sm"
                     >
-                      <Minus size={12} />
+                      <Minus size={16} />
                     </button>
-                    <span className="min-w-[28px] text-center text-xs font-semibold text-[var(--text-primary)]">{quantity}</span>
+                    <span className="min-w-[32px] text-center text-sm font-semibold text-[var(--text-primary)]">{quantity}</span>
                     <button
                       onClick={() => setQuantity((q) => q + 1)}
-                      className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[var(--border)] transition-colors border-none cursor-pointer font-bold text-[var(--text-secondary)] text-sm"
+                      className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center hover:bg-[var(--border)] transition-colors border-none cursor-pointer font-bold text-[var(--text-secondary)] text-sm"
                     >
-                      <Plus size={12} />
+                      <Plus size={16} />
                     </button>
                   </div>
                 </div>
@@ -299,7 +328,7 @@ export default function ProductDetail() {
                     <Percent size={14} /> {t('product.makeOffer')}
                   </button>
                 )}
-              </>
+              </div>
             )}
 
             {/* Out of Stock */}
@@ -403,6 +432,35 @@ export default function ProductDetail() {
       {/* OFFER MODAL */}
       {showOfferModal && product.makeOffer && (
         <OfferModal product={product} onClose={() => setShowOfferModal(false)} />
+      )}
+
+      {/* ── Sticky mobile add-to-cart bar ── */}
+      {product.inStock && (
+        <div
+          className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-[var(--header-border)] bg-[var(--surface)] px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-[0_-4px_20px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-in-out ${
+            showStickyBar ? 'translate-y-0' : 'translate-y-full'
+          }`}
+          style={{ willChange: 'transform' }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-[var(--text-primary)] truncate">{product.name}</p>
+              <p className="text-sm font-bold text-[var(--accent-primary)] tabular-nums">
+                ${effectivePrice.toFixed(2)}
+              </p>
+            </div>
+            <button
+              onClick={handleAddToCart}
+              className={`flex items-center justify-center gap-2 px-5 py-3 min-h-[44px] text-xs font-semibold rounded-xl transition-all duration-300 border cursor-pointer whitespace-nowrap ${
+                added
+                  ? 'border-[var(--success)] bg-[var(--success)] text-[var(--btn-success-text)]'
+                  : 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--btn-blue-text)] hover:bg-[var(--accent-primary-hover)]'
+              }`}
+            >
+              {added ? <><Check size={14} /> {t('product.added')}</> : <><ShoppingCart size={14} /> {t('product.addToCartUpper')}</>}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   )

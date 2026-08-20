@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authenticateCustomer, AuthRequest } from '../../middleware/auth.js'
+import { authenticateCustomer, optionalCustomerAuth, AuthRequest } from '../../middleware/auth.js'
 import { asyncHandler, validateBody, validateParams } from '../../middleware/validate.js'
 import { z } from 'zod'
 import { sendSuccess, sendError } from '../../middleware/response.js'
@@ -33,11 +33,13 @@ const orderSchema = z.object({
 })
 
 // ─── Create Order from Checkout ────────────────────────────────
-router.post('/', authenticateCustomer, validateBody(orderSchema), asyncHandler(async (req: AuthRequest, res) => {
+// Accepts both logged-in and guest checkouts. When no auth token is
+// present, customerId is omitted and the order is stored as a guest order.
+router.post('/', optionalCustomerAuth, validateBody(orderSchema), asyncHandler(async (req: AuthRequest, res) => {
   try {
     const order = await orderService.createOrder({
       ...req.body,
-      customerId: req.user!.id,
+      customerId: req.user?.id ?? null,
     })
     sendSuccess(res, { order }, 201)
   } catch (err: unknown) {

@@ -26,6 +26,7 @@ export default function Checkout() {
 
   const [shipping, setShipping] = useState({
     fullName: '',
+    email: '',
     addressLine1: '',
     addressLine2: '',
     city: '',
@@ -48,19 +49,23 @@ export default function Checkout() {
   // double-submitted order creation (see backend createOrder `[idem:...]`).
   const idempotencyKeyRef = useRef(`ck-${Date.now()}-${Math.random().toString(36).slice(2)}`)
 
-  // Pre-fill name and email from user
+  // Pre-fill name and email from user when available
   useEffect(() => {
     if (user) {
-      setShipping((prev) => ({ ...prev, fullName: prev.fullName || user.name }))
+      setShipping((prev) => ({
+        ...prev,
+        fullName: prev.fullName || user.name,
+        email: prev.email || user.email || '',
+      }))
     }
   }, [user])
 
-  // Redirect if empty cart or not logged in
+  // Redirect if empty cart (guest checkout is allowed)
   useEffect(() => {
-    if (!orderPlaced && (cart.length === 0 || !user)) {
+    if (!orderPlaced && cart.length === 0) {
       navigate('/products')
     }
-  }, [cart.length, user, orderPlaced, navigate])
+  }, [cart.length, orderPlaced, navigate])
 
   const settings = useStoreSettings()
   const subtotal = getCartTotal()
@@ -72,6 +77,8 @@ export default function Checkout() {
   const validateShipping = () => {
     const e: Record<string, boolean> = {}
     if (!shipping.fullName.trim()) e.fullName = true
+    if (!user && !shipping.email.trim()) e.email = true
+    if (!user && shipping.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shipping.email)) e.email = true
     if (!shipping.addressLine1.trim()) e.addressLine1 = true
     if (!shipping.city.trim()) e.city = true
     if (!shipping.state.trim()) e.state = true
@@ -103,6 +110,7 @@ export default function Checkout() {
       })),
       shipping: {
         fullName: shipping.fullName,
+        email: !user ? shipping.email : undefined,
         addressLine1: shipping.addressLine1,
         addressLine2: shipping.addressLine2 || undefined,
         city: shipping.city,
@@ -263,7 +271,7 @@ export default function Checkout() {
         canonical="/checkout"
       />
       {/* Header */}
-      <section className="bg-[var(--secondary-bg)] py-16">
+      <section className="bg-[var(--secondary-bg)] py-8 sm:py-16">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 text-center">
           <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-4">
             {t('checkout.headerLabel')}
@@ -330,6 +338,7 @@ export default function Checkout() {
               errors={errors}
               updateShipping={updateShipping}
               goToStep={goToStep}
+              isGuest={!user}
             />
           )}
 

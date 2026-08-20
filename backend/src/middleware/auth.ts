@@ -64,6 +64,27 @@ export function authenticateCustomer(req: AuthRequest, res: Response, next: Next
   }
 }
 
+// ─── Optional Customer Auth (for guest checkout) ────────────
+// Attempts to verify the customer JWT. If no token is present or it's
+// invalid, req.user stays undefined — the route can proceed without auth.
+export function optionalCustomerAuth(req: AuthRequest, _res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization
+  if (!authHeader?.startsWith('Bearer ')) {
+    return next() // No token — proceed as guest
+  }
+
+  const token = authHeader.split(' ')[1]
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as AuthUser & { type: string }
+    if (decoded.type === 'customer') {
+      req.user = decoded
+    }
+  } catch {
+    // Invalid token — proceed as guest
+  }
+  next()
+}
+
 // ─── Require Role ──────────────────────────────────────────────
 const ROLE_HIERARCHY: Record<string, number> = {
   'owner': 6,

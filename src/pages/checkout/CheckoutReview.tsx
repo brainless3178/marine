@@ -7,6 +7,7 @@ import { OptimizedImage } from '../../components/ui/OptimizedImage'
 
 interface Shipping {
   fullName: string
+  email?: string
   addressLine1: string
   addressLine2: string
   city: string

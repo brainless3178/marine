@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SlidersHorizontal, X as XIcon } from 'lucide-react'
 
@@ -47,152 +48,221 @@ export function ProductFilters({
 }: ProductFiltersProps) {
   const { t } = useTranslation()
 
+  // Lock body scroll when mobile filter sheet is open
+  useEffect(() => {
+    if (showFiltersMobile) {
+      document.documentElement.style.overflow = 'hidden'
+    }
+    return () => {
+      // Only clear if no other modal is open
+      if (!document.querySelector('[role="dialog"], [role="alertdialog"]')) {
+        document.documentElement.style.overflow = ''
+      }
+    }
+  }, [showFiltersMobile])
+
+  // The filter panel content — shared between desktop sidebar and mobile sheet
+  const filterContent = (
+    <div className="p-6">
+      {/* Categories */}
+      <div className="mb-6">
+        <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
+          {t('products.category')}
+        </span>
+        {derivedCategories.map((cat) => (
+          <label
+            key={cat.id}
+            className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5"
+          >
+            <input
+              type="checkbox"
+              checked={selectedCategories.includes(cat.id)}
+              onChange={() => onToggleCategory(cat.id)}
+              className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
+            />
+            <span className="flex-1">{cat.name}</span>
+            <span className="text-xs text-[var(--text-muted)]">{cat.count}</span>
+          </label>
+        ))}
+      </div>
+
+      {/* Price Range */}
+      <div className="mb-6">
+        <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
+          {t('products.priceRange')}
+        </span>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min={priceBounds.min} max={priceBounds.max}
+            value={localMinPrice}
+            onChange={(e) => onMinPriceChange(e.target.value)}
+            onBlur={onApplyPrice}
+            onKeyDown={(e) => e.key === 'Enter' && onApplyPrice()}
+            placeholder={t('products.priceMin')}
+            inputMode="numeric"
+            className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:border-[var(--accent-primary)]"
+          />
+          <span className="text-[var(--text-muted)] text-xs">—</span>
+          <input
+            type="number"
+            min={priceBounds.min} max={priceBounds.max}
+            value={localMaxPrice}
+            onChange={(e) => onMaxPriceChange(e.target.value)}
+            onBlur={onApplyPrice}
+            onKeyDown={(e) => e.key === 'Enter' && onApplyPrice()}
+            placeholder={t('products.priceMax')}
+            inputMode="numeric"
+            className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:border-[var(--accent-primary)]"
+          />
+        </div>
+        <button
+          onClick={onApplyPrice}
+          className="w-full mt-2 py-2 text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border border-[var(--border)] rounded-lg"
+        >
+          {t('products.applyPrice')}
+        </button>
+      </div>
+
+      {/* On Sale */}
+      <div className="mb-6">
+        <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
+          <input
+            type="checkbox"
+            checked={showOnSale}
+            onChange={onToggleOnSale}
+            className="accent-[var(--accent-gold)] w-4 h-4 cursor-pointer"
+          />
+          <span className="font-bold text-[var(--danger)]">{t('products.onSaleOnly')}</span>
+        </label>
+      </div>
+
+      {/* Brands */}
+      <div className="mb-6">
+        <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
+          {t('products.brand')}
+        </span>
+        {derivedBrands.map((brand) => (
+          <label
+            key={brand.slug}
+            className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5"
+          >
+            <input
+              type="checkbox"
+              checked={selectedBrands.includes(brand.slug)}
+              onChange={() => onToggleBrand(brand.slug)}
+              className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
+            />
+            {brand.name}
+          </label>
+        ))}
+      </div>
+
+      {/* Availability */}
+      <div className="mb-6">
+        <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
+          {t('products.availability')}
+        </span>
+        <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
+          <input
+            type="radio"
+            name="urgency"
+            checked={urgencyFilter === 'all'}
+            onChange={() => onSetUrgencyFilter('all')}
+            className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
+          />
+          {t('products.allItems')}
+        </label>
+        <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
+          <input
+            type="radio"
+            name="urgency"
+            checked={urgencyFilter === 'emergency'}
+            onChange={() => onSetUrgencyFilter('emergency')}
+            className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
+          />
+          {t('products.emergencyAvailable')}
+        </label>
+      </div>
+
+      <button
+        onClick={onClearFilters}
+        className="w-full text-right text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border-none cursor-pointer py-2"
+      >
+        {t('products.clearFilters')}
+      </button>
+    </div>
+  )
+
   return (
     <>
-      {/* Mobile filter toggle */}
+      {/* Mobile filter toggle button */}
       <div className="lg:hidden flex justify-between items-center mb-2">
         <span className="text-xs text-[var(--text-muted)] font-mono uppercase tracking-widest">
           {totalCount} {totalCount === 1 ? t('products.product') : t('products.products')}
         </span>
         <button
           onClick={onToggleMobile}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] transition-colors hover:border-[var(--accent-primary)]"
+          className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-lg text-xs font-bold border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] transition-colors hover:border-[var(--accent-primary)]"
         >
           {showFiltersMobile ? <XIcon size={14} /> : <SlidersHorizontal size={14} />}
           {showFiltersMobile ? t('products.hideFilters') : t('products.showFilters')}
         </button>
       </div>
 
-      {/* Sidebar */}
-      <aside className={`lg:sticky lg:top-20 ${showFiltersMobile ? 'block' : 'hidden'} lg:block`}>
-        <div className="card p-6">
-          {/* Categories */}
-          <div className="mb-6">
-            <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
-              {t('products.category')}
-            </span>
-            {derivedCategories.map((cat) => (
-              <label
-                key={cat.id}
-                className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(cat.id)}
-                  onChange={() => onToggleCategory(cat.id)}
-                  className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
-                />
-                <span className="flex-1">{cat.name}</span>
-                <span className="text-xs text-[var(--text-muted)]">{cat.count}</span>
-              </label>
-            ))}
-          </div>
-
-          {/* Price Range */}
-          <div className="mb-6">
-            <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
-              {t('products.priceRange')}
-            </span>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min={priceBounds.min} max={priceBounds.max}
-                value={localMinPrice}
-                onChange={(e) => onMinPriceChange(e.target.value)}
-                onBlur={onApplyPrice}
-                onKeyDown={(e) => e.key === 'Enter' && onApplyPrice()}
-                placeholder={t('products.priceMin')}
-                className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:border-[var(--accent-primary)]"
-              />
-              <span className="text-[var(--text-muted)] text-xs">—</span>
-              <input
-                type="number"
-                min={priceBounds.min} max={priceBounds.max}
-                value={localMaxPrice}
-                onChange={(e) => onMaxPriceChange(e.target.value)}
-                onBlur={onApplyPrice}
-                onKeyDown={(e) => e.key === 'Enter' && onApplyPrice()}
-                placeholder={t('products.priceMax')}
-                className="w-full px-3 py-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:border-[var(--accent-primary)]"
-              />
-            </div>
-            <button
-              onClick={onApplyPrice}
-              className="w-full mt-2 py-2 text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border border-[var(--border)] rounded-lg"
-            >
-              {t('products.applyPrice')}
-            </button>
-          </div>
-
-          {/* On Sale */}
-          <div className="mb-6">
-            <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-              <input
-                type="checkbox"
-                checked={showOnSale}
-                onChange={onToggleOnSale}
-                className="accent-[var(--accent-gold)] w-4 h-4 cursor-pointer"
-              />
-              <span className="font-bold text-[var(--danger)]">{t('products.onSaleOnly')}</span>
-            </label>
-          </div>
-
-          {/* Brands */}
-          <div className="mb-6">
-            <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
-              {t('products.brand')}
-            </span>
-            {derivedBrands.map((brand) => (
-              <label
-                key={brand.slug}
-                className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedBrands.includes(brand.slug)}
-                  onChange={() => onToggleBrand(brand.slug)}
-                  className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
-                />
-                {brand.name}
-              </label>
-            ))}
-          </div>
-
-          {/* Availability */}
-          <div className="mb-6">
-            <span className="inline-block font-body font-medium text-xs tracking-[3px] uppercase text-[var(--text-muted)] mb-3">
-              {t('products.availability')}
-            </span>
-            <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-              <input
-                type="radio"
-                name="urgency"
-                checked={urgencyFilter === 'all'}
-                onChange={() => onSetUrgencyFilter('all')}
-                className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
-              />
-              {t('products.allItems')}
-            </label>
-            <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] transition-colors min-h-[44px] py-2.5">
-              <input
-                type="radio"
-                name="urgency"
-                checked={urgencyFilter === 'emergency'}
-                onChange={() => onSetUrgencyFilter('emergency')}
-                className="accent-[var(--accent-primary)] w-4 h-4 cursor-pointer"
-              />
-              {t('products.emergencyAvailable')}
-            </label>
-          </div>
-
-          <button
-            onClick={onClearFilters}
-            className="w-full text-right text-xs font-bold text-[var(--accent-primary)] hover:text-[var(--accent-gold)] transition-colors bg-transparent border-none cursor-pointer py-2"
-          >
-            {t('products.clearFilters')}
-          </button>
+      {/* Desktop sidebar — sticky, inline */}
+      <aside className="hidden lg:block lg:sticky lg:top-20">
+        <div className="card">
+          {filterContent}
         </div>
       </aside>
+
+      {/* Mobile bottom sheet overlay */}
+      {showFiltersMobile && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden"
+            onClick={onToggleMobile}
+            aria-hidden="true"
+          />
+          {/* Sheet */}
+          <div
+            className="fixed inset-x-0 bottom-0 z-50 lg:hidden max-h-[85vh] flex flex-col bg-[var(--surface)] border-t border-[var(--border)] rounded-t-2xl shadow-2xl animate-slide-up"
+            role="dialog"
+            aria-label="Filters"
+          >
+            {/* Drag handle + header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
+              {/* Drag handle bar */}
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-[var(--border)]" />
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                {t('products.showFilters')} ({totalCount} {totalCount === 1 ? t('products.product') : t('products.products')})
+              </h3>
+              <button
+                onClick={onToggleMobile}
+                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors"
+                aria-label="Close filters"
+              >
+                <XIcon size={18} className="text-[var(--text-secondary)]" />
+              </button>
+            </div>
+            {/* Scrollable filter content */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              {filterContent}
+            </div>
+            {/* Apply button (sticky at bottom) */}
+            <div className="px-5 py-3 border-t border-[var(--border)] shrink-0 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
+              <button
+                onClick={onToggleMobile}
+                className="w-full py-3 min-h-[44px] bg-[var(--accent-primary)] text-[var(--btn-blue-text)] font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary-hover)] transition-colors"
+              >
+                Show Results
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </>
   )
 }

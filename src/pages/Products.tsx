@@ -359,10 +359,11 @@ export default function Products() {
           <div className="relative max-w-[640px] mx-auto mt-8">
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
-              type="text"
+              type="search"
               value={localSearch}
               onChange={(e) => debouncedSetSearch(e.target.value)}
               placeholder={t('products.searchPlaceholder')}
+              autoComplete="off"
               className="w-full pl-11 pr-4 py-4 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-all"
             />
           </div>

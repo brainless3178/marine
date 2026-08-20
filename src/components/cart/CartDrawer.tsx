@@ -230,10 +230,10 @@ export function CartDrawer() {
                                   onClick={() =>
                                     updateQuantity(product.id, quantity - 1)
                                   }
-                                  className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-[var(--border)]"
+                                  className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors hover:bg-[var(--border)]"
                                   aria-label="Decrease quantity"
                                 >
-                                  <Minus size={12} className="text-[var(--text-secondary)]" />
+                                  <Minus size={14} className="text-[var(--text-secondary)]" />
                                 </button>
                                 <span className="min-w-[28px] text-center text-xs font-semibold text-[var(--text-primary)]">
                                   {quantity}
@@ -242,10 +242,10 @@ export function CartDrawer() {
                                   onClick={() =>
                                     updateQuantity(product.id, quantity + 1)
                                   }
-                                  className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-[var(--border)]"
+                                  className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors hover:bg-[var(--border)]"
                                   aria-label="Increase quantity"
                                 >
-                                  <Plus size={12} className="text-[var(--text-secondary)]" />
+                                  <Plus size={14} className="text-[var(--text-secondary)]" />
                                 </button>
                               </div>
 

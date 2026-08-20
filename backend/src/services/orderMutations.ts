@@ -19,7 +19,7 @@ export interface CreateOrderInput {
   paymentMethod: string
   customerNotes?: string
   idempotencyKey?: string
-  customerId: string
+  customerId?: string | null
 }
 
 // ─── Create Order ──────────────────────────────────────────────
@@ -88,7 +88,7 @@ export async function createOrder(input: CreateOrderInput) {
   // Free shipping applies when the subtotal meets the configured threshold.
   // The server always calculates this — the client can never dictate shipping.
   const baseShippingCost = Number(shippingCostSetting?.value) || Number(process.env.DEFAULT_SHIPPING_COST) || 25
-  const freeShippingThreshold = Number(freeShippingThresholdSetting?.value) || 500
+  const freeShippingThreshold = Number(freeShippingThresholdSetting?.value) || 100
   const shippingCost = subtotal >= freeShippingThreshold ? 0 : baseShippingCost
   const taxRate = Number(taxRateSetting?.value) || Number(process.env.DEFAULT_TAX_RATE) || 0.08
   const tax = Math.round(subtotal * taxRate * 100) / 100
